@@ -151,22 +151,18 @@ select {
   gap: 0;
 }
 
-/* Big visual logo without growing the header row: layout stays ~1.75rem tall. */
 .site-header .brand-mark__logo {
   display: flex;
-  width: 5.25rem;
+  width: 1.75rem;
   height: 1.75rem;
   flex-shrink: 0;
   align-items: center;
-  justify-content: flex-start;
-  overflow: visible;
+  justify-content: center;
 }
 
 .site-header .brand-mark__logo-img {
   width: 1.75rem !important;
   height: 1.75rem !important;
-  transform: scale(3);
-  transform-origin: left center;
 }
 
 .brand-mark--footer img {

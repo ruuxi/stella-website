@@ -127,8 +127,8 @@ export default function Home() {
                 className="brand-mark__logo-img"
                 src="/stella-logo.svg"
                 alt=""
-                width={108}
-                height={108}
+                width={64}
+                height={64}
                 priority
               />
             </span>

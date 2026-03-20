@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Stella Globe">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="18 18 64 64" role="img" aria-label="Stella Globe">
   <defs>
     <radialGradient id="stellaDotGradient" cx="50" cy="50" r="34" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#7aa2f7" />
