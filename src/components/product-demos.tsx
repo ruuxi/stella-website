@@ -147,24 +147,25 @@ const SELF_MOD_STAGES: SelfModStage[] = [
   },
 ];
 
-const SELF_MOD_MESSAGES: Record<SelfModLevel, { role: "stella" | "user" | "timestamp"; text: string }[]> = {
+const SELF_MOD_MESSAGES: Record<SelfModLevel, { role: "stella" | "user"; text: string }[]> = {
   low: [
-    { role: "timestamp", text: "Today, 9:12 AM" },
-    { role: "stella", text: "Good morning! You have a clear schedule today." },
-    { role: "user", text: "Great, can you check my email?" },
-    { role: "stella", text: "You have 3 new emails. One from Alex about the project update, one shipping notification, and a newsletter." },
-    { role: "user", text: "Summarize Alex\u2019s email for me" },
-    { role: "stella", text: "Alex says the design review is moved to Thursday at 2pm. They want your feedback on the new mockups before then." },
+    { role: "stella", text: "I can update the interface while we keep working." },
+    { role: "user", text: "Make my messages blue." },
+    { role: "stella", text: "Done. The change stays intentionally focused on the conversation layer." },
   ],
   medium: [
-    { role: "timestamp", text: "Today, 9:12 AM" },
-    { role: "stella", text: "Good morning! You have a clear schedule today." },
-    { role: "user", text: "Great, can you check my email?" },
-    { role: "stella", text: "You have 3 new emails. One from Alex about the project update, one shipping notification, and a newsletter." },
-    { role: "user", text: "Summarize Alex\u2019s email for me" },
-    { role: "stella", text: "Alex says the design review is moved to Thursday at 2pm. They want your feedback on the new mockups before then." },
+    { role: "stella", text: "I can change the whole shell language, not just one control." },
+    { role: "user", text: "Make the app feel more modern." },
+    { role: "stella", text: "Refreshing spacing, borders, and glass treatment across the active workspace." },
   ],
-  high: [],
+  high: [
+    { role: "stella", text: "I can take bigger creative swings if you want the whole app to transform." },
+    { role: "user", text: "Turn this into a cozy cat-themed shell." },
+    {
+      role: "stella",
+      text: "Done — warm cream surfaces, toasted-orange accents, and soft paw-pad corners on bubbles and chrome.",
+    },
+  ],
 };
 
 const CANVAS_CONCEPTS: CanvasConcept[] = [
@@ -555,140 +556,6 @@ function RadialModePreview({ mode }: { mode: RadialWedgeId }) {
 const SELFMOD_MORPH_SWAP_MS = 200;
 const SELFMOD_MORPH_TOTAL_MS = 450;
 
-function StellaAppMockView({ variant, messages }: {
-  variant: "default" | "modern";
-  messages: { role: "stella" | "user" | "timestamp"; text: string }[];
-}) {
-  return (
-    <div className="sam-mock" data-variant={variant}>
-      <div className="sam-mock__sidebar">
-        <div className="sam-mock__sidebar-icon sam-mock__sidebar-icon--active">
-          <MessageSquare size={18} />
-        </div>
-        <div className="sam-mock__sidebar-icon">
-          <House size={18} />
-        </div>
-        <div className="sam-mock__sidebar-divider" />
-        <div className="sam-mock__sidebar-icon">
-          <LayoutGrid size={18} />
-        </div>
-        <div className="sam-mock__sidebar-spacer" />
-        <div className="sam-mock__sidebar-icon">
-          <Settings2 size={18} />
-        </div>
-      </div>
-
-      <div className="sam-mock__chat">
-        <div className="sam-mock__chat-header">
-          <div className="sam-mock__avatar">
-            <Sparkles size={14} />
-          </div>
-          <div>
-            <div className="sam-mock__chat-name">Stella</div>
-            <div className="sam-mock__chat-status">always here</div>
-          </div>
-        </div>
-
-        <div className="sam-mock__messages">
-          {messages.map((msg, i) =>
-            msg.role === "timestamp" ? (
-              <div key={i} className="sam-mock__timestamp">{msg.text}</div>
-            ) : (
-              <div key={i} className={`sam-mock__msg sam-mock__msg--${msg.role}`}>
-                <span className="sam-mock__bubble">{msg.text}</span>
-              </div>
-            )
-          )}
-        </div>
-
-        <div className="sam-mock__composer">
-          <span className="sam-mock__composer-placeholder">Ask me anything...</span>
-          <button className="sam-mock__composer-send" aria-label="Send" type="button">
-            <Send size={14} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CozyCatMockView() {
-  return (
-    <div className="cozy-mock">
-      {/* floating paw decorations */}
-      <div className="cozy-mock__paw cozy-mock__paw--1">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><ellipse cx="12" cy="16" rx="5" ry="4"/><circle cx="7" cy="10" r="2.2"/><circle cx="17" cy="10" r="2.2"/><circle cx="10" cy="7" r="2"/><circle cx="14" cy="7" r="2"/></svg>
-      </div>
-      <div className="cozy-mock__paw cozy-mock__paw--2">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><ellipse cx="12" cy="16" rx="5" ry="4"/><circle cx="7" cy="10" r="2.2"/><circle cx="17" cy="10" r="2.2"/><circle cx="10" cy="7" r="2"/><circle cx="14" cy="7" r="2"/></svg>
-      </div>
-
-      <div className="cozy-mock__topbar">
-        <div className="cozy-mock__avatar">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg>
-        </div>
-        <div className="cozy-mock__greeting">Good morning<span className="cozy-mock__heart">&nbsp;♡</span></div>
-        <button className="cozy-mock__settings-btn" type="button">
-          <Settings2 size={14} />
-        </button>
-      </div>
-
-      <div className="cozy-mock__content">
-        <div className="cozy-mock__card-row">
-          <div className="cozy-mock__card">
-            <div className="cozy-mock__card-top">
-              <div className="cozy-mock__card-icon cozy-mock__card-icon--rose">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </div>
-              <span className="cozy-mock__card-label">Focus</span>
-            </div>
-            <div className="cozy-mock__card-value">2h 15m</div>
-            <div className="cozy-mock__card-sub">Deep work today</div>
-          </div>
-          <div className="cozy-mock__card">
-            <div className="cozy-mock__card-top">
-              <div className="cozy-mock__card-icon cozy-mock__card-icon--lavender">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              </div>
-              <span className="cozy-mock__card-label">Schedule</span>
-            </div>
-            <div className="cozy-mock__card-value">3 events</div>
-            <div className="cozy-mock__card-sub">Next: Team sync</div>
-          </div>
-          <div className="cozy-mock__card">
-            <div className="cozy-mock__card-top">
-              <div className="cozy-mock__card-icon cozy-mock__card-icon--rose">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              </div>
-              <span className="cozy-mock__card-label">Email</span>
-            </div>
-            <div className="cozy-mock__card-value">3 new</div>
-            <div className="cozy-mock__card-sub">1 needs reply</div>
-          </div>
-        </div>
-
-        <div className="cozy-mock__chat-card">
-          <div className="cozy-mock__chat-header">
-            <div className="cozy-mock__chat-dot" />
-            Stella is here
-          </div>
-          <div className="cozy-mock__chat-messages">
-            <div className="cozy-mock__chat-msg cozy-mock__chat-msg--stella">
-              <div className="cozy-mock__chat-msg-avatar">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><ellipse cx="12" cy="16" rx="5" ry="4"/><circle cx="7" cy="10" r="2.2"/><circle cx="17" cy="10" r="2.2"/></svg>
-              </div>
-              <span className="cozy-mock__chat-bubble">You have a cozy day ahead. Want me to play some lo-fi?</span>
-            </div>
-            <div className="cozy-mock__chat-msg cozy-mock__chat-msg--user">
-              <span className="cozy-mock__chat-bubble">Yes please, and remind me about the design review</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function SelfModificationShowcase() {
   const [stageIndex, setStageIndex] = useState(1);
   const [cssMorphing, setCssMorphing] = useState(false);
@@ -780,18 +647,58 @@ function SelfModificationShowcase() {
                 <span />
                 <span />
               </div>
-              <div className="selfmod-shell__path">Stella</div>
+              <div className="selfmod-shell__path">Stella / Self modification / Live workspace</div>
             </div>
 
             <div className="selfmod-shell__body">
-              {activeStage.id === "high" ? (
-                <CozyCatMockView />
-              ) : (
-                <StellaAppMockView
-                  variant={activeStage.id === "medium" ? "modern" : "default"}
-                  messages={activeMessages}
-                />
-              )}
+              <aside className="selfmod-shell__sidebar">
+                <div className="selfmod-shell__brand">
+                  <Image src="/stella-logo.svg" alt="" width={22} height={22} />
+                  <span>STELLA</span>
+                </div>
+
+                <div className="selfmod-shell__nav">
+                  <button type="button" data-active>
+                    <MessageSquare size={15} />
+                    <span>Chat</span>
+                  </button>
+                  <button type="button">
+                    <LayoutGrid size={15} />
+                    <span>Canvas</span>
+                  </button>
+                  <button type="button">
+                    <Settings2 size={15} />
+                    <span>Settings</span>
+                  </button>
+                </div>
+
+                <div className="selfmod-shell__sidebar-card">
+                  <span>Current request</span>
+                  <strong>{activeStage.prompt}</strong>
+                </div>
+              </aside>
+
+              <div className="selfmod-shell__workspace">
+                <div className="selfmod-shell__content">
+                  <section className="selfmod-conversation">
+                    {activeMessages.map((message, index) => (
+                      <div
+                        key={`${activeStage.id}-${index}`}
+                        className={`selfmod-conversation__message selfmod-conversation__message--${message.role}`}
+                      >
+                        {message.text}
+                      </div>
+                    ))}
+
+                    <div className="selfmod-conversation__composer">
+                      <span>Describe how you want Stella to change itself...</span>
+                      <button type="button" aria-label="Send request">
+                        <Send size={14} />
+                      </button>
+                    </div>
+                  </section>
+                </div>
+              </div>
             </div>
             <canvas ref={morphGlRef} className="selfmod-morph-gl" aria-hidden />
           </div>
