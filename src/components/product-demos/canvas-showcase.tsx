@@ -9,6 +9,7 @@ import {
   SquareTerminal,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useViewportActivity } from "@/components/use-viewport-activity";
 import { CANVAS_CONCEPTS } from "./data";
 
 function PlanArtifact() {
@@ -189,19 +190,24 @@ const ARTIFACT_MAP: Record<string, React.FC> = {
 
 export function CanvasShowcase() {
   const [conceptIndex, setConceptIndex] = useState(0);
+  const { ref, isActive } = useViewportActivity<HTMLDivElement>({
+    rootMargin: "240px 0px",
+  });
 
   useEffect(() => {
+    if (!isActive) return;
+
     const timer = window.setInterval(() => {
       setConceptIndex((current) => (current + 1) % CANVAS_CONCEPTS.length);
     }, 5500);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [isActive]);
 
   const activeConcept = CANVAS_CONCEPTS[conceptIndex];
   const ArtifactComponent = ARTIFACT_MAP[activeConcept.id] ?? PlanArtifact;
 
   return (
-    <div className="canvas-showcase">
+    <div ref={ref} className="canvas-showcase">
       <div className="canvas-showcase__meta">
         <div className="demo-eyebrow">Full shell</div>
         <h3>{activeConcept.title}</h3>

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 
 const DOWNLOADS = {
@@ -23,20 +22,15 @@ const labels: Record<Platform, string> = {
 };
 
 export function DownloadButton() {
-  const [platform, setPlatform] = useState<Platform | null>(null);
-
-  useEffect(() => {
-    setPlatform(detectPlatform());
-  }, []);
-
-  const resolved = platform ?? "windows";
+  const platform = detectPlatform();
+  const resolved = platform;
 
   return (
     <a
       className="button button--primary"
       href={DOWNLOADS[resolved]}
     >
-      {platform ? labels[resolved] : "Download Stella"}
+      {labels[resolved]}
       <ArrowRight size={18} />
     </a>
   );

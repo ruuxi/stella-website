@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Circle, Sparkles } from "lucide-react";
 import { DownloadButton } from "@/components/download-button";
 import { HeroStellaOrb } from "@/components/hero-stella-orb-dynamic";
+import { DeferInView } from "@/components/product-demos/defer-in-view";
 
 const ProductDemos = dynamic(
   () =>
@@ -21,6 +22,20 @@ const ProductDemos = dynamic(
     ),
   },
 );
+
+function ProductDemosFallback() {
+  return (
+    <div
+      className="demo-showcase-grid demo-showcase-grid--loading"
+      aria-busy="true"
+      aria-label="Loading product demos"
+    >
+      <div className="demo-panel" />
+      <div className="demo-panel" />
+      <div className="demo-panel" />
+    </div>
+  );
+}
 
 const navItems = [
   "What's New",
@@ -176,7 +191,9 @@ export default function Home() {
             <h2>See Stella in motion</h2>
           </div>
 
-          <ProductDemos />
+          <DeferInView fallback={<ProductDemosFallback />} rootMargin="360px 0px">
+            <ProductDemos />
+          </DeferInView>
         </section>
 
         <section className="grid-shell showcase-section section-border">

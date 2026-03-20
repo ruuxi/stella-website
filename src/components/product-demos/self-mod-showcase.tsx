@@ -5,6 +5,7 @@ import { LayoutGrid, MessageSquare, Settings2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { isWebglMorphSupported, runSelfmodWebglMorph } from "@/lib/selfmod-webgl-morph";
+import { useViewportActivity } from "@/components/use-viewport-activity";
 import { SELF_MOD_STAGES } from "./data";
 
 const SELFMOD_MORPH_SWAP_MS = 250;
@@ -13,12 +14,17 @@ const SELFMOD_MORPH_TOTAL_MS = 500;
 export function SelfModificationShowcase() {
   const [stageIndex, setStageIndex] = useState(1);
   const [cssMorphing, setCssMorphing] = useState(false);
+  const { ref, isActive } = useViewportActivity<HTMLDivElement>({
+    rootMargin: "240px 0px",
+  });
   const morphCaptureRef = useRef<HTMLDivElement | null>(null);
   const morphGlRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
+    if (!isActive) return;
+
     let cancelled = false;
-    let timeoutId: number | undefined;
+    const timeoutIds: number[] = [];
 
     const advanceStage = () => {
       setStageIndex((current) => (current + 1) % SELF_MOD_STAGES.length);
@@ -26,19 +32,19 @@ export function SelfModificationShowcase() {
 
     const runCssFallbackMorph = () => {
       setCssMorphing(true);
-      window.setTimeout(() => {
+      timeoutIds.push(window.setTimeout(() => {
         if (cancelled) return;
         flushSync(() => {
           advanceStage();
         });
-      }, SELFMOD_MORPH_SWAP_MS);
-      window.setTimeout(() => {
+      }, SELFMOD_MORPH_SWAP_MS));
+      timeoutIds.push(window.setTimeout(() => {
         if (!cancelled) setCssMorphing(false);
-      }, SELFMOD_MORPH_TOTAL_MS);
+      }, SELFMOD_MORPH_TOTAL_MS));
     };
 
     const schedule = () => {
-      timeoutId = window.setTimeout(async () => {
+      timeoutIds.push(window.setTimeout(async () => {
         if (cancelled) return;
 
         const captureEl = morphCaptureRef.current;
@@ -61,20 +67,21 @@ export function SelfModificationShowcase() {
         }
 
         if (!cancelled) schedule();
-      }, 3200);
+      }, 3200));
     };
 
     schedule();
     return () => {
       cancelled = true;
-      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+      setCssMorphing(false);
+      timeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
     };
-  }, []);
+  }, [isActive]);
 
   const activeStage = SELF_MOD_STAGES[stageIndex];
 
   return (
-    <div className="selfmod-layout">
+    <div ref={ref} className="selfmod-layout">
       <div className={`selfmod-canvas${cssMorphing ? " selfmod-canvas--morphing" : ""}`}>
         <div className="selfmod-canvas__capture">
           <div className="selfmod-shell" data-stage={activeStage.id}>

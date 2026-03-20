@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { StellaAnimation } from "@/components/stella-animation/stella-animation";
+import { useViewportActivity } from "@/components/use-viewport-activity";
 import {
   cancelAnimation,
   destroyBlob,
@@ -34,20 +35,22 @@ const RADIAL_RESULT_HOLD_MS = 4000;
 const RADIAL_CYCLE_MS = RADIAL_DIAL_PHASE_MS + RADIAL_RESULT_HOLD_MS + 800;
 
 function CaptureVacuumCanvas({
+  active,
   showResult,
   wedgeKey,
 }: {
+  active: boolean;
   showResult: boolean;
   wedgeKey: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    if (!showResult) return;
+    if (!active || !showResult) return;
     const el = canvasRef.current;
     if (!el) return;
     void runVacuumEffect(el, makeCaptureThumbnail(), 0.5, 0.5);
-  }, [showResult, wedgeKey]);
+  }, [active, showResult, wedgeKey]);
 
   return <canvas ref={canvasRef} className="radial-result-vacuum" />;
 }
@@ -56,35 +59,42 @@ export function RadialDialShowcase() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [phase, setPhase] = useState<"dial" | "result">("dial");
   const [isVisible, setIsVisible] = useState(false);
+  const { ref, isActive } = useViewportActivity<HTMLDivElement>({
+    rootMargin: "240px 0px",
+  });
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const selectedIdxRef = useRef(selectedIndex);
   const colorsRef = useRef<BlobColors>(createBlobColors(selectedIndex));
 
   useEffect(() => {
+    if (!isActive) return;
+
     let cancelled = false;
+    const timeoutIds: number[] = [];
 
     const cycle = () => {
       if (cancelled) return;
 
       setPhase("dial");
 
-      window.setTimeout(() => {
+      timeoutIds.push(window.setTimeout(() => {
         if (cancelled) return;
         setPhase("result");
-      }, RADIAL_DIAL_PHASE_MS);
+      }, RADIAL_DIAL_PHASE_MS));
 
-      window.setTimeout(() => {
+      timeoutIds.push(window.setTimeout(() => {
         if (cancelled) return;
         setSelectedIndex((current) => (current + 1) % RADIAL_WEDGES.length);
         cycle();
-      }, RADIAL_CYCLE_MS);
+      }, RADIAL_CYCLE_MS));
     };
 
     cycle();
     return () => {
       cancelled = true;
+      timeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
     };
-  }, []);
+  }, [isActive]);
 
   useEffect(() => {
     selectedIdxRef.current = selectedIndex;
@@ -92,6 +102,8 @@ export function RadialDialShowcase() {
   }, [selectedIndex]);
 
   useEffect(() => {
+    if (!isActive) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -112,17 +124,18 @@ export function RadialDialShowcase() {
     );
 
     return () => {
+      setIsVisible(false);
       cancelAnimation();
       destroyBlob();
     };
-  }, []);
+  }, [isActive]);
 
   const activeWedge = RADIAL_WEDGES[selectedIndex];
-  const showDial = phase === "dial";
-  const showResult = phase === "result";
+  const showDial = isActive && phase === "dial";
+  const showResult = isActive && phase === "result";
 
   return (
-    <div className="radial-demo radial-demo--unified">
+    <div ref={ref} className="radial-demo radial-demo--unified">
       <div className="radial-demo__description">
         <ul className="radial-demo__feature-rail" aria-label="Quick actions">
           {RADIAL_WEDGES.map((wedge, index) => {
@@ -383,8 +396,15 @@ export function RadialDialShowcase() {
                     );
                   })}
 
-                  <div className="radial-center-stella-animation">
-                    <StellaAnimation width={20} height={20} initialBirthProgress={1} maxDpr={1} frameSkip={1} />
+                <div className="radial-center-stella-animation">
+                    <StellaAnimation
+                      width={20}
+                      height={20}
+                      initialBirthProgress={1}
+                      paused={!isActive || !showDial}
+                      maxDpr={1}
+                      frameSkip={1}
+                    />
                   </div>
                 </div>
               </div>
@@ -395,6 +415,7 @@ export function RadialDialShowcase() {
             {activeWedge.id === "capture" && (
               <>
                 <CaptureVacuumCanvas
+                  active={isActive}
                   showResult={showResult}
                   wedgeKey={selectedIndex}
                 />
