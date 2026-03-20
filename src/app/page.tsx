@@ -191,12 +191,14 @@ export default function Home() {
             <h2>See Stella in motion</h2>
           </div>
 
-          <DeferInView fallback={<ProductDemosFallback />} rootMargin="360px 0px">
-            <ProductDemos />
-          </DeferInView>
+          <div className="product-demos-slot">
+            <DeferInView fallback={<ProductDemosFallback />} rootMargin="360px 0px">
+              <ProductDemos />
+            </DeferInView>
+          </div>
         </section>
 
-        <section className="grid-shell showcase-section section-border">
+        <section className="grid-shell showcase-section showcase-section--deferred section-border">
           <div className="section-kicker">
             <span>People</span>
             <h2>See how people use Stella every day</h2>
@@ -235,7 +237,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="grid-shell news-section section-border">
+        <section className="grid-shell news-section section-deferred-render section-border">
           <div className="section-kicker">
             <span>News</span>
             <h2>What&apos;s new in Stella</h2>
@@ -263,7 +265,7 @@ export default function Home() {
 
       </main>
 
-      <footer className="grid-shell site-footer section-border">
+      <footer className="grid-shell site-footer section-deferred-render section-border">
         <div className="footer-brand">
           <a className="brand-mark brand-mark--footer" href="#">
             <Image src="/stella-logo.svg" alt="Stella" width={42} height={42} />

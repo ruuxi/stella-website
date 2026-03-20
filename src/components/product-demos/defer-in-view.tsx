@@ -36,7 +36,7 @@ export function DeferInView({ children, rootMargin = "240px 0px", fallback }: De
   }, [rootMargin]);
 
   return (
-    <div ref={sentinelRef}>
+    <div ref={sentinelRef} style={{ width: "100%", minWidth: 0 }}>
       {active ? children : fallback}
     </div>
   );

@@ -1,7 +1,15 @@
 "use client";
 
+import {
+  startTransition,
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+} from "react";
 import dynamic from "next/dynamic";
 import { DeferInView } from "./defer-in-view";
+import { SelfModificationPoster } from "./self-mod-poster";
 
 function DemoChunkPlaceholder() {
   return (
@@ -14,11 +22,6 @@ function DemoChunkPlaceholder() {
   );
 }
 
-const SelfModificationShowcase = dynamic(
-  () => import("./self-mod-showcase").then((m) => ({ default: m.SelfModificationShowcase })),
-  { loading: () => <DemoChunkPlaceholder /> },
-);
-
 const RadialDialShowcase = dynamic(
   () => import("./radial-dial-showcase").then((m) => ({ default: m.RadialDialShowcase })),
   { loading: () => <DemoChunkPlaceholder /> },
@@ -28,6 +31,62 @@ const CanvasShowcase = dynamic(
   () => import("./canvas-showcase").then((m) => ({ default: m.CanvasShowcase })),
   { loading: () => <DemoChunkPlaceholder /> },
 );
+
+function DeferredSelfModificationShowcase() {
+  const [LoadedShowcase, setLoadedShowcase] = useState<ComponentType | null>(null);
+  const loadedRef = useRef<ComponentType | null>(null);
+  const loadingRef = useRef(false);
+  const activateRef = useRef<() => void>(() => {});
+
+  activateRef.current = () => {
+    if (loadedRef.current || loadingRef.current) return;
+    loadingRef.current = true;
+
+    void import("./self-mod-showcase").then((mod) => {
+      loadedRef.current = mod.SelfModificationShowcase;
+      startTransition(() => {
+        setLoadedShowcase(() => mod.SelfModificationShowcase);
+      });
+    });
+  };
+
+  useEffect(() => {
+    const requestIdle = window.requestIdleCallback?.bind(window);
+    const cancelIdle = window.cancelIdleCallback?.bind(window);
+    let timeoutId: ReturnType<typeof globalThis.setTimeout> | undefined;
+    let idleId: number | undefined;
+
+    if (requestIdle) {
+      idleId = requestIdle(() => {
+        activateRef.current();
+      }, { timeout: 1800 });
+    } else {
+      timeoutId = globalThis.setTimeout(() => {
+        activateRef.current();
+      }, 1200);
+    }
+
+    return () => {
+      if (idleId !== undefined && cancelIdle) {
+        cancelIdle(idleId);
+      }
+      if (timeoutId !== undefined) {
+        globalThis.clearTimeout(timeoutId);
+      }
+    };
+  }, []);
+
+  return (
+    <div
+      onPointerEnter={() => activateRef.current()}
+      onFocusCapture={() => activateRef.current()}
+      onTouchStart={() => activateRef.current()}
+      onClickCapture={() => activateRef.current()}
+    >
+      {LoadedShowcase ? <LoadedShowcase /> : <SelfModificationPoster />}
+    </div>
+  );
+}
 
 export function ProductDemos() {
   return (
@@ -42,7 +101,7 @@ export function ProductDemos() {
             Just tell Stella to change its appearance — from small tweaks like colors to a complete visual makeover. It redesigns itself while you keep chatting.
           </p>
         </div>
-        <SelfModificationShowcase />
+        <DeferredSelfModificationShowcase />
       </article>
 
       <article className="demo-panel demo-panel--full">

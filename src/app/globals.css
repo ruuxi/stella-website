@@ -359,7 +359,7 @@ select {
 .hero-orb-wrap {
   position: absolute;
   inset-inline-end: clamp(2rem, 8vw, 9rem);
-  top: clamp(1rem, 5vw, 4rem);
+  top: clamp(-7.2rem, -1.6vw, -2.4rem);
   width: clamp(280px, 25vw, 440px);
   height: clamp(280px, 25vw, 440px);
   align-items: center;
@@ -504,6 +504,22 @@ select {
 .showcase-grid {
   display: grid;
   gap: 1rem;
+}
+
+.product-demos-slot,
+.product-demos-slot > * {
+  width: 100%;
+  min-width: 0;
+}
+
+.section-deferred-render,
+.showcase-section--deferred {
+  content-visibility: auto;
+  contain-intrinsic-size: 960px;
+}
+
+.showcase-section--deferred {
+  contain-intrinsic-size: 1400px;
 }
 
 .showcase-card {
@@ -912,6 +928,7 @@ select {
   .hero-copy,
   .hero-actions,
   .section-kicker,
+  .product-demos-slot,
   .install-panels,
   .showcase-grid,
   .news-panel,
@@ -994,6 +1011,7 @@ select {
   }
 
   .install-panels,
+  .product-demos-slot,
   .showcase-grid,
   .news-panel,
   .quotes-grid,

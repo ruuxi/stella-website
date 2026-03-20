@@ -663,3 +663,10 @@
   box-shadow: 0 10px 22px color-mix(in srgb, var(--selfmod-accent) 26%, transparent);
 }
 
+.selfmod-poster-note {
+  color: rgba(48, 66, 92, 0.58);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
