@@ -11,6 +11,7 @@
   "dependencies": {
     "@tailwindcss/oxide-win32-x64-msvc": "^4.2.1",
     "framer-motion": "^12.35.2",
+    "html-to-image": "^1.11.13",
     "lightningcss": "^1.32.0",
     "lightningcss-win32-x64-msvc": "^1.32.0",
     "lucide-react": "^0.577.0",

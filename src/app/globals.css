@@ -34,6 +34,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* Reserve gutter so `100vw` / layout don’t jump when the scrollbar appears */
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -241,6 +243,8 @@ select {
   font-weight: 300;
   line-height: 0.88;
   letter-spacing: -0.07em;
+  /* Two lines (“Designed” / “For What’s Next”); reserve height before display font metrics settle */
+  min-height: calc(2 * 0.88 * clamp(3.4rem, 12vw, 8.6rem));
 }
 
 .hero-title span {
@@ -802,12 +806,10 @@ select {
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(18px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 

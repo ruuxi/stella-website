@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useImperativeHandle, useRef } from "react";
+import React, { useEffect, useImperativeHandle, useLayoutEffect, useRef } from "react";
 import {
   BIRTH_DURATION,
   FLASH_DURATION,
@@ -170,7 +170,7 @@ export const StellaAnimation = React.forwardRef<
       }
     }, [paused]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       const container = containerRef.current;
       const canvas = canvasRef.current;
       if (!container || !canvas) return;

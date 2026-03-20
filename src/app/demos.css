@@ -9,6 +9,8 @@
   font-weight: 400;
   line-height: 0.96;
   letter-spacing: -0.05em;
+  /* Reserve ~2 lines so display font swap / wrap doesn’t collapse panel headers */
+  min-height: calc(2 * 0.96 * clamp(1.6rem, 2.8vw, 2.5rem));
 }
 
 .demo-showcase-grid {
@@ -106,6 +108,71 @@
   padding: 0.9rem 1.3rem 1.3rem;
 }
 
+/* Panel wrapper — mirrors desktop `.onboarding-canvas` (Onboarding.css) */
+.selfmod-canvas {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.selfmod-canvas__capture {
+  position: relative;
+  min-width: 0;
+}
+
+/* WebGL overlay — fills `.selfmod-shell__frame` (same box as snapshots; avoids fixed + transform bugs) */
+.selfmod-morph-gl {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  visibility: hidden;
+  box-sizing: border-box;
+}
+
+/* Morph animation — replicated from desktop `Onboarding.css` `.onboarding-canvas-morphing` / `@keyframes demoMorph` */
+.selfmod-canvas--morphing {
+  animation: selfmodDemoMorph 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes selfmodDemoMorph {
+  0% {
+    filter: blur(0) brightness(1);
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  35% {
+    filter: blur(24px) brightness(1.15);
+    transform: scale(1.008);
+    opacity: 0.6;
+  }
+
+  50% {
+    filter: blur(28px) brightness(1.2);
+    transform: scale(1.01);
+    opacity: 0.4;
+  }
+
+  65% {
+    filter: blur(24px) brightness(1.15);
+    transform: scale(1.008);
+    opacity: 0.6;
+  }
+
+  100% {
+    filter: blur(0) brightness(1);
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 .selfmod-shell {
   --selfmod-accent: #3f7ff5;
   --selfmod-accent-soft: rgba(63, 127, 245, 0.18);
@@ -118,13 +185,189 @@
   --selfmod-surface-bg: rgba(244, 250, 255, 0.86);
 }
 
+/* Medium — “make it modern” (desktop `selfmod-demo.css` [data-selfmod-demo="medium"] cues) */
+.selfmod-shell[data-stage="medium"] .selfmod-shell__frame {
+  border-radius: 1.85rem;
+  border-color: rgba(72, 110, 150, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    0 10px 40px rgba(25, 60, 110, 0.1);
+  background:
+    radial-gradient(circle at 78% 18%, rgba(26, 165, 255, 0.12), transparent 32%),
+    linear-gradient(185deg, rgba(255, 255, 255, 0.97) 0%, rgba(236, 245, 252, 0.88) 55%, rgba(232, 242, 255, 0.82) 100%);
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-shell__body {
+  background: linear-gradient(180deg, rgba(232, 244, 255, 0.45), rgba(248, 251, 255, 0.55));
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-shell__titlebar {
+  background: rgba(255, 255, 255, 0.78);
+  border-bottom-color: rgba(84, 112, 146, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-shell__sidebar {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(244, 249, 255, 0.75));
+  border-bottom-color: rgba(84, 112, 146, 0.08);
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-shell__nav button {
+  border-radius: 1.05rem;
+  color: rgba(43, 60, 84, 0.58);
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-shell__nav button[data-active] {
+  border-color: rgba(26, 165, 255, 0.22);
+  background: rgba(255, 255, 255, 0.92);
+  color: rgba(18, 52, 92, 0.94);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 4px 18px rgba(26, 100, 180, 0.08);
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-shell__sidebar-card {
+  border-radius: 1.05rem;
+  border-color: rgba(84, 112, 146, 0.1);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 4px 20px rgba(35, 90, 150, 0.05);
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-conversation__message--stella {
+  border-radius: 0.35rem 1.05rem 1.05rem 1.05rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(84, 112, 146, 0.09);
+  box-shadow: 0 2px 14px rgba(25, 80, 140, 0.05);
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-conversation__message--user {
+  border-radius: 1.05rem 0.35rem 1.05rem 1.05rem;
+  border: 1px solid color-mix(in srgb, var(--selfmod-accent) 22%, rgba(84, 112, 146, 0.08));
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--selfmod-accent) 18%, transparent);
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-conversation__composer {
+  border-radius: 1.25rem;
+  border: 1px solid rgba(84, 112, 146, 0.1);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+    0 6px 28px rgba(25, 90, 160, 0.08);
+}
+
 .selfmod-shell[data-stage="high"] {
-  --selfmod-accent: #ef7f2d;
-  --selfmod-accent-soft: rgba(239, 127, 45, 0.18);
-  --selfmod-surface-bg: rgba(255, 248, 238, 0.9);
+  --selfmod-accent: #ea580c;
+  --selfmod-accent-soft: rgba(249, 115, 22, 0.26);
+  --selfmod-surface-bg: rgba(255, 251, 243, 0.55);
+  --selfmod-cat-cream: #fef3c7;
+  --selfmod-cat-orange: #f97316;
+  --selfmod-cat-peach: #fdba74;
+  --selfmod-cat-brown: #92400e;
+}
+
+/* Cozy cat theme — aligned with desktop `selfmod-demo.css` [data-selfmod-demo="high"] */
+.selfmod-shell[data-stage="high"] .selfmod-shell__frame {
+  border-color: color-mix(in srgb, var(--selfmod-cat-orange) 38%, rgba(120, 90, 70, 0.2));
+  border-radius: 1.35rem;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--selfmod-cat-peach) 45%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--selfmod-cat-orange) 14%, transparent),
+    0 16px 52px color-mix(in srgb, var(--selfmod-cat-orange) 22%, rgba(47, 80, 130, 0.08));
+  background:
+    radial-gradient(circle at 90% 12%, color-mix(in srgb, var(--selfmod-cat-orange) 28%, transparent) 0, transparent 32%),
+    linear-gradient(
+      168deg,
+      color-mix(in srgb, var(--selfmod-cat-cream) 48%, #fff) 0%,
+      #fffbf5 42%,
+      color-mix(in srgb, var(--selfmod-cat-peach) 18%, #fff) 100%
+    );
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-shell__body {
+  background: linear-gradient(
+    158deg,
+    color-mix(in srgb, #fff 86%, #fde68a) 0%,
+    color-mix(in srgb, #fff 93%, #ffedd5) 48%,
+    color-mix(in srgb, #fff 88%, #fed7aa) 100%
+  );
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-shell__titlebar {
+  background: color-mix(in srgb, var(--selfmod-cat-cream) 38%, rgba(255, 255, 255, 0.78));
+  border-bottom-color: color-mix(in srgb, var(--selfmod-cat-orange) 26%, transparent);
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-shell__path {
+  color: color-mix(in srgb, var(--selfmod-cat-brown) 42%, rgba(55, 48, 40, 0.55));
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-shell__sidebar {
+  background: color-mix(in srgb, var(--selfmod-cat-cream) 48%, rgba(255, 253, 250, 0.92));
+  border-bottom-color: color-mix(in srgb, var(--selfmod-cat-orange) 22%, transparent);
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-shell__brand span {
+  color: color-mix(in srgb, var(--selfmod-cat-brown) 35%, rgba(30, 28, 26, 0.88));
+  letter-spacing: 0.14em;
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-shell__nav button {
+  color: color-mix(in srgb, var(--selfmod-cat-brown) 22%, rgba(43, 60, 84, 0.72));
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-shell__nav button[data-active] {
+  border-color: color-mix(in srgb, var(--selfmod-cat-orange) 40%, transparent);
+  background: color-mix(in srgb, var(--selfmod-cat-cream) 55%, #fff);
+  color: color-mix(in srgb, var(--selfmod-cat-brown) 40%, rgba(23, 50, 96, 0.92));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-shell__sidebar-card {
+  border-color: color-mix(in srgb, var(--selfmod-cat-orange) 24%, rgba(84, 112, 146, 0.1));
+  background: color-mix(in srgb, #fff 70%, var(--selfmod-cat-cream));
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-shell__sidebar-card span {
+  color: color-mix(in srgb, var(--selfmod-cat-brown) 35%, rgba(44, 64, 92, 0.5));
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-conversation__message--stella {
+  background: color-mix(in srgb, #fff 76%, var(--selfmod-cat-cream));
+  border: 1px solid color-mix(in srgb, var(--selfmod-cat-orange) 16%, transparent);
+  border-radius: 1.05rem 1.05rem 1.05rem 0.32rem;
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--selfmod-cat-orange) 10%, transparent);
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-conversation__message--user {
+  border-radius: 1.05rem 1.05rem 0.32rem 1.05rem;
+  border: 1px solid color-mix(in srgb, var(--selfmod-cat-orange) 32%, transparent);
+  box-shadow: 0 8px 26px color-mix(in srgb, var(--selfmod-cat-orange) 22%, transparent);
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-conversation__composer {
+  border-radius: 1.12rem;
+  background: color-mix(in srgb, #fff 80%, var(--selfmod-cat-cream));
+  border-color: color-mix(in srgb, var(--selfmod-cat-orange) 26%, rgba(84, 112, 146, 0.08));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--selfmod-cat-orange) 10%, transparent),
+    0 10px 36px color-mix(in srgb, var(--selfmod-cat-orange) 14%, transparent);
+}
+
+/* Stage cross-fade — from desktop `selfmod-demo.css` (`[data-selfmod-demo]` surfaces) */
+.selfmod-shell__frame,
+.selfmod-shell__body,
+.selfmod-shell__sidebar,
+.selfmod-shell__sidebar-card,
+.selfmod-shell__titlebar,
+.selfmod-conversation,
+.selfmod-conversation__message,
+.selfmod-conversation__composer,
+.selfmod-conversation__composer button {
+  transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .selfmod-shell__frame {
+  position: relative;
   overflow: hidden;
   border: 1px solid rgba(84, 112, 146, 0.16);
   border-radius: 1.7rem;
@@ -134,16 +377,6 @@
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.72),
     0 24px 60px rgba(47, 80, 130, 0.12);
-  transition:
-    background 320ms ease,
-    border-color 320ms ease,
-    transform 260ms ease,
-    opacity 260ms ease;
-}
-
-.selfmod-shell[data-morphing] .selfmod-shell__frame {
-  opacity: 0.9;
-  transform: scale(0.992);
 }
 
 .selfmod-shell__titlebar {
@@ -298,31 +531,15 @@
 }
 
 .selfmod-shell__workspace {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  min-height: 0;
+  min-width: 0;
   gap: 1rem;
   padding: 1rem;
 }
 
-.selfmod-shell__workspace-header {
-  display: flex;
-  align-items: start;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.selfmod-shell__workspace-header h3 {
-  margin: 0.28rem 0 0;
-  max-width: 32rem;
-  color: rgba(17, 30, 50, 0.94);
-  font-family: var(--font-display), serif;
-  font-size: clamp(1.7rem, 2.5vw, 2.45rem);
-  font-weight: 400;
-  line-height: 0.98;
-  letter-spacing: -0.05em;
-}
-
-.selfmod-shell__status,
-.selfmod-surface__badge,
 .mini-chat-preview__badge,
 .mini-shell-preview__badge,
 .shell-workspace__badges span {
@@ -341,27 +558,23 @@
 }
 
 .selfmod-shell__content {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
   gap: 1rem;
 }
 
-.selfmod-conversation,
-.selfmod-surface {
-  display: grid;
-  gap: 0.8rem;
-  border: 1px solid rgba(84, 112, 146, 0.12);
-  border-radius: 1.3rem;
-  background: var(--selfmod-surface-bg);
-  padding: 1rem;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  transition:
-    background 320ms ease,
-    border-color 320ms ease,
-    box-shadow 320ms ease;
+.selfmod-conversation {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 1.35rem;
 }
 
 .selfmod-conversation__message {
-  max-width: min(27rem, 90%);
+  max-width: min(26rem, 88%);
   padding: 0.8rem 0.95rem;
   border-radius: 1rem;
   font-size: 0.92rem;
@@ -370,13 +583,15 @@
 }
 
 .selfmod-conversation__message--stella {
-  justify-self: start;
+  align-self: flex-start;
+  margin-right: clamp(1.5rem, 12%, 4rem);
   background: rgba(255, 255, 255, 0.78);
   color: rgba(25, 40, 61, 0.88);
 }
 
 .selfmod-conversation__message--user {
-  justify-self: end;
+  align-self: flex-end;
+  margin-left: clamp(1.5rem, 12%, 4rem);
   background: var(--selfmod-accent);
   color: white;
   box-shadow: 0 12px 26px color-mix(in srgb, var(--selfmod-accent) 26%, transparent);
@@ -387,6 +602,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.8rem;
+  margin-top: auto;
   border: 1px solid color-mix(in srgb, var(--selfmod-accent) 18%, rgba(84, 112, 146, 0.12));
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.82);
@@ -412,71 +628,6 @@
   box-shadow: 0 10px 22px color-mix(in srgb, var(--selfmod-accent) 26%, transparent);
 }
 
-.selfmod-surface__hero {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.selfmod-surface__hero span {
-  display: block;
-  color: rgba(44, 64, 92, 0.48);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.67rem;
-  text-transform: uppercase;
-}
-
-.selfmod-surface__hero strong {
-  display: block;
-  margin-top: 0.34rem;
-  color: rgba(18, 33, 55, 0.92);
-  font-size: 1.05rem;
-  line-height: 1.4;
-  letter-spacing: -0.03em;
-}
-
-.selfmod-surface__cards {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.selfmod-surface__card {
-  display: grid;
-  gap: 0.38rem;
-  border: 1px solid rgba(84, 112, 146, 0.12);
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.76);
-  padding: 0.95rem;
-}
-
-.selfmod-surface__card--primary {
-  background:
-    radial-gradient(circle at top right, var(--selfmod-accent-soft), transparent 42%),
-    rgba(255, 255, 255, 0.84);
-}
-
-.selfmod-surface__card span {
-  color: rgba(44, 64, 92, 0.48);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.67rem;
-  text-transform: uppercase;
-}
-
-.selfmod-surface__card strong {
-  color: rgba(18, 33, 55, 0.9);
-  font-size: 0.88rem;
-  line-height: 1.55;
-  letter-spacing: -0.02em;
-}
-
-.selfmod-meta {
-  display: grid;
-  align-content: start;
-  gap: 1rem;
-}
-
-.selfmod-meta h3,
 .radial-demo__preview h3,
 .canvas-showcase__meta h3 {
   margin: 0;
@@ -487,7 +638,6 @@
   letter-spacing: -0.05em;
 }
 
-.selfmod-meta p,
 .radial-demo__preview p,
 .canvas-showcase__meta p {
   margin: 0;
@@ -498,7 +648,29 @@
 
 .selfmod-stage-list {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.6rem;
+  align-items: stretch;
+}
+
+@media (max-width: 520px) {
+  .selfmod-stage-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.15rem;
+    margin-inline: -0.15rem;
+    padding-inline: 0.15rem;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .selfmod-stage-card {
+    flex: 0 0 min(78vw, 14rem);
+    scroll-snap-align: start;
+  }
 }
 
 .selfmod-stage-card {
@@ -666,8 +838,93 @@
 }
 
 .radial-demo__mode-window {
-  min-height: 25rem;
+  height: 30rem;
+  min-height: 30rem;
+  max-height: 30rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   animation: demo-panel-rise 280ms ease-out both;
+}
+
+.radial-demo__mode-window-slot {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.radial-demo__mode-window-slot > .mode-window,
+.radial-demo__mode-window-slot > .full-mode-preview {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.radial-demo__mode-window-slot .mode-window__body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.radial-demo__mode-window-slot .mode-window--browser .mode-window__body > * {
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+}
+
+.radial-demo__mode-window-slot .mini-shell-preview {
+  flex-shrink: 0;
+}
+
+.radial-demo__mode-window-slot .full-shell-preview-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.radial-demo__mode-window-slot .full-shell-preview-card__body {
+  flex: 1;
+  min-height: 0;
+}
+
+.radial-demo__mode-window-slot .full-shell-preview-card__workspace {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.radial-demo__mode-window-slot .full-shell-preview-card__canvas {
+  flex: 1;
+  min-height: 0;
+}
+
+.radial-demo__mode-window-slot .voice-preview,
+.radial-demo__mode-window-slot .mini-chat-preview,
+.radial-demo__mode-window-slot .capture-preview {
+  flex: 1;
+  min-height: 0;
+}
+
+.radial-demo__mode-window-slot .capture-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.radial-demo__mode-window-slot .capture-preview__window {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 23rem;
+  margin-inline: auto;
+  aspect-ratio: unset;
 }
 
 .mode-window,
@@ -785,8 +1042,7 @@
   line-height: 1.58;
 }
 
-.mock-browser-page__section span,
-.selfmod-surface__hero span {
+.mock-browser-page__section span {
   color: rgba(41, 59, 84, 0.48);
   font-family: var(--font-mono), monospace;
   font-size: 0.66rem;
@@ -1175,6 +1431,7 @@
   display: block;
   width: 100%;
   height: auto;
+  aspect-ratio: 660 / 300;
 }
 
 .shell-diagram__link {
@@ -1315,7 +1572,7 @@
   }
 
   .selfmod-shell__content {
-    grid-template-columns: minmax(0, 1.15fr) minmax(17rem, 0.95fr);
+    min-height: 0;
   }
 
   .radial-demo {
@@ -1346,11 +1603,6 @@
   .demo-showcase-grid {
     grid-column: 2 / 6;
   }
-
-  .selfmod-layout {
-    grid-template-columns: minmax(0, 1.5fr) minmax(20rem, 0.72fr);
-    align-items: start;
-  }
 }
 
 @media (max-width: 767px) {
@@ -1369,9 +1621,7 @@
     min-height: 18rem;
   }
 
-  .shell-workspace__header,
-  .selfmod-shell__workspace-header,
-  .selfmod-surface__hero {
+  .shell-workspace__header {
     grid-template-columns: 1fr;
   }
 }

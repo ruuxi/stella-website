@@ -17,6 +17,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { flushSync } from "react-dom";
+import { isWebglMorphSupported, runSelfmodWebglMorph } from "@/lib/selfmod-webgl-morph";
 import { StellaAnimation } from "@/components/stella-animation/stella-animation";
 import {
   cancelAnimation,
@@ -43,7 +45,6 @@ type SelfModStage = {
   id: SelfModLevel;
   title: string;
   prompt: string;
-  summary: string;
 };
 
 type CanvasConcept = {
@@ -133,22 +134,16 @@ const SELF_MOD_STAGES: SelfModStage[] = [
     id: "low",
     title: "Low",
     prompt: "Make my messages blue.",
-    summary:
-      "Small edits stay local to the conversation surface, so the shell remains familiar while Stella updates the active UI live.",
   },
   {
     id: "medium",
     title: "Medium",
     prompt: "Make the app feel more modern.",
-    summary:
-      "Stella can shift spacing, tone, and chrome together, letting the whole product morph instead of only recoloring one element.",
   },
   {
     id: "high",
     title: "High",
     prompt: "Turn this into a cozy cat-themed shell.",
-    summary:
-      "Bigger self-modification reaches across navigation, surfaces, and detail treatments while the session stays uninterrupted.",
   },
 ];
 
@@ -166,7 +161,10 @@ const SELF_MOD_MESSAGES: Record<SelfModLevel, { role: "stella" | "user"; text: s
   high: [
     { role: "stella", text: "I can take bigger creative swings if you want the whole app to transform." },
     { role: "user", text: "Turn this into a cozy cat-themed shell." },
-    { role: "stella", text: "Applying a full visual pass across navigation, content, and the composer." },
+    {
+      role: "stella",
+      text: "Done — warm cream surfaces, toasted-orange accents, and soft paw-pad corners on bubbles and chrome.",
+    },
   ],
 };
 
@@ -554,20 +552,69 @@ function RadialModePreview({ mode }: { mode: RadialWedgeId }) {
   }
 }
 
+/** CSS-only fallback when WebGL / snapshot fails — desktop `Onboarding.css` `demoMorph`. */
+const SELFMOD_MORPH_SWAP_MS = 200;
+const SELFMOD_MORPH_TOTAL_MS = 450;
+
 function SelfModificationShowcase() {
   const [stageIndex, setStageIndex] = useState(1);
-  const [isMorphing, setIsMorphing] = useState(false);
+  const [cssMorphing, setCssMorphing] = useState(false);
+  const morphCaptureRef = useRef<HTMLDivElement | null>(null);
+  const morphGlRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      setIsMorphing(true);
-      window.setTimeout(() => {
-        setStageIndex((current) => (current + 1) % SELF_MOD_STAGES.length);
-        setIsMorphing(false);
-      }, 260);
-    }, 3200);
+    let cancelled = false;
+    let timeoutId: number | undefined;
 
-    return () => window.clearInterval(timer);
+    const advanceStage = () => {
+      setStageIndex((current) => (current + 1) % SELF_MOD_STAGES.length);
+    };
+
+    const runCssFallbackMorph = () => {
+      setCssMorphing(true);
+      window.setTimeout(() => {
+        if (cancelled) return;
+        flushSync(() => {
+          advanceStage();
+        });
+      }, SELFMOD_MORPH_SWAP_MS);
+      window.setTimeout(() => {
+        if (!cancelled) setCssMorphing(false);
+      }, SELFMOD_MORPH_TOTAL_MS);
+    };
+
+    const schedule = () => {
+      timeoutId = window.setTimeout(async () => {
+        if (cancelled) return;
+
+        const captureEl = morphCaptureRef.current;
+        const glCanvas = morphGlRef.current;
+        const canWebgl = isWebglMorphSupported() && captureEl && glCanvas;
+
+        if (canWebgl) {
+          const ok = await runSelfmodWebglMorph({
+            captureEl,
+            canvas: glCanvas,
+            swap: () => {
+              flushSync(() => {
+                advanceStage();
+              });
+            },
+          });
+          if (!ok && !cancelled) runCssFallbackMorph();
+        } else if (!cancelled) {
+          runCssFallbackMorph();
+        }
+
+        if (!cancelled) schedule();
+      }, 3200);
+    };
+
+    schedule();
+    return () => {
+      cancelled = true;
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+    };
   }, []);
 
   const activeStage = SELF_MOD_STAGES[stageIndex];
@@ -575,123 +622,87 @@ function SelfModificationShowcase() {
 
   return (
     <div className="selfmod-layout">
-      <div
-        className="selfmod-shell"
-        data-stage={activeStage.id}
-        data-morphing={isMorphing || undefined}
-      >
-        <div className="selfmod-shell__frame">
-          <div className="selfmod-shell__titlebar">
-            <div className="selfmod-shell__traffic">
-              <span />
-              <span />
-              <span />
-            </div>
-            <div className="selfmod-shell__path">Stella / Self modification / Live workspace</div>
-          </div>
-
-          <div className="selfmod-shell__body">
-            <aside className="selfmod-shell__sidebar">
-              <div className="selfmod-shell__brand">
-                <Image src="/stella-logo.svg" alt="" width={22} height={22} />
-                <span>STELLA</span>
-              </div>
-
-              <div className="selfmod-shell__nav">
-                <button type="button" data-active>
-                  <MessageSquare size={15} />
-                  <span>Chat</span>
-                </button>
-                <button type="button">
-                  <LayoutGrid size={15} />
-                  <span>Canvas</span>
-                </button>
-                <button type="button">
-                  <Settings2 size={15} />
-                  <span>Settings</span>
-                </button>
-              </div>
-
-              <div className="selfmod-shell__sidebar-card">
-                <span>Current request</span>
-                <strong>{activeStage.prompt}</strong>
-              </div>
-            </aside>
-
-            <div className="selfmod-shell__workspace">
-              <div className="selfmod-shell__workspace-header">
-                <div>
-                  <span className="demo-eyebrow">Morph preview</span>
-                  <h3>Stella updates the product while the session keeps flowing</h3>
-                </div>
-                <div className="selfmod-shell__status">Live</div>
-              </div>
-
-              <div className="selfmod-shell__content">
-                <section className="selfmod-conversation">
-                  {activeMessages.map((message, index) => (
-                    <div
-                      key={`${activeStage.id}-${index}`}
-                      className={`selfmod-conversation__message selfmod-conversation__message--${message.role}`}
-                    >
-                      {message.text}
-                    </div>
-                  ))}
-
-                  <div className="selfmod-conversation__composer">
-                    <span>Describe how you want Stella to change itself...</span>
-                    <button type="button" aria-label="Send request">
-                      <Send size={14} />
-                    </button>
-                  </div>
-                </section>
-
-                <section className="selfmod-surface">
-                  <div className="selfmod-surface__hero">
-                    <div>
-                      <span>Preview state</span>
-                      <strong>{activeStage.title} adaptation</strong>
-                    </div>
-                    <div className="selfmod-surface__badge">Applied instantly</div>
-                  </div>
-
-                  <div className="selfmod-surface__cards">
-                    <article className="selfmod-surface__card selfmod-surface__card--primary">
-                      <span>Shell chrome</span>
-                      <strong>Navigation, border treatment, and depth shift together.</strong>
-                    </article>
-                    <article className="selfmod-surface__card">
-                      <span>Conversation</span>
-                      <strong>Messages and composer inherit the new style without breaking layout.</strong>
-                    </article>
-                    <article className="selfmod-surface__card">
-                      <span>Product feel</span>
-                      <strong>The workspace stays usable while the visual language morphs in place.</strong>
-                    </article>
-                  </div>
-                </section>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="selfmod-stage-list">
+        {SELF_MOD_STAGES.map((stage, index) => (
+          <article
+            key={stage.id}
+            className="selfmod-stage-card"
+            data-active={stageIndex === index || undefined}
+          >
+            <span>{stage.title}</span>
+            <strong>{stage.prompt}</strong>
+          </article>
+        ))}
       </div>
 
-      <div className="selfmod-meta">
-        <div className="demo-eyebrow">Self modification</div>
-        <h3>From small edits to full theme shifts, Stella can reshape its own interface live.</h3>
-        <p>{activeStage.summary}</p>
+      <div
+        className={`selfmod-canvas${cssMorphing ? " selfmod-canvas--morphing" : ""}`}
+      >
+        <div className="selfmod-canvas__capture">
+          <div className="selfmod-shell" data-stage={activeStage.id}>
+            <div ref={morphCaptureRef} className="selfmod-shell__frame">
+            <div className="selfmod-shell__titlebar">
+              <div className="selfmod-shell__traffic">
+                <span />
+                <span />
+                <span />
+              </div>
+              <div className="selfmod-shell__path">Stella / Self modification / Live workspace</div>
+            </div>
 
-        <div className="selfmod-stage-list">
-          {SELF_MOD_STAGES.map((stage, index) => (
-            <article
-              key={stage.id}
-              className="selfmod-stage-card"
-              data-active={stageIndex === index || undefined}
-            >
-              <span>{stage.title}</span>
-              <strong>{stage.prompt}</strong>
-            </article>
-          ))}
+            <div className="selfmod-shell__body">
+              <aside className="selfmod-shell__sidebar">
+                <div className="selfmod-shell__brand">
+                  <Image src="/stella-logo.svg" alt="" width={22} height={22} />
+                  <span>STELLA</span>
+                </div>
+
+                <div className="selfmod-shell__nav">
+                  <button type="button" data-active>
+                    <MessageSquare size={15} />
+                    <span>Chat</span>
+                  </button>
+                  <button type="button">
+                    <LayoutGrid size={15} />
+                    <span>Canvas</span>
+                  </button>
+                  <button type="button">
+                    <Settings2 size={15} />
+                    <span>Settings</span>
+                  </button>
+                </div>
+
+                <div className="selfmod-shell__sidebar-card">
+                  <span>Current request</span>
+                  <strong>{activeStage.prompt}</strong>
+                </div>
+              </aside>
+
+              <div className="selfmod-shell__workspace">
+                <div className="selfmod-shell__content">
+                  <section className="selfmod-conversation">
+                    {activeMessages.map((message, index) => (
+                      <div
+                        key={`${activeStage.id}-${index}`}
+                        className={`selfmod-conversation__message selfmod-conversation__message--${message.role}`}
+                      >
+                        {message.text}
+                      </div>
+                    ))}
+
+                    <div className="selfmod-conversation__composer">
+                      <span>Describe how you want Stella to change itself...</span>
+                      <button type="button" aria-label="Send request">
+                        <Send size={14} />
+                      </button>
+                    </div>
+                  </section>
+                </div>
+              </div>
+            </div>
+            <canvas ref={morphGlRef} className="selfmod-morph-gl" aria-hidden />
+          </div>
+        </div>
         </div>
       </div>
     </div>
@@ -830,8 +841,10 @@ function RadialDialShowcase() {
         <div className="demo-eyebrow">Desktop overlay</div>
         <h3>{activeWedge.heading}</h3>
         <p>{activeWedge.detail}</p>
-        <div className="radial-demo__mode-window" key={activeWedge.id}>
-          <RadialModePreview mode={activeWedge.id} />
+        <div className="radial-demo__mode-window">
+          <div className="radial-demo__mode-window-slot">
+            <RadialModePreview mode={activeWedge.id} />
+          </div>
         </div>
       </div>
     </div>

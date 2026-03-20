@@ -7,6 +7,8 @@ const sans = Manrope({
   variable: "--font-sans",
   subsets: ["latin"],
   display: "swap",
+  preload: true,
+  adjustFontFallback: true,
 });
 
 const display = Cormorant_Garamond({
@@ -15,6 +17,8 @@ const display = Cormorant_Garamond({
   display: "swap",
   weight: ["300", "400", "500", "600"],
   style: ["normal", "italic"],
+  preload: true,
+  adjustFontFallback: true,
 });
 
 const mono = IBM_Plex_Mono({
@@ -22,6 +26,8 @@ const mono = IBM_Plex_Mono({
   subsets: ["latin"],
   display: "swap",
   weight: ["400", "500"],
+  preload: false,
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
