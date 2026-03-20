@@ -22,22 +22,10 @@ export type CanvasConcept = {
   label: string;
   title: string;
   blurb: string;
-  nodes: {
-    id: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    title: string;
-    meta: string;
-    tone: "blue" | "cyan" | "mint" | "slate";
-  }[];
-  links: { from: string; to: string }[];
   activity: {
     id: string;
     name: string;
     meta: string;
-    status: "running" | "ok" | "scheduled";
     preview: string;
   }[];
 };

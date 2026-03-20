@@ -105,15 +105,15 @@ export function RadialDialShowcase() {
   return (
     <div className="radial-demo radial-demo--unified">
       <div className="radial-demo__description">
-        <div className="radial-demo__feature-rail" aria-label="Quick actions">
+        <ul className="radial-demo__feature-rail" aria-label="Quick actions">
           {RADIAL_WEDGES.map((wedge, index) => {
             const Icon = wedge.icon;
             const isActive = selectedIndex === index;
 
             return (
-              <article
+              <li
                 key={wedge.id}
-                className="radial-demo__feature-card"
+                className="radial-demo__feature-item"
                 data-active={isActive || undefined}
               >
                 <span className="radial-demo__feature-icon" aria-hidden="true">
@@ -123,10 +123,10 @@ export function RadialDialShowcase() {
                   <strong>{wedge.label}</strong>
                   <p>{RADIAL_RAIL_DETAILS[wedge.id]}</p>
                 </div>
-              </article>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </div>
 
       <div className="radial-desktop-mock">

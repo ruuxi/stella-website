@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { ArrowRight, Circle, Sparkles } from "lucide-react";
+import { Circle, Sparkles } from "lucide-react";
+import { DownloadButton } from "@/components/download-button";
 import { HeroStellaOrb } from "@/components/hero-stella-orb";
 import { ProductDemos } from "@/components/product-demos";
 
@@ -94,14 +95,17 @@ export default function Home() {
       <header className="grid-shell grid-shell--dense site-header">
         <div className="brand-wrap">
           <a className="brand-mark" href="#">
-            <Image
-              src="/stella-logo.svg"
-              alt="Stella"
-              width={36}
-              height={36}
-              priority
-            />
-            <span className="brand-text">stella</span>
+            <span className="brand-mark__logo">
+              <Image
+                className="brand-mark__logo-img"
+                src="/stella-logo.svg"
+                alt=""
+                width={108}
+                height={108}
+                priority
+              />
+            </span>
+            <span className="brand-text">Stella</span>
           </a>
         </div>
 
@@ -126,29 +130,25 @@ export default function Home() {
         <section className="grid-shell hero-section section-border">
           <div className="hero-title reveal">
             <h1>
-              <span>Designed</span>
+              <span>Your Computer,</span>
               <br />
-              For What&apos;s Next
+              Finally Yours
             </h1>
           </div>
 
           <div className="hero-copy reveal reveal-delay-1">
             <p>
-              Stella is your personal AI assistant that lives on your computer.
-              Chat, voice, automation, and a fully customizable interface — all in one place.
+              Stella lives on your computer to do anything you need.
             </p>
             <p className="hero-copy__subtle">
-              Simple to start. Remembers what matters. Works the way you do.
+              Private by design. Entirely yours.
             </p>
           </div>
 
           <HeroStellaOrb />
 
           <div className="hero-actions reveal reveal-delay-2">
-            <a className="button button--primary" href="#">
-              Download Stella
-              <ArrowRight size={18} />
-            </a>
+            <DownloadButton />
           </div>
         </section>
 
@@ -208,8 +208,8 @@ export default function Home() {
 
           <div className="news-panel reveal">
             <div className="news-panel__header">
-              <span>New</span>
-              <span>Stella keeps getting better</span>
+              <span className="demo-eyebrow">Updates</span>
+              <span className="news-panel__sub">Stella keeps getting better</span>
             </div>
 
             <div className="news-list">
@@ -232,7 +232,7 @@ export default function Home() {
         <div className="footer-brand">
           <a className="brand-mark brand-mark--footer" href="#">
             <Image src="/stella-logo.svg" alt="Stella" width={42} height={42} />
-            <span className="brand-text">stella</span>
+            <span className="brand-text">Stella</span>
           </a>
 
           <ul className="legal-links">

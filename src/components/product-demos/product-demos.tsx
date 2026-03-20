@@ -21,7 +21,7 @@ export function ProductDemos() {
       </article>
 
       <article className="demo-panel demo-panel--full">
-        <div className="demo-panel__header demo-panel__header--tight">
+        <div className="demo-panel__header demo-panel__header--spaced">
           <div className="section-kicker section-kicker--compact">
             <span>Quick access</span>
             <h3>Everything you need, one gesture away.</h3>

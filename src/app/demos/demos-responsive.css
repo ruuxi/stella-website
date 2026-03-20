@@ -1,4 +1,4 @@
-﻿@media (min-width: 768px) {
+@media (min-width: 768px) {
   .demo-showcase-grid {
     grid-column: 2 / 4;
   }
@@ -27,12 +27,12 @@
   }
 
   .canvas-showcase {
-    grid-template-columns: minmax(18rem, 0.5fr) minmax(0, 1fr);
+    grid-template-columns: minmax(16rem, 0.34fr) minmax(0, 1fr);
     align-items: start;
   }
 
   .shell-preview__body {
-    grid-template-columns: 15rem minmax(0, 1fr) 19rem;
+    grid-template-columns: minmax(11rem, 12.5rem) minmax(0, 1fr) minmax(11.5rem, 13rem);
   }
 
   .shell-sidebar {
@@ -49,12 +49,19 @@
   .demo-showcase-grid {
     grid-column: 2 / 6;
   }
+
+  .canvas-showcase {
+    grid-template-columns: minmax(15rem, 0.26fr) minmax(0, 1fr);
+  }
+
+  .shell-preview__body {
+    grid-template-columns: minmax(10rem, 11.25rem) minmax(0, 1fr) minmax(10.25rem, 11.75rem);
+  }
 }
 
 @media (max-width: 767px) {
   .mode-window--browser .mode-window__body,
-  .full-shell-preview-card__body,
-  .shell-preview__titlebar {
+  .full-shell-preview-card__body {
     grid-template-columns: 1fr;
   }
 
@@ -65,9 +72,5 @@
 
   .radial-demo__surface {
     min-height: 18rem;
-  }
-
-  .shell-workspace__header {
-    grid-template-columns: 1fr;
   }
 }

@@ -1,40 +1,36 @@
-﻿/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    Radial dial â€” unified desktop mock
    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 .radial-demo--unified {
   display: grid;
-  gap: 1.2rem;
+  gap: 1.5rem;
 }
 
 .radial-demo__description {
   display: grid;
-  gap: 0.9rem;
+  gap: 1.1rem;
   align-content: start;
 }
 
 .radial-demo__feature-rail {
   display: grid;
-  gap: 1.35rem;
+  gap: 1.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.radial-demo__feature-card {
+.radial-demo__feature-item {
   position: relative;
   display: grid;
   grid-template-columns: 1.75rem minmax(0, 1fr);
-  gap: 0.5rem 0.75rem;
+  gap: 0.55rem 0.85rem;
   align-items: start;
-  padding: 0.72rem 0.85rem 0.72rem 0.7rem;
-  border: 1px solid rgba(84, 112, 146, 0.12);
-  border-radius: var(--page-radius);
-  background: rgba(255, 255, 255, 0.48);
-  backdrop-filter: blur(12px);
-  transition:
-    border-color 200ms ease,
-    background-color 200ms ease;
+  padding: 0.55rem 0 0.55rem 0.45rem;
 }
 
-.radial-demo__feature-card::before {
+.radial-demo__feature-item::before {
   content: "";
   position: absolute;
   left: 0;
@@ -46,18 +42,13 @@
   transition: background-color 200ms ease;
 }
 
-.radial-demo__feature-card[data-active] {
-  border-color: rgba(84, 112, 146, 0.18);
-  background: rgba(255, 255, 255, 0.68);
-}
-
-.radial-demo__feature-card[data-active]::before {
+.radial-demo__feature-item[data-active]::before {
   background: var(--page-accent);
 }
 
 .radial-demo__feature-main {
   display: grid;
-  gap: 0.35rem;
+  gap: 0.5rem;
   min-width: 0;
 }
 
@@ -80,14 +71,14 @@
   transition: color 200ms ease;
 }
 
-.radial-demo__feature-card[data-active] .radial-demo__feature-icon {
+.radial-demo__feature-item[data-active] .radial-demo__feature-icon {
   color: var(--page-accent);
 }
 
-.radial-demo__feature-card p {
+.radial-demo__feature-item p {
   margin: 0;
   font-size: 0.8rem;
-  line-height: 1.5;
+  line-height: 1.62;
   color: var(--page-muted);
   max-width: none;
 }
@@ -903,7 +894,7 @@
   .radial-demo--unified {
     grid-template-columns: minmax(18rem, 0.56fr) minmax(0, 1fr);
     align-items: start;
-    gap: 1.75rem;
+    gap: 2.35rem;
   }
 
   .radial-desktop-mock__screen {

@@ -1,4 +1,4 @@
-﻿.section-kicker--compact {
+.section-kicker--compact {
   gap: 0.45rem;
 }
 
@@ -52,6 +52,11 @@
 
 .demo-panel__header--tight {
   padding-bottom: 0.15rem;
+}
+
+.demo-panel__header--spaced {
+  gap: 1.05rem;
+  padding-bottom: 1.1rem;
 }
 
 .demo-panel__lede {
