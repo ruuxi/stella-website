@@ -5,36 +5,23 @@ import { DownloadButton } from "@/components/download-button";
 import { HeroStellaOrb } from "@/components/hero-stella-orb-dynamic";
 import { DeferInView } from "@/components/product-demos/defer-in-view";
 
-const ProductDemos = dynamic(
-  () =>
-    import("@/components/product-demos/product-demos").then((mod) => mod.ProductDemos),
-  {
-    loading: () => (
-      <div
-        className="demo-showcase-grid demo-showcase-grid--loading"
-        aria-busy="true"
-        aria-label="Loading product demos"
-      >
-        <div className="demo-panel" />
-        <div className="demo-panel" />
-        <div className="demo-panel" />
-      </div>
-    ),
-  },
+const SelfModDemo = dynamic(
+  () => import("@/components/product-demos/product-demos").then((mod) => mod.SelfModDemo),
+  { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
 );
 
-function ProductDemosFallback() {
-  return (
-    <div
-      className="demo-showcase-grid demo-showcase-grid--loading"
-      aria-busy="true"
-      aria-label="Loading product demos"
-    >
-      <div className="demo-panel" />
-      <div className="demo-panel" />
-      <div className="demo-panel" />
-    </div>
-  );
+const RadialDialDemo = dynamic(
+  () => import("@/components/product-demos/product-demos").then((mod) => mod.RadialDialDemo),
+  { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
+);
+
+const CanvasDemo = dynamic(
+  () => import("@/components/product-demos/product-demos").then((mod) => mod.CanvasDemo),
+  { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
+);
+
+function DemoFallback() {
+  return <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} />;
 }
 
 const navItems = [
@@ -178,13 +165,33 @@ export default function Home() {
 
         <section className="grid-shell showcase-section section-border">
           <div className="section-kicker">
-            <span>Product</span>
-            <h2>See Stella in motion</h2>
+            <h2>Make Stella entirely yours</h2>
           </div>
-
           <div className="product-demos-slot">
-            <DeferInView fallback={<ProductDemosFallback />} rootMargin="360px 0px">
-              <ProductDemos />
+            <DeferInView fallback={<DemoFallback />} rootMargin="360px 0px">
+              <SelfModDemo />
+            </DeferInView>
+          </div>
+        </section>
+
+        <section className="grid-shell showcase-section section-border">
+          <div className="section-kicker">
+            <h2>Access Stella from anywhere</h2>
+          </div>
+          <div className="product-demos-slot">
+            <DeferInView fallback={<DemoFallback />} rootMargin="360px 0px">
+              <RadialDialDemo />
+            </DeferInView>
+          </div>
+        </section>
+
+        <section className="grid-shell showcase-section section-border">
+          <div className="section-kicker">
+            <h2>Everything in one place</h2>
+          </div>
+          <div className="product-demos-slot">
+            <DeferInView fallback={<DemoFallback />} rootMargin="360px 0px">
+              <CanvasDemo />
             </DeferInView>
           </div>
         </section>
