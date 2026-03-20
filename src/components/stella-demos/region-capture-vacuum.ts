@@ -125,9 +125,11 @@ export async function runVacuumEffect(
       gl.uniform1f(strengthLoc, t * t * t);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-      if (t < 1) {
+      if (t < 0.85) {
         requestAnimationFrame(frame);
       } else {
+        gl.clearColor(0, 0, 0, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
         gl.deleteTexture(tex);
         gl.deleteBuffer(buf);
         gl.deleteProgram(prog);
