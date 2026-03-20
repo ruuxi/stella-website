@@ -1,8 +1,33 @@
 "use client";
 
-import { CanvasShowcase } from "./canvas-showcase";
-import { RadialDialShowcase } from "./radial-dial-showcase";
-import { SelfModificationShowcase } from "./self-mod-showcase";
+import dynamic from "next/dynamic";
+import { DeferInView } from "./defer-in-view";
+
+function DemoChunkPlaceholder() {
+  return (
+    <div
+      className="demo-showcase-chunk-placeholder"
+      style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }}
+      aria-busy="true"
+      aria-label="Loading interactive demo"
+    />
+  );
+}
+
+const SelfModificationShowcase = dynamic(
+  () => import("./self-mod-showcase").then((m) => ({ default: m.SelfModificationShowcase })),
+  { loading: () => <DemoChunkPlaceholder /> },
+);
+
+const RadialDialShowcase = dynamic(
+  () => import("./radial-dial-showcase").then((m) => ({ default: m.RadialDialShowcase })),
+  { loading: () => <DemoChunkPlaceholder /> },
+);
+
+const CanvasShowcase = dynamic(
+  () => import("./canvas-showcase").then((m) => ({ default: m.CanvasShowcase })),
+  { loading: () => <DemoChunkPlaceholder /> },
+);
 
 export function ProductDemos() {
   return (
@@ -30,7 +55,9 @@ export function ProductDemos() {
             The radial dial pops up wherever you are. Capture your screen, start a chat, dictate with your voice, or get an instant summary — all without switching windows.
           </p>
         </div>
-        <RadialDialShowcase />
+        <DeferInView fallback={<DemoChunkPlaceholder />}>
+          <RadialDialShowcase />
+        </DeferInView>
       </article>
 
       <article className="demo-panel demo-panel--full">
@@ -43,7 +70,9 @@ export function ProductDemos() {
             The full Stella window shows your dashboard, active tasks, and upcoming follow-ups — all in one clean, organized view.
           </p>
         </div>
-        <CanvasShowcase />
+        <DeferInView fallback={<DemoChunkPlaceholder />}>
+          <CanvasShowcase />
+        </DeferInView>
       </article>
     </div>
   );

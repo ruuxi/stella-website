@@ -3,8 +3,6 @@
  * (same shaders, timing, and tween phases). Used on the marketing site where Electron
  * overlay + IPC are unavailable.
  */
-import { toPng } from "html-to-image";
-
 const COVER_RAMP_UP_MS = 250;
 const HMR_CROSSFADE_MS = 300;
 const HMR_CALM_DOWN_MS = 220;
@@ -313,6 +311,8 @@ export async function runSelfmodWebglMorph(options: {
   try {
     const rect = captureEl.getBoundingClientRect();
     if (rect.width < 8 || rect.height < 8) return false;
+
+    const { toPng } = await import("html-to-image");
 
     // Stack on `captureEl` (positioned ancestor, e.g. `.selfmod-shell__frame`) — not `fixed`,
     // which breaks under transformed ancestors and misaligns vs `toPng()` output.

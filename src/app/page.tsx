@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Circle, Sparkles } from "lucide-react";
 import { DownloadButton } from "@/components/download-button";
-import { HeroStellaOrb } from "@/components/hero-stella-orb";
+import { HeroStellaOrb } from "@/components/hero-stella-orb-dynamic";
 
 const ProductDemos = dynamic(
   () =>

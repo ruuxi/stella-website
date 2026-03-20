@@ -23,6 +23,11 @@
   pointer-events: none;
 }
 
+.demo-showcase-chunk-placeholder {
+  border-radius: 12px;
+  background: color-mix(in oklch, var(--page-accent) 7%, transparent);
+}
+
 .demo-panel {
   position: relative;
   overflow: hidden;

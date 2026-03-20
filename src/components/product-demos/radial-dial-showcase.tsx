@@ -33,6 +33,25 @@ const RADIAL_DIAL_PHASE_MS = 1800;
 const RADIAL_RESULT_HOLD_MS = 4000;
 const RADIAL_CYCLE_MS = RADIAL_DIAL_PHASE_MS + RADIAL_RESULT_HOLD_MS + 800;
 
+function CaptureVacuumCanvas({
+  showResult,
+  wedgeKey,
+}: {
+  showResult: boolean;
+  wedgeKey: number;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    if (!showResult) return;
+    const el = canvasRef.current;
+    if (!el) return;
+    void runVacuumEffect(el, makeCaptureThumbnail(), 0.5, 0.5);
+  }, [showResult, wedgeKey]);
+
+  return <canvas ref={canvasRef} className="radial-result-vacuum" />;
+}
+
 export function RadialDialShowcase() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [phase, setPhase] = useState<"dial" | "result">("dial");
@@ -375,13 +394,9 @@ export function RadialDialShowcase() {
           <div className={`radial-desktop-mock__result${showResult ? " radial-desktop-mock__result--visible" : ""}`}>
             {activeWedge.id === "capture" && (
               <>
-                <canvas
-                  key={`vacuum-${selectedIndex}`}
-                  className="radial-result-vacuum"
-                  ref={(el) => {
-                    if (!el) return;
-                    void runVacuumEffect(el, makeCaptureThumbnail(), 0.5, 0.5);
-                  }}
+                <CaptureVacuumCanvas
+                  showResult={showResult}
+                  wedgeKey={selectedIndex}
                 />
                 <div className="radial-result-minishell radial-result-minishell--capture">
                   <div className="radial-result-minishell__badge">Captured: Figma — Homepage redesign</div>
