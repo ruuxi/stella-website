@@ -1,8 +1,26 @@
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Circle, Sparkles } from "lucide-react";
 import { DownloadButton } from "@/components/download-button";
 import { HeroStellaOrb } from "@/components/hero-stella-orb";
-import { ProductDemos } from "@/components/product-demos";
+
+const ProductDemos = dynamic(
+  () =>
+    import("@/components/product-demos/product-demos").then((mod) => mod.ProductDemos),
+  {
+    loading: () => (
+      <div
+        className="demo-showcase-grid demo-showcase-grid--loading"
+        aria-busy="true"
+        aria-label="Loading product demos"
+      >
+        <div className="demo-panel" />
+        <div className="demo-panel" />
+        <div className="demo-panel" />
+      </div>
+    ),
+  },
+);
 
 const navItems = [
   "What's New",

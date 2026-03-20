@@ -18,6 +18,11 @@
   gap: 1rem;
 }
 
+.demo-showcase-grid--loading > .demo-panel {
+  min-height: clamp(18rem, 42vw, 30rem);
+  pointer-events: none;
+}
+
 .demo-panel {
   position: relative;
   overflow: hidden;
