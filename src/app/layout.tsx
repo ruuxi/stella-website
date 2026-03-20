@@ -92,6 +92,11 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   category: "technology",
+  icons: {
+    icon: [{ url: "/stella-logo.svg", type: "image/svg+xml" }],
+    shortcut: "/stella-logo.svg",
+    apple: "/stella-logo.svg",
+  },
 };
 
 const jsonLd = {
