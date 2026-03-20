@@ -401,14 +401,7 @@ select {
   justify-content: center;
   width: 42%;
   height: 42%;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.42), transparent 42%),
-    color-mix(in oklch, var(--page-accent) 8%, rgba(255, 255, 255, 0.35));
-  border: 1px solid color-mix(in oklch, var(--page-accent) 14%, transparent);
-  backdrop-filter: blur(12px);
   flex-shrink: 0;
-  animation: orb-glow 6s ease-in-out infinite;
   z-index: 1;
 }
 
@@ -850,21 +843,6 @@ select {
   50% {
     transform: scale(1.04);
     opacity: 0.38;
-  }
-}
-
-@keyframes orb-glow {
-  0%,
-  100% {
-    box-shadow:
-      0 0 30px 6px color-mix(in oklch, var(--spinner-color-2) 18%, transparent),
-      0 0 70px 18px color-mix(in oklch, var(--accent) 10%, transparent);
-  }
-
-  50% {
-    box-shadow:
-      0 0 42px 12px color-mix(in oklch, var(--spinner-color-2) 24%, transparent),
-      0 0 92px 24px color-mix(in oklch, var(--spinner-color-3) 14%, transparent);
   }
 }
 
