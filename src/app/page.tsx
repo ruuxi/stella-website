@@ -75,31 +75,22 @@ const showcaseCards = [
   },
 ];
 
-const announcements = [
+const features = [
   {
-    date: "March 12, 2026",
-    title: "Smarter daily check-ins",
-    blurb: "Morning summaries now highlight what actually matters instead of listing everything.",
+    title: "Text Stella from anywhere",
+    blurb: "Message Stella from your phone, Discord, Telegram, Teams, or Slack.",
   },
   {
-    date: "March 4, 2026",
-    title: "Longer conversations, no lost thread",
-    blurb: "Stella remembers what you talked about even in really long back-and-forth sessions.",
+    title: "Collaborate with friends",
+    blurb: "Invite people in, create together, and share what you make.",
   },
   {
-    date: "February 25, 2026",
-    title: "Stella can multitask",
-    blurb: "Ask for several things at once and Stella works on them at the same time.",
+    title: "Connect your life",
+    blurb: "Bring in your calendar, Gmail, notes, and more.",
   },
   {
-    date: "February 18, 2026",
-    title: "Voice just got better",
-    blurb: "Talk to Stella anywhere on your screen and pick up right where you left off.",
-  },
-  {
-    date: "February 7, 2026",
-    title: "Easier setup",
-    blurb: "Download, install, and you're ready. That's it.",
+    title: "Create any media",
+    blurb: "Apps, music, games, images, videos — just ask.",
   },
 ];
 
@@ -239,25 +230,19 @@ export default function Home() {
 
         <section className="grid-shell news-section section-deferred-render section-border">
           <div className="section-kicker">
-            <span>News</span>
-            <h2>What&apos;s new in Stella</h2>
+            <span>More</span>
+            <h2>Additional features</h2>
           </div>
 
           <div className="news-panel reveal">
-            <div className="news-panel__header">
-              <span className="demo-eyebrow">Updates</span>
-              <span className="news-panel__sub">Stella keeps getting better</span>
-            </div>
-
             <div className="news-list">
-              {announcements.map((item) => (
-                <a key={item.title} className="news-item" href="#">
-                  <p className="news-item__date">{item.date}</p>
+              {features.map((item) => (
+                <div key={item.title} className="news-item">
                   <div className="news-item__body">
                     <h3>{item.title}</h3>
                     <p>{item.blurb}</p>
                   </div>
-                </a>
+                </div>
               ))}
             </div>
           </div>

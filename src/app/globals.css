@@ -676,10 +676,7 @@ select {
 }
 
 .news-item {
-  display: grid;
-  grid-template-columns: minmax(5.5rem, 7.5rem) minmax(0, 1fr);
-  gap: 0.35rem 1.25rem;
-  align-items: start;
+  display: block;
   padding: 1rem 1.15rem;
   border-bottom: 1px solid rgba(82, 104, 134, 0.08);
   transition: background-color 160ms ease;
@@ -734,11 +731,6 @@ select {
 }
 
 @media (max-width: 520px) {
-  .news-item {
-    grid-template-columns: 1fr;
-    gap: 0.35rem;
-  }
-
   .news-item__date {
     padding-top: 0;
   }
