@@ -41,6 +41,14 @@ type RadialWedge = {
   detail: string;
 };
 
+const RADIAL_RAIL_DETAILS: Record<RadialWedgeId, string> = {
+  capture: "Pull in any part of the screen and start asking questions immediately.",
+  chat: "Start a conversation with the current page, app, and task already in view.",
+  full: "Expand into the full workspace when you want the whole dashboard in front of you.",
+  voice: "Dictate, brainstorm, or steer the next step without touching the keyboard.",
+  auto: "Get the gist, key takeaways, and suggested next steps in one move.",
+};
+
 type SelfModStage = {
   id: SelfModLevel;
   title: string;
@@ -828,20 +836,51 @@ function RadialDialShowcase() {
     <div className="radial-demo radial-demo--unified">
       {/* Description */}
       <div className="radial-demo__description">
-        <h3>{activeWedge.heading}</h3>
-        <p>{activeWedge.detail}</p>
-        <ul className="demo-chip-list">
-          {RADIAL_WEDGES.map((wedge, index) => (
-            <li key={wedge.id} data-active={selectedIndex === index || undefined}>
-              {wedge.label}
-            </li>
-          ))}
-        </ul>
+        <div className="radial-demo__feature-rail" aria-label="Quick actions">
+          {RADIAL_WEDGES.map((wedge, index) => {
+            const Icon = wedge.icon;
+            const isActive = selectedIndex === index;
+
+            return (
+              <article
+                key={wedge.id}
+                className="radial-demo__feature-card"
+                data-active={isActive || undefined}
+              >
+                <span className="radial-demo__feature-icon" aria-hidden="true">
+                  <Icon width={17} height={17} />
+                </span>
+                <div className="radial-demo__feature-main">
+                  <strong>{wedge.label}</strong>
+                  <p>{RADIAL_RAIL_DETAILS[wedge.id]}</p>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
       </div>
 
       {/* Unified desktop mock — scene changes per mode */}
       <div className="radial-desktop-mock">
+        <div className="radial-desktop-mock__titlebar">
+          <div className="radial-desktop-mock__traffic"><span /><span /><span /></div>
+          <div className="radial-desktop-mock__chrome">
+            <strong>Stella quick gesture</strong>
+            <span>Invoke over whatever you are doing</span>
+          </div>
+        </div>
         <div className="radial-desktop-mock__screen" data-mode={activeWedge.id}>
+          <div className="radial-desktop-mock__ambient">
+            <div className="radial-desktop-mock__ambient-card">
+              <span>Current surface</span>
+              <strong>{activeWedge.label}</strong>
+            </div>
+            <div className="radial-desktop-mock__ambient-card radial-desktop-mock__ambient-card--soft">
+              <span>Context follows</span>
+              <strong>Screen + conversation + next step</strong>
+            </div>
+          </div>
 
           {/* ── Per-mode desktop scenes ──────────────────────────── */}
 
@@ -1133,6 +1172,22 @@ function RadialDialShowcase() {
                 </ul>
               </div>
             )}
+
+          </div>
+
+          <div className="radial-desktop-mock__dock" aria-hidden="true">
+            {RADIAL_WEDGES.map((wedge, index) => {
+              const Icon = wedge.icon;
+              return (
+                <span
+                  key={`${wedge.id}-dock`}
+                  className="radial-desktop-mock__dock-item"
+                  data-active={selectedIndex === index || undefined}
+                >
+                  <Icon size={14} />
+                </span>
+              );
+            })}
           </div>
         </div>
       </div>
