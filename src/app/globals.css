@@ -131,7 +131,7 @@ select {
   gap: 0.7rem;
 }
 
-.brand-mark::before {
+.brand-mark--footer::before {
   content: "";
   position: absolute;
   inset-inline-start: calc(-1 * var(--page-cell-padding));
@@ -671,8 +671,14 @@ select {
 }
 
 .news-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 640px) {
+  .news-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 .news-item {

@@ -79,6 +79,22 @@ const features = [
     title: "Create any media",
     blurb: "Apps, music, games, images, videos — just ask.",
   },
+  {
+    title: "Talk to Stella",
+    blurb: "Say \"Stella\" and start talking. No buttons, no typing needed.",
+  },
+  {
+    title: "Automate your routine",
+    blurb: "Set up daily check-ins, reminders, and recurring tasks in plain English.",
+  },
+  {
+    title: "Browse for you",
+    blurb: "Stella can navigate websites, fill forms, and pull information from the web.",
+  },
+  {
+    title: "Manage your files",
+    blurb: "Search, organize, read, and edit files on your computer.",
+  },
 ];
 
 const footerGroups = [
