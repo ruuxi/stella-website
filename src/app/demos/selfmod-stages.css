@@ -1,0 +1,60 @@
+﻿.selfmod-stage-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  align-items: stretch;
+}
+
+@media (max-width: 520px) {
+  .selfmod-stage-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.15rem;
+    margin-inline: -0.15rem;
+    padding-inline: 0.15rem;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .selfmod-stage-card {
+    flex: 0 0 min(78vw, 14rem);
+    scroll-snap-align: start;
+  }
+}
+
+.selfmod-stage-card {
+  display: grid;
+  gap: 0.38rem;
+  border: 1px solid rgba(94, 122, 164, 0.12);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.62);
+  padding: 0.82rem 0.92rem;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.selfmod-stage-card span {
+  color: rgba(43, 60, 84, 0.54);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.selfmod-stage-card strong {
+  color: rgba(18, 33, 55, 0.92);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: -0.03em;
+}
+
+.selfmod-stage-card[data-active] {
+  border-color: rgba(29, 120, 242, 0.22);
+  background: rgba(236, 244, 255, 0.92);
+  transform: translateY(-1px);
+}

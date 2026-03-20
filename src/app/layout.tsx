@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, IBM_Plex_Mono, Manrope } from "next/font/google";
 import "./globals.css";
+/* Product demos (self-mod, radial, canvas) — partials in ./demos/ */
 import "./demos.css";
 
 const sans = Manrope({
