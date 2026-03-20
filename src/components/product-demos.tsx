@@ -84,41 +84,41 @@ const RADIAL_WEDGES: RadialWedge[] = [
     id: "capture",
     label: "Capture",
     icon: Camera,
-    heading: "Capture the active window with one motion",
+    heading: "Grab what's on your screen",
     detail:
-      "Capture should feel like Stella reaches into the exact surface under your cursor, lifts it out, and turns it into context without an extra setup step.",
+      "Capture whatever you're looking at — a webpage, a document, anything — and Stella instantly understands it.",
   },
   {
     id: "chat",
     label: "Chat",
     icon: MessageSquare,
-    heading: "Open chat that already knows what you are on",
+    heading: "Chat that already knows what you're doing",
     detail:
-      "The mini shell should badge the current app or page, so Stella starts from the right window instead of asking you to restate your context.",
+      "Stella sees what app or page you're on and picks up the conversation from there. No need to explain the context.",
   },
   {
     id: "full",
     label: "Full",
     icon: Maximize2,
-    heading: "Expand the overlay into the full Stella shell",
+    heading: "Open the full Stella window",
     detail:
-      "Full mode should feel like the same session growing into the complete application, with the workspace, sidebar, and tasks ready in place.",
+      "Switch to the full view with your dashboard, apps, and everything in one place — without losing your conversation.",
   },
   {
     id: "voice",
     label: "Voice",
     icon: Mic,
-    heading: "Dictate directly into the work surface",
+    heading: "Just talk to Stella",
     detail:
-      "Voice is instant input anywhere. Stella listens, transcribes cleanly, and lands the text where you are already working without mode friction.",
+      "Speak naturally and Stella listens. Dictate notes, ask questions, or give instructions — hands-free, from anywhere.",
   },
   {
     id: "auto",
     label: "Auto",
     icon: Sparkles,
-    heading: "Summarize and explain the page instantly",
+    heading: "Instant page summary",
     detail:
-      "Auto should appear like a smart edge panel that has already read the screen and pulled out the decisions, risks, and next actions that matter.",
+      "Stella reads what's on screen and gives you a quick summary with the key points and suggested next steps.",
   },
 ];
 
@@ -149,38 +149,29 @@ const SELF_MOD_STAGES: SelfModStage[] = [
 
 const SELF_MOD_MESSAGES: Record<SelfModLevel, { role: "stella" | "user"; text: string }[]> = {
   low: [
-    { role: "stella", text: "I can update the interface while we keep working." },
     { role: "user", text: "Make my messages blue." },
-    { role: "stella", text: "Done. The change stays intentionally focused on the conversation layer." },
   ],
   medium: [
-    { role: "stella", text: "I can change the whole shell language, not just one control." },
     { role: "user", text: "Make the app feel more modern." },
-    { role: "stella", text: "Refreshing spacing, borders, and glass treatment across the active workspace." },
   ],
   high: [
-    { role: "stella", text: "I can take bigger creative swings if you want the whole app to transform." },
     { role: "user", text: "Turn this into a cozy cat-themed shell." },
-    {
-      role: "stella",
-      text: "Done — warm cream surfaces, toasted-orange accents, and soft paw-pad corners on bubbles and chrome.",
-    },
   ],
 };
 
 const CANVAS_CONCEPTS: CanvasConcept[] = [
   {
     id: "launch",
-    label: "Dial",
-    title: "Generative canvas mapping the radial launch flow",
+    label: "Plan",
+    title: "Stella maps out your request visually",
     blurb:
-      "The canvas should turn the product ask into a connected system map while the shell keeps active tasks and scheduled follow-ups visible beside it.",
+      "Ask Stella something complex and it breaks the work into connected steps — while the sidebar tracks what's happening right now.",
     nodes: [
-      { id: "capture", x: 34, y: 46, width: 158, height: 68, title: "Capture source window", meta: "ingest live context", tone: "blue" },
-      { id: "chat", x: 236, y: 32, width: 170, height: 72, title: "Mini shell handoff", meta: "window-aware prompts", tone: "cyan" },
-      { id: "auto", x: 454, y: 44, width: 172, height: 70, title: "Auto side panel", meta: "summaries and actions", tone: "mint" },
-      { id: "plan", x: 136, y: 176, width: 198, height: 88, title: "Demo sequencing", meta: "copy and layout decisions", tone: "slate" },
-      { id: "shell", x: 398, y: 186, width: 216, height: 86, title: "Full-shell expansion", meta: "workspace transition", tone: "blue" },
+      { id: "capture", x: 34, y: 46, width: 158, height: 68, title: "Gather information", meta: "from your screen", tone: "blue" },
+      { id: "chat", x: 236, y: 32, width: 170, height: 72, title: "Understand request", meta: "what you need", tone: "cyan" },
+      { id: "auto", x: 454, y: 44, width: 172, height: 70, title: "Quick summary", meta: "key points", tone: "mint" },
+      { id: "plan", x: 136, y: 176, width: 198, height: 88, title: "Make a plan", meta: "steps and priorities", tone: "slate" },
+      { id: "shell", x: 398, y: 186, width: 216, height: 86, title: "Get it done", meta: "execute the plan", tone: "blue" },
     ],
     links: [
       { from: "capture", to: "plan" },
@@ -189,23 +180,23 @@ const CANVAS_CONCEPTS: CanvasConcept[] = [
       { from: "plan", to: "shell" },
     ],
     activity: [
-      { id: "a", name: "Radial showcase", meta: "running now", status: "running", preview: "Cycling through Capture, Chat, Full, Voice, and Auto states." },
-      { id: "b", name: "Wide-screen pass", meta: "scheduled in 12m", status: "scheduled", preview: "Re-check the stacked demo balance at 1440px and 2560px widths." },
-      { id: "c", name: "Homepage copy", meta: "completed", status: "ok", preview: "Product language is aligned to Stella instead of carrying over Amp-specific terms." },
+      { id: "a", name: "Trip research", meta: "working on it", status: "running", preview: "Looking up flights, hotels, and activities for your weekend trip." },
+      { id: "b", name: "Budget summary", meta: "up next", status: "scheduled", preview: "Will compare prices and put together a cost breakdown." },
+      { id: "c", name: "Restaurant list", meta: "done", status: "ok", preview: "Found 5 highly-rated spots near your hotel with outdoor seating." },
     ],
   },
   {
     id: "agents",
-    label: "Agents",
-    title: "Canvas showing how Stella spreads work across the shell",
+    label: "Teamwork",
+    title: "Stella handles multiple things at once",
     blurb:
-      "This view is about coordinated execution: the diagram explains the system, while the right rail shows what is running right now and what is queued next.",
+      "When you ask for something big, Stella splits the work up and tackles different parts at the same time — then brings it all together.",
     nodes: [
-      { id: "thread", x: 28, y: 48, width: 170, height: 74, title: "Conversation thread", meta: "core instruction flow", tone: "slate" },
-      { id: "worker-a", x: 248, y: 34, width: 166, height: 72, title: "Worker A", meta: "radial interaction states", tone: "blue" },
-      { id: "worker-b", x: 456, y: 42, width: 166, height: 72, title: "Worker B", meta: "shell and canvas polish", tone: "cyan" },
-      { id: "review", x: 140, y: 180, width: 190, height: 86, title: "Review surface", meta: "group issues by risk", tone: "mint" },
-      { id: "ship", x: 396, y: 190, width: 214, height: 84, title: "Build and ship", meta: "verify, stage, commit", tone: "blue" },
+      { id: "thread", x: 28, y: 48, width: 170, height: 74, title: "Your request", meta: "what you asked for", tone: "slate" },
+      { id: "worker-a", x: 248, y: 34, width: 166, height: 72, title: "Research", meta: "finding information", tone: "blue" },
+      { id: "worker-b", x: 456, y: 42, width: 166, height: 72, title: "Create", meta: "building the result", tone: "cyan" },
+      { id: "review", x: 140, y: 180, width: 190, height: 86, title: "Check quality", meta: "make sure it's right", tone: "mint" },
+      { id: "ship", x: 396, y: 190, width: 214, height: 84, title: "Deliver", meta: "ready for you", tone: "blue" },
     ],
     links: [
       { from: "thread", to: "worker-a" },
@@ -215,23 +206,23 @@ const CANVAS_CONCEPTS: CanvasConcept[] = [
       { from: "review", to: "ship" },
     ],
     activity: [
-      { id: "d", name: "Implementation summary", meta: "running now", status: "running", preview: "Keeping the code changes understandable while UI work lands." },
-      { id: "e", name: "Shell visual audit", meta: "scheduled in 7m", status: "scheduled", preview: "Inspect sidebar contrast, chrome spacing, and motion pacing." },
-      { id: "f", name: "Task grouping", meta: "completed", status: "ok", preview: "Activity rail now favors current work and scheduled follow-ups over extra noise." },
+      { id: "d", name: "Email draft", meta: "working on it", status: "running", preview: "Writing a friendly follow-up based on your notes from the meeting." },
+      { id: "e", name: "Calendar check", meta: "up next", status: "scheduled", preview: "Looking at your schedule to suggest the best time for a follow-up." },
+      { id: "f", name: "Contact lookup", meta: "done", status: "ok", preview: "Found their email and LinkedIn — added to your draft." },
     ],
   },
   {
     id: "timeline",
     label: "Flow",
-    title: "Canvas turning rough asks into a structured execution map",
+    title: "From idea to done, step by step",
     blurb:
-      "The shell should make Stella feel active and generative at the same time: concepts appear on the canvas while the task rail tracks what is in progress or already planned.",
+      "Stella turns your rough ideas into a clear plan and shows you the progress as each piece comes together.",
     nodes: [
-      { id: "hero", x: 34, y: 46, width: 152, height: 68, title: "Theme direction", meta: "liquid glass palette", tone: "slate" },
-      { id: "demo", x: 236, y: 34, width: 186, height: 76, title: "Demo stack", meta: "self-mod, radial, shell", tone: "blue" },
-      { id: "assets", x: 470, y: 44, width: 150, height: 70, title: "Desktop assets", meta: "orb, capture, shell", tone: "cyan" },
-      { id: "verify", x: 138, y: 182, width: 194, height: 86, title: "Verification", meta: "lint, build, screenshots", tone: "mint" },
-      { id: "ship", x: 404, y: 192, width: 198, height: 82, title: "Release", meta: "scope and polish", tone: "blue" },
+      { id: "hero", x: 34, y: 46, width: 152, height: 68, title: "Your idea", meta: "starting point", tone: "slate" },
+      { id: "demo", x: 236, y: 34, width: 186, height: 76, title: "Break it down", meta: "steps and pieces", tone: "blue" },
+      { id: "assets", x: 470, y: 44, width: 150, height: 70, title: "Gather what's needed", meta: "info and files", tone: "cyan" },
+      { id: "verify", x: 138, y: 182, width: 194, height: 86, title: "Review", meta: "check everything", tone: "mint" },
+      { id: "ship", x: 404, y: 192, width: 198, height: 82, title: "Finish", meta: "all done", tone: "blue" },
     ],
     links: [
       { from: "hero", to: "demo" },
@@ -240,9 +231,9 @@ const CANVAS_CONCEPTS: CanvasConcept[] = [
       { from: "verify", to: "ship" },
     ],
     activity: [
-      { id: "g", name: "Production build", meta: "running now", status: "running", preview: "Compiling the landing page with the new stacked demo surfaces." },
-      { id: "h", name: "Final spacing pass", meta: "scheduled in 18m", status: "scheduled", preview: "Tune the shell proportions on desktop and wider screens." },
-      { id: "i", name: "Scoped changes", meta: "completed", status: "ok", preview: "Reference material and scratch files stayed outside the product changes." },
+      { id: "g", name: "Party planning", meta: "working on it", status: "running", preview: "Putting together a guest list, menu ideas, and a playlist." },
+      { id: "h", name: "Invitations", meta: "up next", status: "scheduled", preview: "Will draft and send invites once the details are set." },
+      { id: "i", name: "Venue options", meta: "done", status: "ok", preview: "Found 3 great venues within your budget — details saved." },
     ],
   },
 ];
@@ -553,8 +544,8 @@ function RadialModePreview({ mode }: { mode: RadialWedgeId }) {
 }
 
 /** CSS-only fallback when WebGL / snapshot fails — desktop `Onboarding.css` `demoMorph`. */
-const SELFMOD_MORPH_SWAP_MS = 200;
-const SELFMOD_MORPH_TOTAL_MS = 450;
+const SELFMOD_MORPH_SWAP_MS = 250;
+const SELFMOD_MORPH_TOTAL_MS = 500;
 
 function SelfModificationShowcase() {
   const [stageIndex, setStageIndex] = useState(1);
@@ -622,24 +613,20 @@ function SelfModificationShowcase() {
 
   return (
     <div className="selfmod-layout">
-      <div className="selfmod-stage-list">
-        {SELF_MOD_STAGES.map((stage, index) => (
-          <article
-            key={stage.id}
-            className="selfmod-stage-card"
-            data-active={stageIndex === index || undefined}
-          >
-            <span>{stage.title}</span>
-            <strong>{stage.prompt}</strong>
-          </article>
-        ))}
-      </div>
-
       <div
         className={`selfmod-canvas${cssMorphing ? " selfmod-canvas--morphing" : ""}`}
       >
         <div className="selfmod-canvas__capture">
           <div className="selfmod-shell" data-stage={activeStage.id}>
+            {/* Cat ears on the title bar — only visible in high stage */}
+            <svg className="selfmod-cat-ears" viewBox="0 0 140 40" aria-hidden="true">
+              {/* Left ear */}
+              <path d="M10 40 L18 8 Q22 0 30 6 L38 40Z" fill="currentColor" />
+              <path d="M16 40 L21 16 Q23 10 28 14 L33 40Z" className="selfmod-cat-ear-inner" />
+              {/* Right ear */}
+              <path d="M130 40 L122 8 Q118 0 110 6 L102 40Z" fill="currentColor" />
+              <path d="M124 40 L119 16 Q117 10 112 14 L107 40Z" className="selfmod-cat-ear-inner" />
+            </svg>
             <div ref={morphCaptureRef} className="selfmod-shell__frame">
             <div className="selfmod-shell__titlebar">
               <div className="selfmod-shell__traffic">
@@ -647,56 +634,101 @@ function SelfModificationShowcase() {
                 <span />
                 <span />
               </div>
-              <div className="selfmod-shell__path">Stella / Self modification / Live workspace</div>
+              <div className="selfmod-shell__path">Stella</div>
             </div>
 
             <div className="selfmod-shell__body">
               <aside className="selfmod-shell__sidebar">
                 <div className="selfmod-shell__brand">
                   <Image src="/stella-logo.svg" alt="" width={22} height={22} />
-                  <span>STELLA</span>
+                  <span className="selfmod-shell__brand-text">STELLA</span>
                 </div>
 
                 <div className="selfmod-shell__nav">
                   <button type="button" data-active>
                     <MessageSquare size={15} />
-                    <span>Chat</span>
+                    <span className="selfmod-shell__nav-label">Chat</span>
                   </button>
                   <button type="button">
                     <LayoutGrid size={15} />
-                    <span>Canvas</span>
+                    <span className="selfmod-shell__nav-label">Canvas</span>
                   </button>
                   <button type="button">
                     <Settings2 size={15} />
-                    <span>Settings</span>
+                    <span className="selfmod-shell__nav-label">Settings</span>
                   </button>
                 </div>
 
-                <div className="selfmod-shell__sidebar-card">
-                  <span>Current request</span>
-                  <strong>{activeStage.prompt}</strong>
-                </div>
+                {/* Cat sleeping on the sidebar — only visible in high stage */}
+                <svg className="selfmod-cat-sleeping" viewBox="0 0 80 50" aria-hidden="true">
+                  {/* Shadow */}
+                  <ellipse cx="36" cy="44" rx="28" ry="5" fill="currentColor" opacity="0.1" />
+                  {/* Curled body */}
+                  <ellipse cx="36" cy="36" rx="24" ry="12" fill="currentColor" opacity="0.85" />
+                  {/* Head */}
+                  <circle cx="16" cy="28" r="10" fill="currentColor" />
+                  {/* Left ear */}
+                  <path d="M8 22 L6 12 L14 18Z" fill="currentColor" />
+                  <path d="M9 21 L8 15 L13 19Z" className="selfmod-cat-ear-inner" />
+                  {/* Right ear */}
+                  <path d="M24 22 L26 12 L18 18Z" fill="currentColor" />
+                  <path d="M23 21 L24 15 L19 19Z" className="selfmod-cat-ear-inner" />
+                  {/* Closed eyes — curved lines */}
+                  <path d="M11 28 Q13 26 15 28" stroke="currentColor" strokeWidth="1.2" fill="none" opacity="0.3" />
+                  <path d="M17 28 Q19 26 21 28" stroke="currentColor" strokeWidth="1.2" fill="none" opacity="0.3" />
+                  {/* Nose */}
+                  <ellipse cx="16" cy="31" rx="1.2" ry="0.8" fill="currentColor" opacity="0.25" />
+                  {/* Tail curling up from behind */}
+                  <path d="M58 32 Q66 28 68 20 Q69 16 66 16 Q63 16 64 22 Q65 28 58 32" fill="currentColor" opacity="0.8" strokeLinejoin="round" />
+                </svg>
               </aside>
 
               <div className="selfmod-shell__workspace">
                 <div className="selfmod-shell__content">
-                  <section className="selfmod-conversation">
-                    {activeMessages.map((message, index) => (
-                      <div
-                        key={`${activeStage.id}-${index}`}
-                        className={`selfmod-conversation__message selfmod-conversation__message--${message.role}`}
-                      >
-                        {message.text}
+                  <div className="selfmod-preview-area">
+                    <div className="selfmod-preview-bubbles">
+                      <div className="selfmod-preview-bubble selfmod-preview-bubble--stella">
+                        Hey! What would you like to change?
                       </div>
-                    ))}
-
-                    <div className="selfmod-conversation__composer">
-                      <span>Describe how you want Stella to change itself...</span>
-                      <button type="button" aria-label="Send request">
-                        <Send size={14} />
-                      </button>
+                      <div className="selfmod-preview-bubble selfmod-preview-bubble--user">
+                        {activeStage.prompt}
+                      </div>
+                      <div className="selfmod-preview-bubble selfmod-preview-bubble--stella">
+                        Done ✓
+                      </div>
                     </div>
-                  </section>
+
+                    {/* Cat paw reaching down from top — only visible in high stage */}
+                    <svg className="selfmod-cat-paw" viewBox="0 0 32 56" aria-hidden="true">
+                      {/* Arm */}
+                      <path d="M10 0 L10 32 Q10 38 16 38 Q22 38 22 32 L22 0Z" fill="currentColor" opacity="0.85" />
+                      {/* Paw pad — wide round bottom */}
+                      <ellipse cx="16" cy="40" rx="10" ry="7" fill="currentColor" />
+                      {/* Three toes */}
+                      <ellipse cx="8" cy="46" rx="4" ry="5" fill="currentColor" />
+                      <ellipse cx="16" cy="48" rx="4" ry="5" fill="currentColor" />
+                      <ellipse cx="24" cy="46" rx="4" ry="5" fill="currentColor" />
+                      {/* Toe beans */}
+                      <ellipse cx="8" cy="47" rx="2" ry="2.5" fill="currentColor" opacity="0.2" />
+                      <ellipse cx="16" cy="49" rx="2" ry="2.5" fill="currentColor" opacity="0.2" />
+                      <ellipse cx="24" cy="47" rx="2" ry="2.5" fill="currentColor" opacity="0.2" />
+                      {/* Main pad bean */}
+                      <ellipse cx="16" cy="40" rx="4.5" ry="3" fill="currentColor" opacity="0.2" />
+                    </svg>
+                  </div>
+                  <div className="selfmod-options">
+                    {SELF_MOD_STAGES.map((stage, index) => (
+                      <button
+                        key={stage.id}
+                        type="button"
+                        className="selfmod-option"
+                        data-active={stageIndex === index || undefined}
+                      >
+                        <span className="selfmod-option__level">{stage.title}</span>
+                        <span className="selfmod-option__prompt">{stage.prompt}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -939,7 +971,7 @@ function CanvasShowcase() {
             <span />
           </div>
           <div className="shell-preview__title">Stella shell</div>
-          <div className="shell-preview__search">Search commands, tasks, and canvases</div>
+          <div className="shell-preview__search">Search anything...</div>
         </div>
 
         <div className="shell-preview__body">
@@ -973,8 +1005,8 @@ function CanvasShowcase() {
 
             <div className="shell-sidebar__focus">
               <span>Focus</span>
-              <strong>Homepage product demos</strong>
-              <p>Three distinct surfaces: self modification, radial modes, and the full shell canvas.</p>
+              <strong>Weekend trip planning</strong>
+              <p>Researching flights, hotels, and restaurants for your upcoming getaway.</p>
             </div>
           </aside>
 
@@ -1026,11 +1058,11 @@ export function ProductDemos() {
       <article className="demo-panel demo-panel--full">
         <div className="demo-panel__header">
           <div className="section-kicker section-kicker--compact">
-            <span>Self modification</span>
-            <h3>Watch Stella reshape itself live.</h3>
+            <span>Customization</span>
+            <h3>Make Stella look however you want.</h3>
           </div>
           <p className="demo-panel__lede">
-            Stella should feel editable as a product surface, not fixed chrome. These states show the interface morphing from focused tweaks to full thematic shifts without interrupting the session.
+            Just tell Stella to change its appearance — from small tweaks like colors to a complete visual makeover. It redesigns itself while you keep chatting.
           </p>
         </div>
         <SelfModificationShowcase />
@@ -1039,11 +1071,11 @@ export function ProductDemos() {
       <article className="demo-panel demo-panel--full">
         <div className="demo-panel__header demo-panel__header--tight">
           <div className="section-kicker section-kicker--compact">
-            <span>Radial dial</span>
-            <h3>The overlay should explain itself through each mode.</h3>
+            <span>Quick access</span>
+            <h3>Everything you need, one gesture away.</h3>
           </div>
           <p className="demo-panel__lede">
-            The dial stays on the left. The selected action opens a product-real mock on the right so the user immediately understands what Auto, Voice, Full, Chat, and Capture actually do.
+            The radial dial pops up wherever you are. Capture your screen, start a chat, dictate with your voice, or get an instant summary — all without switching windows.
           </p>
         </div>
         <RadialDialShowcase />
@@ -1052,11 +1084,11 @@ export function ProductDemos() {
       <article className="demo-panel demo-panel--full">
         <div className="demo-panel__header">
           <div className="section-kicker section-kicker--compact">
-            <span>Canvas shell</span>
-            <h3>The full Stella workspace should feel alive, generative, and operational.</h3>
+            <span>Your workspace</span>
+            <h3>See everything Stella is working on at a glance.</h3>
           </div>
           <p className="demo-panel__lede">
-            This shell view focuses on what matters: a concept-rich canvas in the main area and an activity rail that makes active work and scheduled follow-ups visible at a glance.
+            The full Stella window shows your dashboard, active tasks, and upcoming follow-ups — all in one clean, organized view.
           </p>
         </div>
         <CanvasShowcase />

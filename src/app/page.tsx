@@ -4,100 +4,87 @@ import { HeroStellaOrb } from "@/components/hero-stella-orb";
 import { ProductDemos } from "@/components/product-demos";
 
 const navItems = [
-  "Chronicle",
-  "Owner's Manual",
-  "Models",
-  "Stella Free",
+  "What's New",
+  "How It Works",
+  "Download",
   "Pricing",
 ];
 
 const showcaseCards = [
   {
-    title: "Untangle a flaky checkout regression before launch",
-    author: "AK",
-    authorName: "averyk",
-    prompts: "6 prompts",
-    files: "18 files",
-    delta: "+842",
-    minus: "-103",
-    approx: "~41",
+    title: "Plan my week and check in every morning with a summary",
+    author: "JM",
+    authorName: "jamie",
+    detail: "Scheduling",
+    time: "3 min setup",
   },
   {
-    title: "Plan a TypeScript workspace migration with guardrails",
-    author: "ML",
-    authorName: "mlee",
-    prompts: "14 prompts",
-    files: "33 files",
-    delta: "+516",
-    minus: "-210",
-    approx: "~88",
+    title: "Research birthday gift ideas and compare prices across stores",
+    author: "SL",
+    authorName: "sara",
+    detail: "Web search",
+    time: "2 min chat",
   },
   {
-    title: "Design a terminal-first review flow for agent handoffs",
-    author: "PR",
-    authorName: "priya-r",
-    prompts: "9 prompts",
-    files: "11 files",
-    delta: "+301",
-    minus: "-77",
-    approx: "~24",
+    title: "Redesign my Stella homepage with a cozy autumn theme",
+    author: "TK",
+    authorName: "toby",
+    detail: "Customization",
+    time: "1 prompt",
   },
   {
-    title: "Audit an experiment rollout and clean up product analytics",
-    author: "DN",
-    authorName: "devon",
-    prompts: "4 prompts",
-    files: "12 files",
-    delta: "+190",
-    minus: "-32",
-    approx: "~16",
+    title: "Summarize this long article and pull out the key takeaways",
+    author: "RN",
+    authorName: "riya",
+    detail: "Reading",
+    time: "Instant",
   },
 ];
 
 const announcements = [
   {
     date: "March 12, 2026",
-    title: "A calmer review loop",
-    blurb: "Inline review summaries now group findings by risk instead of by file.",
+    title: "Smarter daily check-ins",
+    blurb: "Morning summaries now highlight what actually matters instead of listing everything.",
   },
   {
     date: "March 4, 2026",
-    title: "Context windows that stay readable",
-    blurb: "Long sessions collapse into tidy thread snapshots without losing momentum.",
+    title: "Longer conversations, no lost thread",
+    blurb: "Stella remembers what you talked about even in really long back-and-forth sessions.",
   },
   {
     date: "February 25, 2026",
-    title: "Parallel plans for parallel teams",
-    blurb: "Stella can split implementation work across focused helpers in one pass.",
+    title: "Stella can multitask",
+    blurb: "Ask for several things at once and Stella works on them at the same time.",
   },
   {
     date: "February 18, 2026",
-    title: "Editor handoff, without the friction",
-    blurb: "Open threads move between the terminal and editor without losing state.",
+    title: "Voice just got better",
+    blurb: "Talk to Stella anywhere on your screen and pick up right where you left off.",
   },
   {
     date: "February 7, 2026",
-    title: "A cleaner install story",
-    blurb: "One command now configures the CLI, shell completions, and editor links.",
+    title: "Easier setup",
+    blurb: "Download, install, and you're ready. That's it.",
   },
 ];
 
 const footerGroups = [
   {
     title: "Product",
-    items: ["Get Started", "Sign In", "Owner's Manual", "Models", "Stella Free"],
+    items: ["Get Started", "Sign In", "Download", "Pricing"],
   },
   {
     title: "Resources",
-    items: ["Chronicle", "Pricing", "Podcast", "Press Kit"],
+    items: ["What's New", "Help Center", "Podcast", "Press Kit"],
   },
   {
-    title: "Guides",
-    items: ["How to Build with Agents", "Context Management"],
+    title: "Learn",
+    items: ["Getting Started Guide", "Tips & Tricks"],
   },
   {
     title: "Community",
-    items: ["X @stella", "Stella Insiders", "YouTube"],
+    items: ["X @stella", "Stella Community", "YouTube"],
   },
 ];
 
@@ -147,11 +134,11 @@ export default function Home() {
 
           <div className="hero-copy reveal reveal-delay-1">
             <p>
-              Stella is the coding environment for teams that want leading models,
-              fast feedback, and a calmer path from prompt to production.
+              Stella is your personal AI assistant that lives on your computer.
+              Chat, voice, automation, and a fully customizable interface — all in one place.
             </p>
             <p className="hero-copy__subtle">
-              Usage-based pricing. Thoughtful defaults. Zero markup for individuals.
+              Simple to start. Remembers what matters. Works the way you do.
             </p>
           </div>
 
@@ -159,7 +146,7 @@ export default function Home() {
 
           <div className="hero-actions reveal reveal-delay-2">
             <a className="button button--primary" href="#">
-              Start with Stella
+              Download Stella
               <ArrowRight size={18} />
             </a>
           </div>
@@ -176,8 +163,8 @@ export default function Home() {
 
         <section className="grid-shell showcase-section section-border">
           <div className="section-kicker">
-            <span>Social</span>
-            <h2>See how people are building with Stella</h2>
+            <span>People</span>
+            <h2>See how people use Stella every day</h2>
           </div>
 
           <div className="showcase-grid">
@@ -201,13 +188,10 @@ export default function Home() {
 
                   <div className="showcase-card__footer">
                     <div>
-                      <p>{card.prompts}</p>
-                      <p>{card.files}</p>
+                      <p>{card.detail}</p>
                     </div>
                     <div className="showcase-card__stats">
-                      <p>{card.delta}</p>
-                      <p>{card.minus}</p>
-                      <p>{card.approx}</p>
+                      <p>{card.time}</p>
                     </div>
                   </div>
                 </div>
@@ -219,13 +203,13 @@ export default function Home() {
         <section className="grid-shell news-section section-border">
           <div className="section-kicker">
             <span>News</span>
-            <h2>Announcements of Stella</h2>
+            <h2>What&apos;s new in Stella</h2>
           </div>
 
           <div className="news-panel reveal">
             <div className="news-panel__header">
               <span>New</span>
-              <span>GPT-5.4, the calm one</span>
+              <span>Stella keeps getting better</span>
             </div>
 
             <div className="news-list">
@@ -284,7 +268,7 @@ export default function Home() {
 
         <div className="footer-note">
           <Sparkles size={14} />
-          <p>Made for teams who want agency, clarity, and a little more taste in their tools.</p>
+          <p>Made for people who want a smarter, calmer way to get things done.</p>
         </div>
       </footer>
     </div>

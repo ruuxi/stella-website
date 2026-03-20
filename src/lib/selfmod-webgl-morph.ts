@@ -5,9 +5,9 @@
  */
 import { toPng } from "html-to-image";
 
-const COVER_RAMP_UP_MS = 220;
-const HMR_CROSSFADE_MS = 260;
-const HMR_CALM_DOWN_MS = 180;
+const COVER_RAMP_UP_MS = 250;
+const HMR_CROSSFADE_MS = 300;
+const HMR_CALM_DOWN_MS = 220;
 const STEADY_STRENGTH = 0.65;
 
 const VERT = `
@@ -341,8 +341,9 @@ export async function runSelfmodWebglMorph(options: {
 
     swap();
 
+    // Wait for React to flush + CSS transitions to complete before snapshotting
     await new Promise<void>((r) => requestAnimationFrame(() => r()));
-    await new Promise<void>((r) => requestAnimationFrame(() => r()));
+    await new Promise<void>((r) => setTimeout(r, 550));
 
     const afterDataUrl = await toPng(captureEl, pngOpts(canvas));
     const imgAfter = await loadImage(afterDataUrl);

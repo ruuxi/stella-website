@@ -115,7 +115,8 @@
   flex: 1;
   min-height: 0;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
+  padding-top: 1.8rem;
 }
 
 .selfmod-canvas__capture {
@@ -353,17 +354,154 @@
     0 10px 36px color-mix(in srgb, var(--selfmod-cat-orange) 14%, transparent);
 }
 
-/* Stage cross-fade — from desktop `selfmod-demo.css` (`[data-selfmod-demo]` surfaces) */
+/* Stage cross-fade */
 .selfmod-shell__frame,
 .selfmod-shell__body,
 .selfmod-shell__sidebar,
 .selfmod-shell__sidebar-card,
 .selfmod-shell__titlebar,
-.selfmod-conversation,
-.selfmod-conversation__message,
-.selfmod-conversation__composer,
-.selfmod-conversation__composer button {
+.selfmod-shell__nav button,
+.selfmod-shell__nav-label,
+.selfmod-shell__brand-text,
+.selfmod-preview-bubble,
+.selfmod-option {
   transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* ── Cat SVGs — hidden by default ─────────────────────────────── */
+
+.selfmod-shell {
+  position: relative;
+}
+
+.selfmod-cat-ears,
+.selfmod-cat-sleeping,
+.selfmod-cat-paw {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.selfmod-cat-ears {
+  width: 130px;
+  height: 38px;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  color: color-mix(in srgb, var(--selfmod-cat-orange, #f97316) 60%, #fde68a);
+}
+
+.selfmod-cat-ear-inner {
+  fill: color-mix(in srgb, var(--selfmod-cat-peach, #fdba74) 70%, #fff);
+}
+
+.selfmod-cat-sleeping {
+  width: 56px;
+  height: 35px;
+  bottom: 0.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: color-mix(in srgb, var(--selfmod-cat-orange, #f97316) 50%, #fde68a);
+}
+
+.selfmod-cat-paw {
+  width: 26px;
+  height: 46px;
+  top: -3rem;
+  right: 2.5rem;
+  z-index: 5;
+  color: color-mix(in srgb, var(--selfmod-cat-orange, #f97316) 45%, #fde68a);
+}
+
+/* Show cat decorations only in high stage */
+.selfmod-shell[data-stage="high"] .selfmod-cat-ears {
+  opacity: 1;
+}
+.selfmod-shell[data-stage="high"] .selfmod-cat-sleeping {
+  opacity: 1;
+}
+.selfmod-shell[data-stage="high"] .selfmod-cat-paw {
+  opacity: 1;
+}
+
+/* ── Medium stage — icon-only sidebar, more spacing ───────────── */
+
+.selfmod-shell[data-stage="medium"] .selfmod-shell__nav-label {
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-shell__brand-text {
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-shell__sidebar {
+  padding: 0.8rem 0.5rem;
+  gap: 0.6rem;
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-shell__nav button {
+  justify-content: center;
+  padding: 0.72rem;
+  gap: 0;
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-shell__brand {
+  justify-content: center;
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-preview-bubbles {
+  gap: 1.4rem;
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-preview-bubble {
+  font-size: 0.82rem;
+  padding: 0.7rem 1rem;
+}
+
+/* ── High stage — cat theme layout overhaul ───────────────────── */
+
+.selfmod-shell[data-stage="high"] .selfmod-shell__nav-label {
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-shell__brand-text {
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-shell__sidebar {
+  padding: 0.8rem 0.45rem;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-shell__nav button {
+  justify-content: center;
+  padding: 0.72rem;
+  gap: 0;
+  border-radius: 50%;
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-shell__brand {
+  justify-content: center;
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-preview-bubbles {
+  gap: 1.6rem;
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-preview-bubble {
+  font-size: 0.82rem;
+  padding: 0.75rem 1rem;
 }
 
 .selfmod-shell__frame {
@@ -434,6 +572,7 @@
 }
 
 .selfmod-shell__body {
+  position: relative;
   display: grid;
   min-height: 34rem;
   background: rgba(246, 250, 255, 0.56);
@@ -1566,6 +1705,11 @@
     grid-template-columns: 16rem minmax(0, 1fr);
   }
 
+  .selfmod-shell[data-stage="medium"] .selfmod-shell__body,
+  .selfmod-shell[data-stage="high"] .selfmod-shell__body {
+    grid-template-columns: 3.8rem minmax(0, 1fr);
+  }
+
   .selfmod-shell__sidebar {
     border-right: 1px solid rgba(84, 112, 146, 0.12);
     border-bottom: 0;
@@ -1624,4 +1768,159 @@
   .shell-workspace__header {
     grid-template-columns: 1fr;
   }
+}
+
+/* ── Self-mod preview bubbles (inside mock window) ──────────────── */
+
+.selfmod-preview-area {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+}
+
+.selfmod-preview-bubbles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+  padding-bottom: 0.8rem;
+}
+
+.selfmod-preview-bubble {
+  max-width: min(22rem, 85%);
+  padding: 0.6rem 0.85rem;
+  border-radius: 0.85rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.selfmod-preview-bubble--stella {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.78);
+  color: rgba(25, 40, 61, 0.82);
+  border: 1px solid rgba(94, 122, 164, 0.1);
+}
+
+.selfmod-preview-bubble--user {
+  align-self: flex-end;
+  background: var(--selfmod-accent);
+  color: #fff;
+  border: 1px solid transparent;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--selfmod-accent) 22%, transparent);
+}
+
+/* Medium stage — modern feel */
+.selfmod-shell[data-stage="medium"] .selfmod-preview-bubble {
+  border-radius: 0.4rem;
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-preview-bubble--stella {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(84, 112, 146, 0.08);
+  box-shadow: 0 2px 12px rgba(25, 80, 140, 0.04);
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-preview-bubble--user {
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--selfmod-accent) 20%, transparent);
+}
+
+/* High stage — cozy cat theme */
+.selfmod-shell[data-stage="high"] .selfmod-preview-bubble--stella {
+  background: color-mix(in srgb, #fff 76%, var(--selfmod-cat-cream));
+  border: 1px solid color-mix(in srgb, var(--selfmod-cat-orange) 16%, transparent);
+  border-radius: 0.9rem 0.9rem 0.9rem 0.25rem;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--selfmod-cat-orange) 8%, transparent);
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-preview-bubble--user {
+  border-radius: 0.9rem 0.9rem 0.25rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--selfmod-cat-orange) 28%, transparent);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--selfmod-cat-orange) 20%, transparent);
+}
+
+/* ── Self-mod option buttons (inside mock window) ───────────────── */
+
+.selfmod-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  flex: 1;
+  justify-content: flex-end;
+  padding: 0.5rem 0;
+}
+
+.selfmod-option {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(94, 122, 164, 0.12);
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.52);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.selfmod-option:hover {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(94, 122, 164, 0.2);
+}
+
+.selfmod-option[data-active] {
+  border-color: rgba(29, 120, 242, 0.28);
+  background: rgba(236, 244, 255, 0.88);
+  transform: translateY(-1px);
+}
+
+.selfmod-option__level {
+  flex-shrink: 0;
+  color: rgba(43, 60, 84, 0.54);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  min-width: 3.5rem;
+}
+
+.selfmod-option[data-active] .selfmod-option__level {
+  color: rgba(29, 120, 242, 0.8);
+}
+
+.selfmod-option__prompt {
+  color: rgba(18, 33, 55, 0.88);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+/* Stage-specific option theming */
+
+.selfmod-shell[data-stage="medium"] .selfmod-option {
+  border-radius: 0.45rem;
+  border-color: rgba(84, 112, 146, 0.09);
+}
+
+.selfmod-shell[data-stage="medium"] .selfmod-option[data-active] {
+  border-color: color-mix(in srgb, var(--selfmod-accent) 30%, rgba(84, 112, 146, 0.1));
+  background: color-mix(in srgb, var(--selfmod-accent) 8%, rgba(255, 255, 255, 0.9));
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-option {
+  border-radius: 0.75rem;
+  border-color: color-mix(in srgb, var(--selfmod-cat-orange) 12%, transparent);
+  background: color-mix(in srgb, #fff 82%, var(--selfmod-cat-cream));
+}
+
+.selfmod-shell[data-stage="high"] .selfmod-option[data-active] {
+  border-color: color-mix(in srgb, var(--selfmod-cat-orange) 34%, transparent);
+  background: color-mix(in srgb, var(--selfmod-cat-cream) 30%, rgba(255, 255, 255, 0.9));
 }

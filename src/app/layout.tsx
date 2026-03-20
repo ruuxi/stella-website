@@ -33,11 +33,11 @@ const mono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "Stella",
   description:
-    "Stella is a polished coding environment for teams working with frontier models.",
+    "Stella is your personal AI assistant that lives on your computer. Chat, voice, scheduling, and a fully customizable interface.",
   openGraph: {
     title: "Stella",
     description:
-      "A Stella landing page inspired by modern editorial product marketing for coding agents.",
+      "Your personal AI assistant. Chat, voice, automation, and a fully customizable interface — all in one place.",
     siteName: "Stella",
     type: "website",
   },
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Stella",
     description:
-      "A Stella landing page inspired by modern editorial product marketing for coding agents.",
+      "Your personal AI assistant. Chat, voice, automation, and a fully customizable interface — all in one place.",
   },
 };
 
