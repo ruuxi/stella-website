@@ -3,8 +3,8 @@
 import { ArrowRight } from "lucide-react";
 
 const DOWNLOADS = {
-  mac: "https://github.com/ruuxi/stella/releases/latest/download/stella-desktop-darwin-arm64.tar.zst",
-  windows: "https://github.com/ruuxi/stella/releases/latest/download/stella-desktop-win-x64.tar.zst",
+  mac: "https://github.com/ruuxi/stella/releases/latest/download/StellaSetup-darwin-arm64",
+  windows: "https://github.com/ruuxi/stella/releases/latest/download/StellaSetup-win-x64.exe",
 } as const;
 
 type Platform = "mac" | "windows";
