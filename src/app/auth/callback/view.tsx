@@ -35,6 +35,7 @@ const buildDeepLink = (client: ClientKind, params: URLSearchParams) => {
 export function AuthCallbackView() {
   const searchParams = useSearchParams();
   const queryString = searchParams.toString();
+  const isDone = searchParams.get("done") === "true";
   const preferredClient = useMemo(
     () => pickClient(searchParams.get("client")),
     [searchParams],
@@ -60,11 +61,28 @@ export function AuthCallbackView() {
   }, [alternateClient, queryString]);
 
   useEffect(() => {
-    if (!queryString || !hasOtt) {
+    if (isDone || !queryString || !hasOtt) {
       return;
     }
     window.location.replace(primaryLink);
-  }, [hasOtt, primaryLink, queryString]);
+  }, [isDone, hasOtt, primaryLink, queryString]);
+
+  if (isDone) {
+    return (
+      <main className={styles.page}>
+        <div className={styles.shell}>
+          <div className={styles.badge}>Stella</div>
+          <h1 className={styles.title}>You're signed in</h1>
+          <p className={styles.body}>
+            You can close this tab and return to Stella.
+          </p>
+          <Link className={styles.homeLink} href="/">
+            Back to stella.sh
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className={styles.page}>
