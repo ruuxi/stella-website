@@ -3,7 +3,7 @@
 import { ArrowRight } from "lucide-react";
 
 const DOWNLOADS = {
-  mac: "https://github.com/ruuxi/stella/releases/latest/download/StellaSetup-darwin-arm64",
+  mac: "https://github.com/ruuxi/stella/releases/latest/download/StellaSetup-darwin-arm64.dmg",
   windows: "https://github.com/ruuxi/stella/releases/latest/download/StellaSetup-win-x64.exe",
 } as const;
 
