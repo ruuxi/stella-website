@@ -10,18 +10,18 @@ const SelfModDemo = dynamic(
   { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
 );
 
-const RadialDialDemo = dynamic(
-  () => import("@/components/product-demos/product-demos").then((mod) => mod.RadialDialDemo),
+const RadialDialSection = dynamic(
+  () => import("@/components/product-demos/demo-sections").then((mod) => mod.RadialDialSection),
   { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
 );
 
-const CanvasDemo = dynamic(
-  () => import("@/components/product-demos/product-demos").then((mod) => mod.CanvasDemo),
+const CanvasSection = dynamic(
+  () => import("@/components/product-demos/demo-sections").then((mod) => mod.CanvasSection),
   { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
 );
 
-const MobileShowcase = dynamic(
-  () => import("@/components/product-demos/mobile-showcase").then((mod) => mod.MobileShowcase),
+const MobileSection = dynamic(
+  () => import("@/components/product-demos/demo-sections").then((mod) => mod.MobileSection),
   { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
 );
 
@@ -30,10 +30,9 @@ function DemoFallback() {
 }
 
 const navItems = [
-  "What's New",
-  "How It Works",
-  "Download",
-  "Pricing",
+  { label: "What's New", href: "#" },
+  { label: "How It Works", href: "/how-it-works" },
+  { label: "Pricing", href: "/pricing" },
 ];
 
 const showcaseCards = [
@@ -143,14 +142,10 @@ export default function Home() {
 
         <nav className="desktop-nav" aria-label="Primary">
           {navItems.map((item) => (
-            <a key={item} href="#">
-              {item}
+            <a key={item.label} href={item.href}>
+              {item.label}
             </a>
           ))}
-          <a href="#">Sign In</a>
-          <a className="button button--compact button--accent" href="#">
-            Get Started
-          </a>
         </nav>
 
         <button className="mobile-nav-toggle" type="button" aria-label="Open menu">
@@ -177,9 +172,8 @@ export default function Home() {
             </p>
           </div>
 
-          <HeroStellaOrb />
-
           <div className="hero-actions reveal reveal-delay-2">
+            <HeroStellaOrb />
             <DownloadButton />
           </div>
         </section>
@@ -187,45 +181,33 @@ export default function Home() {
         <section className="grid-shell showcase-section section-border">
           <div className="section-kicker">
             <h2>Make Stella entirely yours</h2>
+            <p className="section-kicker__desc">
+              Just tell Stella to change its appearance — from small tweaks like
+              colors to a complete visual makeover. It redesigns itself while you
+              keep chatting.
+            </p>
           </div>
           <div className="product-demos-slot">
-            <DeferInView fallback={<DemoFallback />} rootMargin="360px 0px">
-              <SelfModDemo />
-            </DeferInView>
+            <div className="demo-showcase-grid">
+              <article className="demo-panel demo-panel--full">
+                <DeferInView fallback={<DemoFallback />} rootMargin="360px 0px">
+                  <SelfModDemo />
+                </DeferInView>
+              </article>
+            </div>
           </div>
         </section>
 
         <section className="grid-shell showcase-section section-border">
-          <div className="section-kicker">
-            <h2>Access Stella from anywhere</h2>
-          </div>
-          <div className="product-demos-slot">
-            <DeferInView fallback={<DemoFallback />} rootMargin="360px 0px">
-              <RadialDialDemo />
-            </DeferInView>
-          </div>
+          <RadialDialSection />
         </section>
 
         <section className="grid-shell showcase-section section-border">
-          <div className="section-kicker">
-            <h2>Everything in one place</h2>
-          </div>
-          <div className="product-demos-slot">
-            <DeferInView fallback={<DemoFallback />} rootMargin="360px 0px">
-              <CanvasDemo />
-            </DeferInView>
-          </div>
+          <CanvasSection />
         </section>
 
         <section className="grid-shell showcase-section section-border">
-          <div className="section-kicker">
-            <h2>Control your computer from anywhere</h2>
-          </div>
-          <div className="product-demos-slot">
-            <DeferInView fallback={<DemoFallback />} rootMargin="360px 0px">
-              <MobileShowcase />
-            </DeferInView>
-          </div>
+          <MobileSection />
         </section>
 
         <section className="grid-shell showcase-section showcase-section--deferred section-border">

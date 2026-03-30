@@ -32,6 +32,7 @@
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(82, 104, 134, 0.14);
+  padding: var(--demo-panel-padding);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(246, 250, 255, 0.72)),
     var(--page-panel);
@@ -52,6 +53,21 @@
 .demo-panel > * {
   position: relative;
   z-index: 1;
+}
+
+.demo-panel--portrait {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  padding: var(--demo-panel-padding);
+  max-width: none;
+  min-height: 52rem;
+}
+
+/* DeferInView wrapper: same inner inset as self-mod / radial / canvas */
+.demo-panel--portrait > div {
+  padding: var(--demo-panel-inner-padding);
+  box-sizing: border-box;
 }
 
 .demo-panel__header {

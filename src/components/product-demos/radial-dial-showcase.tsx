@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { StellaAnimation } from "@/components/stella-animation/stella-animation";
-import { useViewportActivity } from "@/components/use-viewport-activity";
 import {
   cancelAnimation,
   destroyBlob,
@@ -21,7 +20,7 @@ import {
 } from "@/components/stella-demos/radial-blob";
 import { runVacuumEffect } from "@/components/stella-demos/region-capture-vacuum";
 import { makeCaptureThumbnail } from "./capture-thumbnail";
-import { RADIAL_RAIL_DETAILS, RADIAL_WEDGES } from "./data";
+import { RADIAL_WEDGES } from "./data";
 import {
   CENTER_BG_RADIUS,
   createBlobColors,
@@ -31,8 +30,6 @@ import {
 } from "./radial-geometry";
 
 const RADIAL_DIAL_PHASE_MS = 1800;
-const RADIAL_RESULT_HOLD_MS = 4000;
-const RADIAL_CYCLE_MS = RADIAL_DIAL_PHASE_MS + RADIAL_RESULT_HOLD_MS + 800;
 
 function CaptureVacuumCanvas({
   active,
@@ -55,46 +52,29 @@ function CaptureVacuumCanvas({
   return <canvas ref={canvasRef} className="radial-result-vacuum" />;
 }
 
-export function RadialDialShowcase() {
-  const [selectedIndex, setSelectedIndex] = useState(0);
+export function RadialDialVisual({
+  selectedIndex,
+  isActive,
+}: {
+  selectedIndex: number;
+  isActive: boolean;
+}) {
   const [phase, setPhase] = useState<"dial" | "result">("dial");
   const [isVisible, setIsVisible] = useState(false);
-  const { ref, isActive } = useViewportActivity<HTMLDivElement>({
-    rootMargin: "240px 0px",
-  });
+  const ref = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const selectedIdxRef = useRef(selectedIndex);
   const colorsRef = useRef<BlobColors>(createBlobColors(selectedIndex));
 
+  // Reset phase cycle when selectedIndex changes
   useEffect(() => {
     if (!isActive) return;
-
-    let cancelled = false;
-    const timeoutIds: number[] = [];
-
-    const cycle = () => {
-      if (cancelled) return;
-
-      setPhase("dial");
-
-      timeoutIds.push(window.setTimeout(() => {
-        if (cancelled) return;
-        setPhase("result");
-      }, RADIAL_DIAL_PHASE_MS));
-
-      timeoutIds.push(window.setTimeout(() => {
-        if (cancelled) return;
-        setSelectedIndex((current) => (current + 1) % RADIAL_WEDGES.length);
-        cycle();
-      }, RADIAL_CYCLE_MS));
-    };
-
-    cycle();
-    return () => {
-      cancelled = true;
-      timeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
-    };
-  }, [isActive]);
+    setPhase("dial");
+    const timer = window.setTimeout(() => {
+      setPhase("result");
+    }, RADIAL_DIAL_PHASE_MS);
+    return () => window.clearTimeout(timer);
+  }, [selectedIndex, isActive]);
 
   useEffect(() => {
     selectedIdxRef.current = selectedIndex;
@@ -135,32 +115,7 @@ export function RadialDialShowcase() {
   const showResult = isActive && phase === "result";
 
   return (
-    <div ref={ref} className="radial-demo radial-demo--unified">
-      <div className="radial-demo__description">
-        <ul className="radial-demo__feature-rail" aria-label="Quick actions">
-          {RADIAL_WEDGES.map((wedge, index) => {
-            const Icon = wedge.icon;
-            const isActive = selectedIndex === index;
-
-            return (
-              <li
-                key={wedge.id}
-                className="radial-demo__feature-item"
-                data-active={isActive || undefined}
-              >
-                <span className="radial-demo__feature-icon" aria-hidden="true">
-                  <Icon width={17} height={17} />
-                </span>
-                <div className="radial-demo__feature-main">
-                  <strong>{wedge.label}</strong>
-                  <p>{RADIAL_RAIL_DETAILS[wedge.id]}</p>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-
+    <div ref={ref} className="radial-demo radial-demo--visual-only">
       <div className="radial-desktop-mock">
         <div className="radial-desktop-mock__titlebar">
           <div className="radial-desktop-mock__traffic">
