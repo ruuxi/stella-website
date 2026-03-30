@@ -1,7 +1,7 @@
 .radial-demo {
   display: grid;
   gap: 1.2rem;
-  padding: 0.3rem 1.3rem 1.3rem;
+  padding: var(--demo-panel-inner-padding);
 }
 
 .radial-demo__dock {
@@ -603,7 +603,7 @@
 .canvas-showcase {
   display: grid;
   gap: 1rem;
-  padding: 0.4rem 1.3rem 1.3rem;
+  padding: var(--demo-panel-inner-padding);
 }
 
 .canvas-showcase__meta {
@@ -645,6 +645,13 @@
     0 24px 60px rgba(50, 84, 128, 0.12);
 }
 
+.canvas-showcase--visual-only .shell-preview {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 .shell-preview__titlebar {
   display: flex;
   align-items: center;
@@ -654,9 +661,15 @@
   background: rgba(255, 255, 255, 0.68);
 }
 
+.canvas-showcase--visual-only .shell-preview__titlebar {
+  border-radius: 0.9rem 0.9rem 0 0;
+}
+
 .shell-preview__body {
   display: grid;
-  min-height: 34rem;
+  min-height: 42rem;
+  border-radius: 0 0 0.9rem 0.9rem;
+  overflow: hidden;
 }
 
 .shell-sidebar {

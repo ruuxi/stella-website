@@ -20,6 +20,12 @@
   --page-glow-mint: rgba(123, 245, 219, 0.16);
 
   --page-max-width: 2560px;
+  /* Single text / control width for `.section-kicker` and matching blocks */
+  --section-kicker-measure: 22rem;
+  /* Shared chrome for `.demo-panel` (full + portrait) */
+  --demo-panel-padding: 1.5rem;
+  /* Inset for demo visuals inside the panel — matches `.selfmod-layout` */
+  --demo-panel-inner-padding: 0.9rem 1.3rem 1.3rem;
   --page-margin: clamp(1rem, 4.098vw, 6.5rem);
   --page-cell-padding: clamp(0.8rem, 1.6vw, 1.5rem);
   --page-radius: 0.45rem;
@@ -243,9 +249,10 @@ select {
 
 .hero-section {
   position: relative;
-  align-items: end;
-  padding-top: clamp(1.4rem, 3vw, 3rem);
-  padding-bottom: clamp(2.5rem, 6vw, 5rem);
+  align-items: start;
+  min-height: calc(100svh - 4rem);
+  padding-top: clamp(4rem, 12vw, 14rem);
+  padding-bottom: clamp(4rem, 8vw, 8rem);
 }
 
 .hero-section > * {
@@ -353,9 +360,7 @@ select {
 }
 
 .hero-orb-wrap {
-  position: absolute;
-  inset-inline-end: clamp(2rem, 8vw, 9rem);
-  top: clamp(-7.2rem, -1.6vw, -2.4rem);
+  display: none;
   width: clamp(280px, 25vw, 440px);
   height: clamp(280px, 25vw, 440px);
   align-items: center;
@@ -426,24 +431,53 @@ select {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+  max-width: var(--section-kicker-measure);
+  width: 100%;
+  min-width: 0;
+  padding-inline: var(--page-cell-padding);
 }
 
 .section-kicker span {
   color: rgba(18, 18, 15, 0.46);
   font-family: var(--font-display), serif;
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   font-style: italic;
   letter-spacing: -0.03em;
 }
 
 .section-kicker h2 {
   margin: 0;
-  max-width: 18rem;
   font-family: var(--font-display), serif;
-  font-size: clamp(2rem, 4vw, 3.6rem);
+  font-size: clamp(2.4rem, 5vw, 4.2rem);
   font-weight: 400;
   line-height: 0.92;
   letter-spacing: -0.05em;
+}
+
+.section-kicker__desc {
+  margin: 0;
+  color: var(--page-muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.section-kicker__concept-meta h3 {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display), serif;
+  /* Match small display headings elsewhere (e.g. `.news-item__body h3`) */
+  font-size: clamp(1.15rem, 2vw, 1.35rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+  color: rgba(15, 23, 40, 0.92);
+}
+
+.radial-demo__feature-rail--kicker {
+  margin-top: 0.5rem;
+}
+
+.canvas-showcase__tabs--kicker {
+  margin-top: 0.5rem;
 }
 
 .install-panels {
@@ -506,6 +540,7 @@ select {
 .product-demos-slot > * {
   width: 100%;
   min-width: 0;
+  padding-inline: var(--page-cell-padding);
 }
 
 .section-deferred-render,
@@ -1029,6 +1064,11 @@ select {
     grid-template-columns: 1fr 1fr 1fr;
   }
 
+  /* Top-align kicker + demo / cards in showcase rows (avoid uneven vertical stretch). */
+  .showcase-section {
+    align-items: start;
+  }
+
   .brand-wrap {
     grid-column: 1;
   }
@@ -1111,12 +1151,19 @@ select {
 
   .hero-actions {
     grid-column: 4 / 6;
-    align-self: end;
+    align-self: start;
     justify-content: center;
+    position: relative;
   }
 
   .hero-orb-wrap {
     display: flex;
+    position: absolute;
+    inset-inline-end: auto;
+    top: auto;
+    bottom: calc(100% + 1.5rem);
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   .section-kicker {

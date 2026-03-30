@@ -8,8 +8,6 @@ import {
   Sparkles,
   SquareTerminal,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useViewportActivity } from "@/components/use-viewport-activity";
 import { CANVAS_CONCEPTS } from "./data";
 
 function PlanArtifact() {
@@ -188,46 +186,18 @@ const ARTIFACT_MAP: Record<string, React.FC> = {
   timeline: ReportArtifact,
 };
 
-export function CanvasShowcase() {
-  const [conceptIndex, setConceptIndex] = useState(0);
-  const { ref, isActive } = useViewportActivity<HTMLDivElement>({
-    rootMargin: "240px 0px",
-  });
-
-  useEffect(() => {
-    if (!isActive) return;
-
-    const timer = window.setInterval(() => {
-      setConceptIndex((current) => (current + 1) % CANVAS_CONCEPTS.length);
-    }, 5500);
-    return () => window.clearInterval(timer);
-  }, [isActive]);
-
+export function CanvasVisual({
+  conceptIndex,
+  isActive,
+}: {
+  conceptIndex: number;
+  isActive: boolean;
+}) {
   const activeConcept = CANVAS_CONCEPTS[conceptIndex];
   const ArtifactComponent = ARTIFACT_MAP[activeConcept.id] ?? PlanArtifact;
 
   return (
-    <div ref={ref} className="canvas-showcase">
-      <div className="canvas-showcase__meta">
-        <div className="demo-eyebrow">Full shell</div>
-        <h3>{activeConcept.title}</h3>
-        <p>{activeConcept.blurb}</p>
-
-        <div className="canvas-showcase__tabs">
-          {CANVAS_CONCEPTS.map((concept, index) => (
-            <button
-              key={concept.id}
-              type="button"
-              className="canvas-showcase__tab"
-              data-active={conceptIndex === index || undefined}
-              onClick={() => setConceptIndex(index)}
-            >
-              {concept.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
+    <div className="canvas-showcase canvas-showcase--visual-only">
       <div className="shell-preview">
         <div className="shell-preview__titlebar">
           <div className="shell-preview__traffic">
