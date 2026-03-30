@@ -892,6 +892,125 @@ select {
   }
 }
 
+/* ── Download password modal ─────────────────────────────── */
+
+.dl-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 40, 0.35);
+  backdrop-filter: blur(6px);
+  animation: fade-up 200ms ease both;
+}
+
+.dl-modal {
+  position: relative;
+  width: min(380px, calc(100% - 2rem));
+  border: 1px solid rgba(82, 104, 134, 0.16);
+  border-radius: 1.1rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(246, 250, 255, 0.96));
+  box-shadow:
+    0 24px 60px rgba(15, 23, 40, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+  padding: 2rem 1.6rem 1.6rem;
+  text-align: center;
+}
+
+.dl-modal__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(82, 104, 134, 0.08);
+  color: rgba(15, 23, 40, 0.5);
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.dl-modal__close:hover {
+  background: rgba(82, 104, 134, 0.16);
+  color: rgba(15, 23, 40, 0.8);
+}
+
+.dl-modal__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 999px;
+  background: rgba(29, 120, 242, 0.1);
+  color: var(--page-accent);
+  margin-bottom: 0.9rem;
+}
+
+.dl-modal__title {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display), serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+}
+
+.dl-modal__desc {
+  margin: 0 0 1.2rem;
+  color: var(--page-muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.dl-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.dl-modal__input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(82, 104, 134, 0.2);
+  border-radius: 0.55rem;
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  letter-spacing: -0.02em;
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.dl-modal__input:focus {
+  border-color: rgba(29, 120, 242, 0.45);
+  box-shadow: 0 0 0 3px rgba(29, 120, 242, 0.1);
+}
+
+.dl-modal__input--error {
+  border-color: rgba(220, 38, 38, 0.5);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
+}
+
+.dl-modal__error {
+  color: #dc2626;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-align: left;
+}
+
+.dl-modal__submit {
+  width: 100%;
+  margin-top: 0.2rem;
+}
+
 @keyframes ring-breathe-slow {
   0%,
   100% {

@@ -20,6 +20,11 @@ const CanvasDemo = dynamic(
   { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
 );
 
+const MobileShowcase = dynamic(
+  () => import("@/components/product-demos/mobile-showcase").then((mod) => mod.MobileShowcase),
+  { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
+);
+
 function DemoFallback() {
   return <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} />;
 }
@@ -208,6 +213,17 @@ export default function Home() {
           <div className="product-demos-slot">
             <DeferInView fallback={<DemoFallback />} rootMargin="360px 0px">
               <CanvasDemo />
+            </DeferInView>
+          </div>
+        </section>
+
+        <section className="grid-shell showcase-section section-border">
+          <div className="section-kicker">
+            <h2>Control your computer from anywhere</h2>
+          </div>
+          <div className="product-demos-slot">
+            <DeferInView fallback={<DemoFallback />} rootMargin="360px 0px">
+              <MobileShowcase />
             </DeferInView>
           </div>
         </section>

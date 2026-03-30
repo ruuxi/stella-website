@@ -1,0 +1,476 @@
+/* ── Mobile showcase ─────────────────────────────────────── */
+
+.mobile-demo-panel {
+  overflow: visible;
+}
+
+.mobile-showcase {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.3rem;
+}
+
+/* ── Left column ─────────────────────────────────────────── */
+
+.mobile-showcase__left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.mobile-showcase__header {
+  display: grid;
+  gap: 0.85rem;
+}
+
+/* ── Phone wrapper & mockup ──────────────────────────────── */
+
+.mobile-showcase__phone-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.mobile-phone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 280px;
+  border: 1px solid rgba(84, 112, 146, 0.18);
+  border-radius: 2.2rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(246, 250, 255, 0.94) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 24px 60px rgba(47, 80, 130, 0.12),
+    0 0 0 1px rgba(84, 112, 146, 0.06);
+  overflow: hidden;
+}
+
+.mobile-phone__notch {
+  position: absolute;
+  top: 0.45rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5rem;
+  height: 1.4rem;
+  border-radius: 0 0 1rem 1rem;
+  background: rgba(18, 28, 46, 0.06);
+  z-index: 2;
+}
+
+.mobile-phone__status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 1.5rem 0;
+  min-height: 1.8rem;
+}
+
+.mobile-phone__time {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(15, 23, 40, 0.72);
+  letter-spacing: -0.02em;
+}
+
+.mobile-phone__status-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: rgba(15, 23, 40, 0.52);
+}
+
+.mobile-phone__battery {
+  display: block;
+  width: 1.2rem;
+  height: 0.55rem;
+  border-radius: 2px;
+  border: 1px solid rgba(15, 23, 40, 0.35);
+  position: relative;
+}
+
+.mobile-phone__battery::before {
+  content: "";
+  position: absolute;
+  inset: 1.5px;
+  border-radius: 1px;
+  background: rgba(15, 23, 40, 0.35);
+  width: 70%;
+}
+
+.mobile-phone__battery::after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.5px;
+  height: 0.25rem;
+  border-radius: 0 1px 1px 0;
+  background: rgba(15, 23, 40, 0.35);
+}
+
+.mobile-phone__header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem 0.6rem;
+  border-bottom: 1px solid rgba(84, 112, 146, 0.1);
+}
+
+.mobile-phone__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: rgba(29, 120, 242, 0.1);
+  flex-shrink: 0;
+}
+
+.mobile-phone__avatar img {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.mobile-phone__contact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.mobile-phone__name {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: rgba(15, 23, 40, 0.92);
+  letter-spacing: -0.03em;
+}
+
+.mobile-phone__status-text {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.62rem;
+  color: rgba(44, 64, 92, 0.55);
+  letter-spacing: -0.01em;
+}
+
+.mobile-phone__dot {
+  display: block;
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 999px;
+  background: #34d399;
+  flex-shrink: 0;
+}
+
+/* ── Chat messages ──────────────────────────────────────── */
+
+.mobile-phone__chat {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.6rem;
+  padding: 0.85rem 0.75rem;
+}
+
+.mobile-msg {
+  max-width: 82%;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  letter-spacing: -0.015em;
+  animation: mobile-msg-in 400ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.mobile-msg--user {
+  align-self: flex-end;
+  border-radius: 1rem 1rem 0.25rem 1rem;
+  background: var(--page-accent);
+  color: white;
+  box-shadow: 0 6px 18px rgba(29, 120, 242, 0.22);
+}
+
+.mobile-msg--stella {
+  align-self: flex-start;
+  border-radius: 1rem 1rem 1rem 0.25rem;
+  background: rgba(255, 255, 255, 0.88);
+  color: rgba(25, 40, 61, 0.88);
+  border: 1px solid rgba(84, 112, 146, 0.1);
+}
+
+.mobile-msg:nth-child(1) { animation-delay: 0ms; }
+.mobile-msg:nth-child(2) { animation-delay: 100ms; }
+.mobile-msg:nth-child(3) { animation-delay: 200ms; }
+.mobile-msg:nth-child(4) { animation-delay: 300ms; }
+
+@keyframes mobile-msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Composer ────────────────────────────────────────────── */
+
+.mobile-phone__composer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin: 0 0.65rem 0.85rem;
+  padding: 0.38rem 0.38rem 0.38rem 0.85rem;
+  border: 1px solid rgba(84, 112, 146, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.mobile-phone__composer span {
+  color: rgba(48, 66, 92, 0.42);
+  font-size: 0.74rem;
+}
+
+.mobile-phone__composer button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--page-accent);
+  color: white;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+/* ── Desktop action card ─────────────────────────────────── */
+
+.mobile-desktop-card {
+  width: 100%;
+  border: 1px solid rgba(84, 112, 146, 0.14);
+  border-radius: 1rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(246, 250, 255, 0.85));
+  box-shadow: 0 12px 32px rgba(47, 80, 130, 0.08);
+  overflow: hidden;
+}
+
+.mobile-desktop-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid rgba(84, 112, 146, 0.1);
+  color: rgba(15, 23, 40, 0.72);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.mobile-desktop-card__live {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #34d399;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mobile-desktop-card__live::before {
+  content: "";
+  display: block;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: #34d399;
+  animation: live-pulse 2s ease-in-out infinite;
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.mobile-desktop-card__screen {
+  padding: 0.75rem;
+}
+
+.mobile-desktop-card__taskbar {
+  display: flex;
+  gap: 0.3rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(84, 112, 146, 0.08);
+  margin-bottom: 0.7rem;
+}
+
+.mobile-desktop-card__taskbar span {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: rgba(129, 149, 182, 0.35);
+}
+
+.mobile-desktop-card__taskbar span:first-child { background: #ffb457; }
+.mobile-desktop-card__taskbar span:nth-child(2) { background: #7bc8ff; }
+.mobile-desktop-card__taskbar span:nth-child(3) { background: #53d8b1; }
+
+.mobile-desktop-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.5rem 0;
+}
+
+.mobile-desktop-card__action {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: rgba(15, 23, 40, 0.82);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.mobile-desktop-card__action svg {
+  color: var(--page-accent);
+  flex-shrink: 0;
+}
+
+.mobile-desktop-card__detail {
+  margin: 0;
+  color: rgba(44, 64, 92, 0.58);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  padding-left: 1.6rem;
+}
+
+.mobile-desktop-card__footer {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.85rem;
+  border-top: 1px solid rgba(84, 112, 146, 0.08);
+  color: rgba(44, 64, 92, 0.48);
+  font-size: 0.62rem;
+  font-family: var(--font-mono), monospace;
+  letter-spacing: 0.01em;
+}
+
+.mobile-desktop-card__pulse {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: var(--page-accent);
+  animation: live-pulse 2s ease-in-out infinite;
+}
+
+/* ── Messaging channels ─────────────────────────────────── */
+
+.mobile-channels__label {
+  display: block;
+  color: rgba(44, 64, 92, 0.48);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+
+.mobile-channels__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.mobile-channel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.78rem;
+  border: 1px solid rgba(84, 112, 146, 0.13);
+  border-radius: 0.65rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(248, 251, 255, 0.78));
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.mobile-channel:hover {
+  border-color: rgba(29, 120, 242, 0.22);
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(29, 120, 242, 0.08);
+}
+
+.mobile-channel__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(29, 120, 242, 0.72);
+  flex-shrink: 0;
+}
+
+.mobile-channel__name {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: rgba(15, 23, 40, 0.72);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+/* ── Desktop: side-by-side, phone fills height ───────────── */
+
+@media (min-width: 768px) {
+  .mobile-showcase {
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+    padding: 1.5rem;
+    min-height: 36rem;
+  }
+
+  .mobile-showcase__left {
+    justify-content: center;
+    gap: 1.6rem;
+  }
+
+  .mobile-showcase__phone-wrap {
+    align-self: stretch;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .mobile-phone {
+    width: 300px;
+    height: 100%;
+  }
+
+  .mobile-desktop-card {
+    max-width: 380px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mobile-showcase {
+    grid-template-columns: 1fr 320px;
+    gap: 3rem;
+    padding: 2rem;
+  }
+
+  .mobile-phone {
+    width: 320px;
+  }
+}
