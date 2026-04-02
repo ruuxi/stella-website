@@ -86,7 +86,7 @@ export function RadialDialSection() {
   }, [isActive]);
 
   return (
-    <div ref={ref} style={{ display: "contents" }}>
+    <div style={{ display: "contents" }}>
       <div className="section-kicker">
         <h2>Access Stella from anywhere</h2>
         <p className="section-kicker__desc">
@@ -117,7 +117,7 @@ export function RadialDialSection() {
           })}
         </ul>
       </div>
-      <div className="product-demos-slot">
+      <div ref={ref} className="product-demos-slot">
         <div className="demo-showcase-grid">
           <article className="demo-panel demo-panel--full">
             <DeferInView fallback={<DemoChunkPlaceholder />}>
@@ -152,7 +152,7 @@ export function CanvasSection() {
   const activeConcept = CANVAS_CONCEPTS[conceptIndex];
 
   return (
-    <div ref={ref} style={{ display: "contents" }}>
+    <div style={{ display: "contents" }}>
       <div className="section-kicker">
         <h2>Everything in one place</h2>
         <p className="section-kicker__desc">
@@ -177,7 +177,7 @@ export function CanvasSection() {
           <p className="section-kicker__desc">{activeConcept.blurb}</p>
         </div>
       </div>
-      <div className="product-demos-slot">
+      <div ref={ref} className="product-demos-slot">
         <div className="demo-showcase-grid">
           <article className="demo-panel demo-panel--full">
             <DeferInView fallback={<DemoChunkPlaceholder />}>
