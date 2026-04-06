@@ -2,9 +2,8 @@
 
 import Image from "next/image";
 import { LayoutGrid, MessageSquare, Settings2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { flushSync } from "react-dom";
-import { isWebglMorphSupported, runSelfmodWebglMorph } from "@/lib/selfmod-webgl-morph";
 import { useViewportActivity } from "@/components/use-viewport-activity";
 import { SELF_MOD_STAGES } from "./data";
 
@@ -17,8 +16,6 @@ export function SelfModificationShowcase() {
   const { ref, isActive } = useViewportActivity<HTMLDivElement>({
     rootMargin: "240px 0px",
   });
-  const morphCaptureRef = useRef<HTMLDivElement | null>(null);
-  const morphGlRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     if (!isActive) return;
@@ -44,28 +41,9 @@ export function SelfModificationShowcase() {
     };
 
     const schedule = () => {
-      timeoutIds.push(window.setTimeout(async () => {
+      timeoutIds.push(window.setTimeout(() => {
         if (cancelled) return;
-
-        const captureEl = morphCaptureRef.current;
-        const glCanvas = morphGlRef.current;
-        const canWebgl = isWebglMorphSupported() && captureEl && glCanvas;
-
-        if (canWebgl) {
-          const ok = await runSelfmodWebglMorph({
-            captureEl,
-            canvas: glCanvas,
-            swap: () => {
-              flushSync(() => {
-                advanceStage();
-              });
-            },
-          });
-          if (!ok && !cancelled) runCssFallbackMorph();
-        } else if (!cancelled) {
-          runCssFallbackMorph();
-        }
-
+        runCssFallbackMorph();
         if (!cancelled) schedule();
       }, 3200));
     };
@@ -98,7 +76,7 @@ export function SelfModificationShowcase() {
               <path d="M130 40 L122 8 Q118 0 110 6 L102 40Z" fill="currentColor" />
               <path d="M124 40 L119 16 Q117 10 112 14 L107 40Z" className="selfmod-cat-ear-inner" />
             </svg>
-            <div ref={morphCaptureRef} className="selfmod-shell__frame">
+            <div className="selfmod-shell__frame">
               <div className="selfmod-shell__titlebar">
                 <div className="selfmod-shell__traffic">
                   <span />
@@ -186,7 +164,6 @@ export function SelfModificationShowcase() {
                   </div>
                 </div>
               </div>
-              <canvas ref={morphGlRef} className="selfmod-morph-gl" aria-hidden />
             </div>
           </div>
         </div>
