@@ -7,7 +7,7 @@ import { flushSync } from "react-dom";
 import { useViewportActivity } from "@/components/use-viewport-activity";
 import { SELF_MOD_STAGES } from "./data";
 
-const ONBOARDING_MORPH_CSS_DURATION_MS = 400;
+const ONBOARDING_MORPH_CSS_DURATION_MS = 800;
 const ONBOARDING_MORPH_SWAP_MS = Math.round(ONBOARDING_MORPH_CSS_DURATION_MS / 2);
 
 export function SelfModificationShowcase() {
