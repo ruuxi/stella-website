@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ArrowRight, Lock, X } from "lucide-react";
 
 const DOWNLOADS = {
@@ -12,20 +12,18 @@ const DOWNLOAD_PASSWORD = "2326";
 
 type Platform = "mac" | "windows";
 
-function detectPlatform(): Platform {
-  if (typeof navigator === "undefined") return "windows";
-  const ua = navigator.userAgent.toLowerCase();
-  if (ua.includes("mac")) return "mac";
-  return "windows";
-}
-
 const labels: Record<Platform, string> = {
   mac: "Download for Mac",
   windows: "Download for Windows",
 };
 
 export function DownloadButton() {
-  const platform = detectPlatform();
+  const [platform, setPlatform] = useState<Platform>("mac");
+
+  useEffect(() => {
+    const ua = navigator.userAgent.toLowerCase();
+    setPlatform(ua.includes("mac") ? "mac" : "windows");
+  }, []);
   const [showModal, setShowModal] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
