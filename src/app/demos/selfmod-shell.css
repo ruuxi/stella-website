@@ -21,19 +21,6 @@
   min-width: 0;
 }
 
-/* WebGL overlay â€” fills `.selfmod-shell__frame` (same box as snapshots; avoids fixed + transform bugs) */
-.selfmod-morph-gl {
-  position: absolute;
-  inset: 0;
-  z-index: 40;
-  display: block;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  visibility: hidden;
-  box-sizing: border-box;
-}
-
 /*
  * Desktop onboarding CSS fallback when the native morph path is unavailable.
  * Duration is supplied inline from `SelfModificationShowcase`, matching
