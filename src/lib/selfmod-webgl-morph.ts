@@ -3,10 +3,16 @@
  * `src/shell/overlay/MorphTransition.tsx` when the marketing site cannot use the
  * Electron overlay + IPC path directly.
  */
-const ONBOARDING_MORPH_PAINT_SETTLE_MS = 200;
 const ONBOARDING_MORPH_COVER_RAMP_MS = 600;
 const ONBOARDING_MORPH_REVERSE_MS = 800;
 const ONBOARDING_MORPH_STEADY_STRENGTH = 0.65;
+
+/**
+ * Post-swap settle: the website uses CSS transitions (500ms) on stage-change
+ * properties, unlike the desktop which swaps entire React components atomically.
+ * Wait for those transitions to finish before capturing the "after" screenshot.
+ */
+const POST_SWAP_SETTLE_MS = 550;
 
 const VERT = `
 attribute vec2 a_pos;
@@ -204,8 +210,10 @@ function startRenderLoop(
   mixRef: { current: number },
   alphaRef: { current: number },
   startTime: number,
+  onFirstFrame?: () => void,
 ): () => void {
   let running = true;
+  let firstFramePainted = false;
   const { gl, strengthLoc, timeLoc, mixLoc, alphaLoc } = ctx;
 
   const frame = (now: number) => {
@@ -217,6 +225,10 @@ function startRenderLoop(
     gl.uniform1f(mixLoc, mixRef.current);
     gl.uniform1f(alphaLoc, alphaRef.current);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    if (!firstFramePainted) {
+      firstFramePainted = true;
+      onFirstFrame?.();
+    }
     requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
@@ -280,8 +292,8 @@ export async function runSelfmodWebglMorph(options: {
 
     const { toPng } = await import("html-to-image");
 
-    // Stack on `captureEl` (positioned ancestor, e.g. `.selfmod-shell__frame`) — not `fixed`,
-    // which breaks under transformed ancestors and misaligns vs `toPng()` output.
+    // Position the canvas over `captureEl` but keep it invisible until the
+    // first GL frame paints so there is no black flash.
     Object.assign(canvas.style, {
       position: "absolute",
       left: "0",
@@ -290,7 +302,7 @@ export async function runSelfmodWebglMorph(options: {
       height: "100%",
       zIndex: "40",
       pointerEvents: "none",
-      opacity: "1",
+      opacity: "0",
       visibility: "visible",
     });
 
@@ -301,7 +313,9 @@ export async function runSelfmodWebglMorph(options: {
     if (!ctx) return false;
 
     const loopStart = performance.now();
-    stopLoop = startRenderLoop(ctx, strengthRef, mixRef, alphaRef, loopStart);
+    stopLoop = startRenderLoop(ctx, strengthRef, mixRef, alphaRef, loopStart, () => {
+      canvas.style.opacity = "1";
+    });
 
     await tweenRef(
       strengthRef,
@@ -311,9 +325,11 @@ export async function runSelfmodWebglMorph(options: {
 
     swap();
 
-    // Match desktop onboarding: let the new frame paint, then wait briefly before revealing.
+    // The website uses CSS transitions (500ms) when `data-stage` changes,
+    // unlike the desktop which swaps whole components atomically.  Wait for
+    // transitions to finish so the "after" capture shows the final state.
     await new Promise<void>((r) => requestAnimationFrame(() => r()));
-    await new Promise<void>((r) => setTimeout(r, ONBOARDING_MORPH_PAINT_SETTLE_MS));
+    await new Promise<void>((r) => setTimeout(r, POST_SWAP_SETTLE_MS));
 
     const afterDataUrl = await toPng(captureEl, pngOpts(canvas));
     const imgAfter = await loadImage(afterDataUrl);
