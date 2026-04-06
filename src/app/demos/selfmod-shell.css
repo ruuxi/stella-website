@@ -34,39 +34,28 @@
   box-sizing: border-box;
 }
 
-/* Morph animation â€” replicated from desktop `Onboarding.css` `.onboarding-canvas-morphing` / `@keyframes demoMorph` */
+/*
+ * Desktop onboarding CSS fallback when the native morph path is unavailable.
+ * Duration is supplied inline from `SelfModificationShowcase`, matching
+ * `OnboardingCanvas` in the desktop app.
+ */
 .selfmod-canvas--morphing {
-  animation: selfmodDemoMorph 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  animation-name: onboardingMorphFallback;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
 }
 
-@keyframes selfmodDemoMorph {
+@keyframes onboardingMorphFallback {
   0% {
-    filter: blur(0) brightness(1);
-    transform: scale(1);
+    filter: blur(0);
     opacity: 1;
   }
-
-  35% {
-    filter: blur(24px) brightness(1.15);
-    transform: scale(1.008);
-    opacity: 0.6;
-  }
-
   50% {
-    filter: blur(28px) brightness(1.2);
-    transform: scale(1.01);
-    opacity: 0.4;
+    filter: blur(12px);
+    opacity: 0.88;
   }
-
-  65% {
-    filter: blur(24px) brightness(1.15);
-    transform: scale(1.008);
-    opacity: 0.6;
-  }
-
   100% {
-    filter: blur(0) brightness(1);
-    transform: scale(1);
+    filter: blur(0);
     opacity: 1;
   }
 }
