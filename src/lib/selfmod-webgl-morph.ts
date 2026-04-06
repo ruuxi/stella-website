@@ -1,12 +1,12 @@
 /**
- * WebGL self-mod morph — ported from desktop `src/shell/overlay/MorphTransition.tsx`
- * (same shaders, timing, and tween phases). Used on the marketing site where Electron
- * overlay + IPC are unavailable.
+ * WebGL self-mod morph — mirrors the desktop onboarding morph in
+ * `src/shell/overlay/MorphTransition.tsx` when the marketing site cannot use the
+ * Electron overlay + IPC path directly.
  */
-const COVER_RAMP_UP_MS = 250;
-const HMR_CROSSFADE_MS = 300;
-const HMR_CALM_DOWN_MS = 220;
-const STEADY_STRENGTH = 0.65;
+const ONBOARDING_MORPH_PAINT_SETTLE_MS = 200;
+const ONBOARDING_MORPH_COVER_RAMP_MS = 600;
+const ONBOARDING_MORPH_REVERSE_MS = 800;
+const ONBOARDING_MORPH_STEADY_STRENGTH = 0.65;
 
 const VERT = `
 attribute vec2 a_pos;
@@ -23,69 +23,59 @@ uniform sampler2D u_tex;
 uniform sampler2D u_tex2;
 uniform float u_mix;
 uniform float u_strength;
+uniform float u_alpha;
 uniform float u_time;
 uniform float u_aspect;
 uniform vec2 u_center;
-uniform vec3 u_color1;
-uniform vec3 u_color2;
-uniform vec3 u_color3;
-uniform vec3 u_color4;
 varying vec2 v_uv;
-
-vec4 sampleWithChroma(sampler2D tex, vec2 uv, vec2 chromDir, float chromatic) {
-  float r = texture2D(tex, clamp(uv + chromDir * chromatic, 0.0, 1.0)).r;
-  float g = texture2D(tex, clamp(uv, 0.0, 1.0)).g;
-  float b = texture2D(tex, clamp(uv - chromDir * chromatic, 0.0, 1.0)).b;
-  float a = texture2D(tex, clamp(uv, 0.0, 1.0)).a;
-  return vec4(r, g, b, a);
-}
 
 void main() {
   vec2 d = v_uv - u_center;
   d.x *= u_aspect;
   float dist = length(d);
 
-  float rippleFreq = 6.0;
-  float rippleAmp = u_strength * 0.012;
-  float ripple = sin(dist * rippleFreq - u_time * 4.0) * rippleAmp;
-  ripple *= smoothstep(0.0, 0.35, dist);
-  ripple *= (1.0 - smoothstep(0.6, 1.0, dist));
+  // Concentric rings expanding outward from center.
+  float phase = dist * 28.0 - u_time * 6.0;
+  float ripple = sin(phase);
 
-  float warpAmp = u_strength * 0.02;
-  float warp = sin(dist * 3.0 + u_time * 2.0) * warpAmp * smoothstep(0.0, 0.3, dist);
+  // Soft second harmonic for texture — same speed so rings stay concentric.
+  ripple += sin(phase * 2.0 + 0.5) * 0.3;
 
-  vec2 offset = normalize(d + vec2(0.001)) * (ripple + warp);
-  offset.x /= u_aspect;
-  vec2 uv = v_uv + offset;
+  // Damping: rings lose energy as they travel outward.
+  float damping = exp(-dist * 4.0);
+  float envelope = smoothstep(0.0, 0.06, dist) * (1.0 - smoothstep(0.7, 1.0, dist));
+  ripple *= envelope * damping;
 
-  float chromatic = u_strength * 0.003;
-  vec2 chromDir = normalize(d + vec2(0.001));
-  chromDir.x /= u_aspect;
+  // Wave slope drives chromatic split direction.
+  float dRipple = cos(phase) * 28.0 + cos(phase * 2.0 + 0.5) * 0.3 * 56.0;
+  dRipple *= envelope;
 
-  vec4 col1 = sampleWithChroma(u_tex, uv, chromDir, chromatic);
-  vec4 col2 = sampleWithChroma(u_tex2, uv, chromDir, chromatic);
-  vec4 col = mix(col1, col2, u_mix);
+  // Gentle UV displacement.
+  float displaceAmp = u_strength * 0.002;
+  vec2 radial = d / (dist + 0.0001);
+  radial.x /= u_aspect;
+  vec2 uv = v_uv + radial * ripple * displaceAmp;
 
-  float dx = 0.002 * u_strength;
-  float lumCenter = dot(col.rgb, vec3(0.299, 0.587, 0.114));
-  vec2 uvR = clamp(uv + vec2(dx, 0.0), 0.0, 1.0);
-  float lumRight = dot(mix(texture2D(u_tex, uvR), texture2D(u_tex2, uvR), u_mix).rgb, vec3(0.299, 0.587, 0.114));
-  vec2 uvU = clamp(uv + vec2(0.0, dx), 0.0, 1.0);
-  float lumUp = dot(mix(texture2D(u_tex, uvU), texture2D(u_tex2, uvU), u_mix).rgb, vec3(0.299, 0.587, 0.114));
-  float edge = length(vec2(lumRight - lumCenter, lumUp - lumCenter));
+  // Chromatic aberration — 3-way split along radial direction.
+  float chromAmt = u_strength * 0.011;
+  float slopeNorm = sign(dRipple) * min(abs(dRipple) / 30.0, 1.0);
+  float chromBase = chromAmt * (0.5 + 0.5 * abs(slopeNorm));
 
-  float angle = atan(d.y, d.x);
-  float colorPhase = fract(angle / 6.2832 + u_time * 0.3) * 4.0;
+  vec2 rOff = radial * chromBase;
+  vec2 bOff = radial * -chromBase;
+  vec2 gOff = radial * chromBase * 0.3 * slopeNorm;
 
-  vec3 tint = mix(u_color1, u_color2, smoothstep(0.0, 1.0, colorPhase));
-  tint = mix(tint, u_color3, smoothstep(1.0, 2.0, colorPhase));
-  tint = mix(tint, u_color4, smoothstep(2.0, 3.0, colorPhase));
-  tint = mix(tint, u_color1, smoothstep(3.0, 4.0, colorPhase));
+  float r1 = texture2D(u_tex, clamp(uv + rOff, 0.0, 1.0)).r;
+  float g1 = texture2D(u_tex, clamp(uv + gOff, 0.0, 1.0)).g;
+  float b1 = texture2D(u_tex, clamp(uv + bOff, 0.0, 1.0)).b;
 
-  float colorMask = smoothstep(0.02, 0.08, edge) * u_strength * 0.35;
-  col.rgb = mix(col.rgb, tint, colorMask);
+  float r2 = texture2D(u_tex2, clamp(uv + rOff, 0.0, 1.0)).r;
+  float g2 = texture2D(u_tex2, clamp(uv + gOff, 0.0, 1.0)).g;
+  float b2 = texture2D(u_tex2, clamp(uv + bOff, 0.0, 1.0)).b;
 
-  gl_FragColor = col;
+  vec3 col = mix(vec3(r1, g1, b1), vec3(r2, g2, b2), u_mix);
+
+  gl_FragColor = vec4(col, u_alpha);
 }`;
 
 type GLContext = {
@@ -99,28 +89,8 @@ type GLContext = {
   strengthLoc: WebGLUniformLocation | null;
   timeLoc: WebGLUniformLocation | null;
   mixLoc: WebGLUniformLocation | null;
+  alphaLoc: WebGLUniformLocation | null;
 };
-
-function cssToVec3(color: string): [number, number, number] {
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = 1;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return [0.48, 0.64, 0.96];
-  try {
-    ctx.fillStyle = "#000";
-    ctx.fillStyle = color;
-    ctx.fillRect(0, 0, 1, 1);
-    const d = ctx.getImageData(0, 0, 1, 1).data;
-    return [d[0] / 255, d[1] / 255, d[2] / 255];
-  } catch {
-    return [0.48, 0.64, 0.96];
-  }
-}
-
-function resolveThemeColor(varName: string, fallback: string): [number, number, number] {
-  const raw = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-  return cssToVec3(raw || fallback);
-}
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -182,17 +152,9 @@ function initGL(canvas: HTMLCanvasElement, img: HTMLImageElement): GLContext | n
   gl.uniform1i(gl.getUniformLocation(prog, "u_tex"), 0);
   gl.uniform1i(gl.getUniformLocation(prog, "u_tex2"), 1);
   gl.uniform1f(gl.getUniformLocation(prog, "u_mix"), 0.0);
+  gl.uniform1f(gl.getUniformLocation(prog, "u_alpha"), 1.0);
   gl.uniform2f(gl.getUniformLocation(prog, "u_center"), 0.5, 0.5);
   gl.uniform1f(gl.getUniformLocation(prog, "u_aspect"), img.width / img.height);
-
-  const color1 = resolveThemeColor("--spinner-color-1", "#7aa2f7");
-  const color2 = resolveThemeColor("--spinner-color-2", "#bb9af7");
-  const color3 = resolveThemeColor("--spinner-color-3", "#7dcfff");
-  const color4 = resolveThemeColor("--spinner-color-4", "#9ece6a");
-  gl.uniform3f(gl.getUniformLocation(prog, "u_color1"), color1[0], color1[1], color1[2]);
-  gl.uniform3f(gl.getUniformLocation(prog, "u_color2"), color2[0], color2[1], color2[2]);
-  gl.uniform3f(gl.getUniformLocation(prog, "u_color3"), color3[0], color3[1], color3[2]);
-  gl.uniform3f(gl.getUniformLocation(prog, "u_color4"), color4[0], color4[1], color4[2]);
 
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -208,6 +170,7 @@ function initGL(canvas: HTMLCanvasElement, img: HTMLImageElement): GLContext | n
     strengthLoc: gl.getUniformLocation(prog, "u_strength"),
     timeLoc: gl.getUniformLocation(prog, "u_time"),
     mixLoc: gl.getUniformLocation(prog, "u_mix"),
+    alphaLoc: gl.getUniformLocation(prog, "u_alpha"),
   };
 }
 
@@ -239,10 +202,11 @@ function startRenderLoop(
   ctx: GLContext,
   strengthRef: { current: number },
   mixRef: { current: number },
+  alphaRef: { current: number },
   startTime: number,
 ): () => void {
   let running = true;
-  const { gl, strengthLoc, timeLoc, mixLoc } = ctx;
+  const { gl, strengthLoc, timeLoc, mixLoc, alphaLoc } = ctx;
 
   const frame = (now: number) => {
     if (!running) return;
@@ -251,6 +215,7 @@ function startRenderLoop(
     gl.uniform1f(strengthLoc, strengthRef.current);
     gl.uniform1f(timeLoc, (now - startTime) / 1000);
     gl.uniform1f(mixLoc, mixRef.current);
+    gl.uniform1f(alphaLoc, alphaRef.current);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     requestAnimationFrame(frame);
   };
@@ -307,6 +272,7 @@ export async function runSelfmodWebglMorph(options: {
   let stopLoop: (() => void) | null = null;
   const strengthRef = { current: 0 };
   const mixRef = { current: 0 };
+  const alphaRef = { current: 1 };
 
   try {
     const rect = captureEl.getBoundingClientRect();
@@ -335,22 +301,28 @@ export async function runSelfmodWebglMorph(options: {
     if (!ctx) return false;
 
     const loopStart = performance.now();
-    stopLoop = startRenderLoop(ctx, strengthRef, mixRef, loopStart);
+    stopLoop = startRenderLoop(ctx, strengthRef, mixRef, alphaRef, loopStart);
 
-    await tweenRef(strengthRef, STEADY_STRENGTH, COVER_RAMP_UP_MS);
+    await tweenRef(
+      strengthRef,
+      ONBOARDING_MORPH_STEADY_STRENGTH,
+      ONBOARDING_MORPH_COVER_RAMP_MS,
+    );
 
     swap();
 
-    // Wait for React to flush + CSS transitions to complete before snapshotting
+    // Match desktop onboarding: let the new frame paint, then wait briefly before revealing.
     await new Promise<void>((r) => requestAnimationFrame(() => r()));
-    await new Promise<void>((r) => setTimeout(r, 550));
+    await new Promise<void>((r) => setTimeout(r, ONBOARDING_MORPH_PAINT_SETTLE_MS));
 
     const afterDataUrl = await toPng(captureEl, pngOpts(canvas));
     const imgAfter = await loadImage(afterDataUrl);
 
     loadSecondTexture(ctx, imgAfter);
-    await tweenRef(mixRef, 1.0, HMR_CROSSFADE_MS);
-    await tweenRef(strengthRef, 0, HMR_CALM_DOWN_MS);
+    await Promise.all([
+      tweenRef(mixRef, 1.0, ONBOARDING_MORPH_REVERSE_MS),
+      tweenRef(strengthRef, 0, ONBOARDING_MORPH_REVERSE_MS),
+    ]);
   } catch {
     return false;
   } finally {

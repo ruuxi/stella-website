@@ -8,8 +8,8 @@ import { isWebglMorphSupported, runSelfmodWebglMorph } from "@/lib/selfmod-webgl
 import { useViewportActivity } from "@/components/use-viewport-activity";
 import { SELF_MOD_STAGES } from "./data";
 
-const SELFMOD_MORPH_SWAP_MS = 250;
-const SELFMOD_MORPH_TOTAL_MS = 500;
+const ONBOARDING_MORPH_CSS_DURATION_MS = 400;
+const ONBOARDING_MORPH_SWAP_MS = Math.round(ONBOARDING_MORPH_CSS_DURATION_MS / 2);
 
 export function SelfModificationShowcase() {
   const [stageIndex, setStageIndex] = useState(1);
@@ -37,10 +37,10 @@ export function SelfModificationShowcase() {
         flushSync(() => {
           advanceStage();
         });
-      }, SELFMOD_MORPH_SWAP_MS));
+      }, ONBOARDING_MORPH_SWAP_MS));
       timeoutIds.push(window.setTimeout(() => {
         if (!cancelled) setCssMorphing(false);
-      }, SELFMOD_MORPH_TOTAL_MS));
+      }, ONBOARDING_MORPH_CSS_DURATION_MS));
     };
 
     const schedule = () => {
@@ -82,7 +82,14 @@ export function SelfModificationShowcase() {
 
   return (
     <div ref={ref} className="selfmod-layout">
-      <div className={`selfmod-canvas${cssMorphing ? " selfmod-canvas--morphing" : ""}`}>
+      <div
+        className={`selfmod-canvas${cssMorphing ? " selfmod-canvas--morphing" : ""}`}
+        style={
+          cssMorphing
+            ? { animationDuration: `${ONBOARDING_MORPH_CSS_DURATION_MS}ms` }
+            : undefined
+        }
+      >
         <div className="selfmod-canvas__capture">
           <div className="selfmod-shell" data-stage={activeStage.id}>
             <svg className="selfmod-cat-ears" viewBox="0 0 140 40" aria-hidden="true">
