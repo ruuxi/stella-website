@@ -239,13 +239,18 @@ export const StellaAnimation = React.forwardRef<
       if (!mainRenderer) return;
 
       let frameCount = 0;
+      let lastFrameTime = performance.now();
 
       const animate = () => {
         if (pausedRef.current) {
           requestRef.current = undefined;
+          lastFrameTime = 0;
           return;
         }
-        timeRef.current += 0.008;
+        const frameNow = performance.now();
+        const dt = lastFrameTime ? (frameNow - lastFrameTime) / 1000 : 0.016;
+        lastFrameTime = frameNow;
+        timeRef.current += dt * 1.4;
 
         if (frameSkip > 0 && ++frameCount % (frameSkip + 1) !== 0) {
           requestRef.current = requestAnimationFrame(animate);
