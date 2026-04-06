@@ -30,7 +30,6 @@ function DemoFallback() {
 }
 
 const navItems = [
-  { label: "What's New", href: "#" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "Pricing", href: "/pricing" },
 ];
@@ -140,17 +139,13 @@ export default function Home() {
           </a>
         </div>
 
-        <nav className="desktop-nav" aria-label="Primary">
+        <nav className="site-nav" aria-label="Primary">
           {navItems.map((item) => (
             <a key={item.label} href={item.href}>
               {item.label}
             </a>
           ))}
         </nav>
-
-        <button className="mobile-nav-toggle" type="button" aria-label="Open menu">
-          Menu
-        </button>
       </header>
 
       <main>

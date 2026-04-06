@@ -172,9 +172,17 @@ export function CanvasSection() {
             </button>
           ))}
         </div>
-        <div className="section-kicker__concept-meta">
-          <h3>{activeConcept.title}</h3>
-          <p className="section-kicker__desc">{activeConcept.blurb}</p>
+        <div className="section-kicker__concept-stack">
+          {CANVAS_CONCEPTS.map((concept, index) => (
+            <div
+              key={concept.id}
+              className="section-kicker__concept-meta"
+              data-active={conceptIndex === index || undefined}
+            >
+              <h3>{concept.title}</h3>
+              <p className="section-kicker__desc">{concept.blurb}</p>
+            </div>
+          ))}
         </div>
       </div>
       <div ref={ref} className="product-demos-slot">
@@ -206,30 +214,50 @@ const PLATFORM_LABELS: Record<Platform, string> = {
 };
 const CYCLE_MS = 4000;
 
-function usePlatformCycle() {
+function useIsMobile(breakpoint = 768) {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    setMobile(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setMobile(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, [breakpoint]);
+  return mobile;
+}
+
+function usePlatformCycle(isMobile: boolean) {
   const [slots, setSlots] = useState<Platform[]>(["imessage", "discord", "slack"]);
+  const [singleIndex, setSingleIndex] = useState(0);
   const nextSlotRef = useRef(0);
 
   const cycle = useCallback(() => {
-    setSlots((prev) => {
-      const slot = nextSlotRef.current;
-      nextSlotRef.current = (slot + 1) % 3;
+    if (isMobile) {
+      setSingleIndex((i) => (i + 1) % ALL_PLATFORMS.length);
+    } else {
+      setSlots((prev) => {
+        const slot = nextSlotRef.current;
+        nextSlotRef.current = (slot + 1) % 3;
 
-      const available = ALL_PLATFORMS.filter((p) => !prev.includes(p));
-      if (available.length === 0) return prev;
-      const next = available[Math.floor(Math.random() * available.length)];
+        const available = ALL_PLATFORMS.filter((p) => !prev.includes(p));
+        if (available.length === 0) return prev;
+        const next = available[Math.floor(Math.random() * available.length)];
 
-      const updated = [...prev];
-      updated[slot] = next;
-      return updated;
-    });
-  }, []);
+        const updated = [...prev];
+        updated[slot] = next;
+        return updated;
+      });
+    }
+  }, [isMobile]);
 
-  return { slots, cycle };
+  const activePlatform = ALL_PLATFORMS[singleIndex];
+
+  return { slots, cycle, activePlatform };
 }
 
 export function MobileSection() {
-  const { slots, cycle } = usePlatformCycle();
+  const isMobile = useIsMobile();
+  const { slots, cycle, activePlatform } = usePlatformCycle(isMobile);
   const { ref, isActive } = useViewportActivity<HTMLDivElement>({
     rootMargin: "360px 0px",
   });
@@ -254,22 +282,37 @@ export function MobileSection() {
         <div className="demo-showcase-grid">
           <article className="demo-panel demo-panel--portrait">
             <DeferInView fallback={<DemoChunkPlaceholder />}>
-              <div className="mobile-phone-row">
-                {slots.map((platform, i) => (
-                  <div key={i} className="mobile-phone-col">
-                    <div className="mobile-phone-swap">
-                      <MobilePhoneVisual
-                        key={platform}
-                        activeConvo={i}
-                        platform={platform}
-                      />
-                    </div>
-                    <span className="mobile-phone-label">
-                      {PLATFORM_LABELS[platform]}
-                    </span>
+              {isMobile ? (
+                <div className="mobile-phone-single">
+                  <div className="mobile-phone-swap">
+                    <MobilePhoneVisual
+                      key={activePlatform}
+                      activeConvo={0}
+                      platform={activePlatform}
+                    />
                   </div>
-                ))}
-              </div>
+                  <span className="mobile-phone-label">
+                    {PLATFORM_LABELS[activePlatform]}
+                  </span>
+                </div>
+              ) : (
+                <div className="mobile-phone-row">
+                  {slots.map((platform, i) => (
+                    <div key={i} className="mobile-phone-col">
+                      <div className="mobile-phone-swap">
+                        <MobilePhoneVisual
+                          key={platform}
+                          activeConvo={i}
+                          platform={platform}
+                        />
+                      </div>
+                      <span className="mobile-phone-label">
+                        {PLATFORM_LABELS[platform]}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </DeferInView>
           </article>
         </div>

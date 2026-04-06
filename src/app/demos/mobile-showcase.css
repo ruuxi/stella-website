@@ -1589,6 +1589,59 @@
   height: 46rem;
 }
 
+/* ── Single-phone mobile layout ────────────────────────── */
+
+.mobile-phone-single {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.mobile-phone-single .mobile-phone-swap {
+  width: 100%;
+  /* Fixed height prevents layout shift when platform cycles */
+  height: 26rem;
+  overflow: hidden;
+}
+
+.mobile-phone-single .mobile-phone-visual .mobile-phone {
+  height: 26rem;
+  max-height: none;
+}
+
+/* Compact phone internals on mobile */
+.mobile-phone-single .mobile-phone__chat,
+.mobile-phone-single .stella-app-chat,
+.mobile-phone-single .discord-chat,
+.mobile-phone-single .slack-chat,
+.mobile-phone-single .telegram-chat,
+.mobile-phone-single .teams-chat {
+  overflow: hidden;
+}
+
+/* ── Mobile: compact channels, tighter phone ───────────── */
+
+@media (max-width: 767px) {
+  .mobile-channels__list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .mobile-channel {
+    padding: 0.7rem 0.8rem;
+    flex: 0 0 auto;
+  }
+
+  .mobile-channel__name {
+    font-size: 0.8rem;
+  }
+}
+
 /* ── Desktop: side-by-side, phone fills height ───────────── */
 
 @media (min-width: 768px) {
