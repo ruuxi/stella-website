@@ -307,15 +307,31 @@ select {
 
 .hero-actions {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
+  justify-content: flex-start;
+}
+
+@media (max-width: 767px) {
+  .hero-actions {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .hero-actions > .button--primary {
+    display: none;
+  }
 }
 
 .hero-orb-wrap {
-  display: flex;
-  width: clamp(160px, 40vw, 220px);
-  height: clamp(160px, 40vw, 220px);
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .hero-orb-wrap {
+    display: flex;
+    width: clamp(160px, 40vw, 220px);
+    height: clamp(160px, 40vw, 220px);
+  }
 }
 
 .stella-animation-container {
@@ -375,6 +391,8 @@ select {
 }
 
 .hero-orb-wrap {
+  width: clamp(280px, 25vw, 440px);
+  height: clamp(280px, 25vw, 440px);
   align-items: center;
   justify-content: center;
   pointer-events: none;
@@ -1193,16 +1211,13 @@ select {
   .hero-actions {
     grid-column: 4 / 6;
     align-self: start;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
     position: relative;
   }
 
   .hero-orb-wrap {
+    display: flex;
     position: absolute;
-    width: clamp(280px, 25vw, 440px);
-    height: clamp(280px, 25vw, 440px);
     inset-inline-end: auto;
     top: auto;
     bottom: calc(100% + 1.5rem);
