@@ -1,6 +1,5 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { Circle, Sparkles } from "lucide-react";
 import { DownloadButton } from "@/components/download-button";
 import { HeroStellaOrb } from "@/components/hero-stella-orb-dynamic";
 import { DeferInView } from "@/components/product-demos/defer-in-view";
@@ -152,9 +151,9 @@ export default function Home() {
         <section className="grid-shell hero-section section-border">
           <div className="hero-title reveal">
             <h1>
-              <span>Your Computer,</span>
+              <span>Your Personal</span>
               <br />
-              Finally Yours
+              AI Assistant
             </h1>
           </div>
 
@@ -275,15 +274,6 @@ export default function Home() {
 
           <ul className="legal-links">
             <li>
-              <a href="#">
-                <Circle size={8} fill="currentColor" strokeWidth={0} />
-                All Systems Operational
-              </a>
-            </li>
-            <li>
-              <a href="#">Security</a>
-            </li>
-            <li>
               <a href="/privacy">Privacy Policy</a>
             </li>
             <li>
@@ -305,11 +295,6 @@ export default function Home() {
               </ul>
             </div>
           ))}
-        </div>
-
-        <div className="footer-note">
-          <Sparkles size={14} />
-          <p>Made for people who want a smarter, calmer way to get things done.</p>
         </div>
       </footer>
     </div>

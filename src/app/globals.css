@@ -160,16 +160,16 @@ select {
 
 .site-header .brand-mark__logo {
   display: flex;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: clamp(2.65rem, 5.5vw, 3.35rem);
+  height: clamp(2.65rem, 5.5vw, 3.35rem);
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
 }
 
 .site-header .brand-mark__logo-img {
-  width: 1.75rem !important;
-  height: 1.75rem !important;
+  width: clamp(2.65rem, 5.5vw, 3.35rem) !important;
+  height: clamp(2.65rem, 5.5vw, 3.35rem) !important;
 }
 
 .brand-mark--footer img {
@@ -178,10 +178,10 @@ select {
 }
 
 .brand-text {
-  font-family: var(--font-sans), sans-serif;
-  font-size: 1.02rem;
-  font-weight: 700;
-  letter-spacing: -0.04em;
+  font-family: var(--font-display), serif;
+  font-size: clamp(1.5rem, 3.2vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.06em;
 }
 
 .site-nav {
@@ -278,7 +278,7 @@ select {
   font-weight: 300;
   line-height: 0.88;
   letter-spacing: -0.07em;
-  /* Two lines (“Designed” / “For What’s Next”); reserve height before display font metrics settle */
+  /* Two-line headline; reserve height before display font metrics settle */
   min-height: calc(2 * 0.88 * clamp(3.4rem, 12vw, 8.6rem));
 }
 
@@ -908,19 +908,6 @@ select {
   letter-spacing: -0.03em;
 }
 
-.footer-note {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  color: rgba(18, 18, 15, 0.58);
-  font-size: 0.82rem;
-}
-
-.footer-note p {
-  margin: 0;
-  max-width: 26rem;
-}
-
 .reveal {
   animation: fade-up 720ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
@@ -1164,8 +1151,7 @@ select {
   .showcase-grid,
   .news-panel,
   .quotes-grid,
-  .footer-columns,
-  .footer-note {
+  .footer-columns {
     grid-column: 2 / 4;
   }
 
@@ -1252,9 +1238,5 @@ select {
 
   .footer-columns {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .footer-note {
-    grid-column: 2 / 5;
   }
 }

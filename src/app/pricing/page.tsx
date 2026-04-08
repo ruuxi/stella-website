@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { ArrowRight, Check, Circle, Sparkles } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import "./pricing.css";
 
 export const metadata: Metadata = {
@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 };
 
 const navItems = [
-  { label: "What's New", href: "#" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "Pricing", href: "/pricing" },
 ];
@@ -112,20 +111,13 @@ export default function Pricing() {
             <span className="brand-text">Stella</span>
           </a>
         </div>
-        <nav className="desktop-nav" aria-label="Primary">
+        <nav className="site-nav" aria-label="Primary">
           {navItems.map((item) => (
             <a key={item.label} href={item.href}>
               {item.label}
             </a>
           ))}
         </nav>
-        <button
-          className="mobile-nav-toggle"
-          type="button"
-          aria-label="Open menu"
-        >
-          Menu
-        </button>
       </header>
 
       <main>
@@ -225,15 +217,6 @@ export default function Pricing() {
           </a>
           <ul className="legal-links">
             <li>
-              <a href="#">
-                <Circle size={8} fill="currentColor" strokeWidth={0} />
-                All Systems Operational
-              </a>
-            </li>
-            <li>
-              <a href="#">Security</a>
-            </li>
-            <li>
               <a href="/privacy">Privacy Policy</a>
             </li>
             <li>
@@ -254,12 +237,6 @@ export default function Pricing() {
               </ul>
             </div>
           ))}
-        </div>
-        <div className="footer-note">
-          <Sparkles size={14} />
-          <p>
-            Made for people who want a smarter, calmer way to get things done.
-          </p>
         </div>
       </footer>
     </div>
