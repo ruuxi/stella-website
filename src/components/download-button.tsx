@@ -4,8 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import { ArrowRight, Lock, X } from "lucide-react";
 
 const DOWNLOADS = {
-  mac: "https://github.com/ruuxi/stella/releases/latest/download/StellaSetup-darwin-arm64.dmg",
-  windows: "https://github.com/ruuxi/stella/releases/latest/download/StellaSetup.exe",
+  mac: "https://github.com/ruuxi/stella/releases/latest/download/Stella-darwin-arm64.dmg",
+  windows: "https://github.com/ruuxi/stella/releases/latest/download/Stella.exe",
 } as const;
 
 const DOWNLOAD_PASSWORD = "2326";
