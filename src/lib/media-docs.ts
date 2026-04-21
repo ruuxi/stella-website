@@ -3,7 +3,7 @@
  *
  * Served as plain text (llms.txt-style) at:
  *   - https://stella.sh/docs/media          (overview)
- *   - https://stella.sh/docs/media/images   (image generation + edit + realtime)
+ *   - https://stella.sh/docs/media/images   (image generation + edit)
  *   - https://stella.sh/docs/media/video    (image-to-video, video-to-video, extend)
  *   - https://stella.sh/docs/media/audio    (TTS, sound effects, transcription, separation)
  *   - https://stella.sh/docs/media/3d       (text-to-3d)
@@ -113,7 +113,7 @@ rate limits) are parsed and forwarded as-is — show the message to the user.
 `.trim();
 
 const KIND_DESCRIPTIONS: Record<MediaDocsKind, string> = {
-  images: "image generation, editing, and realtime image flows",
+  images: "image generation and editing",
   video: "image-to-video, video extension, and video-to-video",
   audio: "speech-to-text, text-to-dialogue, sound effects, and audio separation",
   "3d": "text-to-3d asset generation",
@@ -144,9 +144,9 @@ const SECTION_IMAGES = `
 
 ### \`text_to_image\` — generate images from text
 
-- Profiles: \`best\` (default, OpenAI GPT Image 2; photoreal, accurate text), \`fast\` (Flux Klein 9B; quicker, lower fidelity)
-- Convenience fields: \`prompt\`, \`aspectRatio\`
-- Useful \`input\` overrides: \`quality\` (\`low\` | \`medium\` | \`high\`), \`num_images\` (1–4), \`output_format\` (\`png\` | \`jpeg\` | \`webp\`)
+- Profiles: \`best\` (default; photoreal with accurate in-image text), \`fast\` (quicker, lower fidelity).
+- Convenience fields: \`prompt\`, \`aspectRatio\`.
+- Useful \`input\` overrides: \`quality\` (\`low\` | \`medium\` | \`high\`), \`num_images\` (1–4), \`output_format\` (\`png\` | \`jpeg\` | \`webp\`).
 
 \`\`\`bash
 curl -X POST "$STELLA_API/api/media/v1/generate" \\
@@ -162,13 +162,13 @@ curl -X POST "$STELLA_API/api/media/v1/generate" \\
 
 ### \`icon\` — icons, logos, thumbnails (square)
 
-- Single profile, square output is enforced by the backend.
-- Convenience fields: \`prompt\`. Don't pass \`aspectRatio\`.
+- Single profile (\`default\`); square output is enforced by the backend.
+- Convenience field: \`prompt\`. Don't pass \`aspectRatio\`.
 - Useful \`input\` hints: transparent / background style, brand constraints described in the prompt.
 
 ### \`image_edit\` — edit an existing image
 
-- Profile: \`default\` (OpenAI GPT Image 2 edit; mask-aware natural-language edits).
+- Single profile (\`default\`); supports mask-aware natural-language edits.
 - Required: \`source\` (or \`sourceUrl\`) of the image to edit.
 - Convenience fields: \`prompt\`, \`aspectRatio\` (defaults to \`auto\`).
 - Useful \`input\` overrides: \`quality\`, \`num_images\`, \`mask_url\`.
@@ -184,13 +184,6 @@ curl -X POST "$STELLA_API/api/media/v1/generate" \\
   }'
 \`\`\`
 
-### \`realtime\` — low-latency image edit/generation
-
-- Profile: \`default\` (Flux Klein realtime).
-- For live inputs (drawing, webcam frames).
-- The realtime *session* lifecycle is backend-owned; you talk to the same
-  \`/api/media/v1/generate\` endpoint per frame, not a direct provider websocket.
-
 ## Notes for agents
 
 - After submitting, just tell the user what you generated. The Display sidebar
@@ -205,7 +198,7 @@ const SECTION_VIDEO = `
 
 ### \`image_to_video\` — animate a still image
 
-- Profile: \`motion\` (Kling motion control).
+- Single profile (\`motion\`); guided motion control from a still.
 - Required: \`source\` (or \`sourceUrl\`) of the still image.
 - Convenience fields: \`prompt\`, \`aspectRatio\`.
 - Useful \`input\` hints: \`duration\` (seconds), camera/motion controls.
@@ -225,13 +218,13 @@ curl -X POST "$STELLA_API/api/media/v1/generate" \\
 
 ### \`video_extend\` — continue an existing video
 
-- Profile: \`default\` (LTX 2.3 extend).
+- Single profile (\`default\`).
 - Required: \`source\` (or \`sourceUrl\`) of the input video.
 - Useful \`input\` hints: \`prompt\`, \`aspectRatio\`, target duration.
 
 ### \`video_to_video\` — transform a video
 
-- Profiles: \`reference\` (default, Kling reference video-to-video), \`edit\` (Grok Imagine edit).
+- Profiles: \`reference\` (default; reference-guided transformation), \`edit\` (instruction-driven editing).
 - Required: \`source\` (or \`sourceUrl\`) of the input video.
 - Convenience fields: \`prompt\`, \`aspectRatio\`.
 - Useful \`input\` hints: reference strength, style controls.
@@ -249,7 +242,7 @@ const SECTION_AUDIO = `
 
 ### \`text_to_dialogue\` — speak a script
 
-- Profile: \`default\` (ElevenLabs Eleven v3).
+- Single profile (\`default\`).
 - Convenience field: \`prompt\` is mapped to the provider's \`text\` field.
 - Useful \`input\` hints: voice settings, speaker mapping for multi-voice scripts.
 
@@ -265,19 +258,19 @@ curl -X POST "$STELLA_API/api/media/v1/generate" \\
 
 ### \`sound_effects\` — Foley / sfx from text
 
-- Profile: \`default\` (ElevenLabs sfx v2).
+- Single profile (\`default\`).
 - Convenience field: \`prompt\` → provider \`text\`.
-- Useful \`input\` hints: \`duration_seconds\`.
+- Required \`input\` hint: \`duration_seconds\` (gateway requires it for billing).
 
 ### \`speech_to_text\` — transcribe audio
 
-- Profile: \`default\` (ElevenLabs Scribe v2).
+- Single profile (\`default\`).
 - Required: \`source\` (or \`sourceUrl\`) of the audio file.
 - Output includes \`text\`, segments, and detected language.
 
 ### \`audio_visual_separate\` — isolate audio guided by video
 
-- Profile: \`default\` (SAM Audio).
+- Single profile (\`default\`).
 - Required inputs go in \`sources\`: \`{ "video": "data:...", "audio": "data:..." }\`.
 - Output: separated stems / tracks.
 
@@ -294,7 +287,7 @@ const SECTION_3D = `
 
 ### \`text_to_3d\` — generate a 3D asset
 
-- Profile: \`default\` (Hyper3D Rodin v2).
+- Single profile (\`default\`).
 - Convenience field: \`prompt\`.
 - Useful \`input\` hints: optional reference images via \`sources\` if you want shape guidance.
 
