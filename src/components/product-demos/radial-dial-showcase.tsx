@@ -1,35 +1,13 @@
 "use client";
 
-import Image from "next/image";
-import {
-  House,
-  LayoutGrid,
-  MessageSquare,
-  Search,
-  Sparkles,
-} from "lucide-react";
+import { Search, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { StellaAnimation } from "@/components/stella-animation/stella-animation";
-import {
-  cancelAnimation,
-  destroyBlob,
-  initBlob,
-  startAmbientLoop,
-  startOpen,
-  type BlobColors,
-} from "@/components/stella-demos/radial-blob";
 import { runVacuumEffect } from "@/components/stella-demos/region-capture-vacuum";
 import { makeCaptureThumbnail } from "./capture-thumbnail";
 import { RADIAL_WEDGES } from "./data";
-import {
-  CENTER_BG_RADIUS,
-  createBlobColors,
-  RADIAL_CENTER,
-  RADIAL_LAYOUT,
-  RADIAL_SIZE,
-} from "./radial-geometry";
+import { StellaSidebar } from "./stella-shell";
 
-const RADIAL_DIAL_PHASE_MS = 1800;
+const MENU_PHASE_MS = 1800;
 
 function CaptureVacuumCanvas({
   active,
@@ -59,63 +37,24 @@ export function RadialDialVisual({
   selectedIndex: number;
   isActive: boolean;
 }) {
-  const [phase, setPhase] = useState<"dial" | "result">("dial");
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef<HTMLDivElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const selectedIdxRef = useRef(selectedIndex);
-  const colorsRef = useRef<BlobColors>(createBlobColors(selectedIndex));
+  const [phase, setPhase] = useState<"menu" | "result">("menu");
 
   // Reset phase cycle when selectedIndex changes
   useEffect(() => {
     if (!isActive) return;
-    setPhase("dial");
+    setPhase("menu");
     const timer = window.setTimeout(() => {
       setPhase("result");
-    }, RADIAL_DIAL_PHASE_MS);
+    }, MENU_PHASE_MS);
     return () => window.clearTimeout(timer);
   }, [selectedIndex, isActive]);
 
-  useEffect(() => {
-    selectedIdxRef.current = selectedIndex;
-    colorsRef.current = createBlobColors(selectedIndex);
-  }, [selectedIndex]);
-
-  useEffect(() => {
-    if (!isActive) return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
-    canvas.width = RADIAL_SIZE * dpr;
-    canvas.height = RADIAL_SIZE * dpr;
-
-    if (!initBlob(canvas)) return;
-
-    startOpen(
-      selectedIdxRef,
-      colorsRef,
-      () => {
-        setIsVisible(true);
-        startAmbientLoop(selectedIdxRef, colorsRef);
-      },
-      () => setIsVisible(true),
-    );
-
-    return () => {
-      setIsVisible(false);
-      cancelAnimation();
-      destroyBlob();
-    };
-  }, [isActive]);
-
   const activeWedge = RADIAL_WEDGES[selectedIndex];
-  const showDial = isActive && phase === "dial";
+  const showMenu = isActive && phase === "menu";
   const showResult = isActive && phase === "result";
 
   return (
-    <div ref={ref} className="radial-demo radial-demo--visual-only">
+    <div className="radial-demo radial-demo--visual-only">
       <div className="radial-desktop-mock">
         <div className="radial-desktop-mock__titlebar">
           <div className="radial-desktop-mock__traffic">
@@ -124,8 +63,8 @@ export function RadialDialVisual({
             <span />
           </div>
           <div className="radial-desktop-mock__chrome">
-            <strong>Stella quick gesture</strong>
-            <span>Invoke over whatever you are doing</span>
+            <strong>Stella quick menu</strong>
+            <span>⌘ / Ctrl + right-click anywhere</span>
           </div>
         </div>
         <div className="radial-desktop-mock__screen" data-mode={activeWedge.id}>
@@ -294,75 +233,31 @@ export function RadialDialVisual({
             </div>
           )}
 
-          <div className={`radial-desktop-mock__dial${showDial ? " radial-desktop-mock__dial--visible" : ""}`}>
-            <div className="radial-shell">
-              <div className="radial-dial-container">
-                <canvas
-                  ref={canvasRef}
-                  className="radial-blob-canvas"
-                  style={{ width: RADIAL_SIZE, height: RADIAL_SIZE }}
-                />
-                <div className={`radial-dial-frame${isVisible ? " radial-dial-frame--visible" : ""}`} aria-hidden="true">
-                  <svg
-                    width={RADIAL_SIZE}
-                    height={RADIAL_SIZE}
-                    viewBox={`0 0 ${RADIAL_SIZE} ${RADIAL_SIZE}`}
-                    className="radial-dial"
-                  >
-                    {RADIAL_LAYOUT.map((wedge, index) => {
-                      const isSelected = selectedIndex === index;
-                      return (
-                        <path
-                          key={wedge.id}
-                          d={wedge.path}
-                          fill={isSelected ? "rgba(29, 120, 242, 0.9)" : "rgba(250, 252, 255, 1)"}
-                          stroke={isSelected ? "rgba(102, 220, 255, 0.88)" : "rgba(120, 145, 189, 0.35)"}
-                          strokeWidth={1.5}
-                          className="wedge-path"
-                        />
-                      );
-                    })}
-                    <circle
-                      cx={RADIAL_CENTER}
-                      cy={RADIAL_CENTER}
-                      r={CENTER_BG_RADIUS}
-                      fill="rgba(241, 247, 255, 0.96)"
-                      stroke="rgba(120, 145, 189, 0.42)"
-                      strokeWidth={1}
-                    />
-                  </svg>
-
-                  {RADIAL_LAYOUT.map((wedge, index) => {
-                    const Icon = wedge.icon;
-                    const isSelected = selectedIndex === index;
-                    return (
-                      <div
-                        key={`${wedge.id}-content`}
-                        className="radial-wedge-content"
-                        style={{
-                          left: wedge.position.x,
-                          top: wedge.position.y,
-                          color: isSelected ? "rgba(248, 252, 255, 0.98)" : "rgba(77, 96, 122, 0.84)",
-                        }}
-                      >
-                        <Icon aria-hidden="true" width={16} height={16} />
-                        <span className="radial-wedge-label">{wedge.label}</span>
-                      </div>
-                    );
-                  })}
-
-                <div className="radial-center-stella-animation">
-                    <StellaAnimation
-                      width={20}
-                      height={20}
-                      initialBirthProgress={1}
-                      paused={!isActive || !showDial}
-                      maxDpr={1}
-                      frameSkip={1}
-                    />
-                  </div>
-                </div>
-              </div>
+          <div
+            className={`radial-desktop-mock__menu${
+              showMenu ? " radial-desktop-mock__menu--visible" : ""
+            }`}
+            aria-hidden="true"
+          >
+            <div className="quickmenu" role="menu" aria-label="Stella quick menu">
+              <div className="quickmenu__hint">⌘ + right-click</div>
+              <ul className="quickmenu__list">
+                {RADIAL_WEDGES.map((wedge, index) => {
+                  const Icon = wedge.icon;
+                  const isSelected = index === selectedIndex;
+                  return (
+                    <li
+                      key={wedge.id}
+                      className="quickmenu__item"
+                      data-selected={isSelected || undefined}
+                      role="menuitem"
+                    >
+                      <Icon size={14} aria-hidden="true" />
+                      <span>{wedge.label}</span>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           </div>
 
@@ -406,16 +301,7 @@ export function RadialDialVisual({
                   <em />
                 </div>
                 <div className="radial-result-fullshell__body">
-                  <aside className="radial-result-fullshell__sidebar">
-                    <div className="radial-result-fullshell__brand">
-                      <Image src="/stella-logo.svg" alt="" width={18} height={18} />
-                    </div>
-                    <div className="radial-result-fullshell__nav">
-                      <House size={14} />
-                      <MessageSquare size={14} />
-                      <LayoutGrid size={14} />
-                    </div>
-                  </aside>
+                  <StellaSidebar className="radial-result-fullshell__sidebar" />
                   <div className="radial-result-fullshell__workspace">
                     <div className="radial-result-fullshell__status">Your session continues here.</div>
                     <div className="radial-result-fullshell__grid">

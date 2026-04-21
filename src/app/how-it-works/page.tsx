@@ -278,13 +278,13 @@ export default function HowItWorks() {
               <div className="hiw-method">
                 <div className="hiw-method__header">
                   <h3>Quick access anywhere</h3>
-                  <span className="hiw-method__badge">Ctrl + right-click</span>
+                  <span className="hiw-method__badge">⌘/Ctrl + right-click</span>
                 </div>
                 <p>
-                  Hold Ctrl and right-click anywhere on your screen. A small
-                  radial menu appears with options to chat, capture what&apos;s
-                  on screen, start voice mode, or get a quick answer — without
-                  leaving whatever you&apos;re working on.
+                  Hold ⌘ (or Ctrl on Windows) and right-click anywhere on your
+                  screen. A small menu appears with options to chat, capture
+                  what&apos;s on screen, start voice mode, or get a quick
+                  answer — without leaving whatever you&apos;re working on.
                 </p>
               </div>
 

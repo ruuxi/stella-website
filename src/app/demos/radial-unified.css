@@ -220,8 +220,9 @@
   border: 1px solid rgba(82, 104, 134, 0.08);
 }
 
-/* â”€â”€ Dial overlay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Quick menu overlay ──────────────────────────────────── */
 
+.radial-desktop-mock__menu,
 .radial-desktop-mock__dial {
   position: absolute;
   inset: 0;
@@ -234,6 +235,82 @@
   pointer-events: none;
   transition: opacity 350ms ease;
   z-index: 5;
+}
+
+/* Native-style context menu mockup that pops at the (mocked) cursor. */
+.quickmenu {
+  display: flex;
+  flex-direction: column;
+  width: 13.5rem;
+  padding: 0.4rem 0;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(82, 104, 134, 0.18);
+  background: rgba(252, 253, 255, 0.98);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 40, 0.06),
+    0 18px 38px rgba(15, 23, 40, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  font-size: 0.78rem;
+  color: rgba(15, 23, 40, 0.86);
+  user-select: none;
+  transform: translateY(0.25rem);
+  animation: quickmenu-pop 220ms cubic-bezier(0.18, 0.78, 0.34, 1.06) both;
+}
+
+.quickmenu__hint {
+  padding: 0.32rem 0.85rem 0.4rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(50, 70, 100, 0.5);
+  border-bottom: 1px solid rgba(82, 104, 134, 0.1);
+  margin-bottom: 0.25rem;
+}
+
+.quickmenu__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.quickmenu__item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.quickmenu__item svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity 140ms ease;
+}
+
+.quickmenu__item[data-selected] {
+  background: linear-gradient(180deg, rgba(29, 120, 242, 0.96), rgba(20, 96, 210, 0.96));
+  color: white;
+}
+
+.quickmenu__item[data-selected] svg {
+  opacity: 1;
+}
+
+@keyframes quickmenu-pop {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .radial-desktop-mock__ambient {
@@ -277,6 +354,7 @@
   letter-spacing: -0.02em;
 }
 
+.radial-desktop-mock__menu--visible,
 .radial-desktop-mock__dial--visible {
   opacity: 1;
 }
@@ -446,30 +524,30 @@
 
 .radial-result-fullshell__body {
   display: grid;
-  grid-template-columns: 3rem 1fr;
+  grid-template-columns: 170px 1fr;
   flex: 1;
   min-height: 0;
+  overflow: hidden;
 }
 
+/* StellaSidebar lives inside a small absolutely-positioned card; tighten
+ * footer padding so the brand + nav + footer all fit in the limited
+ * vertical space without scrollbars. */
 .radial-result-fullshell__sidebar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.6rem 0;
-  border-right: 1px solid rgba(82, 104, 134, 0.08);
-  background: rgba(251, 253, 255, 0.7);
+  background: rgba(251, 253, 255, 0.78);
 }
 
-.radial-result-fullshell__brand {
-  padding: 0.3rem;
+.radial-result-fullshell__sidebar.stella-sidebar .stella-sidebar__brand {
+  min-height: 64px;
 }
 
-.radial-result-fullshell__nav {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  color: rgba(50, 70, 100, 0.45);
+.radial-result-fullshell__sidebar.stella-sidebar .stella-sidebar__footer {
+  padding: 8px 10px;
+}
+
+.radial-result-fullshell__sidebar.stella-sidebar .stella-sidebar__nav-item {
+  padding: 7px 10px;
+  font-size: 12.5px;
 }
 
 .radial-result-fullshell__workspace {

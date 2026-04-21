@@ -41,83 +41,10 @@
   animation: demo-ring-breathe 10s ease-in-out infinite;
 }
 
-.radial-shell {
-  width: 280px;
-  height: 280px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.radial-dial-container {
-  position: relative;
-  width: 280px;
-  height: 280px;
-  contain: layout paint;
-}
-
-.radial-blob-canvas,
 .capture-preview__vacuum {
   position: absolute;
   inset: 0;
   pointer-events: none;
-}
-
-.radial-dial-frame {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transition: opacity 150ms ease-out;
-}
-
-.radial-dial-frame--visible {
-  opacity: 1;
-}
-
-.radial-dial {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.wedge-path {
-  transition: stroke 150ms ease;
-}
-
-.radial-wedge-content {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  width: 56px;
-  height: 40px;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  transition: color 150ms ease;
-}
-
-.radial-wedge-label {
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1;
-}
-
-.radial-center-stella-animation {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 70px;
-  height: 70px;
-  transform: translate(-50%, -50%);
-  overflow: hidden;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.radial-center-stella-animation .ascii-canvas {
-  transform: translate(-50%, -50%) scale(0.5);
 }
 
 .radial-demo__preview {
@@ -672,58 +599,12 @@
   overflow: hidden;
 }
 
-.shell-sidebar {
-  display: grid;
-  align-content: start;
-  gap: 1rem;
-  border-bottom: 1px solid rgba(84, 112, 146, 0.12);
-  background: rgba(250, 252, 255, 0.78);
-  padding: 1rem;
-}
-
-.shell-sidebar__brand strong {
-  display: block;
-  color: rgba(18, 33, 55, 0.94);
-  font-size: 0.94rem;
-  letter-spacing: -0.03em;
-}
-
-.shell-sidebar__brand span {
-  display: block;
-  color: rgba(48, 66, 92, 0.48);
-  font-size: 0.73rem;
-}
-
 .shell-workspace {
   display: flex;
   flex-direction: column;
   min-height: 0;
   min-width: 0;
   padding: 1rem;
-}
-
-/* Canvas shell mock: keep side rails slim so the generative canvas reads as the hero column */
-.shell-preview .shell-sidebar {
-  gap: 0.75rem;
-  padding: 0.72rem 0.65rem;
-}
-
-.shell-preview .shell-sidebar__brand {
-  gap: 0.55rem;
-}
-
-.shell-preview .shell-sidebar__brand strong {
-  font-size: 0.86rem;
-}
-
-.shell-preview .shell-sidebar__nav {
-  gap: 0.35rem;
-}
-
-.shell-preview .shell-sidebar__nav button {
-  gap: 0.5rem;
-  padding: 0.52rem 0.55rem;
-  font-size: 0.76rem;
 }
 
 .shell-preview .shell-activity__header {

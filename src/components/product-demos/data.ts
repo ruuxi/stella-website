@@ -18,7 +18,7 @@ export const RADIAL_RAIL_DETAILS: Record<RadialWedgeId, string> = {
 export const RADIAL_WEDGES: RadialWedge[] = [
   {
     id: "capture",
-    label: "Capture",
+    label: "Capture region",
     icon: Camera,
     heading: "Grab what's on your screen",
     detail:
@@ -26,7 +26,7 @@ export const RADIAL_WEDGES: RadialWedge[] = [
   },
   {
     id: "chat",
-    label: "Chat",
+    label: "Open chat",
     icon: MessageSquare,
     heading: "Chat that already knows what you're doing",
     detail:
@@ -34,7 +34,7 @@ export const RADIAL_WEDGES: RadialWedge[] = [
   },
   {
     id: "full",
-    label: "Full",
+    label: "Full window",
     icon: Maximize2,
     heading: "Open the full Stella window",
     detail:
@@ -42,7 +42,7 @@ export const RADIAL_WEDGES: RadialWedge[] = [
   },
   {
     id: "voice",
-    label: "Voice",
+    label: "Voice mode",
     icon: Mic,
     heading: "Just talk to Stella",
     detail:
@@ -50,20 +50,13 @@ export const RADIAL_WEDGES: RadialWedge[] = [
   },
   {
     id: "auto",
-    label: "Auto",
+    label: "Auto summary",
     icon: Sparkles,
     heading: "Instant page summary",
     detail:
       "Stella reads what's on screen and gives you a quick summary with the key points and suggested next steps.",
   },
 ];
-
-export const RADIAL_VECTOR_PALETTE = {
-  base: [0.93, 0.96, 1] as [number, number, number],
-  selected: [0.17, 0.48, 0.95] as [number, number, number],
-  center: [0.95, 0.97, 1] as [number, number, number],
-  stroke: [0.64, 0.73, 0.9] as [number, number, number],
-};
 
 export const SELF_MOD_STAGES: SelfModStage[] = [
   { id: "low", title: "Low", prompt: "Make my messages blue." },

@@ -67,7 +67,7 @@ const MobileChannels = dynamic(
   { ssr: false },
 );
 
-/* ── Radial Dial section ──────────────────────────── */
+/* ── Quick menu section ────────────────────────────── */
 
 const RADIAL_CYCLE_MS = 1800 + 4000 + 800;
 
@@ -90,9 +90,9 @@ export function RadialDialSection() {
       <div className="section-kicker">
         <h2>Access Stella from anywhere</h2>
         <p className="section-kicker__desc">
-          The radial dial pops up wherever you are. Capture your screen, start a
-          chat, dictate with your voice, or get an instant summary — all without
-          switching windows.
+          Hold ⌘ (or Ctrl on Windows) and right-click anywhere on your screen.
+          A small menu appears with options to capture, chat, dictate, or get
+          an instant summary — without switching windows.
         </p>
         <ul className="radial-demo__feature-rail radial-demo__feature-rail--kicker" aria-label="Quick actions">
           {RADIAL_WEDGES.map((wedge, index) => {
