@@ -1,3 +1,21 @@
+/* ────────────────────────────────────────────────────────────────────
+ * Self-mod showcase — mock of the real desktop Stella shell.
+ *
+ * Mirrors `desktop/src/global/onboarding/panels/StellaAppMock.tsx` so the
+ * website "Stella can transform itself" demo reads as the same product
+ * users see in onboarding. The shell has a 170px brand-on-right sidebar
+ * (Home / Social / New App + footer), an italic Cormorant home title
+ * with category pills, and a pill composer at the bottom.
+ *
+ * Stages map to the desktop "transformation pills":
+ *   • [data-stage="low"]    → default Stella surface
+ *   • [data-stage="medium"] → modern workspace rail + tabs + dashboard
+ *   • [data-stage="high"]   → cozy tuxedo-cat theme everywhere
+ *
+ * Variables that drive theme accents:
+ *   --selfmod-accent       Primary accent for the active stage
+ *   --selfmod-accent-soft  Translucent variant for halos/borders
+ * ──────────────────────────────────────────────────────────────────── */
 
 .selfmod-layout {
   display: grid;
@@ -5,7 +23,6 @@
   padding: var(--demo-panel-inner-padding);
 }
 
-/* Panel wrapper â€” mirrors desktop `.onboarding-canvas` (Onboarding.css) */
 .selfmod-canvas {
   display: flex;
   flex-direction: column;
@@ -21,11 +38,6 @@
   min-width: 0;
 }
 
-/*
- * Desktop onboarding CSS fallback when the native morph path is unavailable.
- * Duration is supplied inline from `SelfModificationShowcase`, matching
- * `OnboardingCanvas` in the desktop app.
- */
 .selfmod-canvas--morphing {
   animation-name: onboardingMorphFallback;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
@@ -33,343 +45,49 @@
 }
 
 @keyframes onboardingMorphFallback {
-  0% {
-    filter: blur(0);
-    opacity: 1;
-  }
-  50% {
-    filter: blur(12px);
-    opacity: 0.88;
-  }
-  100% {
-    filter: blur(0);
-    opacity: 1;
-  }
+  0% { filter: blur(0); opacity: 1; }
+  50% { filter: blur(12px); opacity: 0.88; }
+  100% { filter: blur(0); opacity: 1; }
 }
+
+/* ── Shell root ─────────────────────────────────────────────────── */
 
 .selfmod-shell {
   --selfmod-accent: #3f7ff5;
   --selfmod-accent-soft: rgba(63, 127, 245, 0.18);
-  --selfmod-surface-bg: rgba(245, 249, 255, 0.82);
-}
-
-.selfmod-shell[data-stage="medium"] {
-  --selfmod-accent: #1aa5ff;
-  --selfmod-accent-soft: rgba(26, 165, 255, 0.16);
-  --selfmod-surface-bg: rgba(244, 250, 255, 0.86);
-}
-
-/* Medium â€” â€œmake it modernâ€ (desktop `selfmod-demo.css` [data-selfmod-demo="medium"] cues) */
-.selfmod-shell[data-stage="medium"] .selfmod-shell__frame {
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  background: transparent;
-}
-
-.selfmod-shell[data-stage="medium"] .selfmod-shell__body {
-  background: linear-gradient(180deg, rgba(232, 244, 255, 0.45), rgba(248, 251, 255, 0.55));
-}
-
-.selfmod-shell[data-stage="medium"] .selfmod-shell__titlebar {
-  background: rgba(255, 255, 255, 0.78);
-  border-bottom-color: rgba(84, 112, 146, 0.08);
-  backdrop-filter: blur(14px);
-}
-
-.selfmod-shell[data-stage="medium"] .selfmod-shell__sidebar {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(244, 249, 255, 0.75));
-  border-bottom-color: rgba(84, 112, 146, 0.08);
-}
-
-.selfmod-shell[data-stage="medium"] .selfmod-shell__nav button {
-  border-radius: 1.05rem;
-  color: rgba(43, 60, 84, 0.58);
-}
-
-.selfmod-shell[data-stage="medium"] .selfmod-shell__nav button[data-active] {
-  border-color: rgba(26, 165, 255, 0.22);
-  background: rgba(255, 255, 255, 0.92);
-  color: rgba(18, 52, 92, 0.94);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    0 4px 18px rgba(26, 100, 180, 0.08);
-}
-
-.selfmod-shell[data-stage="medium"] .selfmod-shell__sidebar-card {
-  border-radius: 1.05rem;
-  border-color: rgba(84, 112, 146, 0.1);
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 4px 20px rgba(35, 90, 150, 0.05);
-}
-
-.selfmod-shell[data-stage="medium"] .selfmod-conversation__message--stella {
-  border-radius: 0.35rem 1.05rem 1.05rem 1.05rem;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(84, 112, 146, 0.09);
-  box-shadow: 0 2px 14px rgba(25, 80, 140, 0.05);
-}
-
-.selfmod-shell[data-stage="medium"] .selfmod-conversation__message--user {
-  border-radius: 1.05rem 0.35rem 1.05rem 1.05rem;
-  border: 1px solid color-mix(in srgb, var(--selfmod-accent) 22%, rgba(84, 112, 146, 0.08));
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--selfmod-accent) 18%, transparent);
-}
-
-.selfmod-shell[data-stage="medium"] .selfmod-conversation__composer {
-  border-radius: 1.25rem;
-  border: 1px solid rgba(84, 112, 146, 0.1);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.6) inset,
-    0 6px 28px rgba(25, 90, 160, 0.08);
-}
-
-.selfmod-shell[data-stage="high"] {
-  --selfmod-accent: #ea580c;
-  --selfmod-accent-soft: rgba(249, 115, 22, 0.26);
-  --selfmod-surface-bg: rgba(255, 251, 243, 0.55);
-  --selfmod-cat-cream: #fef3c7;
-  --selfmod-cat-orange: #f97316;
-  --selfmod-cat-peach: #fdba74;
-  --selfmod-cat-brown: #92400e;
-}
-
-/* Cozy cat theme â€” aligned with desktop `selfmod-demo.css` [data-selfmod-demo="high"] */
-.selfmod-shell[data-stage="high"] .selfmod-shell__frame {
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  background: transparent;
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-shell__body {
-  background: linear-gradient(
-    158deg,
-    color-mix(in srgb, #fff 86%, #fde68a) 0%,
-    color-mix(in srgb, #fff 93%, #ffedd5) 48%,
-    color-mix(in srgb, #fff 88%, #fed7aa) 100%
-  );
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-shell__titlebar {
-  background: color-mix(in srgb, var(--selfmod-cat-cream) 38%, rgba(255, 255, 255, 0.78));
-  border-bottom-color: color-mix(in srgb, var(--selfmod-cat-orange) 26%, transparent);
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-shell__path {
-  color: color-mix(in srgb, var(--selfmod-cat-brown) 42%, rgba(55, 48, 40, 0.55));
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-shell__sidebar {
-  background: color-mix(in srgb, var(--selfmod-cat-cream) 48%, rgba(255, 253, 250, 0.92));
-  border-bottom-color: color-mix(in srgb, var(--selfmod-cat-orange) 22%, transparent);
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-shell__brand span {
-  color: color-mix(in srgb, var(--selfmod-cat-brown) 35%, rgba(30, 28, 26, 0.88));
-  letter-spacing: 0.14em;
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-shell__nav button {
-  color: color-mix(in srgb, var(--selfmod-cat-brown) 22%, rgba(43, 60, 84, 0.72));
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-shell__nav button[data-active] {
-  border-color: color-mix(in srgb, var(--selfmod-cat-orange) 40%, transparent);
-  background: color-mix(in srgb, var(--selfmod-cat-cream) 55%, #fff);
-  color: color-mix(in srgb, var(--selfmod-cat-brown) 40%, rgba(23, 50, 96, 0.92));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-shell__sidebar-card {
-  border-color: color-mix(in srgb, var(--selfmod-cat-orange) 24%, rgba(84, 112, 146, 0.1));
-  background: color-mix(in srgb, #fff 70%, var(--selfmod-cat-cream));
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-shell__sidebar-card span {
-  color: color-mix(in srgb, var(--selfmod-cat-brown) 35%, rgba(44, 64, 92, 0.5));
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-conversation__message--stella {
-  background: color-mix(in srgb, #fff 76%, var(--selfmod-cat-cream));
-  border: 1px solid color-mix(in srgb, var(--selfmod-cat-orange) 16%, transparent);
-  border-radius: 1.05rem 1.05rem 1.05rem 0.32rem;
-  box-shadow: 0 6px 22px color-mix(in srgb, var(--selfmod-cat-orange) 10%, transparent);
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-conversation__message--user {
-  border-radius: 1.05rem 1.05rem 0.32rem 1.05rem;
-  border: 1px solid color-mix(in srgb, var(--selfmod-cat-orange) 32%, transparent);
-  box-shadow: 0 8px 26px color-mix(in srgb, var(--selfmod-cat-orange) 22%, transparent);
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-conversation__composer {
-  border-radius: 1.12rem;
-  background: color-mix(in srgb, #fff 80%, var(--selfmod-cat-cream));
-  border-color: color-mix(in srgb, var(--selfmod-cat-orange) 26%, rgba(84, 112, 146, 0.08));
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--selfmod-cat-orange) 10%, transparent),
-    0 10px 36px color-mix(in srgb, var(--selfmod-cat-orange) 14%, transparent);
-}
-
-/* Stage cross-fade */
-.selfmod-shell__frame,
-.selfmod-shell__body,
-.selfmod-shell__sidebar,
-.selfmod-shell__sidebar-card,
-.selfmod-shell__titlebar,
-.selfmod-shell__nav button,
-.selfmod-shell__nav-label,
-.selfmod-shell__brand-text,
-.selfmod-preview-bubble,
-.selfmod-option {
-  transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
-/* â”€â”€ Cat SVGs â€” hidden by default â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-
-.selfmod-shell {
+  --selfmod-foreground: rgba(15, 23, 40, 0.92);
+  --selfmod-text: rgba(28, 41, 64, 0.9);
+  --selfmod-text-weak: rgba(48, 66, 92, 0.68);
+  --selfmod-text-weaker: rgba(68, 86, 110, 0.5);
+  --selfmod-glass-bg: rgba(255, 255, 255, 0.62);
+  --selfmod-border-weak: rgba(84, 112, 146, 0.12);
+  --selfmod-border-strong: rgba(84, 112, 146, 0.2);
+  --selfmod-bg: rgba(248, 251, 255, 0.78);
   position: relative;
+  font-family: var(--font-sans), "Manrope", system-ui, sans-serif;
+  color: var(--selfmod-text);
 }
 
-.selfmod-cat-ears,
-.selfmod-cat-sleeping,
-.selfmod-cat-paw {
-  position: absolute;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.selfmod-cat-ears {
-  width: 130px;
-  height: 38px;
-  top: -28px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  color: color-mix(in srgb, var(--selfmod-cat-orange, #f97316) 60%, #fde68a);
-}
-
-.selfmod-cat-ear-inner {
-  fill: color-mix(in srgb, var(--selfmod-cat-peach, #fdba74) 70%, #fff);
-}
-
-.selfmod-cat-sleeping {
-  width: 56px;
-  height: 35px;
-  bottom: 0.6rem;
-  left: 50%;
-  transform: translateX(-50%);
-  color: color-mix(in srgb, var(--selfmod-cat-orange, #f97316) 50%, #fde68a);
-}
-
-.selfmod-cat-paw {
-  width: 26px;
-  height: 46px;
-  top: -3rem;
-  right: 2.5rem;
-  z-index: 5;
-  color: color-mix(in srgb, var(--selfmod-cat-orange, #f97316) 45%, #fde68a);
-}
-
-/* Show cat decorations only in high stage */
-.selfmod-shell[data-stage="high"] .selfmod-cat-ears {
-  opacity: 1;
-}
-.selfmod-shell[data-stage="high"] .selfmod-cat-sleeping {
-  opacity: 1;
-}
-.selfmod-shell[data-stage="high"] .selfmod-cat-paw {
-  opacity: 1;
-}
-
-/* â”€â”€ Medium stage â€” icon-only sidebar, more spacing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-
-.selfmod-shell[data-stage="medium"] .selfmod-shell__nav-label {
-  width: 0;
-  overflow: hidden;
-  opacity: 0;
-}
-
-.selfmod-shell[data-stage="medium"] .selfmod-shell__brand-text {
-  width: 0;
-  overflow: hidden;
-  opacity: 0;
-}
-
-.selfmod-shell[data-stage="medium"] .selfmod-shell__sidebar {
-  padding: 0.8rem 0.5rem;
-  gap: 0.6rem;
-}
-
-.selfmod-shell[data-stage="medium"] .selfmod-shell__nav button {
-  justify-content: center;
-  padding: 0.72rem;
-  gap: 0;
-}
-
-.selfmod-shell[data-stage="medium"] .selfmod-shell__brand {
-  justify-content: center;
-}
-
-.selfmod-shell[data-stage="medium"] .selfmod-preview-bubbles {
-  gap: 1.4rem;
-}
-
-.selfmod-shell[data-stage="medium"] .selfmod-preview-bubble {
-  font-size: 0.82rem;
-  padding: 0.7rem 1rem;
-}
-
-/* â”€â”€ High stage â€” cat theme layout overhaul â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-
-.selfmod-shell[data-stage="high"] .selfmod-shell__nav-label {
-  width: 0;
-  overflow: hidden;
-  opacity: 0;
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-shell__brand-text {
-  width: 0;
-  overflow: hidden;
-  opacity: 0;
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-shell__sidebar {
-  padding: 0.8rem 0.45rem;
-  gap: 0.5rem;
-  position: relative;
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-shell__nav button {
-  justify-content: center;
-  padding: 0.72rem;
-  gap: 0;
-  border-radius: 50%;
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-shell__brand {
-  justify-content: center;
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-preview-bubbles {
-  gap: 1.6rem;
-}
-
-.selfmod-shell[data-stage="high"] .selfmod-preview-bubble {
-  font-size: 0.82rem;
-  padding: 0.75rem 1rem;
+.selfmod-shell *,
+.selfmod-shell *::before,
+.selfmod-shell *::after {
+  box-sizing: border-box;
 }
 
 .selfmod-shell__frame {
-  position: relative;
   overflow: hidden;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
+  border-radius: 16px;
+  border: 1px solid var(--selfmod-border-weak);
+  background-color: var(--selfmod-bg);
+  background-image:
+    radial-gradient(120% 90% at 80% 0%, color-mix(in srgb, var(--selfmod-accent) 8%, transparent), transparent 60%),
+    radial-gradient(90% 80% at 0% 100%, color-mix(in srgb, var(--selfmod-accent) 6%, transparent), transparent 55%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 24px 60px rgba(50, 84, 128, 0.12);
+  transition:
+    background-color 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+    border-color 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .selfmod-shell__titlebar {
@@ -377,50 +95,29 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.85rem 1rem;
-  border-bottom: 1px solid rgba(84, 112, 146, 0.12);
-  background: rgba(255, 255, 255, 0.58);
-  border-radius: 0.9rem 0.9rem 0 0;
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid var(--selfmod-border-weak);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(14px);
 }
 
-.selfmod-shell__traffic,
-.mode-window__traffic,
-.shell-preview__traffic {
+.selfmod-shell__traffic {
   display: flex;
   gap: 0.38rem;
 }
 
-.selfmod-shell__traffic span,
-.mode-window__traffic span,
-.shell-preview__traffic span,
-.full-shell-preview-card__titlebar span {
+.selfmod-shell__traffic span {
   width: 0.62rem;
   height: 0.62rem;
   border-radius: 999px;
   background: rgba(129, 149, 182, 0.42);
 }
-
-.selfmod-shell__traffic span:first-child,
-.mode-window__traffic span:first-child,
-.shell-preview__traffic span:first-child,
-.full-shell-preview-card__titlebar span {
-  background: #ffb457;
-}
-
-.selfmod-shell__traffic span:nth-child(2),
-.mode-window__traffic span:nth-child(2),
-.shell-preview__traffic span:nth-child(2) {
-  background: #7bc8ff;
-}
-
-.selfmod-shell__traffic span:nth-child(3),
-.mode-window__traffic span:nth-child(3),
-.shell-preview__traffic span:nth-child(3) {
-  background: #53d8b1;
-}
+.selfmod-shell__traffic span:first-child { background: #ffb457; }
+.selfmod-shell__traffic span:nth-child(2) { background: #7bc8ff; }
+.selfmod-shell__traffic span:nth-child(3) { background: #53d8b1; }
 
 .selfmod-shell__path {
-  color: rgba(44, 64, 92, 0.55);
+  color: var(--selfmod-text-weaker);
   font-family: var(--font-mono), monospace;
   font-size: 0.68rem;
   letter-spacing: 0.02em;
@@ -431,203 +128,1075 @@
   position: relative;
   display: grid;
   min-height: 42rem;
-  border-radius: 0 0 0.9rem 0.9rem;
+  border-radius: 0 0 16px 16px;
   overflow: hidden;
-  background: rgba(246, 250, 255, 0.56);
 }
+
+/* ── Sidebar ────────────────────────────────────────────────────── */
 
 .selfmod-shell__sidebar {
-  display: grid;
-  align-content: start;
-  gap: 1rem;
-  padding: 1rem;
-  border-bottom: 1px solid rgba(84, 112, 146, 0.12);
-  background: rgba(251, 253, 255, 0.72);
-}
-
-.selfmod-shell__brand,
-.full-shell-preview-card__brand,
-.shell-sidebar__brand {
   display: flex;
-  align-items: center;
-  gap: 0.7rem;
-}
-
-.selfmod-shell__brand span,
-.full-shell-preview-card__brand span {
-  color: rgba(26, 39, 61, 0.84);
-  font-size: 0.82rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-}
-
-.selfmod-shell__nav,
-.full-shell-preview-card__nav,
-.shell-sidebar__nav {
-  display: grid;
-  gap: 0.45rem;
-}
-
-.selfmod-shell__nav button,
-.full-shell-preview-card__nav button,
-.shell-sidebar__nav button {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
+  flex-direction: column;
   width: 100%;
-  border: 1px solid transparent;
-  border-radius: 0.95rem;
+  background: var(--selfmod-glass-bg);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--selfmod-border-weak);
+  overflow: hidden;
+  position: relative;
+}
+
+.selfmod-shell__sidebar-default {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+.selfmod-shell[data-modern] .selfmod-shell__sidebar-default,
+.selfmod-shell[data-cozy] .selfmod-shell__sidebar-default { display: none; }
+
+.selfmod-shell__sidebar-header { height: 16px; flex-shrink: 0; }
+
+.selfmod-shell__brand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 84px;
+  padding: 0 14px;
+}
+.selfmod-shell__brand-glyph {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(calc(-50% - 38px), -50%);
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.42;
+  color: var(--selfmod-foreground);
+}
+.selfmod-shell__brand-text {
+  color: var(--selfmod-text-weaker);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  line-height: 1;
+  text-transform: uppercase;
+  transform: translateX(-4px);
+}
+
+.selfmod-shell__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 12px 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.selfmod-shell__nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-radius: 8px;
   background: transparent;
-  color: rgba(43, 60, 84, 0.68);
-  padding: 0.72rem 0.82rem;
-  font: inherit;
+  color: var(--selfmod-text);
+  font-size: 13.5px;
+  font-weight: 500;
   text-align: left;
 }
-
-.selfmod-shell__nav button[data-active],
-.full-shell-preview-card__nav button[data-active],
-.shell-sidebar__nav button[data-active] {
-  border-color: rgba(79, 118, 255, 0.16);
-  background: rgba(255, 255, 255, 0.76);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  color: rgba(23, 50, 96, 0.94);
+.selfmod-shell__nav-item.active {
+  background: color-mix(in srgb, var(--selfmod-foreground) 8%, transparent);
+  color: var(--selfmod-foreground);
+}
+.selfmod-shell__nav-item.active .selfmod-shell__nav-icon {
+  color: var(--selfmod-accent);
 }
 
-.selfmod-shell__sidebar-card,
-.shell-sidebar__focus {
+.selfmod-shell__nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--selfmod-text-weak);
+}
+
+.selfmod-shell__sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-top: 1px solid var(--selfmod-border-weak);
+}
+.selfmod-shell__footer-icons {
   display: grid;
-  gap: 0.42rem;
-  border: 1px solid rgba(84, 112, 146, 0.12);
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.7);
-  padding: 0.95rem;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 8px;
+  justify-items: center;
+  align-items: center;
+}
+.selfmod-shell__icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  color: var(--selfmod-text-weak);
+  border-radius: 8px;
 }
 
-.selfmod-shell__sidebar-card span,
-.shell-sidebar__focus span {
-  color: rgba(44, 64, 92, 0.48);
+/* ── Modern sidebar (Workspace + Memory list) ───────────────────── */
+
+.selfmod-shell__sidebar-modern {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  padding: 16px 12px;
+  gap: 4px;
+}
+.selfmod-shell[data-modern] .selfmod-shell__sidebar-modern {
+  display: flex;
+  animation: selfmodFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.selfmod-shell[data-modern] .selfmod-shell__sidebar {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--selfmod-accent) 6%, var(--selfmod-glass-bg)) 0%,
+    var(--selfmod-glass-bg) 100%
+  );
+  border-right: 1px solid color-mix(in srgb, var(--selfmod-accent) 18%, transparent);
+}
+
+.selfmod-shell__modern-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--selfmod-foreground) 5%, transparent);
+  border: 1px solid var(--selfmod-border-weak);
+  font-size: 12px;
+  color: var(--selfmod-text-weak);
+  margin-bottom: 8px;
+}
+.selfmod-shell__modern-kbd {
+  margin-left: auto;
+  padding: 1px 6px;
   font-family: var(--font-mono), monospace;
-  font-size: 0.67rem;
-  letter-spacing: 0.02em;
+  font-size: 9.5px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--selfmod-foreground) 8%, transparent);
+  color: var(--selfmod-text-weaker);
+}
+.selfmod-shell__modern-section {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
+  color: var(--selfmod-text-weaker);
+  padding: 10px 10px 4px;
+}
+.selfmod-shell__modern-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--selfmod-text);
+}
+.selfmod-shell__modern-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--selfmod-text-weak);
+}
+.selfmod-shell__modern-badge {
+  margin-left: auto;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--selfmod-accent) 18%, transparent);
+  color: var(--selfmod-accent);
+}
+.selfmod-shell__modern-item.active {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--selfmod-accent) 16%, transparent),
+    color-mix(in srgb, var(--selfmod-accent) 4%, transparent)
+  );
+  color: var(--selfmod-foreground);
+  box-shadow: inset 2px 0 0 var(--selfmod-accent);
+}
+.selfmod-shell__modern-item.active .selfmod-shell__modern-icon {
+  color: var(--selfmod-accent);
 }
 
-.selfmod-shell__sidebar-card strong,
-.shell-sidebar__focus strong {
-  color: rgba(19, 33, 54, 0.92);
-  font-size: 0.95rem;
-  line-height: 1.4;
-  letter-spacing: -0.03em;
+/* ── Cozy sidebar (Mochi rail) ──────────────────────────────────── */
+
+.selfmod-shell__sidebar-cozy {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  color: #5c3d2e;
+}
+.selfmod-shell[data-cozy] .selfmod-shell__sidebar-cozy {
+  display: flex;
+  animation: selfmodFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.shell-sidebar__focus p {
-  margin: 0;
-  color: rgba(52, 70, 95, 0.68);
-  font-size: 0.83rem;
-  line-height: 1.55;
+.selfmod-shell__cozy-rail-header { height: 16px; flex-shrink: 0; }
+.selfmod-shell__cozy-rail-brand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 84px;
+  padding: 0 14px;
 }
-
-.selfmod-shell__workspace {
+.selfmod-shell__cozy-rail-paw {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(calc(-50% - 38px), -50%);
+  width: 32px;
+  height: 32px;
+  color: #1c1c1c;
+  opacity: 0.85;
+}
+.selfmod-shell__cozy-rail-paw svg { width: 100%; height: 100%; }
+.selfmod-shell__cozy-rail-name {
+  color: #8b6240;
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-size: 17px;
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+.selfmod-shell__cozy-rail-nav {
   display: flex;
   flex-direction: column;
-  align-self: stretch;
+  gap: 1px;
+  padding: 0 12px 12px;
+  flex: 1;
   min-height: 0;
+}
+.selfmod-shell__cozy-rail-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  color: #5c3d2e;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+.selfmod-shell__cozy-rail-item.active {
+  background: rgba(255, 252, 246, 0.6);
+  color: #1c1c1c;
+  font-weight: 600;
+  box-shadow:
+    inset 0 0 0 1px rgba(139, 105, 75, 0.2),
+    0 1px 2px rgba(139, 105, 75, 0.1);
+}
+.selfmod-shell__cozy-rail-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: #b8845c;
+}
+.selfmod-shell__cozy-rail-icon svg { width: 100%; height: 100%; }
+.selfmod-shell__cozy-rail-item.active .selfmod-shell__cozy-rail-icon {
+  color: #d4869a;
+}
+.selfmod-shell__cozy-rail-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid rgba(139, 105, 75, 0.18);
+}
+.selfmod-shell__cozy-rail-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1c1c1c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px rgba(255, 252, 246, 0.7);
+}
+.selfmod-shell__cozy-rail-avatar svg { width: 100%; height: 100%; }
+.selfmod-shell__cozy-rail-meta {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
-  gap: 1rem;
-  padding: 1rem;
+}
+.selfmod-shell__cozy-rail-meta-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1c1c1c;
+  line-height: 1.2;
+}
+.selfmod-shell__cozy-rail-meta-status {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #b8845c;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.selfmod-shell__cozy-rail-pulse {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #d4869a;
+  animation: selfmodCozyDot 2s ease-in-out infinite;
 }
 
-.mini-chat-preview__badge,
-.mini-shell-preview__badge {
+/* ── Main column ────────────────────────────────────────────────── */
+
+.selfmod-shell__main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-left: 1px solid var(--selfmod-border-weak);
+  position: relative;
+}
+
+.selfmod-shell__header {
+  flex-shrink: 0;
+  height: 0;
+  overflow: hidden;
+  transition: height 0.3s ease;
+}
+.selfmod-shell[data-modern] .selfmod-shell__header {
+  height: 38px;
+  display: flex;
+  align-items: stretch;
+  background: color-mix(in srgb, var(--selfmod-foreground) 4%, transparent);
+  border-bottom: 1px solid var(--selfmod-border-weak);
+  animation: selfmodFadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.selfmod-shell__tabs {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  padding: 6px 6px 0;
+  gap: 1px;
+}
+.selfmod-shell__tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px 7px 12px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--selfmod-text-weak);
+  border-radius: 7px 7px 0 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  position: relative;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  background: transparent;
+}
+.selfmod-shell__tab.active {
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--selfmod-foreground);
+  border-color: var(--selfmod-border-weak);
+  font-weight: 600;
+  margin-bottom: -1px;
+  z-index: 1;
+}
+.selfmod-shell__tab.active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background: var(--selfmod-accent);
+  border-radius: 0 0 2px 2px;
+}
+.selfmod-shell__tab-icon {
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--selfmod-text-weak);
+}
+.selfmod-shell__tab.active .selfmod-shell__tab-icon { color: var(--selfmod-accent); }
+.selfmod-shell__tab-label {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  letter-spacing: -0.005em;
+}
+.selfmod-shell__tab-add {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(79, 118, 255, 0.18);
+  margin: 7px 8px 6px 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  background: transparent;
+  border: 1px dashed color-mix(in srgb, var(--selfmod-foreground) 22%, transparent);
+  color: var(--selfmod-text-weak);
+  font-size: 13px;
+  font-weight: 500;
+  flex-shrink: 0;
+  align-self: center;
+  line-height: 1;
+}
+
+/* ── Body area: home, cards (modern), cozy home ─────────────────── */
+
+.selfmod-shell__body-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px 12px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.selfmod-shell__home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  width: 100%;
+  max-width: 540px;
+  flex: 1;
+}
+.selfmod-shell[data-modern] .selfmod-shell__home,
+.selfmod-shell[data-cozy] .selfmod-shell__home { display: none; }
+
+.selfmod-shell__home-title {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  font-weight: 450;
+  font-style: italic;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--selfmod-foreground);
+  text-align: center;
+  margin: 0;
+  width: 100%;
+}
+.selfmod-shell__home-categories {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.selfmod-shell__home-category {
+  padding: 6px 22px;
+  min-width: 88px;
+  text-align: center;
+  background: var(--selfmod-glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--selfmod-border-strong);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  color: rgba(26, 73, 151, 0.84);
-  padding: 0.42rem 0.72rem;
-  font-family: var(--font-mono), monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  color: var(--selfmod-text);
+  font-size: 13px;
+  font-weight: 500;
 }
-
-.selfmod-shell__content {
+.selfmod-shell__home-category.active {
+  background: color-mix(in srgb, var(--selfmod-foreground) 6%, rgba(255, 255, 255, 0.85));
+  color: var(--selfmod-foreground);
+}
+.selfmod-shell__home-suggestions {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  gap: 1rem;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  margin-top: 4px;
+  padding: 0 24px;
+}
+.selfmod-shell__home-suggestion {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--selfmod-text);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
 }
 
-.selfmod-conversation {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  gap: 1.35rem;
+/* Cards (modern stage) */
+.selfmod-shell__cards {
+  display: none;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 540px;
+  margin: auto 0;
 }
-
-.selfmod-conversation__message {
-  max-width: min(26rem, 88%);
-  padding: 0.8rem 0.95rem;
-  border-radius: 1rem;
-  font-size: 0.92rem;
-  line-height: 1.55;
-  letter-spacing: -0.02em;
+.selfmod-shell[data-modern] .selfmod-shell__cards {
+  display: grid;
+  animation: selfmodFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-
-.selfmod-conversation__message--stella {
-  align-self: flex-start;
-  margin-right: clamp(1.5rem, 12%, 4rem);
-  background: rgba(255, 255, 255, 0.78);
-  color: rgba(25, 40, 61, 0.88);
+.selfmod-shell__card {
+  position: relative;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--selfmod-glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--selfmod-border-strong);
+  overflow: hidden;
 }
-
-.selfmod-conversation__message--user {
-  align-self: flex-end;
-  margin-left: clamp(1.5rem, 12%, 4rem);
-  background: var(--selfmod-accent);
-  color: white;
-  box-shadow: 0 12px 26px color-mix(in srgb, var(--selfmod-accent) 26%, transparent);
+.selfmod-shell__card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 2px;
+  background: var(--card-accent, var(--selfmod-accent));
+  border-radius: 0 0 2px 0;
 }
-
-.selfmod-conversation__composer {
+.selfmod-shell__card-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.8rem;
-  margin-top: auto;
-  border: 1px solid color-mix(in srgb, var(--selfmod-accent) 18%, rgba(84, 112, 146, 0.12));
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.selfmod-shell__card-head-icon {
+  width: 13px;
+  height: 13px;
+  color: var(--card-accent, var(--selfmod-accent));
+}
+.selfmod-shell__card-head-icon svg { width: 100%; height: 100%; }
+.selfmod-shell__card-head-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--card-accent, var(--selfmod-accent));
+}
+.selfmod-shell__card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--selfmod-foreground);
+  line-height: 1.35;
+  margin-bottom: 3px;
+}
+.selfmod-shell__card-meta {
+  font-size: 10.5px;
+  color: var(--selfmod-text-weak);
+}
+.selfmod-shell__card-bar {
+  margin-top: 8px;
+  height: 4px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.82);
-  padding: 0.35rem 0.38rem 0.35rem 1rem;
+  background: color-mix(in srgb, var(--selfmod-foreground) 6%, transparent);
+  overflow: hidden;
+}
+.selfmod-shell__card-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--card-accent, var(--selfmod-accent));
+  opacity: 0.85;
 }
 
-.selfmod-conversation__composer span {
-  color: rgba(48, 66, 92, 0.56);
-  font-size: 0.86rem;
+/* Cozy home (high stage) */
+.selfmod-shell__home-cozy {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  width: 100%;
+  max-width: 540px;
+  flex: 1;
+}
+.selfmod-shell[data-cozy] .selfmod-shell__home-cozy {
+  display: flex;
+  animation: selfmodFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.selfmod-shell__home-cozy-title {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  font-weight: 450;
+  font-style: italic;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: #5c3d2e;
+  text-align: center;
+  margin: 0;
+  width: 100%;
+}
+.selfmod-shell__home-cozy-categories {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.selfmod-shell__home-cozy-category {
+  padding: 6px 22px;
+  min-width: 88px;
+  text-align: center;
+  background: rgba(255, 252, 246, 0.55);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(139, 105, 75, 0.25);
+  border-radius: 999px;
+  color: #8b6240;
+  font-size: 13px;
+  font-weight: 500;
+}
+.selfmod-shell__home-cozy-category.active {
+  background: #fef3e2;
+  color: #1c1c1c;
+  border-color: rgba(139, 105, 75, 0.4);
+  box-shadow: 0 1px 2px rgba(139, 105, 75, 0.15);
+}
+.selfmod-shell__home-cozy-suggestions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  margin-top: 4px;
+  padding: 0 24px;
+}
+.selfmod-shell__home-cozy-suggestion {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 500;
+  color: #5c3d2e;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.selfmod-shell__home-cozy-suggestion::before {
+  content: "❧";
+  color: #d4869a;
+  font-style: normal;
+  font-size: 11px;
+  flex-shrink: 0;
+  transform: translateY(-1px);
 }
 
-.selfmod-conversation__composer button,
-.voice-preview__send {
+/* ── Composer ───────────────────────────────────────────────────── */
+
+.selfmod-shell__composer-wrap {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  padding: 8px 24px 16px;
+  width: 100%;
+}
+.selfmod-shell__composer {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 999px;
+  box-shadow: 0 6px 24px rgba(50, 84, 128, 0.1);
+  overflow: hidden;
+  transition: border-radius 0.3s ease, background 0.3s ease;
+}
+.selfmod-shell[data-cozy] .selfmod-shell__composer {
+  border-radius: 22px;
+  background: linear-gradient(135deg, #fef3e2 0%, #f5e1c4 100%);
+  box-shadow:
+    0 6px 24px rgba(139, 105, 75, 0.18),
+    0 0 0 1px rgba(139, 105, 75, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.selfmod-shell__composer-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 50px;
+  padding: 8px 10px;
+}
+.selfmod-shell[data-cozy] .selfmod-shell__composer-form { display: none; }
+
+.selfmod-shell__composer-add {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.5px solid var(--selfmod-text);
+  background: color-mix(in srgb, var(--selfmod-foreground) 6%, transparent);
+  color: var(--selfmod-foreground);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border: 0;
-  border-radius: 999px;
+  flex-shrink: 0;
+}
+.selfmod-shell__composer-input {
+  flex: 1;
+  padding: 4px;
+  font-size: 13.5px;
+  color: var(--selfmod-text-weaker);
+  opacity: 0.85;
+}
+.selfmod-shell__composer-submit {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
   background: var(--selfmod-accent);
-  color: white;
-  box-shadow: 0 10px 22px color-mix(in srgb, var(--selfmod-accent) 26%, transparent);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.5;
 }
 
-.selfmod-poster-note {
-  color: rgba(48, 66, 92, 0.58);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.02em;
+.selfmod-shell__composer-cozy { display: none; }
+.selfmod-shell[data-cozy] .selfmod-shell__composer-cozy { display: block; }
+
+/* Cozy widget reuses CozyWidget JSX from cozy-cat.tsx — we style its
+   .selfmod-cozy* classes here so it matches the desktop sleeping cat. */
+.selfmod-cozy {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 14px;
+  padding: 12px 18px 12px 14px;
+  min-height: 82px;
+  position: relative;
+  overflow: hidden;
+  animation: selfmodFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.selfmod-cozy::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 18% 28%, rgba(139, 105, 75, 0.08) 3px, transparent 4px),
+    radial-gradient(circle at 64% 78%, rgba(139, 105, 75, 0.06) 2.5px, transparent 3.5px),
+    radial-gradient(circle at 92% 18%, rgba(139, 105, 75, 0.07) 4px, transparent 5px),
+    radial-gradient(circle at 78% 50%, rgba(139, 105, 75, 0.05) 2px, transparent 3px);
+  pointer-events: none;
+}
+.selfmod-cozy-cat {
+  flex-shrink: 0;
+  width: 96px;
+  height: 64px;
+  position: relative;
+}
+.selfmod-cozy-cat svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+.selfmod-cozy-cat-body {
+  transform-origin: 60px 56px;
+  animation: selfmodCozyBreathe 3.6s ease-in-out infinite;
+}
+.selfmod-cozy-cat-tail {
+  transform-origin: 102px 50px;
+  animation: selfmodCozyTail 3.6s ease-in-out infinite;
+}
+.selfmod-cozy-cat::after {
+  content: "";
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 78px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(92, 64, 51, 0.18), transparent 70%);
+}
+.selfmod-cozy-zzz {
+  position: absolute;
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-style: italic;
+  font-weight: 600;
+  color: #b08560;
+  pointer-events: none;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  z-index: 2;
+}
+.selfmod-cozy-zzz-1 {
+  top: 18px;
+  left: 78px;
+  font-size: 10px;
+  opacity: 0.5;
+  animation: selfmodCozyFloat 3.2s ease-in-out 0s infinite;
+}
+.selfmod-cozy-zzz-2 {
+  top: 8px;
+  left: 86px;
+  font-size: 13px;
+  opacity: 0.65;
+  animation: selfmodCozyFloat 3.2s ease-in-out 0.7s infinite;
+}
+.selfmod-cozy-zzz-3 {
+  top: -2px;
+  left: 96px;
+  font-size: 17px;
+  opacity: 0.78;
+  animation: selfmodCozyFloat 3.2s ease-in-out 1.4s infinite;
+}
+.selfmod-cozy-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  z-index: 1;
+}
+.selfmod-cozy-state {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
+  color: #b8845c;
+}
+.selfmod-cozy-state-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d4869a;
+  box-shadow: 0 0 0 0 rgba(212, 134, 154, 0.55);
+  animation: selfmodCozyDot 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.selfmod-cozy-line {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-size: 17px;
+  font-style: italic;
+  font-weight: 500;
+  color: #5c3d2e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.1;
+}
+.selfmod-cozy-meter {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8b6240;
+  flex-shrink: 0;
+  padding: 7px 12px;
+  background: rgba(255, 252, 246, 0.65);
+  border: 1px solid rgba(139, 105, 75, 0.22);
+  border-radius: 999px;
+  z-index: 1;
+  font-variant-numeric: tabular-nums;
+}
+.selfmod-cozy-heart {
+  color: #d4869a;
+  font-size: 13px;
+  line-height: 1;
+  animation: selfmodCozyHeartbeat 1.4s ease-in-out infinite;
+}
+
+/* ── Stage chips at the bottom of the composer column ───────────── */
+
+.selfmod-shell__stages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  padding: 0 24px 14px;
+}
+.selfmod-shell__stage-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--selfmod-border-strong);
+  background: rgba(255, 255, 255, 0.62);
+  font-size: 11px;
+  color: var(--selfmod-text-weak);
+  transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.selfmod-shell__stage-chip[data-active] {
+  background: color-mix(in srgb, var(--selfmod-accent) 12%, rgba(255, 255, 255, 0.85));
+  border-color: color-mix(in srgb, var(--selfmod-accent) 32%, transparent);
+  color: var(--selfmod-foreground);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--selfmod-accent) 18%, transparent);
+}
+.selfmod-shell__stage-chip-level {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--selfmod-text-weaker);
+}
+.selfmod-shell__stage-chip[data-active] .selfmod-shell__stage-chip-level {
+  color: var(--selfmod-accent);
+}
+.selfmod-shell__stage-chip-prompt {
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 14rem;
+}
+
+/* ── Stage-specific accent overrides ────────────────────────────── */
+
+.selfmod-shell[data-stage="medium"] {
+  --selfmod-accent: #1aa5ff;
+  --selfmod-accent-soft: rgba(26, 165, 255, 0.18);
+}
+
+.selfmod-shell[data-stage="high"] {
+  --selfmod-accent: #d4869a;
+  --selfmod-accent-soft: rgba(212, 134, 154, 0.22);
+}
+
+.selfmod-shell[data-cozy] .selfmod-shell__frame {
+  background-color: #fbf2e1;
+  background-image:
+    radial-gradient(circle at 12% 22%, rgba(139, 105, 75, 0.08) 4px, transparent 5px),
+    radial-gradient(circle at 28% 78%, rgba(139, 105, 75, 0.06) 3px, transparent 4px),
+    radial-gradient(circle at 78% 28%, rgba(139, 105, 75, 0.07) 5px, transparent 6px),
+    radial-gradient(circle at 88% 72%, rgba(139, 105, 75, 0.05) 3px, transparent 4px),
+    radial-gradient(circle at 52% 52%, rgba(139, 105, 75, 0.04) 4px, transparent 5px),
+    radial-gradient(120% 90% at 80% 0%, rgba(232, 154, 152, 0.18), transparent 60%),
+    radial-gradient(90% 80% at 0% 100%, rgba(212, 134, 154, 0.12), transparent 55%),
+    linear-gradient(135deg, #fef3e2, #f5e1c4);
+  border-color: rgba(139, 105, 75, 0.25);
+}
+.selfmod-shell[data-cozy] .selfmod-shell__main {
+  border-color: rgba(139, 105, 75, 0.2);
+}
+.selfmod-shell[data-cozy] .selfmod-shell__sidebar {
+  background: linear-gradient(180deg, #fef3e2 0%, #f4d9b8 100%);
+  border-right: 1px solid rgba(139, 105, 75, 0.25);
+}
+.selfmod-shell[data-cozy] .selfmod-shell__titlebar {
+  background: rgba(254, 243, 226, 0.7);
+  border-bottom-color: rgba(139, 105, 75, 0.22);
+}
+.selfmod-shell[data-cozy] .selfmod-shell__path {
+  color: rgba(139, 105, 75, 0.7);
+}
+.selfmod-shell[data-cozy] .selfmod-shell__stage-chip {
+  background: rgba(255, 252, 246, 0.6);
+  border-color: rgba(139, 105, 75, 0.25);
+  color: #8b6240;
+}
+.selfmod-shell[data-cozy] .selfmod-shell__stage-chip[data-active] {
+  background: #fef3e2;
+  border-color: rgba(139, 105, 75, 0.45);
+  color: #1c1c1c;
+  box-shadow: 0 4px 14px rgba(212, 134, 154, 0.22);
+}
+.selfmod-shell[data-cozy] .selfmod-shell__stage-chip-level {
+  color: rgba(139, 105, 75, 0.7);
+}
+.selfmod-shell[data-cozy] .selfmod-shell__stage-chip[data-active] .selfmod-shell__stage-chip-level {
+  color: #d4869a;
+}
+
+/* Tabs in cozy mode (when both modern + cozy somehow combined) */
+.selfmod-shell[data-cozy] .selfmod-shell__header {
+  background: rgba(254, 243, 226, 0.7);
+  border-bottom-color: rgba(139, 105, 75, 0.22);
+}
+
+/* ── Smooth stage cross-fade for surfaces ───────────────────────── */
+
+.selfmod-shell__sidebar,
+.selfmod-shell__main,
+.selfmod-shell__nav-item,
+.selfmod-shell__home-title,
+.selfmod-shell__home-category,
+.selfmod-shell__home-suggestion,
+.selfmod-shell__composer {
+  transition:
+    background 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+    border-color 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+    color 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* ── Animations ─────────────────────────────────────────────────── */
+
+@keyframes selfmodFadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes selfmodCozyFloat {
+  0% { transform: translateY(2px) scale(0.92); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: translateY(-12px) scale(1.05); opacity: 0; }
+}
+@keyframes selfmodCozyDot {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(212, 134, 154, 0.5);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(212, 134, 154, 0);
+    transform: scale(1.15);
+  }
+}
+@keyframes selfmodCozyHeartbeat {
+  0%, 100% { transform: scale(1); }
+  20% { transform: scale(1.22); }
+  40% { transform: scale(0.94); }
+  60% { transform: scale(1.14); }
+  80% { transform: scale(1); }
+}
+@keyframes selfmodCozyTail {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-3deg); }
+}
+@keyframes selfmodCozyBreathe {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.04); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selfmod-cozy-zzz,
+  .selfmod-cozy-state-dot,
+  .selfmod-cozy-heart,
+  .selfmod-cozy-cat-body,
+  .selfmod-cozy-cat-tail,
+  .selfmod-shell__cozy-rail-pulse,
+  .selfmod-shell__sidebar-modern,
+  .selfmod-shell__sidebar-cozy,
+  .selfmod-shell__cards,
+  .selfmod-shell__home-cozy,
+  .selfmod-shell__header,
+  .selfmod-cozy { animation: none; }
 }

@@ -1,14 +1,8 @@
 "use client";
 
-import Image from "next/image";
-import {
-  FolderGit2,
-  LayoutGrid,
-  MessageSquare,
-  Sparkles,
-  SquareTerminal,
-} from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { CANVAS_CONCEPTS } from "./data";
+import { StellaSidebar } from "./stella-shell";
 
 function PlanArtifact() {
   return (
@@ -208,31 +202,7 @@ export function CanvasVisual({
         </div>
 
         <div className="shell-preview__body">
-          <aside className="shell-sidebar">
-            <div className="shell-sidebar__brand">
-              <Image src="/stella-logo.svg" alt="" width={20} height={20} />
-              <strong>Stella</strong>
-            </div>
-
-            <nav className="shell-sidebar__nav" aria-label="Shell navigation">
-              <button type="button" data-active>
-                <LayoutGrid size={16} />
-                <span>Canvas</span>
-              </button>
-              <button type="button">
-                <MessageSquare size={16} />
-                <span>Threads</span>
-              </button>
-              <button type="button">
-                <SquareTerminal size={16} />
-                <span>Tasks</span>
-              </button>
-              <button type="button">
-                <FolderGit2 size={16} />
-                <span>Projects</span>
-              </button>
-            </nav>
-          </aside>
+          <StellaSidebar className="shell-preview__sidebar" />
 
           <div className="shell-workspace">
             <div className="shell-workspace__canvas">

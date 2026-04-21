@@ -1,10 +1,9 @@
 /* Product demos — split for maintainability; order matches former monolith. */
 @import "./demos/showcase-shell.css";
+@import "./demos/stella-shell.css";
 @import "./demos/selfmod-shell.css";
 @import "./demos/demo-meta-typography.css";
-@import "./demos/selfmod-stages.css";
 @import "./demos/radial-canvas-modes.css";
 @import "./demos/demos-responsive.css";
-@import "./demos/selfmod-preview-chrome.css";
 @import "./demos/radial-unified.css";
 @import "./demos/mobile-showcase.css";

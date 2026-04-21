@@ -1,0 +1,150 @@
+/* ────────────────────────────────────────────────────────────────────
+ * Canonical Stella sidebar — used across every desktop-style website
+ * mock so they all read as the real product. Mirrors the desktop
+ * `desktop/src/global/onboarding/panels/StellaAppMock.tsx` "default"
+ * 170px sidebar (brand on right, Home / Social / New App nav, footer
+ * with Palette+Settings icons + Store / Connect / Sign in items).
+ *
+ * Component: `<StellaSidebar />` from `components/product-demos/
+ * stella-shell.tsx`. Class names are intentionally `stella-sidebar*`
+ * so that other showcases (canvas, radial dial, etc.) can drop the
+ * component in without inheriting selfmod/radial-specific styles.
+ * ──────────────────────────────────────────────────────────────────── */
+
+.stella-sidebar {
+  --stella-sidebar-fg: rgba(15, 23, 40, 0.92);
+  --stella-sidebar-text: rgba(28, 41, 64, 0.9);
+  --stella-sidebar-text-weak: rgba(48, 66, 92, 0.66);
+  --stella-sidebar-text-weaker: rgba(68, 86, 110, 0.5);
+  --stella-sidebar-accent: #3f7ff5;
+  --stella-sidebar-bg: rgba(255, 255, 255, 0.62);
+  --stella-sidebar-border: rgba(84, 112, 146, 0.14);
+  --stella-sidebar-hover: rgba(15, 23, 40, 0.06);
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  background: var(--stella-sidebar-bg);
+  backdrop-filter: blur(14px);
+  border-right: 1px solid var(--stella-sidebar-border);
+  font-family: var(--font-sans), "Manrope", system-ui, sans-serif;
+  color: var(--stella-sidebar-text);
+}
+
+.stella-sidebar *,
+.stella-sidebar *::before,
+.stella-sidebar *::after {
+  box-sizing: border-box;
+}
+
+.stella-sidebar__header {
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.stella-sidebar__brand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 84px;
+  padding: 0 14px;
+}
+
+.stella-sidebar__brand-glyph {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(calc(-50% - 38px), -50%);
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.42;
+  color: var(--stella-sidebar-fg);
+}
+
+.stella-sidebar__brand-text {
+  color: var(--stella-sidebar-text-weaker);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  line-height: 1;
+  text-transform: uppercase;
+  transform: translateX(-4px);
+}
+
+.stella-sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 12px 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.stella-sidebar__nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  color: var(--stella-sidebar-text);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  cursor: default;
+}
+
+.stella-sidebar__nav-item.active {
+  background: color-mix(in srgb, var(--stella-sidebar-fg) 8%, transparent);
+  color: var(--stella-sidebar-fg);
+}
+
+.stella-sidebar__nav-item.active .stella-sidebar__nav-icon {
+  color: var(--stella-sidebar-accent);
+}
+
+.stella-sidebar__nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--stella-sidebar-text-weak);
+}
+
+.stella-sidebar__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-top: 1px solid var(--stella-sidebar-border);
+}
+
+.stella-sidebar__footer-icons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 8px;
+  justify-items: center;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.stella-sidebar__icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  color: var(--stella-sidebar-text-weak);
+}
+
+.stella-sidebar__footer .stella-sidebar__nav-item {
+  padding: 8px 12px;
+  font-size: 13px;
+}

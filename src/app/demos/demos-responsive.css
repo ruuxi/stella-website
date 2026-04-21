@@ -1,20 +1,19 @@
 @media (min-width: 768px) {
   .selfmod-shell__body {
-    grid-template-columns: 16rem minmax(0, 1fr);
+    grid-template-columns: 170px minmax(0, 1fr);
   }
 
-  .selfmod-shell[data-stage="medium"] .selfmod-shell__body,
-  .selfmod-shell[data-stage="high"] .selfmod-shell__body {
-    grid-template-columns: 3.8rem minmax(0, 1fr);
+  .selfmod-shell[data-modern] .selfmod-shell__body {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .selfmod-shell[data-cozy] .selfmod-shell__body {
+    grid-template-columns: 184px minmax(0, 1fr);
   }
 
   .selfmod-shell__sidebar {
     border-right: 1px solid rgba(84, 112, 146, 0.12);
     border-bottom: 0;
-  }
-
-  .selfmod-shell__content {
-    min-height: 0;
   }
 
   .radial-demo {
@@ -36,12 +35,7 @@
   }
 
   .shell-preview__body {
-    grid-template-columns: minmax(11rem, 12.5rem) minmax(0, 1fr) minmax(11.5rem, 13rem);
-  }
-
-  .shell-sidebar {
-    border-right: 1px solid rgba(84, 112, 146, 0.12);
-    border-bottom: 0;
+    grid-template-columns: 170px minmax(0, 1fr) minmax(11.5rem, 13rem);
   }
 
   .shell-activity {
@@ -59,7 +53,7 @@
   }
 
   .shell-preview__body {
-    grid-template-columns: minmax(10rem, 11.25rem) minmax(0, 1fr) minmax(10.25rem, 11.75rem);
+    grid-template-columns: 170px minmax(0, 1fr) minmax(10.25rem, 11.75rem);
   }
 }
 
@@ -96,15 +90,9 @@
   }
 
   .selfmod-shell__body {
-    height: 30rem;
-    min-height: 30rem;
-    max-height: 30rem;
-  }
-
-  .selfmod-conversation__message {
-    max-width: 100%;
-    font-size: 0.82rem;
-    padding: 0.6rem 0.75rem;
+    height: 32rem;
+    min-height: 32rem;
+    max-height: 32rem;
   }
 
   .selfmod-shell__titlebar,
@@ -123,6 +111,10 @@
 
   .selfmod-shell__sidebar {
     display: none;
+  }
+
+  .selfmod-shell__main {
+    border-left: 0;
   }
 
   .radial-desktop-mock__screen {
@@ -144,12 +136,16 @@
     max-height: 28rem;
   }
 
-  .shell-sidebar {
+  .shell-preview__sidebar {
     display: none;
   }
 
   .shell-activity {
     display: none;
+  }
+
+  .shell-preview__body {
+    grid-template-columns: 1fr;
   }
 
   .radial-demo__mode-window {
