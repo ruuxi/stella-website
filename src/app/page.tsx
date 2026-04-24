@@ -172,8 +172,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="grid-shell showcase-section section-border">
-          <div className="section-kicker">
+        <section className="grid-shell showcase-section section-border" data-reveal>
+          <div className="section-kicker" data-reveal-child style={{ ["--reveal-index" as string]: 0 }}>
             <h2>Make Stella entirely yours</h2>
             <p className="section-kicker__desc">
               Just tell Stella to change its appearance — from small tweaks like
@@ -181,7 +181,7 @@ export default function Home() {
               keep chatting.
             </p>
           </div>
-          <div className="product-demos-slot">
+          <div className="product-demos-slot" data-reveal-child style={{ ["--reveal-index" as string]: 1 }}>
             <div className="demo-showcase-grid">
               <article className="demo-panel demo-panel--full">
                 <DeferInView fallback={<DemoFallback />} rootMargin="360px 0px">
@@ -192,20 +192,23 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="grid-shell showcase-section section-border">
+        <section className="grid-shell showcase-section section-border" data-reveal>
           <RadialDialSection />
         </section>
 
-        <section className="grid-shell showcase-section section-border">
+        <section className="grid-shell showcase-section section-border" data-reveal>
           <CanvasSection />
         </section>
 
-        <section className="grid-shell showcase-section section-border">
+        <section className="grid-shell showcase-section section-border" data-reveal>
           <MobileSection />
         </section>
 
-        <section className="grid-shell showcase-section showcase-section--deferred section-border">
-          <div className="section-kicker">
+        <section
+          className="grid-shell showcase-section showcase-section--deferred section-border"
+          data-reveal
+        >
+          <div className="section-kicker" data-reveal-child style={{ ["--reveal-index" as string]: 0 }}>
             <span>People</span>
             <h2>See how people use Stella every day</h2>
           </div>
@@ -214,8 +217,9 @@ export default function Home() {
             {showcaseCards.map((card, index) => (
               <article
                 key={card.title}
-                className="showcase-card reveal"
-                style={{ animationDelay: `${index * 90}ms` }}
+                className="showcase-card"
+                data-reveal-child
+                style={{ ["--reveal-index" as string]: index + 1 }}
               >
                 <div className="showcase-card__mesh" aria-hidden="true" />
                 <a className="showcase-card__link" href="#" aria-label={card.title} />
@@ -243,16 +247,24 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="grid-shell news-section section-deferred-render section-border">
-          <div className="section-kicker">
+        <section
+          className="grid-shell news-section section-deferred-render section-border"
+          data-reveal
+        >
+          <div className="section-kicker" data-reveal-child style={{ ["--reveal-index" as string]: 0 }}>
             <span>More</span>
             <h2>Additional features</h2>
           </div>
 
-          <div className="news-panel reveal">
+          <div className="news-panel" data-reveal-child style={{ ["--reveal-index" as string]: 1 }}>
             <div className="news-list">
-              {features.map((item) => (
-                <div key={item.title} className="news-item">
+              {features.map((item, index) => (
+                <div
+                  key={item.title}
+                  className="news-item"
+                  data-reveal-child
+                  style={{ ["--reveal-index" as string]: index + 2 }}
+                >
                   <div className="news-item__body">
                     <h3>{item.title}</h3>
                     <p>{item.blurb}</p>

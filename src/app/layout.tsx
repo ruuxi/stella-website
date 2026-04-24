@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, IBM_Plex_Mono, Manrope } from "next/font/google";
 import { getSiteUrl } from "@/lib/site-url";
+import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import "./globals.css";
 /* Product demos (self-mod, radial, canvas) — partials in ./demos/ */
 import "./demos.css";
@@ -129,6 +130,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {children}
+        <RevealOnScroll />
       </body>
     </html>
   );

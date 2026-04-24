@@ -930,6 +930,67 @@ select {
   }
 }
 
+/* ---------------------------------------------------------------- */
+/* Apple-style scroll-triggered section reveal.                      */
+/* Activated only after the client mounts and adds `has-reveal` to   */
+/* <html>, so SSR / no-JS / reduced-motion users see content as-is.  */
+/* ---------------------------------------------------------------- */
+
+.has-reveal [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 32px, 0) scale(0.985);
+  filter: blur(16px) saturate(0.9);
+  will-change: opacity, transform, filter;
+  transition:
+    opacity 1200ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1300ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.has-reveal [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* Children inside a revealed section cascade in slightly behind the
+   parent for a layered, considered feel. Index is set per-child via
+   `--reveal-index` so the order is intentional, not source-order. */
+.has-reveal [data-reveal] [data-reveal-child] {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  filter: blur(10px);
+  will-change: opacity, transform, filter;
+  transition:
+    opacity 950ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1050ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(160ms + var(--reveal-index, 0) * 80ms);
+}
+
+.has-reveal [data-reveal].is-revealed [data-reveal-child] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* Once revealed, drop the GPU promotion so static sections don't
+   keep an extra compositor layer around. */
+.has-reveal [data-reveal].is-revealed,
+.has-reveal [data-reveal].is-revealed [data-reveal-child] {
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .has-reveal [data-reveal],
+  .has-reveal [data-reveal] [data-reveal-child] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+}
+
 @keyframes breathing {
   0% {
     transform: scale(1);
