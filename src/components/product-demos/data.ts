@@ -1,24 +1,18 @@
-import {
-  Camera,
-  Maximize2,
-  MessageSquare,
-  Mic,
-  Sparkles,
-} from "lucide-react";
+import { Camera, MessageSquare, Mic, Plus } from "lucide-react";
 import type { CanvasConcept, RadialWedge, RadialWedgeId, SelfModStage } from "./types";
 
 export const RADIAL_RAIL_DETAILS: Record<RadialWedgeId, string> = {
   capture: "Pull in any part of the screen and start asking questions immediately.",
   chat: "Start a conversation with the current page, app, and task already in view.",
-  full: "Expand into the full workspace when you want the whole dashboard in front of you.",
+  add: "Quietly attach what you grabbed to your chat — no window switching.",
   voice: "Dictate, brainstorm, or steer the next step without touching the keyboard.",
-  auto: "Get the gist, key takeaways, and suggested next steps in one move.",
 };
 
+// Order matches the real Stella radial: top → right → bottom → left.
 export const RADIAL_WEDGES: RadialWedge[] = [
   {
     id: "capture",
-    label: "Capture region",
+    label: "Capture",
     icon: Camera,
     heading: "Grab what's on your screen",
     detail:
@@ -26,35 +20,27 @@ export const RADIAL_WEDGES: RadialWedge[] = [
   },
   {
     id: "chat",
-    label: "Open chat",
+    label: "Chat",
     icon: MessageSquare,
     heading: "Chat that already knows what you're doing",
     detail:
       "Stella sees what app or page you're on and picks up the conversation from there. No need to explain the context.",
   },
   {
-    id: "full",
-    label: "Full window",
-    icon: Maximize2,
-    heading: "Open the full Stella window",
+    id: "add",
+    label: "Add",
+    icon: Plus,
+    heading: "Add to your conversation",
     detail:
-      "Switch to the full view with your dashboard, apps, and everything in one place — without losing your conversation.",
+      "Pin what you grabbed to the current chat as context — no need to leave the app you're in.",
   },
   {
     id: "voice",
-    label: "Voice mode",
+    label: "Voice",
     icon: Mic,
     heading: "Just talk to Stella",
     detail:
       "Speak naturally and Stella listens. Dictate notes, ask questions, or give instructions — hands-free, from anywhere.",
-  },
-  {
-    id: "auto",
-    label: "Auto summary",
-    icon: Sparkles,
-    heading: "Instant page summary",
-    detail:
-      "Stella reads what's on screen and gives you a quick summary with the key points and suggested next steps.",
   },
 ];
 

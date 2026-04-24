@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useViewportActivity } from "@/components/use-viewport-activity";
-import { RADIAL_RAIL_DETAILS, RADIAL_WEDGES, CANVAS_CONCEPTS } from "./data";
+import { RADIAL_WEDGES, CANVAS_CONCEPTS } from "./data";
 import { DeferInView } from "./defer-in-view";
+import { RadialDialInteractive } from "./radial-dial-interactive";
 import type { Platform } from "./mobile-showcase";
 
 function DemoChunkPlaceholder() {
@@ -67,55 +68,51 @@ const MobileChannels = dynamic(
   { ssr: false },
 );
 
-/* ── Quick menu section ────────────────────────────── */
+/* ── Radial dial section ───────────────────────────── */
 
-const RADIAL_CYCLE_MS = 1800 + 4000 + 800;
+const RADIAL_CYCLE_MS = 3200;
 
 export function RadialDialSection() {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [autoplay, setAutoplay] = useState(true);
   const { ref, isActive } = useViewportActivity<HTMLDivElement>({
     rootMargin: "360px 0px",
   });
 
   useEffect(() => {
-    if (!isActive) return;
+    if (!isActive || !autoplay) return;
     const timer = window.setInterval(() => {
       setSelectedIndex((i) => (i + 1) % RADIAL_WEDGES.length);
     }, RADIAL_CYCLE_MS);
     return () => window.clearInterval(timer);
-  }, [isActive]);
+  }, [isActive, autoplay]);
+
+  const handleSelect = useCallback((index: number) => {
+    setAutoplay(false);
+    setSelectedIndex(index);
+  }, []);
+
+  const activeWedge = RADIAL_WEDGES[selectedIndex];
 
   return (
     <div style={{ display: "contents" }}>
-      <div className="section-kicker">
+      <div className="section-kicker section-kicker--radial">
         <h2>Access Stella from anywhere</h2>
         <p className="section-kicker__desc">
-          Hold ⌘ (or Ctrl on Windows) and right-click anywhere on your screen.
-          A small menu appears with options to capture, chat, dictate, or get
-          an instant summary — without switching windows.
+          Hold ⌘ (or Ctrl on Windows) and right-click anywhere on your screen
+          to summon Stella&apos;s radial dial. Flick toward an action — no menus,
+          no window switching.
         </p>
-        <ul className="radial-demo__feature-rail radial-demo__feature-rail--kicker" aria-label="Quick actions">
-          {RADIAL_WEDGES.map((wedge, index) => {
-            const Icon = wedge.icon;
-            return (
-              <li
-                key={wedge.id}
-                className="radial-demo__feature-item"
-                data-active={selectedIndex === index || undefined}
-                onClick={() => setSelectedIndex(index)}
-                style={{ cursor: "pointer" }}
-              >
-                <span className="radial-demo__feature-icon" aria-hidden="true">
-                  <Icon width={17} height={17} />
-                </span>
-                <div className="radial-demo__feature-main">
-                  <strong>{wedge.label}</strong>
-                  <p>{RADIAL_RAIL_DETAILS[wedge.id]}</p>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+        <RadialDialInteractive
+          selectedIndex={selectedIndex}
+          onSelect={handleSelect}
+        />
+        <div className="radial-dial-caption" aria-live="polite">
+          <div key={activeWedge.id} className="radial-dial-caption__inner">
+            <strong>{activeWedge.heading}</strong>
+            <p>{activeWedge.detail}</p>
+          </div>
+        </div>
       </div>
       <div ref={ref} className="product-demos-slot">
         <div className="demo-showcase-grid">

@@ -987,6 +987,192 @@
   box-sizing: border-box;
 }
 
+/* ── Interactive radial dial (in section-kicker) ───────────────── */
+
+.section-kicker--radial {
+  display: grid;
+  gap: 1.4rem;
+  align-content: start;
+}
+
+.radial-dial-interactive {
+  position: relative;
+  width: 248px;
+  height: 248px;
+  margin-top: 0.4rem;
+  user-select: none;
+}
+
+.radial-dial-interactive__halo {
+  position: absolute;
+  inset: -28px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(102, 178, 255, 0.18), transparent 62%);
+  pointer-events: none;
+  filter: blur(2px);
+}
+
+.radial-dial-interactive__svg {
+  position: relative;
+  display: block;
+  overflow: visible;
+}
+
+.radial-dial-interactive__wedge {
+  cursor: pointer;
+  outline: none;
+}
+
+.radial-dial-interactive__wedge-fill {
+  fill: rgba(255, 255, 255, 0.94);
+  stroke: rgba(82, 104, 134, 0.18);
+  stroke-width: 1.25;
+  transition:
+    fill 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    stroke 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  filter: drop-shadow(0 1px 1px rgba(15, 23, 40, 0.04));
+}
+
+.radial-dial-interactive__wedge[data-selected] .radial-dial-interactive__wedge-fill {
+  /* SVG `fill` can't take a CSS gradient; the shadow + halo carry the depth. */
+  fill: rgba(29, 120, 242, 0.96);
+  stroke: rgba(20, 96, 210, 0.55);
+  filter: drop-shadow(0 8px 18px rgba(29, 120, 242, 0.32));
+}
+
+.radial-dial-interactive__wedge:focus-visible .radial-dial-interactive__wedge-fill {
+  stroke: rgba(29, 120, 242, 0.7);
+  stroke-width: 2;
+}
+
+.radial-dial-interactive__wedge-content {
+  width: 56px;
+  height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: rgba(50, 70, 100, 0.6);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: color 220ms ease, transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.radial-dial-interactive__wedge[data-selected] .radial-dial-interactive__wedge-content {
+  color: #fff;
+  transform: scale(1.06);
+}
+
+.radial-dial-interactive__center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 38% 32%, rgba(255, 255, 255, 0.95), rgba(245, 250, 255, 0.7) 60%),
+    rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(82, 104, 134, 0.16);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 12px 30px rgba(15, 23, 40, 0.12);
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.radial-dial-interactive__hint {
+  position: absolute;
+  left: 50%;
+  bottom: -1.6rem;
+  transform: translateX(-50%);
+  margin: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(50, 70, 100, 0.42);
+  white-space: nowrap;
+}
+
+.radial-dial-caption {
+  position: relative;
+  margin-top: 1.6rem;
+  min-height: 4.5rem;
+}
+
+.radial-dial-caption__inner {
+  display: grid;
+  gap: 0.35rem;
+  animation: radial-caption-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes radial-caption-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+.radial-dial-caption strong {
+  color: rgba(15, 23, 40, 0.9);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.radial-dial-caption p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--page-muted);
+}
+
+/* ── Add wedge result chip ─────────────────────────────────── */
+
+.radial-result-minishell__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  align-self: flex-start;
+  padding: 0.32rem 0.55rem;
+  border-radius: 0.5rem;
+  background: rgba(236, 244, 255, 0.92);
+  border: 1px solid rgba(29, 120, 242, 0.22);
+  color: rgba(20, 50, 96, 0.88);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.radial-result-minishell__chip svg {
+  color: rgba(29, 120, 242, 0.9);
+}
+
+.radial-result-minishell__chip em {
+  font-style: normal;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(50, 70, 100, 0.55);
+  margin-left: 0.15rem;
+}
+
 @media (max-width: 767px) {
   .radial-demo__feature-rail {
     gap: 0.5rem;

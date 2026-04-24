@@ -1,6 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 
-export type RadialWedgeId = "capture" | "chat" | "full" | "voice" | "auto";
+export type RadialWedgeId = "capture" | "chat" | "add" | "voice";
 export type SelfModLevel = "low" | "medium" | "high";
 
 export type RadialWedge = {
