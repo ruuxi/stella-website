@@ -1594,11 +1594,11 @@ const css = `
     overflow: visible;
   }
   .sam-cozy-cat-body {
-    transform-origin: 60px 56px;
+    transform-origin: 90px 100px;
     animation: samCozyBreathe 3.6s ease-in-out infinite;
   }
   .sam-cozy-cat-tail {
-    transform-origin: 102px 50px;
+    transform-origin: 140px 100px;
     animation: samCozyTail 3.6s ease-in-out infinite;
   }
   .sam-cozy-cat::after {
@@ -1675,6 +1675,448 @@ const css = `
     font-size: 13px;
     line-height: 1;
     animation: samCozyHeartbeat 1.4s ease-in-out infinite;
+  }
+
+  /* ══════════════════════════════════════════
+     COZY MODE → "MOCHI" — entirely different application.
+
+     When the user picks "Cozy mode", this overlay covers the whole
+     window (the regular sidebar + main column is hidden underneath).
+     The point isn't a different colour scheme — it's a different
+     *kind* of app: no rail, no chat shell, no tabs. Instead, a slow
+     magazine surface that reads like a small daily journal kept by a
+     tuxedo cat. Different chrome, different rhythm, different
+     navigation, different composer, different verbs.
+     ══════════════════════════════════════════ */
+  .sam-mochi {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 12px;
+    color: #2a1a13;
+    font-family: var(--font-family-sans, system-ui);
+    background:
+      radial-gradient(120% 80% at 18% 0%, rgba(232, 154, 152, 0.32), transparent 55%),
+      radial-gradient(90% 80% at 100% 100%, rgba(212, 134, 154, 0.28), transparent 55%),
+      linear-gradient(168deg, #fef3e2 0%, #f7e2c4 55%, #efd4b6 100%);
+  }
+  .sam-root[data-cozy="true"] .sam-mochi {
+    display: flex;
+    animation: samMochiIn 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  /* When Mochi is on, hide the regular Stella shell entirely so the
+     transformation reads as "different app", not "same app retinted." */
+  .sam-root[data-cozy="true"] > .sam-sidebar,
+  .sam-root[data-cozy="true"] > .sam-main {
+    visibility: hidden;
+  }
+
+  /* Soft hand-drawn "paw print" texture so the surface feels warm and
+     personal rather than a flat gradient. */
+  .sam-mochi__bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(circle at 8% 18%, rgba(139, 105, 75, 0.06) 4px, transparent 5px),
+      radial-gradient(circle at 22% 70%, rgba(139, 105, 75, 0.05) 3px, transparent 4px),
+      radial-gradient(circle at 76% 22%, rgba(139, 105, 75, 0.06) 5px, transparent 6px),
+      radial-gradient(circle at 88% 78%, rgba(139, 105, 75, 0.04) 3px, transparent 4px),
+      radial-gradient(circle at 48% 90%, rgba(139, 105, 75, 0.05) 4px, transparent 5px);
+  }
+
+  /* HEADER — minimal: brand · soft pill nav · current state. */
+  .sam-mochi__header {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 24px;
+    padding: 22px 32px 18px;
+  }
+  .sam-mochi__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-family-display, "Cormorant Garamond", Georgia, serif);
+    font-style: italic;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #1c1c1c;
+  }
+  .sam-mochi__brand-paw {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    color: #1c1c1c;
+  }
+  .sam-mochi__brand-paw svg { width: 100%; height: 100%; }
+
+  .sam-mochi__chips {
+    justify-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    background: rgba(255, 252, 246, 0.55);
+    border: 1px solid rgba(139, 105, 75, 0.18);
+    backdrop-filter: blur(10px);
+  }
+  .sam-mochi__chip {
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #8b6240;
+    border-radius: 999px;
+    letter-spacing: -0.005em;
+  }
+  .sam-mochi__chip.is-active {
+    background: #1c1c1c;
+    color: #fef3e2;
+    box-shadow: 0 1px 4px rgba(28, 28, 28, 0.18);
+  }
+
+  .sam-mochi__time {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: rgba(255, 252, 246, 0.6);
+    border: 1px solid rgba(139, 105, 75, 0.18);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #5c3d2e;
+  }
+  .sam-mochi__time-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #d4869a;
+  }
+
+  /* STAGE — magazine grid: feature spread, side stats, journal. */
+  .sam-mochi__stage {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    grid-template-rows: 1fr auto;
+    gap: 18px;
+    padding: 4px 32px 18px;
+    overflow: hidden;
+  }
+  .sam-mochi__feature {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 28px 30px 30px;
+    border-radius: 22px;
+    background:
+      radial-gradient(80% 70% at 100% 0%, rgba(255, 255, 255, 0.55), transparent 60%),
+      linear-gradient(180deg, #fff8ec 0%, #fbe5c8 100%);
+    border: 1px solid rgba(139, 105, 75, 0.18);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.7) inset,
+      0 18px 50px -22px rgba(139, 105, 75, 0.35);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .sam-mochi__feature-eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #b8845c;
+  }
+  .sam-mochi__feature-title {
+    margin: 0;
+    font-family: var(--font-family-display, "Cormorant Garamond", Georgia, serif);
+    font-weight: 400;
+    font-style: normal;
+    font-size: clamp(2rem, 4.4vw, 3.4rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    color: #1c1c1c;
+  }
+  .sam-mochi__feature-title em {
+    font-style: italic;
+    color: #5c3d2e;
+  }
+  .sam-mochi__feature-body {
+    margin: 6px 0 0;
+    max-width: 28rem;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: #5c3d2e;
+  }
+  .sam-mochi__feature-actions {
+    margin-top: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sam-mochi__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(139, 105, 75, 0.28);
+    background: rgba(255, 252, 246, 0.9);
+    color: #5c3d2e;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: default;
+  }
+  .sam-mochi__btn--primary {
+    background: #1c1c1c;
+    color: #fef3e2;
+    border-color: #1c1c1c;
+    box-shadow: 0 6px 20px -10px rgba(28, 28, 28, 0.5);
+  }
+  .sam-mochi__btn--primary span:first-child { color: #e89a98; }
+
+  .sam-mochi__feature-cat {
+    position: absolute;
+    right: -18px;
+    bottom: -22px;
+    width: 56%;
+    max-width: 420px;
+    z-index: -1;
+    opacity: 0.95;
+    filter: drop-shadow(0 18px 18px rgba(92, 64, 51, 0.18));
+  }
+  .sam-mochi__feature-cat svg { width: 100%; height: auto; }
+
+  /* PULSE — small softly-glassy stat panel on the right. */
+  .sam-mochi__pulse {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 22px 22px 18px;
+    border-radius: 22px;
+    background: rgba(255, 252, 246, 0.7);
+    border: 1px solid rgba(139, 105, 75, 0.18);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.7) inset,
+      0 18px 50px -28px rgba(139, 105, 75, 0.3);
+    backdrop-filter: blur(14px) saturate(140%);
+  }
+  .sam-mochi__pulse-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    column-gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px dashed rgba(139, 105, 75, 0.18);
+  }
+  .sam-mochi__pulse-row:first-child { padding-top: 0; }
+  .sam-mochi__pulse-label {
+    grid-column: 1;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #b8845c;
+    align-self: end;
+  }
+  .sam-mochi__pulse-value {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    font-family: var(--font-family-display, "Cormorant Garamond", Georgia, serif);
+    font-style: italic;
+    font-size: 32px;
+    font-weight: 500;
+    color: #1c1c1c;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .sam-mochi__pulse-meta {
+    grid-column: 1;
+    font-family: var(--font-family-display, "Cormorant Garamond", Georgia, serif);
+    font-style: italic;
+    font-size: 13px;
+    color: #5c3d2e;
+  }
+  .sam-mochi__purr {
+    margin-top: auto;
+    padding-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sam-mochi__purr-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #b8845c;
+  }
+  .sam-mochi__purr-value {
+    font-family: var(--font-family-display, "Cormorant Garamond", Georgia, serif);
+    font-style: italic;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: #5c3d2e;
+    text-transform: none;
+  }
+  .sam-mochi__purr-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 30px;
+  }
+  .sam-mochi__purr-bar {
+    flex: 1;
+    height: var(--purr-h);
+    border-radius: 2px;
+    background: linear-gradient(0deg, rgba(212, 134, 154, 0.85), rgba(232, 154, 152, 0.95));
+    transform-origin: bottom;
+    animation: samMochiPurr 1.6s ease-in-out infinite alternate;
+    animation-delay: calc(var(--purr-i) * 70ms);
+  }
+
+  /* MOMENTS — full-width journal across the bottom. */
+  .sam-mochi__moments {
+    grid-column: 1 / span 2;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px 22px 16px;
+    border-radius: 18px;
+    background: rgba(255, 248, 236, 0.7);
+    border: 1px solid rgba(139, 105, 75, 0.18);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 14px 40px -28px rgba(139, 105, 75, 0.25);
+  }
+  .sam-mochi__moments-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .sam-mochi__moments-head h2 {
+    margin: 0;
+    font-family: var(--font-family-display, "Cormorant Garamond", Georgia, serif);
+    font-style: italic;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    color: #1c1c1c;
+  }
+  .sam-mochi__moments-head span {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #b8845c;
+  }
+  .sam-mochi__moments-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  .sam-mochi__moment {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    border-left: 2px solid rgba(212, 134, 154, 0.55);
+    background: rgba(255, 252, 246, 0.5);
+    border-radius: 0 8px 8px 0;
+  }
+  .sam-mochi__moment-time {
+    font-family: var(--font-family-mono, ui-monospace, monospace);
+    font-size: 10px;
+    font-weight: 600;
+    color: #b8845c;
+    letter-spacing: 0.04em;
+  }
+  .sam-mochi__moment-body {
+    font-family: var(--font-family-display, "Cormorant Garamond", Georgia, serif);
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.3;
+    color: #5c3d2e;
+    letter-spacing: -0.005em;
+  }
+
+  /* COMPOSE — soft, intimate, totally different language. */
+  .sam-mochi__compose {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 32px 22px;
+    padding: 10px 12px;
+    border-radius: 999px;
+    background: rgba(255, 252, 246, 0.85);
+    border: 1px solid rgba(139, 105, 75, 0.22);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 12px 30px -16px rgba(139, 105, 75, 0.3);
+    backdrop-filter: blur(12px);
+  }
+  .sam-mochi__compose-input {
+    flex: 1;
+    padding: 6px 6px 6px 10px;
+    font-family: var(--font-family-display, "Cormorant Garamond", Georgia, serif);
+    font-style: italic;
+    font-size: 16px;
+    color: #5c3d2e;
+  }
+  .sam-mochi__compose-placeholder { opacity: 0.7; }
+  .sam-mochi__compose-send {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #1c1c1c;
+    color: #e89a98;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 6px 18px -8px rgba(28, 28, 28, 0.5);
+  }
+
+  @keyframes samMochiIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes samMochiPurr {
+    0%   { transform: scaleY(0.55); opacity: 0.85; }
+    100% { transform: scaleY(1);    opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sam-mochi,
+    .sam-mochi__purr-bar { animation: none; }
   }
 
   /* ══════════════════════════════════════════
@@ -2105,93 +2547,126 @@ const COZY_AVATAR = (
  * mock feels personal and "drastic" — a true vibe shift from the default
  * pill composer rather than another utilitarian variation. */
 const COZY_CAT_SVG = (
-  <svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
-    {/* Tail wrapping around the back, drawn first so the body sits on top. */}
+  <svg viewBox="0 0 180 140" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="samCatBody" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#2a2a2a" />
+        <stop offset="100%" stopColor="#0a0a0a" />
+      </linearGradient>
+      <linearGradient id="samCatBelly" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#ffffff" />
+        <stop offset="100%" stopColor="#f0f0f0" />
+      </linearGradient>
+      <filter id="samCatShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#000000" floodOpacity="0.25" />
+      </filter>
+    </defs>
+
     <g className="sam-cozy-cat-tail">
+      {/* Tail Base (Black) */}
       <path
-        d="M104 60 Q120 52 115 36 Q108 22 90 27"
-        stroke="#1c1c1c"
-        strokeWidth="9"
-        fill="none"
+        d="M 140 100 C 170 100 175 130 140 130 L 60 130"
+        stroke="url(#samCatBody)"
+        strokeWidth="14"
         strokeLinecap="round"
+        fill="none"
       />
-      <ellipse
-        cx="92"
-        cy="27"
-        rx="5.5"
-        ry="4"
-        fill="white"
-        transform="rotate(18 92 27)"
+      {/* Tail Tip (White overlay with rounded cap) */}
+      <path
+        d="M 70 130 L 45 130"
+        stroke="url(#samCatBelly)"
+        strokeWidth="14"
+        strokeLinecap="round"
+        fill="none"
       />
     </g>
 
     <g className="sam-cozy-cat-body">
-      {/* Body — the classic "loaf" silhouette. */}
+      {/* Main Body Loaf */}
       <path
-        d="M14 56 Q14 36 40 31 Q60 26 80 31 Q106 36 106 56 L106 70 Q106 75 101 75 L19 75 Q14 75 14 70 Z"
-        fill="#1c1c1c"
-      />
-      {/* White chest patch fading down through the front of the loaf. */}
-      <path
-        d="M44 56 Q60 51 76 56 L73 74 Q60 76 47 74 Z"
-        fill="white"
+        d="M 50 120 L 140 120 C 165 120 165 75 140 65 C 115 55 85 55 70 60 C 45 65 30 90 50 120 Z"
+        fill="url(#samCatBody)"
       />
 
-      {/* Head sitting on top-left of the body. */}
-      <ellipse cx="50" cy="32" rx="18" ry="16" fill="#1c1c1c" />
-      {/* White face mask — tuxedo down to the chin. */}
+      {/* Chest White (under the head) */}
       <path
-        d="M40 35 Q40 48 50 50 Q60 48 60 35 Q55 32 50 32 Q45 32 40 35 Z"
-        fill="white"
+        d="M 50 95 C 50 120 90 120 90 95 C 80 107 60 107 50 95 Z"
+        fill="url(#samCatBelly)"
       />
 
-      {/* Ears (outer + pink inner). */}
-      <path d="M37 22 L33 10 L46 20 Z" fill="#1c1c1c" />
-      <path d="M63 22 L67 10 L54 20 Z" fill="#1c1c1c" />
-      <path d="M38 20 L36 13 L43 19 Z" fill="#f4b8b0" />
-      <path d="M62 20 L64 13 L57 19 Z" fill="#f4b8b0" />
+      {/* Tucked Paws */}
+      <rect x="48" y="112" width="18" height="10" rx="5" fill="url(#samCatBelly)" />
+      <rect x="74" y="112" width="18" height="10" rx="5" fill="url(#samCatBelly)" />
+      <path d="M 54 113 L 54 121 M 60 113 L 60 121" stroke="#d0d0d0" strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M 80 113 L 80 121 M 86 113 L 86 121" stroke="#d0d0d0" strokeWidth="1.2" strokeLinecap="round" />
 
-      {/* Closed sleeping eyes. */}
-      <path
-        d="M42 36 Q44 33.5 46 36"
-        stroke="#1c1c1c"
-        strokeWidth="1.4"
-        fill="none"
-        strokeLinecap="round"
-      />
-      <path
-        d="M54 36 Q56 33.5 58 36"
-        stroke="#1c1c1c"
-        strokeWidth="1.4"
-        fill="none"
-        strokeLinecap="round"
-      />
+      {/* Head Group (Ears & Face) */}
+      <g transform="translate(17.5, 23) scale(0.75)">
+        {/* Back Left Ear */}
+        <path d="M 42 42 C 35 15 48 15 62 34 Z" fill="url(#samCatBody)" />
+        <path d="M 45 40 C 42 22 49 20 57 34 Z" fill="#eba4a2" />
 
-      {/* Pink nose + tiny mouth. */}
-      <path d="M48 41 L52 41 L50 43.4 Z" fill="#e89a98" />
-      <path
-        d="M50 43.4 Q48 45.4 46 44.6 M50 43.4 Q52 45.4 54 44.6"
-        stroke="#1c1c1c"
-        strokeWidth="0.8"
-        fill="none"
-        strokeLinecap="round"
-      />
+        {/* Back Right Ear */}
+        <path d="M 98 42 C 105 15 92 15 78 34 Z" fill="url(#samCatBody)" />
+        <path d="M 95 40 C 98 22 91 20 83 34 Z" fill="#eba4a2" />
 
-      {/* Whiskers. */}
-      <line x1="35" y1="40" x2="44" y2="41" stroke="#1c1c1c" strokeWidth="0.5" />
-      <line x1="35" y1="42.5" x2="44" y2="42" stroke="#1c1c1c" strokeWidth="0.5" />
-      <line x1="56" y1="41" x2="65" y2="40" stroke="#1c1c1c" strokeWidth="0.5" />
-      <line x1="56" y1="42" x2="65" y2="42.5" stroke="#1c1c1c" strokeWidth="0.5" />
+        {/* Head Base with Drop Shadow */}
+        <g filter="url(#samCatShadow)">
+          <circle cx="70" cy="65" r="34" fill="url(#samCatBody)" />
 
-      {/* White paws tucked under the chin. */}
-      <ellipse cx="36" cy="73" rx="6.5" ry="3" fill="white" />
-      <ellipse cx="64" cy="73" rx="6.5" ry="3" fill="white" />
-      <line x1="33.5" y1="71.5" x2="33.5" y2="74" stroke="#cfcfcf" strokeWidth="0.5" />
-      <line x1="36" y1="71" x2="36" y2="74.5" stroke="#cfcfcf" strokeWidth="0.5" />
-      <line x1="38.5" y1="71.5" x2="38.5" y2="74" stroke="#cfcfcf" strokeWidth="0.5" />
-      <line x1="61.5" y1="71.5" x2="61.5" y2="74" stroke="#cfcfcf" strokeWidth="0.5" />
-      <line x1="64" y1="71" x2="64" y2="74.5" stroke="#cfcfcf" strokeWidth="0.5" />
-      <line x1="66.5" y1="71.5" x2="66.5" y2="74" stroke="#cfcfcf" strokeWidth="0.5" />
+          {/* Tuxedo Mask (White) */}
+          <path
+            d="M 70 46 C 62 60 50 72 40 78 C 55 96 85 96 100 78 C 90 72 78 60 70 46 Z"
+            fill="url(#samCatBelly)"
+          />
+
+          {/* Cheeks Blush */}
+          <ellipse cx="50" cy="74" rx="5" ry="3" fill="#ffb6c1" opacity="0.4" transform="rotate(-15 50 74)" />
+          <ellipse cx="90" cy="74" rx="5" ry="3" fill="#ffb6c1" opacity="0.4" transform="rotate(15 90 74)" />
+
+          {/* Sleeping Eyes */}
+          <path
+            d="M 48 68 Q 55 73 62 68"
+            stroke="#1a1a1a"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <path
+            d="M 78 68 Q 85 73 92 68"
+            stroke="#1a1a1a"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            fill="none"
+          />
+
+          {/* Nose */}
+          <path d="M 64 80 L 76 80 L 70 86 Z" fill="#eba4a2" />
+          <path
+            d="M 70 86 L 70 91 M 70 91 Q 62 95 58 91 M 70 91 Q 78 95 82 91"
+            stroke="#1a1a1a"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            fill="none"
+          />
+
+          {/* Whiskers */}
+          <path
+            d="M 42 76 L 25 73 M 42 80 L 22 80 M 43 84 L 27 87"
+            stroke="#ffffff"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            opacity="0.6"
+          />
+          <path
+            d="M 98 76 L 115 73 M 98 80 L 118 80 M 97 84 L 113 87"
+            stroke="#ffffff"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            opacity="0.6"
+          />
+        </g>
+      </g>
     </g>
   </svg>
 );
@@ -2738,6 +3213,125 @@ export function StellaAppMock({
               </div>
             </div>
           </div>
+        </div>
+
+        {/* COZY MODE — completely different app layout. When the user
+            picks "Cozy mode", the standard sidebar + main shell is
+            hidden and this magazine-style "Mochi's home" surface takes
+            over the entire window. Different chrome, different rhythm,
+            different navigation — to make it clear that Stella isn't
+            just retinted, it's an entirely different application. */}
+        <div className="sam-mochi" aria-hidden={!toggles.composer}>
+          <div className="sam-mochi__bg" aria-hidden="true" />
+          <header className="sam-mochi__header">
+            <span className="sam-mochi__brand">
+              <span className="sam-mochi__brand-paw" aria-hidden="true">
+                {COZY_ICON_PAW}
+              </span>
+              <span>Mochi</span>
+            </span>
+            <nav className="sam-mochi__chips" aria-label="Mochi sections">
+              {["Today", "Naps", "Treats", "Play"].map((label, idx) => (
+                <span
+                  key={label}
+                  className={`sam-mochi__chip${idx === 0 ? " is-active" : ""}`}
+                >
+                  {label}
+                </span>
+              ))}
+            </nav>
+            <span className="sam-mochi__time">
+              <span className="sam-mochi__time-dot" aria-hidden="true" />
+              Purring · 1h 42m
+            </span>
+          </header>
+
+          <main className="sam-mochi__stage">
+            <section className="sam-mochi__feature">
+              <div className="sam-mochi__feature-eyebrow">A small day, well kept</div>
+              <h1 className="sam-mochi__feature-title">
+                Curled by the <em>window.</em>
+              </h1>
+              <p className="sam-mochi__feature-body">
+                Soft rain. The radiator hums. Mochi has been napping since
+                1:42 — turn the lights down a little if you&rsquo;re passing.
+              </p>
+              <div className="sam-mochi__feature-actions">
+                <button type="button" className="sam-mochi__btn sam-mochi__btn--primary">
+                  <span aria-hidden="true">{"\u2665"}</span>
+                  Send a head scratch
+                </button>
+                <button type="button" className="sam-mochi__btn">Quiet hour</button>
+              </div>
+              <div className="sam-mochi__feature-cat" aria-hidden="true">
+                {COZY_CAT_SVG}
+              </div>
+            </section>
+
+            <aside className="sam-mochi__pulse">
+              <div className="sam-mochi__pulse-row">
+                <span className="sam-mochi__pulse-label">Naps today</span>
+                <span className="sam-mochi__pulse-value">3</span>
+                <span className="sam-mochi__pulse-meta">of usually 5</span>
+              </div>
+              <div className="sam-mochi__pulse-row">
+                <span className="sam-mochi__pulse-label">Treats</span>
+                <span className="sam-mochi__pulse-value">1</span>
+                <span className="sam-mochi__pulse-meta">after dinner</span>
+              </div>
+              <div className="sam-mochi__pulse-row">
+                <span className="sam-mochi__pulse-label">Window time</span>
+                <span className="sam-mochi__pulse-value">42m</span>
+                <span className="sam-mochi__pulse-meta">birds at the feeder</span>
+              </div>
+              <div className="sam-mochi__purr">
+                <div className="sam-mochi__purr-head">
+                  <span>Purr meter</span>
+                  <span className="sam-mochi__purr-value">soft</span>
+                </div>
+                <div className="sam-mochi__purr-bars" aria-hidden="true">
+                  {[40, 60, 80, 65, 50, 70, 85, 60, 45, 65, 80, 55].map((h, i) => (
+                    <span
+                      key={i}
+                      className="sam-mochi__purr-bar"
+                      style={{ ["--purr-h" as string]: `${h}%`, ["--purr-i" as string]: i }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </aside>
+
+            <section className="sam-mochi__moments">
+              <header className="sam-mochi__moments-head">
+                <h2>Today&rsquo;s little things</h2>
+                <span>Quietly noted by Mochi</span>
+              </header>
+              <ol className="sam-mochi__moments-list">
+                {[
+                  { time: "7:14 AM", body: "Greeted you with a soft head bump" },
+                  { time: "9:02 AM", body: "Watched the birds at the feeder · 18 min" },
+                  { time: "11:30 AM", body: "Curled into a perfect loaf in the sun" },
+                  { time: "1:42 PM", body: "Asleep by the window. Rain outside." },
+                ].map((item) => (
+                  <li key={item.time} className="sam-mochi__moment">
+                    <span className="sam-mochi__moment-time">{item.time}</span>
+                    <span className="sam-mochi__moment-body">{item.body}</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          </main>
+
+          <footer className="sam-mochi__compose">
+            <span className="sam-mochi__compose-input">
+              <span className="sam-mochi__compose-placeholder">
+                Whisper to Mochi&hellip;
+              </span>
+            </span>
+            <button type="button" className="sam-mochi__compose-send" aria-label="Send">
+              <span aria-hidden="true">{"\u2665"}</span>
+            </button>
+          </footer>
         </div>
 
         {/* TRANSFORMATION PILLS (only when interactive) */}
