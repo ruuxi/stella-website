@@ -1,0 +1,190 @@
+/* ──────────────────────────────────────────────────────────────────────
+   "An app that becomes you" — full-bleed self-mod section.
+
+   Sits outside .grid-shell so the interactive Stella surface can span
+   the entire viewport. The header above it borrows the same eyebrow +
+   display-italic h2 treatment as the rest of the site (`.section-kicker`)
+   so it reads as a peer of the other sections, just unframed.
+
+   The mock itself is the real desktop onboarding "creation" surface;
+   its inline CSS reads from CSS variables that we scope on
+   `.self-mod-hero__stage-inner` so it renders identically here.
+   ────────────────────────────────────────────────────────────────────── */
+
+.self-mod-hero {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(3rem, 6vw, 5rem);
+  padding: clamp(5.5rem, 11vw, 9rem) 0 clamp(4.5rem, 9vw, 7rem);
+  isolation: isolate;
+}
+
+.self-mod-hero--placeholder {
+  min-height: clamp(36rem, 80vw, 56rem);
+}
+
+/* ── Heading ─────────────────────────────────────────────────────── */
+
+.self-mod-hero__copy {
+  width: min(100%, 56rem);
+  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.self-mod-hero__eyebrow {
+  color: rgba(18, 18, 15, 0.46);
+  font-family: var(--font-display), serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  letter-spacing: -0.03em;
+}
+
+.self-mod-hero__title {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-size: clamp(3.4rem, 12vw, 8.6rem);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 0.88;
+  letter-spacing: -0.07em;
+  color: inherit;
+}
+
+.self-mod-hero__lede {
+  margin: 0.6rem auto 0;
+  max-width: 36rem;
+  color: var(--page-muted, rgba(18, 18, 15, 0.6));
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* ── Stage ───────────────────────────────────────────────────────── */
+
+.self-mod-hero__stage {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0 clamp(1rem, 4vw, 3rem);
+}
+
+.self-mod-hero__stage-inner {
+  position: relative;
+  width: min(100%, 1240px);
+  aspect-ratio: 16 / 10;
+  min-height: 520px;
+  max-height: 760px;
+  border-radius: 22px;
+  overflow: visible;
+  box-shadow:
+    0 30px 80px -32px rgba(15, 23, 42, 0.28),
+    0 12px 36px -20px rgba(15, 23, 42, 0.14);
+
+  /* Stella theme tokens — scoped so the mock renders exactly like the
+     real desktop app without leaking into the rest of the marketing
+     site's design tokens. */
+  --font-family-sans: var(--font-sans), system-ui, sans-serif;
+  --font-family-display: var(--font-display), Georgia, serif;
+  --font-family-mono: var(--font-mono), ui-monospace, monospace;
+
+  --background: #f6f7fa;
+  --foreground: #161616;
+
+  --primary: #0f62fe;
+  --primary-foreground: #ffffff;
+  --accent: #0f62fe;
+
+  --text-strong: color-mix(in srgb, var(--foreground) 95%, transparent);
+  --text-base: color-mix(in srgb, var(--foreground) 75%, transparent);
+  --text-weak: color-mix(in srgb, var(--foreground) 50%, transparent);
+  --text-weaker: color-mix(in srgb, var(--foreground) 35%, transparent);
+
+  --border-strong: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --border-base: color-mix(in srgb, var(--foreground) 8%, transparent);
+  --border-weak: color-mix(in srgb, var(--foreground) 5%, transparent);
+
+  --glass-bg: color-mix(in srgb, var(--background) 40%, transparent);
+  --glass-blur: blur(40px) saturate(180%);
+
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  --radius-md: 6px;
+  --radius-lg: 8px;
+}
+
+/* Soft transition layer — when any toggle flips, the whole surface
+   does a gentle exposure flash so the change feels intentional rather
+   than abrupt. */
+.self-mod-hero__stage-inner .sam-root {
+  transition:
+    background-color 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    background-image 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.self-mod-hero__stage-inner .sam-sidebar,
+.self-mod-hero__stage-inner .sam-header,
+.self-mod-hero__stage-inner .sam-composer,
+.self-mod-hero__stage-inner .sam-body {
+  transition:
+    width 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Soften the swap between the default home and the modern dashboard
+   so it feels like a transformation rather than two states blinking. */
+.self-mod-hero__stage-inner .sam-body-default,
+.self-mod-hero__stage-inner .sam-cards,
+.self-mod-hero__stage-inner .sam-body-cozy,
+.self-mod-hero__stage-inner .sam-body-create,
+.self-mod-hero__stage-inner .sam-sidebar-default,
+.self-mod-hero__stage-inner .sam-sidebar-modern,
+.self-mod-hero__stage-inner .sam-sidebar-cozy,
+.self-mod-hero__stage-inner .sam-composer-form,
+.self-mod-hero__stage-inner .sam-cozy {
+  animation-duration: 0.55s !important;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .self-mod-hero__stage-inner {
+    --background: #1a1a1d;
+    --foreground: #f2f4f8;
+    --primary: #78a9ff;
+    --primary-foreground: #161616;
+    --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.45);
+    box-shadow:
+      0 40px 120px -40px rgba(0, 0, 0, 0.7),
+      0 14px 50px -22px rgba(0, 0, 0, 0.5);
+  }
+}
+
+@media (max-width: 900px) {
+  .self-mod-hero__stage-inner {
+    aspect-ratio: auto;
+    min-height: 600px;
+    border-radius: 18px;
+  }
+}
+
+@media (max-width: 640px) {
+  .self-mod-hero {
+    padding-top: 4rem;
+    padding-bottom: 3rem;
+  }
+  .self-mod-hero__stage {
+    padding: 0 0.5rem;
+  }
+  .self-mod-hero__stage-inner {
+    min-height: 540px;
+  }
+}

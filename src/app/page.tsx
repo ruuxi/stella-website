@@ -4,9 +4,9 @@ import { DownloadButton } from "@/components/download-button";
 import { HeroStellaOrb } from "@/components/hero-stella-orb-dynamic";
 import { DeferInView } from "@/components/product-demos/defer-in-view";
 
-const SelfModDemo = dynamic(
-  () => import("@/components/product-demos/product-demos").then((mod) => mod.SelfModDemo),
-  { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
+const SelfModHero = dynamic(
+  () => import("@/components/product-demos/self-mod-hero").then((mod) => mod.SelfModHero),
+  { loading: () => <div className="self-mod-hero self-mod-hero--placeholder" /> },
 );
 
 const RadialDialSection = dynamic(
@@ -23,10 +23,6 @@ const MobileSection = dynamic(
   () => import("@/components/product-demos/demo-sections").then((mod) => mod.MobileSection),
   { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
 );
-
-function DemoFallback() {
-  return <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} />;
-}
 
 const navItems = [
   { label: "How It Works", href: "/how-it-works" },
@@ -172,25 +168,12 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="grid-shell showcase-section section-border" data-reveal>
-          <div className="section-kicker" data-reveal-child style={{ ["--reveal-index" as string]: 0 }}>
-            <h2>Make Stella entirely yours</h2>
-            <p className="section-kicker__desc">
-              Just tell Stella to change its appearance — from small tweaks like
-              colors to a complete visual makeover. It redesigns itself while you
-              keep chatting.
-            </p>
-          </div>
-          <div className="product-demos-slot" data-reveal-child style={{ ["--reveal-index" as string]: 1 }}>
-            <div className="demo-showcase-grid">
-              <article className="demo-panel demo-panel--full">
-                <DeferInView fallback={<DemoFallback />} rootMargin="360px 0px">
-                  <SelfModDemo />
-                </DeferInView>
-              </article>
-            </div>
-          </div>
-        </section>
+        <DeferInView
+          fallback={<div className="self-mod-hero self-mod-hero--placeholder" />}
+          rootMargin="480px 0px"
+        >
+          <SelfModHero />
+        </DeferInView>
 
         <section className="grid-shell showcase-section section-border" data-reveal>
           <RadialDialSection />
