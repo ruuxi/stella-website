@@ -175,17 +175,11 @@ export default function Home() {
           <SelfModHero />
         </DeferInView>
 
-        <section className="grid-shell showcase-section section-border" data-reveal>
-          <RadialDialSection />
-        </section>
+        <RadialDialSection />
 
-        <section className="grid-shell showcase-section section-border" data-reveal>
-          <CanvasSection />
-        </section>
+        <CanvasSection />
 
-        <section className="grid-shell showcase-section section-border" data-reveal>
-          <MobileSection />
-        </section>
+        <MobileSection />
 
         <section
           className="grid-shell showcase-section showcase-section--deferred section-border"

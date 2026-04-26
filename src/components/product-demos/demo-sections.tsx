@@ -95,38 +95,48 @@ export function RadialDialSection() {
   const activeWedge = RADIAL_WEDGES[selectedIndex];
 
   return (
-    <div style={{ display: "contents" }}>
-      <div className="section-kicker section-kicker--radial">
-        <h2>Access Stella from anywhere</h2>
-        <p className="section-kicker__desc">
-          Hold ⌘ (or Ctrl on Windows) and right-click anywhere on your screen
-          to summon Stella&apos;s radial dial. Flick toward an action — no menus,
-          no window switching.
+    <section className="radial-hero" data-reveal>
+      <header
+        className="radial-hero__copy"
+        data-reveal-child
+        style={{ ["--reveal-index" as string]: 0 }}
+      >
+        <span className="radial-hero__eyebrow">Anywhere</span>
+        <h2 className="radial-hero__title">Stella, on call.</h2>
+        <p className="radial-hero__lede">
+          One gesture summons Stella anywhere on your screen. Flick toward an
+          action — no menus, no window switching.
         </p>
-        <RadialDialInteractive
-          selectedIndex={selectedIndex}
-          onSelect={handleSelect}
-        />
-        <div className="radial-dial-caption" aria-live="polite">
-          <div key={activeWedge.id} className="radial-dial-caption__inner">
-            <strong>{activeWedge.heading}</strong>
-            <p>{activeWedge.detail}</p>
+      </header>
+
+      <div
+        className="radial-hero__stage"
+        data-reveal-child
+        style={{ ["--reveal-index" as string]: 1 }}
+      >
+        <div className="radial-hero__dial" aria-label="Stella radial dial">
+          <RadialDialInteractive
+            selectedIndex={selectedIndex}
+            onSelect={handleSelect}
+          />
+          <div className="radial-dial-caption" aria-live="polite">
+            <div key={activeWedge.id} className="radial-dial-caption__inner">
+              <strong>{activeWedge.heading}</strong>
+              <p>{activeWedge.detail}</p>
+            </div>
           </div>
         </div>
-      </div>
-      <div ref={ref} className="product-demos-slot">
-        <div className="demo-showcase-grid">
-          <article className="demo-panel demo-panel--full">
-            <DeferInView fallback={<DemoChunkPlaceholder />}>
-              <RadialDialVisual
-                selectedIndex={selectedIndex}
-                isActive={isActive}
-              />
-            </DeferInView>
-          </article>
+
+        <div ref={ref} className="radial-hero__mock">
+          <DeferInView fallback={<DemoChunkPlaceholder />}>
+            <RadialDialVisual
+              selectedIndex={selectedIndex}
+              isActive={isActive}
+            />
+          </DeferInView>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -146,22 +156,39 @@ export function CanvasSection() {
     return () => window.clearInterval(timer);
   }, [isActive]);
 
-  const activeConcept = CANVAS_CONCEPTS[conceptIndex];
-
   return (
-    <div style={{ display: "contents" }}>
-      <div className="section-kicker">
-        <h2>Everything in one place</h2>
-        <p className="section-kicker__desc">
-          The full Stella window shows your dashboard, active tasks, and
-          upcoming follow-ups — all in one clean, organized view.
+    <section className="canvas-hero" data-reveal>
+      <header
+        className="canvas-hero__copy"
+        data-reveal-child
+        style={{ ["--reveal-index" as string]: 0 }}
+      >
+        <span className="canvas-hero__eyebrow">Display</span>
+        <h2 className="canvas-hero__title">Ask. Watch it appear.</h2>
+        <p className="canvas-hero__lede">
+          The chat stays in the centre. Whatever Stella is making — a sheet,
+          a doc, or a few side quests at once — opens beside it in a panel
+          that&apos;s always there.
         </p>
-        <div className="canvas-showcase__tabs canvas-showcase__tabs--kicker">
+      </header>
+
+      <div
+        className="canvas-hero__stage"
+        data-reveal-child
+        style={{ ["--reveal-index" as string]: 1 }}
+      >
+        <div
+          className="canvas-hero__menu"
+          role="tablist"
+          aria-label="Display examples"
+        >
           {CANVAS_CONCEPTS.map((concept, index) => (
             <button
               key={concept.id}
               type="button"
-              className="canvas-showcase__tab"
+              role="tab"
+              aria-selected={conceptIndex === index}
+              className="canvas-hero__menu-item"
               data-active={conceptIndex === index || undefined}
               onClick={() => setConceptIndex(index)}
             >
@@ -169,32 +196,17 @@ export function CanvasSection() {
             </button>
           ))}
         </div>
-        <div className="section-kicker__concept-stack">
-          {CANVAS_CONCEPTS.map((concept, index) => (
-            <div
-              key={concept.id}
-              className="section-kicker__concept-meta"
-              data-active={conceptIndex === index || undefined}
-            >
-              <h3>{concept.title}</h3>
-              <p className="section-kicker__desc">{concept.blurb}</p>
-            </div>
-          ))}
+
+        <div ref={ref} className="canvas-hero__mock">
+          <DeferInView fallback={<DemoChunkPlaceholder />}>
+            <CanvasVisual
+              conceptIndex={conceptIndex}
+              isActive={isActive}
+            />
+          </DeferInView>
         </div>
       </div>
-      <div ref={ref} className="product-demos-slot">
-        <div className="demo-showcase-grid">
-          <article className="demo-panel demo-panel--full">
-            <DeferInView fallback={<DemoChunkPlaceholder />}>
-              <CanvasVisual
-                conceptIndex={conceptIndex}
-                isActive={isActive}
-              />
-            </DeferInView>
-          </article>
-        </div>
-      </div>
-    </div>
+    </section>
   );
 }
 
@@ -266,54 +278,67 @@ export function MobileSection() {
   }, [isActive, cycle]);
 
   return (
-    <div style={{ display: "contents" }}>
-      <div className="section-kicker">
-        <h2>Control your computer from anywhere</h2>
-        <p className="section-kicker__desc">
+    <section className="mobile-hero" data-reveal>
+      <header
+        className="mobile-hero__copy"
+        data-reveal-child
+        style={{ ["--reveal-index" as string]: 0 }}
+      >
+        <span className="mobile-hero__eyebrow">Anywhere</span>
+        <h2 className="mobile-hero__title">
+          Control your computer from anywhere
+        </h2>
+        <p className="mobile-hero__lede">
           Away from your desk? Message Stella from anywhere and she&apos;ll take
           action on your computer in real time.
         </p>
-        <MobileChannels />
-      </div>
-      <div ref={ref} className="product-demos-slot">
-        <div className="demo-showcase-grid">
-          <article className="demo-panel demo-panel--portrait">
-            <DeferInView fallback={<DemoChunkPlaceholder />}>
-              {isMobile ? (
-                <div className="mobile-phone-single">
-                  <div className="mobile-phone-swap">
-                    <MobilePhoneVisual
-                      key={activePlatform}
-                      activeConvo={0}
-                      platform={activePlatform}
-                    />
-                  </div>
-                  <span className="mobile-phone-label">
-                    {PLATFORM_LABELS[activePlatform]}
-                  </span>
+      </header>
+
+      <div
+        className="mobile-hero__stage"
+        data-reveal-child
+        style={{ ["--reveal-index" as string]: 1 }}
+      >
+        <div className="mobile-hero__channels">
+          <MobileChannels />
+        </div>
+
+        <div ref={ref} className="mobile-hero__mock">
+          <DeferInView fallback={<DemoChunkPlaceholder />}>
+            {isMobile ? (
+              <div className="mobile-phone-single">
+                <div className="mobile-phone-swap">
+                  <MobilePhoneVisual
+                    key={activePlatform}
+                    activeConvo={0}
+                    platform={activePlatform}
+                  />
                 </div>
-              ) : (
-                <div className="mobile-phone-row">
-                  {slots.map((platform, i) => (
-                    <div key={i} className="mobile-phone-col">
-                      <div className="mobile-phone-swap">
-                        <MobilePhoneVisual
-                          key={platform}
-                          activeConvo={i}
-                          platform={platform}
-                        />
-                      </div>
-                      <span className="mobile-phone-label">
-                        {PLATFORM_LABELS[platform]}
-                      </span>
+                <span className="mobile-phone-label">
+                  {PLATFORM_LABELS[activePlatform]}
+                </span>
+              </div>
+            ) : (
+              <div className="mobile-phone-row">
+                {slots.map((platform, i) => (
+                  <div key={i} className="mobile-phone-col">
+                    <div className="mobile-phone-swap">
+                      <MobilePhoneVisual
+                        key={platform}
+                        activeConvo={i}
+                        platform={platform}
+                      />
                     </div>
-                  ))}
-                </div>
-              )}
-            </DeferInView>
-          </article>
+                    <span className="mobile-phone-label">
+                      {PLATFORM_LABELS[platform]}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </DeferInView>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

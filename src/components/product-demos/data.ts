@@ -52,39 +52,52 @@ export const SELF_MOD_STAGES: SelfModStage[] = [
 
 export const CANVAS_CONCEPTS: CanvasConcept[] = [
   {
-    id: "launch",
-    label: "Plan",
-    title: "Stella builds visual workspaces, not just text",
+    id: "spreadsheet",
+    label: "Build a sheet",
+    title: "Ask once. Watch it appear.",
     blurb:
-      "Ask something complex and Stella generates a rich layout — cards, charts, tables — whatever communicates the answer best.",
-    activity: [
-      { id: "a", name: "Flight search", meta: "done", preview: "Found direct SFO → SAN on Friday, $124 round trip." },
-      { id: "b", name: "Hotel comparison", meta: "done", preview: "Compared 8 beachfront hotels — top pick saved." },
-      { id: "c", name: "Restaurant research", meta: "working on it", preview: "Scanning reviews for outdoor spots near the hotel." },
+      "Ask Stella for one thing — a spreadsheet, a doc, a chart. The chat stays in the middle; the work opens beside it the moment it's ready.",
+    display: "spreadsheet",
+    chat: [
+      {
+        id: "u1",
+        role: "user",
+        text: "Pull our Q1 numbers into a sheet, broken down by channel.",
+      },
+      {
+        id: "s1",
+        role: "stella",
+        text: "On it — opening the sheet on the right as I fill it in.",
+      },
     ],
   },
   {
-    id: "agents",
-    label: "Compare",
-    title: "Side-by-side comparisons, built on the fly",
+    id: "app",
+    label: "Build an app",
+    title: "Describe an app. Use it.",
     blurb:
-      "Need to weigh your options? Stella creates structured visual comparisons so you can see differences at a glance.",
-    activity: [
-      { id: "d", name: "Spec research", meta: "done", preview: "Pulled specs for all three models from official sources." },
-      { id: "e", name: "Price tracking", meta: "done", preview: "Checked current prices across 4 retailers." },
-      { id: "f", name: "Recommendation", meta: "working on it", preview: "Matching features against your stated priorities." },
+      "Tell Stella the tool you wish existed and she builds it on the spot — opening the running app beside you, ready to use.",
+    display: "app",
+    chat: [
+      {
+        id: "u2",
+        role: "user",
+        text: "Build me a focus timer — 25-minute rounds with short breaks.",
+      },
+      {
+        id: "s2",
+        role: "stella",
+        text: "Done. It's open on the right — press start whenever you're ready.",
+      },
     ],
   },
   {
-    id: "timeline",
-    label: "Analyze",
-    title: "From raw data to a polished summary",
+    id: "multitask",
+    label: "All at once",
+    title: "Many asks. All in motion.",
     blurb:
-      "Stella reads your documents and data, then generates a formatted analysis with key metrics, tables, and next steps.",
-    activity: [
-      { id: "g", name: "Data collection", meta: "done", preview: "Imported sales data from Q1 spreadsheets." },
-      { id: "h", name: "Trend analysis", meta: "done", preview: "Identified growth patterns across all channels." },
-      { id: "i", name: "Report generation", meta: "working on it", preview: "Building the summary with charts and recommendations." },
-    ],
+      "Send one ask, send another while the first is still going — Stella spins up a fresh agent for each, all working in parallel right inside the conversation.",
+    display: "multitask",
+    chat: [],
   },
 ];

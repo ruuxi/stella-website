@@ -38,6 +38,14 @@
     grid-template-columns: 170px minmax(0, 1fr) minmax(11.5rem, 13rem);
   }
 
+  .shell-preview__body--chat {
+    grid-template-columns: 170px minmax(17rem, 0.84fr) minmax(22rem, 1.16fr);
+  }
+
+  .shell-preview__body--multitask {
+    grid-template-columns: 170px minmax(0, 1fr);
+  }
+
   .shell-activity {
     border-left: 1px solid rgba(84, 112, 146, 0.12);
   }
@@ -54,6 +62,14 @@
 
   .shell-preview__body {
     grid-template-columns: 170px minmax(0, 1fr) minmax(10.25rem, 11.75rem);
+  }
+
+  .shell-preview__body--chat {
+    grid-template-columns: 170px minmax(18rem, 0.82fr) minmax(24rem, 1.18fr);
+  }
+
+  .shell-preview__body--multitask {
+    grid-template-columns: 170px minmax(0, 1fr);
   }
 }
 
@@ -145,6 +161,10 @@
   }
 
   .shell-preview__body {
+    grid-template-columns: 1fr;
+  }
+
+  .shell-preview__body--chat {
     grid-template-columns: 1fr;
   }
 

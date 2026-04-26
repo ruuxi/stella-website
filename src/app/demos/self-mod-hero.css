@@ -6,9 +6,9 @@
    display-italic h2 treatment as the rest of the site (`.section-kicker`)
    so it reads as a peer of the other sections, just unframed.
 
-   The mock itself is the real desktop onboarding "creation" surface;
-   its inline CSS reads from CSS variables that we scope on
-   `.self-mod-hero__stage-inner` so it renders identically here.
+   The mock is the interactive `StellaAppMock` (floating transformation
+   pills). We scope theme variables on `.self-mod-hero__stage-inner` so
+   it matches the app without leaking into the rest of the site.
    ────────────────────────────────────────────────────────────────────── */
 
 .self-mod-hero {
@@ -117,16 +117,22 @@
   --radius-lg: 8px;
 }
 
-/* Soft transition layer — when any toggle flips, the whole surface
-   does a gentle exposure flash so the change feels intentional rather
-   than abrupt. */
+/* Floating pills use `position: absolute; z-index: 30` — keep them
+   above the main column and Mochi overlay, and don’t clip at the root. */
+.self-mod-hero__stage-inner .sam-root[data-interactive="true"] {
+  overflow: visible;
+}
+.self-mod-hero__stage-inner .sam-pill {
+  z-index: 50;
+}
+
+/* Soft cross-fade when a transformation toggle changes */
 .self-mod-hero__stage-inner .sam-root {
   transition:
     background-color 0.55s cubic-bezier(0.22, 1, 0.36, 1),
     background-image 0.55s cubic-bezier(0.22, 1, 0.36, 1),
     border-color 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
-
 .self-mod-hero__stage-inner .sam-sidebar,
 .self-mod-hero__stage-inner .sam-header,
 .self-mod-hero__stage-inner .sam-composer,
@@ -139,9 +145,6 @@
     box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
     border-radius 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
-
-/* Soften the swap between the default home and the modern dashboard
-   so it feels like a transformation rather than two states blinking. */
 .self-mod-hero__stage-inner .sam-body-default,
 .self-mod-hero__stage-inner .sam-cards,
 .self-mod-hero__stage-inner .sam-body-cozy,

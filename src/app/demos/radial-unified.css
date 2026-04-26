@@ -987,6 +987,377 @@
   box-sizing: border-box;
 }
 
+/* ──────────────────────────────────────────────────────────────────
+   "Stella, on call." — full-bleed radial hero.
+
+   Mirrors the .self-mod-hero layout: an unframed section with the
+   eyebrow + display-italic title sitting centred at the top, and a
+   two-column stage below — large interactive dial on the left, the
+   live desktop mock on the right with no card chrome around it.
+   ────────────────────────────────────────────────────────────────── */
+
+.radial-hero {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(2.6rem, 5.5vw, 4.5rem);
+  padding: clamp(5rem, 10vw, 8rem) 0 clamp(4rem, 8vw, 6.5rem);
+  isolation: isolate;
+}
+
+.radial-hero__copy {
+  width: min(100%, 56rem);
+  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.radial-hero__eyebrow {
+  color: rgba(18, 18, 15, 0.46);
+  font-family: var(--font-display), serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  letter-spacing: -0.03em;
+}
+
+.radial-hero__title {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-size: clamp(3.4rem, 12vw, 8.6rem);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 0.88;
+  letter-spacing: -0.07em;
+  color: inherit;
+}
+
+.radial-hero__lede {
+  margin: 0.6rem auto 0;
+  max-width: 36rem;
+  color: var(--page-muted, rgba(18, 18, 15, 0.6));
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.radial-hero__stage {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(360px, 0.85fr) minmax(0, 1.45fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  padding: 0 clamp(1.5rem, 5vw, 4rem);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.radial-hero__dial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.6rem, 3vw, 2.4rem);
+}
+
+/* Hero-scale dial. The inner SVG has a fixed 248px viewBox-bound
+   width/height attribute; we force it to fill the wrapper so the
+   absolutely-centered logo disk lands exactly on the dial's centre at
+   any scale. */
+.radial-hero__dial .radial-dial-interactive {
+  width: clamp(280px, 26vw, 360px);
+  height: clamp(280px, 26vw, 360px);
+}
+.radial-hero__dial .radial-dial-interactive__svg {
+  width: 100%;
+  height: 100%;
+}
+.radial-hero__dial .radial-dial-interactive__center {
+  width: clamp(72px, 7vw, 92px);
+  height: clamp(72px, 7vw, 92px);
+}
+/* StellaAnimation sizes its canvas as `width × ascii-font-size` per
+   axis — at default 7px font and width=14, that gives roughly a
+   ~52px-wide ASCII orb that fits cleanly inside the centre disk. The
+   container itself is `position: absolute; transform: translate(-50%)`
+   on the canvas, so we just clip overflow as a safety net. */
+.radial-hero__dial .radial-dial-interactive__center {
+  overflow: hidden;
+}
+.radial-hero__dial .radial-dial-interactive__center .stella-animation-container {
+  --ascii-font-size: 5px;
+  --ascii-line-height: 5px;
+  width: 100%;
+  height: 100%;
+}
+
+/* Reserve a fixed slot for the caption so the longest wedge copy
+   doesn't push the mock down when shorter copy is shown. The slot
+   sizes itself off the tallest expected caption (heading + 3 lines of
+   detail) and stays put as the auto-cycling caption swaps in/out. */
+.radial-hero__dial .radial-dial-caption {
+  margin-top: 0;
+  text-align: center;
+  width: min(100%, 24rem);
+  min-height: 6.5rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.radial-hero__dial .radial-dial-caption__inner {
+  width: 100%;
+  justify-items: center;
+  text-align: center;
+}
+
+.radial-hero__mock {
+  position: relative;
+  width: 100%;
+  min-height: clamp(360px, 48vw, 560px);
+}
+
+/* Drop the card frame from the visual — the desktop mock now floats
+   directly in the layout, no demo-panel border or shadow. */
+.radial-hero__mock .radial-demo--visual-only {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+@media (max-width: 900px) {
+  .radial-hero__stage {
+    grid-template-columns: 1fr;
+    gap: clamp(2rem, 6vw, 3rem);
+  }
+  .radial-hero__dial {
+    order: 1;
+  }
+  .radial-hero__mock {
+    order: 2;
+    min-height: clamp(320px, 70vw, 520px);
+  }
+}
+
+@media (max-width: 640px) {
+  .radial-hero {
+    padding-top: 4rem;
+    padding-bottom: 3rem;
+  }
+  .radial-hero__stage {
+    padding: 0 0.75rem;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   Canvas hero — "Ask. Watch it appear."
+
+   Same structural rhythm as `.radial-hero`: centered eyebrow + title +
+   lede above, two-column stage below. Left column is a vertical menu
+   of three concept buttons; right column is the chat-centric mock with
+   no card chrome around it.
+   ────────────────────────────────────────────────────────────────── */
+
+.canvas-hero,
+.mobile-hero {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(2.6rem, 5.5vw, 4.5rem);
+  padding: clamp(5rem, 10vw, 8rem) 0 clamp(4rem, 8vw, 6.5rem);
+  isolation: isolate;
+}
+
+.canvas-hero__copy,
+.mobile-hero__copy {
+  width: min(100%, 56rem);
+  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.canvas-hero__eyebrow,
+.mobile-hero__eyebrow {
+  color: rgba(18, 18, 15, 0.46);
+  font-family: var(--font-display), serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  letter-spacing: -0.03em;
+}
+
+.canvas-hero__title,
+.mobile-hero__title {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-size: clamp(3.4rem, 12vw, 8.6rem);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 0.88;
+  letter-spacing: -0.07em;
+  color: inherit;
+}
+
+.canvas-hero__lede,
+.mobile-hero__lede {
+  margin: 0.6rem auto 0;
+  max-width: 38rem;
+  color: var(--page-muted, rgba(18, 18, 15, 0.6));
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* Stage = horizontal pill bar above + full-width mock below.
+   Distinct from the side-by-side hero pattern used elsewhere. */
+.canvas-hero__stage {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.4rem, 3vw, 2.4rem);
+  padding: 0 clamp(1.5rem, 5vw, 4rem);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.canvas-hero__menu {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.35rem;
+  border-radius: 999px;
+  background: rgba(18, 18, 15, 0.04);
+  border: 1px solid rgba(18, 18, 15, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.canvas-hero__menu-item {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+  padding: 0.55rem 1.1rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(18, 18, 15, 0.55);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  transition:
+    background 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.canvas-hero__menu-item:hover {
+  color: rgba(18, 18, 15, 0.85);
+}
+
+.canvas-hero__menu-item[data-active] {
+  background: rgba(18, 18, 15, 0.92);
+  color: #fff;
+}
+
+.canvas-hero__mock {
+  position: relative;
+  width: 100%;
+  max-width: 1180px;
+  min-height: clamp(420px, 52vw, 640px);
+}
+
+/* Drop the demo-panel card chrome — the chat-centric mock floats
+   directly on the page, same as the radial-hero mock. */
+.canvas-hero__mock .canvas-showcase {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+@media (max-width: 640px) {
+  .canvas-hero {
+    padding-top: 4rem;
+    padding-bottom: 3rem;
+  }
+  .canvas-hero__stage {
+    padding: 0 0.75rem;
+  }
+  .canvas-hero__menu {
+    width: 100%;
+    flex-direction: column;
+    border-radius: 1.2rem;
+  }
+  .canvas-hero__menu-item {
+    width: 100%;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   Mobile hero — "Control your computer from anywhere"
+
+   Same hero rhythm. Left column keeps the channels list ("Message
+   Stella from …") so the meaning of the section is right next to the
+   phones. Right column is the phone row with no card behind it.
+   ────────────────────────────────────────────────────────────────── */
+
+.mobile-hero__stage {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.6fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  padding: 0 clamp(1.5rem, 5vw, 4rem);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.mobile-hero__channels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+/* The shared MobileChannels widget already has a top margin; nuke it
+   in this layout so it sits flush with its column. */
+.mobile-hero__channels .mobile-channels {
+  margin-top: 0 !important;
+}
+
+.mobile-hero__mock {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.mobile-hero__mock .mobile-phone-row {
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .mobile-hero__stage {
+    grid-template-columns: 1fr;
+    gap: clamp(1.6rem, 5vw, 2.6rem);
+  }
+  .mobile-hero__channels {
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .mobile-hero {
+    padding-top: 4rem;
+    padding-bottom: 3rem;
+  }
+  .mobile-hero__stage {
+    padding: 0 0.75rem;
+  }
+}
+
 /* ── Interactive radial dial (in section-kicker) ───────────────── */
 
 .section-kicker--radial {

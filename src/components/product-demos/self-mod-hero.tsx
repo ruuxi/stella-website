@@ -9,13 +9,12 @@ import {
 } from "./stella-app-mock-types";
 
 /**
- * "Make it yours" — full-bleed section that sits outside the page grid.
+ * "Make it yours" — full-bleed section outside the page grid.
  *
- * The mock is the real onboarding "creation" surface from
- * desktop/src/global/onboarding/panels/StellaAppMock.tsx. We render it
- * as a single-select demo: choosing one pill deselects whatever was
- * active before, so the user always sees one transformation at a time
- * — never a frankenstein of two half-applied styles.
+ * Uses the interactive `StellaAppMock` with floating transformation pills
+ * (Workspace rail, Tabs, Dashboard, Create an app, Cozy mode) — same
+ * affordance as the marketing mock, with single-select: only one
+ * transformation active at a time.
  */
 export function SelfModHero() {
   const [active, setActive] = useState<SectionKey | null>(null);
@@ -31,7 +30,11 @@ export function SelfModHero() {
 
   return (
     <section className="self-mod-hero" data-reveal>
-      <header className="self-mod-hero__copy" data-reveal-child style={{ ["--reveal-index" as string]: 0 }}>
+      <header
+        className="self-mod-hero__copy"
+        data-reveal-child
+        style={{ ["--reveal-index" as string]: 0 }}
+      >
         <span className="self-mod-hero__eyebrow">Yours</span>
         <h2 className="self-mod-hero__title">An app that becomes you.</h2>
         <p className="self-mod-hero__lede">
@@ -40,7 +43,11 @@ export function SelfModHero() {
         </p>
       </header>
 
-      <div className="self-mod-hero__stage" data-reveal-child style={{ ["--reveal-index" as string]: 1 }}>
+      <div
+        className="self-mod-hero__stage"
+        data-reveal-child
+        style={{ ["--reveal-index" as string]: 1 }}
+      >
         <div className="self-mod-hero__stage-inner">
           <StellaAppMock
             interactive

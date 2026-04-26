@@ -100,10 +100,11 @@ export function SelfModificationShowcase() {
  * sidebar, Home/Social/New App nav, italic Cormorant home title with
  * category pills + suggestions, and a pill composer at the bottom.
  *
- * Stages mirror the four "transformation" pills in the desktop
- * onboarding's StellaAppMock. Each stage applies a distinct paradigm
- * shift so the demo reads as "Stella can rebuild itself", not just
- * a colour swap:
+ * Stages (low / medium / high) are the same three creation examples as
+ * desktop onboarding: subtle tweak → modern shell → cozy cat theme
+ * (see `SELF_MOD_STAGES` in `./data` and
+ * `onboarding/panels/selfmod/SelfModShowcase` in the desktop app).
+ * Each stage applies a distinct paradigm shift, not just a colour swap:
  *   • low    → default home with a subtle "messages are blue" tweak
  *   • medium → modern workspace rail + tabs + dashboard cards
  *   • high   → cozy tuxedo-cat theme across the whole shell
@@ -359,9 +360,16 @@ const CARDS: {
   },
 ];
 
-export function SelfModShell({ stage }: { stage: SelfModLevel }) {
+export function SelfModShell({
+  stage,
+  onStageSelect,
+}: {
+  stage: SelfModLevel;
+  onStageSelect?: (stage: SelfModLevel) => void;
+}) {
   const isModern = stage === "medium";
   const isCozy = stage === "high";
+  const stageInteractive = Boolean(onStageSelect);
 
   return (
     <div
@@ -732,23 +740,51 @@ export function SelfModShell({ stage }: { stage: SelfModLevel }) {
               </div>
             </div>
 
-            {/* STAGE CHIPS — match the desktop "transformation pills" UX
-                without claiming to be interactive on the static demo. */}
-            <div className="selfmod-shell__stages" aria-hidden="true">
-              {SELF_MOD_STAGES.map((option) => (
-                <div
-                  key={option.id}
-                  className="selfmod-shell__stage-chip"
-                  data-active={stage === option.id || undefined}
-                >
-                  <span className="selfmod-shell__stage-chip-level">
-                    {option.title}
-                  </span>
-                  <span className="selfmod-shell__stage-chip-prompt">
-                    {option.prompt}
-                  </span>
-                </div>
-              ))}
+            <div
+              className="selfmod-shell__stages"
+              aria-label={
+                stageInteractive ? "Creation examples" : undefined
+              }
+              role={stageInteractive ? "tablist" : undefined}
+              aria-hidden={stageInteractive ? undefined : true}
+            >
+              {SELF_MOD_STAGES.map((option) => {
+                const isActive = stage === option.id;
+                const content = (
+                  <>
+                    <span className="selfmod-shell__stage-chip-level">
+                      {option.title}
+                    </span>
+                    <span className="selfmod-shell__stage-chip-prompt">
+                      {option.prompt}
+                    </span>
+                  </>
+                );
+                if (onStageSelect) {
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      className="selfmod-shell__stage-chip"
+                      data-active={isActive || undefined}
+                      role="tab"
+                      aria-selected={isActive}
+                      onClick={() => onStageSelect(option.id)}
+                    >
+                      {content}
+                    </button>
+                  );
+                }
+                return (
+                  <div
+                    key={option.id}
+                    className="selfmod-shell__stage-chip"
+                    data-active={isActive || undefined}
+                  >
+                    {content}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

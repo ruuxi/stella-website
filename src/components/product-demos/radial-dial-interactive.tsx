@@ -1,7 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useId } from "react";
+import { StellaAnimation } from "@/components/stella-animation/stella-animation";
+import { useViewportActivity } from "@/components/use-viewport-activity";
 import { RADIAL_WEDGES } from "./data";
 
 /**
@@ -57,6 +58,9 @@ export function RadialDialInteractive({
   onPointerLeave?: () => void;
 }) {
   const haloId = useId();
+  const { ref: orbRef, isActive } = useViewportActivity<HTMLDivElement>({
+    rootMargin: "200px 0px",
+  });
 
   return (
     <div className="radial-dial-interactive" onPointerLeave={onPointerLeave}>
@@ -133,13 +137,15 @@ export function RadialDialInteractive({
         />
       </svg>
 
-      <div className="radial-dial-interactive__center" aria-hidden="true">
-        <Image src="/stella-logo.svg" alt="" width={36} height={36} priority={false} />
+      <div ref={orbRef} className="radial-dial-interactive__center" aria-hidden="true">
+        <StellaAnimation
+          width={14}
+          height={10}
+          paused={!isActive}
+          maxDpr={1.5}
+          frameSkip={1}
+        />
       </div>
-
-      <p className="radial-dial-interactive__hint" aria-hidden="true">
-        ⌘ + right-click anywhere
-      </p>
     </div>
   );
 }

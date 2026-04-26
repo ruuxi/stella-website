@@ -17,15 +17,19 @@ export type SelfModStage = {
   prompt: string;
 };
 
+export type CanvasChatMessage = {
+  id: string;
+  role: "user" | "stella";
+  text: string;
+};
+
+export type CanvasDisplayKind = "spreadsheet" | "app" | "multitask";
+
 export type CanvasConcept = {
   id: string;
   label: string;
   title: string;
   blurb: string;
-  activity: {
-    id: string;
-    name: string;
-    meta: string;
-    preview: string;
-  }[];
+  display: CanvasDisplayKind;
+  chat: CanvasChatMessage[];
 };

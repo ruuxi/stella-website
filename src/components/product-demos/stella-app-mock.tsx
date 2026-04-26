@@ -654,7 +654,7 @@ const css = `
   .sam-home-suggestions {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 6px;
     width: 100%;
     margin-top: 4px;
@@ -666,6 +666,7 @@ const css = `
     color: var(--text-base);
     line-height: 1.45;
     letter-spacing: -0.01em;
+    text-align: center;
   }
 
   /* BODY — modern: cards-as-tools dashboard */
@@ -2188,11 +2189,7 @@ const css = `
   .sam-pill[data-section="createApp"]  { top: calc(50% - 16px); left: 184px; animation-delay: 0.22s; }
   .sam-pill[data-section="composer"]   { bottom: 24px; left: 30%; animation-delay: 0.28s; }
 
-  .sam-root[data-any-active="false"] .sam-pill[data-section="sidebar"] {
-    animation:
-      samPillIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both,
-      samPillAttention 2.6s ease-in-out 1.2s 2;
-  }
+  /* No repeat attention pulse on the first pill (samPillAttention removed). */
 
   /* ══════════════════════════════════════════
      ANIMATIONS
@@ -2204,18 +2201,6 @@ const css = `
   @keyframes samPillIn {
     from { opacity: 0; transform: translateY(-4px) scale(0.92); }
     to   { opacity: 0.95; transform: translateY(0) scale(1); }
-  }
-  @keyframes samPillAttention {
-    0%, 100% {
-      box-shadow:
-        0 4px 16px color-mix(in oklch, var(--foreground) 10%, transparent),
-        0 0 0 0 color-mix(in oklch, var(--primary) 0%, transparent);
-    }
-    50% {
-      box-shadow:
-        0 4px 16px color-mix(in oklch, var(--foreground) 10%, transparent),
-        0 0 0 8px color-mix(in oklch, var(--primary) 14%, transparent);
-    }
   }
   @keyframes samCozyFloat {
     0%   { transform: translateY(2px)  scale(0.92); opacity: 0; }
@@ -2258,7 +2243,6 @@ const css = `
     .sam-cards,
     .sam-sidebar-modern,
     .sam-cozy { animation: none; }
-    .sam-root[data-any-active="false"] .sam-pill[data-section="sidebar"] { animation: none; }
   }
 `;
 

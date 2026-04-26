@@ -1018,3 +1018,502 @@
     opacity: 0.42;
   }
 }
+
+/* ──────────────────────────────────────────────────────────────────
+   "Ask. Watch it appear." — chat-centred shell.
+
+   Layout: Stella sidebar | chat (centre, the constant) | display
+   sidebar (the artefact Stella is producing). The display sidebar is
+   the only thing that swaps per concept; the chat shape stays put so
+   the eye sees "ask → see it" rather than the whole window changing.
+   ────────────────────────────────────────────────────────────────── */
+
+.shell-preview__body--chat {
+  grid-template-columns: 170px minmax(17rem, 0.84fr) minmax(22rem, 1.16fr);
+  background:
+    radial-gradient(circle at 16% 8%, rgba(102, 220, 255, 0.14), transparent 32%),
+    radial-gradient(circle at 88% 20%, rgba(79, 118, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(252, 254, 255, 0.9), rgba(247, 250, 255, 0.74));
+}
+
+/* Multitask: no display panel — chat fills the remaining width, with
+   the same Stella sidebar on the left. The story is the chat itself
+   (multiple user messages each spawning their own agent line). */
+.shell-preview__body--multitask {
+  grid-template-columns: 170px minmax(0, 1fr);
+}
+
+/* ── Centre chat ───────────────────────────────────────────────
+   Mirrors the real desktop chat (full-shell.chat.css):
+   - User events are pill-shaped bubbles, right-aligned, primary-tint.
+   - Assistant events are NOT bubbles — plain text on the surface.
+   - No avatars, no header chrome, no sparkle icons.
+   - Working indicator: small Stella orb + a single rotating status
+     line above the composer (mirrors WorkingIndicator).
+   ───────────────────────────────────────────────────────────────── */
+
+.shell-chat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  padding: 0.9rem 1.1rem 1rem;
+}
+
+.shell-chat__messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem; /* desktop event-list gap: 24px → scaled */
+  padding: 1.1rem 0 0.85rem;
+  overflow: hidden;
+  animation: shellChatSwap 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes shellChatSwap {
+  from { opacity: 0; transform: translateY(4px); filter: blur(4px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+
+/* Base event item — assistant default: no bubble, plain text */
+.shell-event-item {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  width: 100%;
+  max-width: 100%;
+  font-size: 0.84rem;       /* desktop 17px → scaled to mock */
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+  color: rgba(15, 23, 40, 0.92);
+  white-space: pre-wrap;
+}
+
+/* User event item — pill bubble, right-aligned */
+.shell-event-item--user {
+  margin-left: auto;
+  max-width: 85%;
+  width: fit-content;
+  padding: 0.6rem 0.75rem;                 /* desktop 12px */
+  border-radius: 0.95rem;                  /* desktop 18px */
+  border-bottom-right-radius: 0.25rem;     /* desktop 4px */
+  background: color-mix(in srgb, #1f64dd 10%, transparent);
+  border: 1px solid rgba(84, 112, 146, 0.18);
+  color: rgba(15, 23, 40, 0.92);
+}
+
+/* Working indicator (multitask) — small orb + rotating shimmer line */
+.shell-working {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.1rem 0.65rem;
+  pointer-events: none;
+}
+
+.shell-working__orb {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+  background:
+    radial-gradient(circle at 35% 32%, rgba(255, 255, 255, 0.95), transparent 42%),
+    radial-gradient(circle, rgba(102, 220, 255, 0.92), rgba(31, 100, 221, 0.82));
+  box-shadow: 0 0 8px rgba(31, 100, 221, 0.25);
+  animation: shellOrbBreathe 2.4s ease-in-out infinite;
+}
+
+@keyframes shellOrbBreathe {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50%      { transform: scale(0.92); opacity: 1; }
+}
+
+.shell-working__rotator {
+  position: relative;
+  flex: 1;
+  height: 1rem;
+  overflow: hidden;
+}
+
+.shell-working__line {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  font-size: 0.7rem;
+  line-height: 1;
+  color: rgba(15, 23, 40, 0.55);
+  opacity: 0;
+  animation: shellWorkingRotate 6s linear infinite;
+  animation-delay: calc(var(--task-index) * 2s);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes shellWorkingRotate {
+  0%, 30%   { opacity: 1; transform: translateY(0); }
+  33%, 100% { opacity: 0; transform: translateY(4px); }
+}
+
+/* Composer — minimalist pill, single placeholder line, no send button */
+.shell-composer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.62rem 0.95rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(84, 112, 146, 0.18);
+  box-shadow: 0 6px 18px -14px rgba(50, 84, 128, 0.25);
+}
+
+.shell-composer__placeholder {
+  flex: 1;
+  font-size: 0.76rem;
+  color: rgba(50, 70, 100, 0.5);
+}
+
+/* ── Display sidebar (right) ─────────────────────────────────── */
+
+.shell-display {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  background: var(--glass-bg, rgba(255, 255, 255, 0.45));
+  backdrop-filter: var(--glass-blur, blur(30px) saturate(160%));
+  -webkit-backdrop-filter: var(--glass-blur, blur(30px) saturate(160%));
+  border-left: 1px solid color-mix(in oklch, var(--border, rgba(84, 112, 146, 0.18)) 50%, transparent);
+  border-radius: 0 0 0 32px;
+  overflow: hidden;
+  animation: shellDisplaySwap 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes shellDisplaySwap {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+.display-surface {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-height: 0;
+  padding: 1.1rem 1.15rem 1.15rem;
+  background:
+    radial-gradient(100% 60% at 85% 0%, rgba(102, 220, 255, 0.1), transparent 48%),
+    transparent;
+  overflow: hidden;
+}
+
+/* ── Spreadsheet artifact ─────────────────────────────────────── */
+
+.sheet-formula {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.32rem 0.5rem;
+  background: rgba(248, 251, 255, 0.92);
+  border: 1px solid rgba(84, 112, 146, 0.1);
+  border-radius: 0.4rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  color: rgba(15, 23, 40, 0.7);
+}
+.sheet-formula__cell {
+  padding: 0 0.35rem;
+  border-right: 1px solid rgba(84, 112, 146, 0.18);
+  color: rgba(31, 100, 221, 0.78);
+  font-weight: 600;
+}
+
+.sheet-grid {
+  display: grid;
+  grid-template-columns: 1.4rem repeat(4, minmax(0, 1fr));
+  border: 1px solid rgba(84, 112, 146, 0.16);
+  border-radius: 0.45rem;
+  overflow: hidden;
+  background: #fff;
+}
+.sheet-grid__corner,
+.sheet-grid__col-head,
+.sheet-grid__row-head {
+  background: rgba(248, 251, 255, 0.95);
+  border-right: 1px solid rgba(84, 112, 146, 0.12);
+  border-bottom: 1px solid rgba(84, 112, 146, 0.12);
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: rgba(50, 70, 100, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem 0;
+}
+.sheet-grid__cell {
+  padding: 0.32rem 0.45rem;
+  border-right: 1px solid rgba(84, 112, 146, 0.08);
+  border-bottom: 1px solid rgba(84, 112, 146, 0.08);
+  font-size: 0.7rem;
+  color: rgba(15, 23, 40, 0.82);
+  font-variant-numeric: tabular-nums;
+  background: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sheet-grid__cell--head {
+  background: rgba(248, 251, 255, 0.85);
+  font-weight: 600;
+  color: rgba(15, 23, 40, 0.7);
+  font-size: 0.66rem;
+}
+.sheet-grid__cell--total {
+  background: rgba(31, 100, 221, 0.06);
+  font-weight: 700;
+  color: rgba(15, 23, 40, 0.92);
+}
+.sheet-grid__cell--up {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.sheet-tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding-top: 0.3rem;
+  border-top: 1px solid rgba(84, 112, 146, 0.1);
+}
+.sheet-tabs__tab {
+  padding: 0.22rem 0.55rem;
+  border-radius: 0.4rem 0.4rem 0 0;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: rgba(50, 70, 100, 0.52);
+  background: rgba(248, 251, 255, 0.7);
+  border: 1px solid transparent;
+}
+.sheet-tabs__tab.is-active {
+  background: #fff;
+  border-color: rgba(84, 112, 146, 0.16);
+  border-bottom-color: #fff;
+  color: rgba(31, 100, 221, 0.85);
+}
+
+/* ── Focus-timer mini-app artifact ───────────────────────────── */
+
+.display-surface--app {
+  align-items: stretch;
+  justify-content: space-between;
+  padding: 1.4rem 1.4rem 1.5rem;
+  gap: 1rem;
+  background:
+    radial-gradient(120% 80% at 80% 0%, rgba(102, 220, 255, 0.16), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(245, 250, 255, 0.4));
+  border-radius: 1rem;
+}
+
+.focus-app__chrome {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: rgba(50, 70, 100, 0.6);
+  letter-spacing: 0.02em;
+}
+.focus-app__name {
+  font-weight: 600;
+  color: rgba(15, 23, 40, 0.85);
+  font-size: 0.82rem;
+  letter-spacing: -0.01em;
+}
+
+.focus-app__ring {
+  position: relative;
+  align-self: center;
+  width: clamp(160px, 22vw, 220px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+.focus-app__ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+.focus-app__ring-track {
+  fill: none;
+  stroke: rgba(31, 100, 221, 0.1);
+  stroke-width: 10;
+}
+.focus-app__ring-progress {
+  fill: none;
+  stroke: url(#focus-ring-grad);
+  stroke: rgba(31, 100, 221, 0.85);
+  stroke-width: 10;
+  stroke-linecap: round;
+  filter: drop-shadow(0 4px 12px rgba(31, 100, 221, 0.25));
+  transition: stroke-dashoffset 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.focus-app__readout {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  pointer-events: none;
+}
+.focus-app__readout strong {
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(2.1rem, 3vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: rgba(15, 23, 40, 0.92);
+}
+.focus-app__readout span {
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(50, 70, 100, 0.55);
+}
+
+.focus-app__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+.focus-app__stats > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.55rem 0.4rem;
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(84, 112, 146, 0.1);
+}
+.focus-app__stats strong {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(15, 23, 40, 0.92);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.focus-app__stats span {
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(50, 70, 100, 0.55);
+}
+
+.focus-app__controls {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1fr;
+  gap: 0.4rem;
+}
+.focus-app__btn {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+  padding: 0.6rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+.focus-app__btn--ghost {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(84, 112, 146, 0.16);
+  color: rgba(15, 23, 40, 0.7);
+}
+.focus-app__btn--primary {
+  background: rgba(15, 23, 40, 0.92);
+  border: 1px solid rgba(15, 23, 40, 0.92);
+  color: #fff;
+}
+
+/* ── Multitask: per-message agent line ────────────────────────
+   Sits directly under each user bubble. A small Stella orb, the
+   spawned agent name, its current status, and (when finished) a
+   subtle "done" tag — same idea as the desktop's WorkingIndicator,
+   but inline per turn so the eye reads "many things in motion". */
+
+.shell-agent-line {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding-left: 0.1rem;
+  font-size: 0.74rem;
+  line-height: 1.2;
+  color: rgba(15, 23, 40, 0.55);
+  margin-top: -0.55rem; /* tighten under the user bubble */
+}
+
+.shell-agent-line__orb {
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 35% 32%, rgba(255, 255, 255, 0.95), transparent 42%),
+    radial-gradient(circle, rgba(102, 220, 255, 0.92), rgba(31, 100, 221, 0.82));
+  box-shadow: 0 0 6px rgba(31, 100, 221, 0.22);
+  flex-shrink: 0;
+  animation: shellOrbBreathe 2.4s ease-in-out infinite;
+}
+
+.shell-agent-line[data-state="done"] .shell-agent-line__orb {
+  background: rgba(34, 168, 94, 0.9);
+  box-shadow: none;
+  animation: none;
+}
+
+.shell-agent-line__agent {
+  font-weight: 600;
+  color: rgba(15, 23, 40, 0.85);
+}
+
+.shell-agent-line__sep {
+  color: rgba(50, 70, 100, 0.35);
+}
+
+.shell-agent-line__status {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shell-agent-line__done {
+  flex-shrink: 0;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(34, 168, 94, 0.12);
+  color: rgba(15, 110, 60, 0.9);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Multitask chat: tighter row gap, since each turn is a user bubble
+   immediately followed by its agent line. */
+.shell-chat--wide .shell-chat__messages {
+  gap: 1.2rem;
+}

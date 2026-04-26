@@ -22,11 +22,16 @@ export function RevealOnScroll() {
 
     const observed = new WeakSet<Element>();
 
+    // We toggle a non-React attribute (`data-revealed`) rather than a
+    // className so we never collide with React's hydration of dynamically
+    // imported sections. The CSS selector is `[data-reveal][data-revealed]`.
+    const reveal = (el: Element) => el.setAttribute("data-revealed", "");
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
-          entry.target.classList.add("is-revealed");
+          reveal(entry.target);
           observer.unobserve(entry.target);
         }
       },
@@ -48,7 +53,7 @@ export function RevealOnScroll() {
         const rect = node.getBoundingClientRect();
         const inView = rect.top < window.innerHeight * 0.92 && rect.bottom > 0;
         if (inView) {
-          node.classList.add("is-revealed");
+          reveal(node);
           return;
         }
 

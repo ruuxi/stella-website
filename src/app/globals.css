@@ -947,7 +947,7 @@ select {
     filter 1100ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.has-reveal [data-reveal].is-revealed {
+.has-reveal [data-reveal][data-revealed] {
   opacity: 1;
   transform: none;
   filter: none;
@@ -968,7 +968,7 @@ select {
   transition-delay: calc(160ms + var(--reveal-index, 0) * 80ms);
 }
 
-.has-reveal [data-reveal].is-revealed [data-reveal-child] {
+.has-reveal [data-reveal][data-revealed] [data-reveal-child] {
   opacity: 1;
   transform: none;
   filter: none;
@@ -976,8 +976,8 @@ select {
 
 /* Once revealed, drop the GPU promotion so static sections don't
    keep an extra compositor layer around. */
-.has-reveal [data-reveal].is-revealed,
-.has-reveal [data-reveal].is-revealed [data-reveal-child] {
+.has-reveal [data-reveal][data-revealed],
+.has-reveal [data-reveal][data-revealed] [data-reveal-child] {
   will-change: auto;
 }
 

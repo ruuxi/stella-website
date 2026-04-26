@@ -1045,6 +1045,19 @@
   color: var(--selfmod-text-weak);
   transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
+
+button.selfmod-shell__stage-chip {
+  appearance: none;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  max-width: 100%;
+}
+button.selfmod-shell__stage-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--selfmod-accent) 50%, transparent);
+}
 .selfmod-shell__stage-chip[data-active] {
   background: color-mix(in srgb, var(--selfmod-accent) 12%, rgba(255, 255, 255, 0.85));
   border-color: color-mix(in srgb, var(--selfmod-accent) 32%, transparent);
