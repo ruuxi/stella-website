@@ -175,6 +175,77 @@ export default function Home() {
           <SelfModHero />
         </DeferInView>
 
+        <section className="privacy-hero" data-reveal>
+          <header
+            className="privacy-hero__copy"
+            data-reveal-child
+            style={{ ["--reveal-index" as string]: 0 }}
+          >
+            <span className="privacy-hero__eyebrow">Private</span>
+            <h2 className="privacy-hero__title">Your stuff stays yours.</h2>
+            <p className="privacy-hero__lede">
+              Stella runs on your computer, with your files. We don&apos;t keep
+              your conversations or your work on our servers, and you&apos;re
+              free to use whichever model you like — or read the code and see
+              exactly how it all fits together.
+            </p>
+          </header>
+
+          <div
+            className="privacy-hero__grid"
+            data-reveal-child
+            style={{ ["--reveal-index" as string]: 1 }}
+          >
+            <article className="privacy-card">
+              <span className="privacy-card__label">Local</span>
+              <h3 className="privacy-card__title">Nothing on our servers</h3>
+              <p className="privacy-card__body">
+                Your files, chats, and memories live on your computer. We
+                don&apos;t hold onto them, and we can&apos;t see them.
+              </p>
+            </article>
+
+            <article className="privacy-card">
+              <a
+                className="privacy-card__github"
+                href="https://github.com/ruuxi/stella"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="View Stella on GitHub"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M12 .5C5.73.5.75 5.48.75 11.75c0 4.96 3.22 9.16 7.69 10.65.56.1.77-.24.77-.54v-2.1c-3.13.68-3.79-1.34-3.79-1.34-.51-1.31-1.25-1.66-1.25-1.66-1.02-.7.08-.69.08-.69 1.13.08 1.72 1.16 1.72 1.16 1 1.72 2.63 1.22 3.27.93.1-.73.39-1.22.71-1.5-2.5-.29-5.13-1.25-5.13-5.56 0-1.23.44-2.23 1.16-3.02-.12-.29-.5-1.43.11-2.99 0 0 .95-.3 3.1 1.15.9-.25 1.86-.37 2.82-.38.96.01 1.92.13 2.82.38 2.15-1.45 3.1-1.15 3.1-1.15.61 1.56.23 2.7.11 2.99.72.79 1.16 1.79 1.16 3.02 0 4.32-2.64 5.27-5.15 5.55.4.34.76 1.02.76 2.06v3.05c0 .3.21.65.78.54 4.46-1.49 7.68-5.69 7.68-10.65C23.25 5.48 18.27.5 12 .5Z"
+                  />
+                </svg>
+              </a>
+              <span className="privacy-card__label">Open</span>
+              <h3 className="privacy-card__title">Open source, all of it</h3>
+              <p className="privacy-card__body">
+                Every line of Stella is on GitHub. Read it, fork it, or change
+                it to suit how you work.
+              </p>
+            </article>
+
+            <article className="privacy-card">
+              <span className="privacy-card__label">Yours to choose</span>
+              <h3 className="privacy-card__title">Bring any model</h3>
+              <p className="privacy-card__body">
+                Use GPT, Claude, Gemini, or a model running on your own
+                machine. Switch whenever you want — Stella works with all of
+                them.
+              </p>
+            </article>
+          </div>
+        </section>
+
         <RadialDialSection />
 
         <CanvasSection />

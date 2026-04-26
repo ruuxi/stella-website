@@ -1,0 +1,139 @@
+/* ──────────────────────────────────────────────────────────────────────
+   "Your stuff stays yours" — privacy / open-source section.
+
+   Sits between the self-mod hero and the radial dial section. Borrows
+   the same eyebrow + display-italic h2 treatment as the other unframed
+   heroes (`.self-mod-hero`, `.radial-hero`) so it reads as a peer.
+   ────────────────────────────────────────────────────────────────────── */
+
+.privacy-hero {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(2.5rem, 5vw, 4rem);
+  padding: clamp(4.5rem, 9vw, 7rem) 0 clamp(4.5rem, 9vw, 7rem);
+  isolation: isolate;
+}
+
+.privacy-hero__copy {
+  width: min(100%, 52rem);
+  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.privacy-hero__eyebrow {
+  color: rgba(18, 18, 15, 0.46);
+  font-family: var(--font-display), serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  letter-spacing: -0.03em;
+}
+
+.privacy-hero__title {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-size: clamp(2.8rem, 8vw, 6rem);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+  color: inherit;
+}
+
+.privacy-hero__lede {
+  margin: 0.5rem auto 0;
+  max-width: 38rem;
+  color: var(--page-muted, rgba(18, 18, 15, 0.6));
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.privacy-hero__grid {
+  width: min(100%, 64rem);
+  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
+}
+
+.privacy-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.4rem 1.5rem 1.5rem;
+  border: 1px solid rgba(82, 104, 134, 0.14);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(246, 250, 255, 0.6)),
+    var(--page-panel);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
+}
+
+.privacy-card__label {
+  color: rgba(18, 18, 15, 0.46);
+  font-family: var(--font-display), serif;
+  font-size: 0.82rem;
+  font-style: italic;
+  letter-spacing: -0.02em;
+}
+
+.privacy-card__title {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-size: clamp(1.2rem, 2vw, 1.45rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  color: rgba(15, 23, 40, 0.92);
+}
+
+.privacy-card__github {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  color: rgba(18, 18, 15, 0.55);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(82, 104, 134, 0.14);
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.privacy-card__github:hover {
+  color: rgba(18, 18, 15, 0.92);
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+
+.privacy-card__github:focus-visible {
+  outline: 2px solid rgba(15, 98, 254, 0.55);
+  outline-offset: 2px;
+}
+
+.privacy-card__body {
+  margin: 0;
+  color: var(--page-muted, rgba(18, 18, 15, 0.6));
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .privacy-hero__grid {
+    grid-template-columns: 1fr;
+    max-width: 32rem;
+  }
+}
