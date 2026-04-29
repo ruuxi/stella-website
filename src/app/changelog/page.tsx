@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import "./changelog.css";
 
@@ -599,7 +600,7 @@ export default function Changelog() {
       {/* ── Header ─────────────────────────────────── */}
       <header className="grid-shell grid-shell--dense site-header">
         <div className="brand-wrap">
-          <a className="brand-mark" href="/">
+          <Link className="brand-mark" href="/">
             <span className="brand-mark__logo">
               <Image
                 className="brand-mark__logo-img"
@@ -611,7 +612,7 @@ export default function Changelog() {
               />
             </span>
             <span className="brand-text">Stella</span>
-          </a>
+          </Link>
         </div>
         <nav className="site-nav" aria-label="Primary">
           {navItems.map((item) => (
@@ -683,7 +684,7 @@ export default function Changelog() {
       {/* ── Footer ─────────────────────────────────── */}
       <footer className="grid-shell site-footer section-border">
         <div className="footer-brand">
-          <a className="brand-mark brand-mark--footer" href="/">
+          <Link className="brand-mark brand-mark--footer" href="/">
             <Image
               src="/stella-logo.svg"
               alt="Stella"
@@ -691,7 +692,7 @@ export default function Changelog() {
               height={42}
             />
             <span className="brand-text">Stella</span>
-          </a>
+          </Link>
           <ul className="legal-links">
             <li>
               <a href="/privacy">Privacy Policy</a>

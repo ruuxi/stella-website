@@ -152,6 +152,39 @@
     max-height: 28rem;
   }
 
+  /* Canvas hero ("Ask. Watch it appear.") needs more vertical room on
+     mobile because the "All at once" tab packs three turns + a task
+     list + composer. Apply to every canvas tab so switching between
+     them doesn't cause a layout shift. */
+  .canvas-hero .shell-preview__body--chat {
+    height: 34rem;
+    min-height: 34rem;
+    max-height: 34rem;
+  }
+
+  /* Tighten multitask content so it never overlaps the composer. */
+  .shell-preview__body--multitask .shell-chat--wide .shell-chat__messages {
+    gap: 0.7rem;
+  }
+
+  .shell-preview__body--multitask .shell-event-item {
+    font-size: 0.78rem;
+    line-height: 1.4;
+  }
+
+  .shell-preview__body--multitask .shell-event-item--user {
+    padding: 0.45rem 0.6rem;
+  }
+
+  .shell-preview__body--multitask .shell-tasks {
+    gap: 0.3rem;
+  }
+
+  .shell-preview__body--multitask .shell-tasks__item {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.5rem;
+  }
+
   .shell-preview__sidebar {
     display: none;
   }

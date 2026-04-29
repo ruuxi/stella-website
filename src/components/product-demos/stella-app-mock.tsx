@@ -21,8 +21,6 @@ import {
   type SectionToggles,
 } from "./stella-app-mock-types";
 
-/* eslint-disable react/no-unknown-property */
-
 type SectionPill = {
   key: SectionKey;
   label: string;

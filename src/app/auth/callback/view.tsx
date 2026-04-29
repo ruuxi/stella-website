@@ -72,7 +72,7 @@ export function AuthCallbackView() {
       <main className={styles.page}>
         <div className={styles.shell}>
           <div className={styles.badge}>Stella</div>
-          <h1 className={styles.title}>You're signed in</h1>
+          <h1 className={styles.title}>You&apos;re signed in</h1>
           <p className={styles.body}>
             You can close this tab and return to Stella.
           </p>

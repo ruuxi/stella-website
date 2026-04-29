@@ -97,7 +97,7 @@ function LabeledCursor({
 
 export function MemorySection() {
   return (
-    <section className="ob-memory" data-reveal>
+    <section className="ob-memory" data-reveal suppressHydrationWarning>
       <header
         className="ob-memory__copy"
         data-reveal-child
@@ -168,7 +168,7 @@ export function MemorySection() {
 
 export function TogetherSection() {
   return (
-    <section className="ob-together" data-reveal>
+    <section className="ob-together" data-reveal suppressHydrationWarning>
       <header
         className="ob-together__copy"
         data-reveal-child
@@ -224,7 +224,7 @@ const ACTION_TIME_SLOTS = ["7:00", "7:30", "8:00", "8:30", "9:00"];
 
 export function ActionsSection() {
   return (
-    <section className="ob-actions" data-reveal>
+    <section className="ob-actions" data-reveal suppressHydrationWarning>
       <header
         className="ob-actions__copy"
         data-reveal-child
@@ -299,7 +299,7 @@ const VOICE_WAVEFORM_BARS = Array.from({ length: 56 }, (_, i) => {
 
 export function VoiceSection() {
   return (
-    <section className="ob-voice" data-reveal>
+    <section className="ob-voice" data-reveal suppressHydrationWarning>
       <header
         className="ob-voice__copy"
         data-reveal-child
@@ -425,7 +425,7 @@ const EXTENSION_BROWSERS = ["Chrome", "Arc", "Brave", "Edge", "Vivaldi"];
 
 export function ExtensionSection() {
   return (
-    <section className="ob-extension" data-reveal>
+    <section className="ob-extension" data-reveal suppressHydrationWarning>
       <header
         className="ob-extension__copy"
         data-reveal-child

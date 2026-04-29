@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef, useSyncExternalStore } from "react";
 import { ArrowRight, Lock, X } from "lucide-react";
 
 const DOWNLOADS = {
@@ -17,13 +17,26 @@ const labels: Record<Platform, string> = {
   windows: "Download for Windows",
 };
 
-export function DownloadButton() {
-  const [platform, setPlatform] = useState<Platform>("mac");
+function subscribeNoop() {
+  return () => {};
+}
 
-  useEffect(() => {
-    const ua = navigator.userAgent.toLowerCase();
-    setPlatform(ua.includes("mac") ? "mac" : "windows");
-  }, []);
+function detectPlatform(): Platform {
+  if (typeof navigator === "undefined") return "mac";
+  return navigator.userAgent.toLowerCase().includes("mac") ? "mac" : "windows";
+}
+
+export function DownloadButton() {
+  // Resolve the platform from `navigator` only on the client. Using
+  // useSyncExternalStore avoids the cascading re-render that comes from
+  // calling setState inside useEffect, while still keeping the SSR
+  // markup stable ("Download for Mac").
+  const platform = useSyncExternalStore<Platform>(
+    subscribeNoop,
+    detectPlatform,
+    () => "mac",
+  );
+
   const [showModal, setShowModal] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);

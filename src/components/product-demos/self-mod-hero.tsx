@@ -1,12 +1,30 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useSyncExternalStore } from "react";
 import { StellaAppMock } from "./stella-app-mock";
+import { MobileSelfModMock } from "./self-mod-hero-mobile";
 import {
   EMPTY_SECTION_TOGGLES,
   type SectionKey,
   type SectionToggles,
 } from "./stella-app-mock-types";
+
+function useIsNarrow(breakpoint = 640) {
+  const query = `(max-width: ${breakpoint - 1}px)`;
+  const subscribe = useCallback(
+    (notify: () => void) => {
+      const mql = window.matchMedia(query);
+      mql.addEventListener("change", notify);
+      return () => mql.removeEventListener("change", notify);
+    },
+    [query],
+  );
+  const getSnapshot = useCallback(
+    () => window.matchMedia(query).matches,
+    [query],
+  );
+  return useSyncExternalStore(subscribe, getSnapshot, () => false);
+}
 
 /**
  * "Make it yours" — full-bleed section outside the page grid.
@@ -18,6 +36,7 @@ import {
  */
 export function SelfModHero() {
   const [active, setActive] = useState<SectionKey | null>(null);
+  const isNarrow = useIsNarrow();
 
   const handleToggle = useCallback((section: SectionKey) => {
     setActive((prev) => (prev === section ? null : section));
@@ -29,7 +48,7 @@ export function SelfModHero() {
   };
 
   return (
-    <section className="self-mod-hero" data-reveal>
+    <section className="self-mod-hero" data-reveal suppressHydrationWarning>
       <header
         className="self-mod-hero__copy"
         data-reveal-child
@@ -48,13 +67,17 @@ export function SelfModHero() {
         data-reveal-child
         style={{ ["--reveal-index" as string]: 1 }}
       >
-        <div className="self-mod-hero__stage-inner">
-          <StellaAppMock
-            interactive
-            toggles={toggles}
-            onToggleSection={handleToggle}
-          />
-        </div>
+        {isNarrow ? (
+          <MobileSelfModMock />
+        ) : (
+          <div className="self-mod-hero__stage-inner">
+            <StellaAppMock
+              interactive
+              toggles={toggles}
+              onToggleSection={handleToggle}
+            />
+          </div>
+        )}
       </div>
     </section>
   );

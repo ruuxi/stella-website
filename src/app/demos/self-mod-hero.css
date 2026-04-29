@@ -184,10 +184,484 @@
     padding-top: 4rem;
     padding-bottom: 3rem;
   }
+
   .self-mod-hero__stage {
-    padding: 0 0.5rem;
+    padding: 0 1rem;
   }
-  .self-mod-hero__stage-inner {
-    min-height: 540px;
-  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+   Mobile mock — purpose-built for narrow viewports.
+   See `self-mod-hero-mobile.tsx`.
+   ────────────────────────────────────────────────────────────────────── */
+
+.smhm {
+  width: 100%;
+  max-width: 22rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.1rem;
+}
+
+.smhm__phone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 32rem;
+  border-radius: 1.7rem;
+  overflow: hidden;
+  background: linear-gradient(180deg, #fbfbfd 0%, #f1f3f7 100%);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow:
+    0 28px 60px -28px rgba(15, 23, 42, 0.32),
+    0 8px 24px -16px rgba(15, 23, 42, 0.18);
+  color: rgba(15, 23, 40, 0.92);
+  transition:
+    background 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.smhm__phone[data-variant="cozy"] {
+  background: linear-gradient(180deg, #f7ead2 0%, #e8d3a7 100%);
+  color: #43321b;
+}
+
+/* ── Status bar ──────────────────────────────────────────────────── */
+
+.smhm__status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem 0.2rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: inherit;
+  opacity: 0.78;
+}
+
+.smhm__status-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.smhm__signal {
+  width: 14px;
+  height: 8px;
+  background:
+    linear-gradient(currentColor, currentColor) left bottom / 2px 3px no-repeat,
+    linear-gradient(currentColor, currentColor) 4px bottom / 2px 5px no-repeat,
+    linear-gradient(currentColor, currentColor) 8px bottom / 2px 7px no-repeat,
+    linear-gradient(currentColor, currentColor) 12px bottom / 2px 8px no-repeat;
+}
+
+.smhm__battery {
+  width: 18px;
+  height: 9px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  position: relative;
+  background: linear-gradient(currentColor, currentColor) left center / 70% 100% no-repeat;
+}
+
+.smhm__battery::after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  top: 2px;
+  width: 2px;
+  height: 3px;
+  background: currentColor;
+  border-radius: 0 1px 1px 0;
+}
+
+/* ── Header ──────────────────────────────────────────────────────── */
+
+.smhm__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 1rem 0.7rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.smhm__phone[data-variant="cozy"] .smhm__header {
+  border-bottom-color: rgba(67, 50, 27, 0.1);
+}
+
+.smhm__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.smhm__brand-orb {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 35% 32%, rgba(255, 255, 255, 0.95), transparent 42%),
+    radial-gradient(circle, rgba(102, 220, 255, 0.92), rgba(31, 100, 221, 0.82));
+  box-shadow: 0 0 6px rgba(31, 100, 221, 0.25);
+}
+
+.smhm__phone[data-variant="cozy"] .smhm__brand-orb {
+  background: radial-gradient(circle at 35% 32%, #fff8e8 5%, #d6a45a 70%);
+  box-shadow: 0 0 6px rgba(214, 164, 90, 0.4);
+}
+
+.smhm__brand-name {
+  font-family: var(--font-display, Georgia), serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+.smhm__rail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.05);
+}
+
+.smhm__rail-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.25);
+}
+
+.smhm__rail-dot--active {
+  background: var(--page-accent, #1f64dd);
+  box-shadow: 0 0 0 3px rgba(31, 100, 221, 0.15);
+}
+
+.smhm__header-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.05);
+  color: inherit;
+  opacity: 0.7;
+}
+
+/* ── Tab bar (variant: tabs) ─────────────────────────────────────── */
+
+.smhm__tabs {
+  display: flex;
+  gap: 0.3rem;
+  padding: 0.55rem 0.85rem 0.4rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.smhm__tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  color: rgba(15, 23, 40, 0.55);
+  cursor: pointer;
+}
+
+.smhm__tab[data-active] {
+  background: rgba(15, 23, 42, 0.92);
+  color: #fff;
+}
+
+/* ── Body ────────────────────────────────────────────────────────── */
+
+.smhm__body {
+  flex: 1;
+  min-height: 0;
+  padding: 1rem 1rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Default + tabs + rail share this layout */
+
+.smhm__home {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.smhm__greeting {
+  margin: 0;
+  font-family: var(--font-display, Georgia), serif;
+  font-weight: 300;
+  font-size: 1.65rem;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  color: rgba(15, 23, 40, 0.85);
+}
+
+.smhm__greeting em {
+  font-style: italic;
+}
+
+.smhm__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.smhm__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: rgba(15, 23, 40, 0.78);
+}
+
+.smhm__threads {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.1rem;
+  overflow: hidden;
+}
+
+.smhm__thread {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.smhm__thread-orb {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+  background:
+    radial-gradient(circle at 35% 32%, rgba(255, 255, 255, 0.9), transparent 42%),
+    radial-gradient(circle, rgba(102, 220, 255, 0.9), rgba(31, 100, 221, 0.82));
+}
+
+.smhm__thread-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.smhm__thread-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: rgba(15, 23, 40, 0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.smhm__thread-detail {
+  font-size: 0.68rem;
+  color: rgba(15, 23, 40, 0.5);
+}
+
+/* Dashboard variant */
+
+.smhm__dash {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.smhm__dash-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.7rem 0.75rem;
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(15, 23, 42, 0.07);
+}
+
+.smhm__dash-card--tall {
+  grid-row: span 2;
+  background: linear-gradient(160deg, rgba(31, 100, 221, 0.92), rgba(102, 220, 255, 0.85));
+  color: #fff;
+  border-color: transparent;
+}
+
+.smhm__dash-card--wide {
+  grid-column: span 2;
+}
+
+.smhm__dash-eyebrow {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.smhm__dash-figure {
+  font-family: var(--font-display, Georgia), serif;
+  font-weight: 400;
+  font-size: 1.7rem;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.smhm__dash-card--tall .smhm__dash-figure {
+  font-size: 2.4rem;
+  margin-top: 0.4rem;
+}
+
+.smhm__dash-detail {
+  font-size: 0.68rem;
+  letter-spacing: -0.01em;
+  opacity: 0.78;
+  line-height: 1.35;
+}
+
+/* Cozy variant */
+
+.smhm__cozy {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  text-align: center;
+  color: #43321b;
+}
+
+.smhm__cozy-cat {
+  width: 70%;
+  max-width: 14rem;
+  height: auto;
+}
+
+.smhm__cozy-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.smhm__cozy-name {
+  font-family: var(--font-display, Georgia), serif;
+  font-style: italic;
+  font-size: 1.4rem;
+  letter-spacing: -0.03em;
+}
+
+.smhm__cozy-detail {
+  font-size: 0.78rem;
+  opacity: 0.7;
+}
+
+/* ── Composer ────────────────────────────────────────────────────── */
+
+.smhm__composer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0.75rem 0.85rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 18px -14px rgba(50, 84, 128, 0.25);
+}
+
+.smhm__composer[data-cozy] {
+  background: rgba(255, 248, 232, 0.9);
+  border-color: rgba(67, 50, 27, 0.15);
+  color: #43321b;
+}
+
+.smhm__composer-plus {
+  width: 1.2rem;
+  height: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.06);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(15, 23, 40, 0.6);
+}
+
+.smhm__composer-placeholder {
+  flex: 1;
+  font-size: 0.78rem;
+  letter-spacing: -0.01em;
+  color: rgba(15, 23, 40, 0.45);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.smhm__composer[data-cozy] .smhm__composer-placeholder {
+  color: rgba(67, 50, 27, 0.55);
+}
+
+.smhm__composer-mic {
+  display: inline-flex;
+  color: rgba(15, 23, 40, 0.55);
+}
+
+/* ── Pill toggle (below the phone) ──────────────────────────────── */
+
+.smhm__pills {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0 0.25rem;
+}
+
+.smhm__pill {
+  appearance: none;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.78);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: rgba(15, 23, 40, 0.78);
+  padding: 0.6rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background-color 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.smhm__pill[data-active] {
+  background: rgba(15, 23, 42, 0.92);
+  border-color: rgba(15, 23, 42, 0.92);
+  color: #fff;
 }

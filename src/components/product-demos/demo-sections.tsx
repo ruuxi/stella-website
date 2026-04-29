@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import dynamic from "next/dynamic";
 import { useViewportActivity } from "@/components/use-viewport-activity";
 import { RADIAL_WEDGES, CANVAS_CONCEPTS } from "./data";
@@ -95,7 +101,7 @@ export function RadialDialSection() {
   const activeWedge = RADIAL_WEDGES[selectedIndex];
 
   return (
-    <section className="radial-hero" data-reveal>
+    <section className="radial-hero" data-reveal suppressHydrationWarning>
       <header
         className="radial-hero__copy"
         data-reveal-child
@@ -157,7 +163,7 @@ export function CanvasSection() {
   }, [isActive]);
 
   return (
-    <section className="canvas-hero" data-reveal>
+    <section className="canvas-hero" data-reveal suppressHydrationWarning>
       <header
         className="canvas-hero__copy"
         data-reveal-child
@@ -224,15 +230,20 @@ const PLATFORM_LABELS: Record<Platform, string> = {
 const CYCLE_MS = 4000;
 
 function useIsMobile(breakpoint = 768) {
-  const [mobile, setMobile] = useState(false);
-  useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
-    setMobile(mql.matches);
-    const handler = (e: MediaQueryListEvent) => setMobile(e.matches);
-    mql.addEventListener("change", handler);
-    return () => mql.removeEventListener("change", handler);
-  }, [breakpoint]);
-  return mobile;
+  const query = `(max-width: ${breakpoint - 1}px)`;
+  const subscribe = useCallback(
+    (notify: () => void) => {
+      const mql = window.matchMedia(query);
+      mql.addEventListener("change", notify);
+      return () => mql.removeEventListener("change", notify);
+    },
+    [query],
+  );
+  const getSnapshot = useCallback(
+    () => window.matchMedia(query).matches,
+    [query],
+  );
+  return useSyncExternalStore(subscribe, getSnapshot, () => false);
 }
 
 const DESKTOP_SLOT_COUNT = 2;
@@ -280,7 +291,7 @@ export function MobileSection() {
   }, [isActive, cycle]);
 
   return (
-    <section className="mobile-hero" data-reveal>
+    <section className="mobile-hero" data-reveal suppressHydrationWarning>
       <header
         className="mobile-hero__copy"
         data-reveal-child
