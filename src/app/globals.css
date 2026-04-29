@@ -206,6 +206,33 @@ select {
   margin-inline-start: 0.25rem;
 }
 
+@media (max-width: 640px) {
+  .site-nav {
+    gap: 0.05rem;
+  }
+
+  .site-nav a {
+    padding: 0.4rem 0.45rem;
+    font-size: 0.72rem;
+    letter-spacing: -0.04em;
+  }
+}
+
+@media (max-width: 420px) {
+  .site-header .brand-mark {
+    gap: 0.35rem;
+  }
+
+  .brand-text {
+    font-size: 1.2rem;
+  }
+
+  .site-nav a {
+    padding: 0.35rem 0.35rem;
+    font-size: 0.68rem;
+  }
+}
+
 .button {
   display: inline-flex;
   align-items: center;
@@ -1248,11 +1275,13 @@ select {
   }
 
   .hero-title {
-    grid-column: 2 / 4;
+    grid-column: 2 / 5;
+    margin-left: -8rem;
   }
 
   .hero-copy {
     grid-column: 2 / 4;
+    margin-left: -8rem;
   }
 
   .hero-actions {

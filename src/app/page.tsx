@@ -173,9 +173,7 @@ export default function Home() {
         <section className="grid-shell hero-section section-border">
           <div className="hero-title reveal">
             <h1>
-              <span>Your Personal</span>
-              <br />
-              AI Assistant
+              <span>Your Personal</span> AI Assistant
             </h1>
           </div>
 
