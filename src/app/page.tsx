@@ -52,6 +52,7 @@ const ExtensionSection = dynamic(
 const navItems = [
   { label: "How It Works", href: "/how-it-works" },
   { label: "Pricing", href: "/pricing" },
+  { label: "What's New", href: "/changelog" },
 ];
 
 const showcaseCards = [
