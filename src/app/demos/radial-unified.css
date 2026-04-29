@@ -1337,6 +1337,17 @@
   width: 100%;
 }
 
+/* Two-up phone layout on desktop: each phone gets more room than the
+   old three-up row, but we still cap so the pair doesn't dominate the
+   page on very wide viewports. */
+.mobile-hero__mock .mobile-phone-col {
+  max-width: 24rem;
+}
+
+.mobile-hero__mock .mobile-phone-row {
+  gap: clamp(1.5rem, 3vw, 3rem);
+}
+
 @media (max-width: 900px) {
   .mobile-hero__stage {
     grid-template-columns: 1fr;

@@ -24,6 +24,31 @@ const MobileSection = dynamic(
   { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
 );
 
+const MemorySection = dynamic(
+  () => import("@/components/product-demos/onboarding-derived-sections").then((mod) => mod.MemorySection),
+  { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
+);
+
+const ActionsSection = dynamic(
+  () => import("@/components/product-demos/onboarding-derived-sections").then((mod) => mod.ActionsSection),
+  { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
+);
+
+const TogetherSection = dynamic(
+  () => import("@/components/product-demos/onboarding-derived-sections").then((mod) => mod.TogetherSection),
+  { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
+);
+
+const VoiceSection = dynamic(
+  () => import("@/components/product-demos/onboarding-derived-sections").then((mod) => mod.VoiceSection),
+  { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
+);
+
+const ExtensionSection = dynamic(
+  () => import("@/components/product-demos/onboarding-derived-sections").then((mod) => mod.ExtensionSection),
+  { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
+);
+
 const navItems = [
   { label: "How It Works", href: "/how-it-works" },
   { label: "Pricing", href: "/pricing" },
@@ -250,7 +275,17 @@ export default function Home() {
 
         <CanvasSection />
 
+        <ActionsSection />
+
+        <VoiceSection />
+
         <MobileSection />
+
+        <MemorySection />
+
+        <TogetherSection />
+
+        <ExtensionSection />
 
         <section
           className="grid-shell showcase-section showcase-section--deferred section-border"

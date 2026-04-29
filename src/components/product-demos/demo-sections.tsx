@@ -235,8 +235,10 @@ function useIsMobile(breakpoint = 768) {
   return mobile;
 }
 
+const DESKTOP_SLOT_COUNT = 2;
+
 function usePlatformCycle(isMobile: boolean) {
-  const [slots, setSlots] = useState<Platform[]>(["imessage", "discord", "slack"]);
+  const [slots, setSlots] = useState<Platform[]>(["imessage", "discord"]);
   const [singleIndex, setSingleIndex] = useState(0);
   const nextSlotRef = useRef(0);
 
@@ -246,7 +248,7 @@ function usePlatformCycle(isMobile: boolean) {
     } else {
       setSlots((prev) => {
         const slot = nextSlotRef.current;
-        nextSlotRef.current = (slot + 1) % 3;
+        nextSlotRef.current = (slot + 1) % DESKTOP_SLOT_COUNT;
 
         const available = ALL_PLATFORMS.filter((p) => !prev.includes(p));
         if (available.length === 0) return prev;
