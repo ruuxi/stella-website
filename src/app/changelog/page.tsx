@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { SiteHeaderAccount } from "@/components/auth/site-header-account";
 import "./changelog.css";
 
 export const metadata: Metadata = {
@@ -43,6 +44,43 @@ type Entry = {
 };
 
 const entries: Entry[] = [
+  {
+    date: "April 30, 2026",
+    tags: ["New", "Polish"],
+    items: [
+      "Click-to-update launcher — Stella can now check for and install updates on demand, with a manual update check, reinstall option, and a native uninstall confirmation.",
+      "Launcher UI polish and an R2 public-URL fix for downloads.",
+      "Store integrations now render as App Store-style rows.",
+      "Chat home overview now shows your task history with progress summaries.",
+      "Sent user messages animate into the full chat surface.",
+      "In-app dictation bar gets a send arrow.",
+      "Display sidebar drops the heavy blur and preserves the active tab when you reopen the panel.",
+      "Computer-use: webview apps now wake the CEF accessibility broker and accept single x/y clicks.",
+      "Fixes: onboarding completion handoff, store display tab routing, first chat-send home bounce, remote connector desktop routing, and several working-indicator copy/lifecycle bugs.",
+      "Global social chat is disabled while moderation tooling matures.",
+    ],
+  },
+  {
+    date: "April 29, 2026",
+    tags: ["New", "Polish"],
+    items: [
+      "Universal macOS desktop builds — one download works on both Apple Silicon and Intel Macs.",
+      "Local Parakeet dictation is now on by default.",
+      "Sign-in dialog redesigned as a single grow-in form with quick links to your inbox.",
+      "Modernized dialog styling across the app.",
+      "Launch splash stays up until startup is fully ready (no more flash of an empty window).",
+      "Mini window: double-tap toggle reliability fixes, focus behavior fixes, and the keybind now routes through the radial chat action.",
+      "Social: unread badges on the Social tab and Friends button; rooms are marked read correctly; global chat excluded from unread counts.",
+      "Store: reworked around threaded creator pages and a feature roster, with new visibility tiers, share-with-friends, and chat embeds.",
+      "Display sidebar tab polish and an explicit '+' picker.",
+      "Store tabs are centered over the visible area and no longer lag during resize.",
+      "Magic-link polling stays alive after you close the auth dialog, so the link still completes sign-in.",
+      "Display font now used for the startup branding.",
+      "Auth-aware Convex queries — pages no longer flash errors during sign-in transitions.",
+      "Many launcher fixes (Windows process control & tray icon, Intel macOS install lockfile, dock visibility, uninstall retry, Tauri plugin pinning).",
+      "Stella cleanly tears down child processes on quit.",
+    ],
+  },
   {
     date: "April 28, 2026",
     tags: ["New", "Polish"],
@@ -620,6 +658,7 @@ export default function Changelog() {
               {item.label}
             </a>
           ))}
+          <SiteHeaderAccount />
         </nav>
       </header>
 
