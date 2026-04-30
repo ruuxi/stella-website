@@ -1,20 +1,31 @@
 "use client";
 
-import { useState, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowRight, Lock, X } from "lucide-react";
 
 const DOWNLOADS = {
-  mac: "https://github.com/ruuxi/stella/releases/latest/download/Stella-darwin-arm64.dmg",
+  macArm64:
+    "https://github.com/ruuxi/stella/releases/latest/download/Stella-darwin-arm64.dmg",
+  macX64:
+    "https://github.com/ruuxi/stella/releases/latest/download/Stella-darwin-x64.dmg",
   windows: "https://github.com/ruuxi/stella/releases/latest/download/Stella.exe",
 } as const;
 
 const DOWNLOAD_PASSWORD = "2326";
 
-type Platform = "mac" | "windows";
+type Platform = "macArm64" | "macX64" | "windows";
 
 const labels: Record<Platform, string> = {
-  mac: "Download for Mac",
+  macArm64: "Download for Mac",
+  macX64: "Download for Mac",
   windows: "Download for Windows",
+};
+
+type NavigatorUAData = {
+  platform?: string;
+  getHighEntropyValues?: (
+    hints: string[],
+  ) => Promise<{ architecture?: string; platform?: string }>;
 };
 
 function subscribeNoop() {
@@ -22,8 +33,10 @@ function subscribeNoop() {
 }
 
 function detectPlatform(): Platform {
-  if (typeof navigator === "undefined") return "mac";
-  return navigator.userAgent.toLowerCase().includes("mac") ? "mac" : "windows";
+  if (typeof navigator === "undefined") return "macArm64";
+  return navigator.userAgent.toLowerCase().includes("mac")
+    ? "macArm64"
+    : "windows";
 }
 
 export function DownloadButton() {
@@ -34,13 +47,40 @@ export function DownloadButton() {
   const platform = useSyncExternalStore<Platform>(
     subscribeNoop,
     detectPlatform,
-    () => "mac",
+    () => "macArm64",
   );
 
+  const [macArchitecture, setMacArchitecture] = useState<"arm64" | "x64">(
+    "arm64",
+  );
+  const resolvedPlatform: Platform =
+    platform === "macArm64" && macArchitecture === "x64" ? "macX64" : platform;
   const [showModal, setShowModal] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (typeof navigator === "undefined" || platform !== "macArm64") {
+      return;
+    }
+
+    const userAgentData = (navigator as Navigator & { userAgentData?: NavigatorUAData })
+      .userAgentData;
+
+    userAgentData
+      ?.getHighEntropyValues?.(["architecture", "platform"])
+      .then((hints) => {
+        const hintPlatform = hints.platform ?? userAgentData.platform ?? "";
+        const isMac = hintPlatform.toLowerCase().includes("mac");
+        const isIntel = hints.architecture?.toLowerCase() === "x86";
+
+        if (isMac && isIntel) {
+          setMacArchitecture("x64");
+        }
+      })
+      .catch(() => {});
+  }, [platform]);
 
   function handleClick(e: React.MouseEvent) {
     e.preventDefault();
@@ -54,7 +94,7 @@ export function DownloadButton() {
     e.preventDefault();
     if (password === DOWNLOAD_PASSWORD) {
       setShowModal(false);
-      window.location.href = DOWNLOADS[platform];
+      window.location.href = DOWNLOADS[resolvedPlatform];
     } else {
       setError(true);
     }
@@ -67,7 +107,7 @@ export function DownloadButton() {
         onClick={handleClick}
         type="button"
       >
-        {labels[platform]}
+        {labels[resolvedPlatform]}
         <ArrowRight size={18} />
       </button>
 
