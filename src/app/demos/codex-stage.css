@@ -1,0 +1,333 @@
+/* ──────────────────────────────────────────────────────────────────────
+   Codex-style two-column section layout for product mocks.
+
+   Modeled after openai.com/codex: a narrow italic-serif text column
+   (eyebrow + title + lede) sits beside a vivid blue/violet gradient
+   "frame" that holds the mock. Sections alternate sides via the
+   `data-flip="true"` attribute on `.codex-stage`.
+
+   Stella's cream page background, italic display titles, and existing
+   per-section mock chrome are kept intact; only the outer layout and
+   the colored frame are imported from Codex.
+
+   Loaded LAST in `demos.css` so its overrides win against per-section
+   centered hero rules in `radial-unified.css`,
+   `onboarding-derived-sections.css`, etc.
+   ────────────────────────────────────────────────────────────────────── */
+
+.codex-section {
+  position: relative;
+  width: 100%;
+  padding: clamp(3.5rem, 8vw, 6.5rem) 0;
+  display: block;
+  isolation: isolate;
+}
+
+/* Neutralize the centered-flex hero shells of converted sections so
+   `.codex-stage` can take over the inner layout. The original section
+   selectors set `display: flex; flex-direction: column; align-items:
+   center` and add their own gap/padding — we override those here. */
+.codex-section.radial-hero,
+.codex-section.canvas-hero,
+.codex-section.mobile-hero,
+.codex-section.ob-memory,
+.codex-section.ob-together,
+.codex-section.ob-actions,
+.codex-section.ob-voice,
+.codex-section.ob-extension {
+  display: block;
+  align-items: stretch;
+  gap: 0;
+}
+
+.codex-stage {
+  width: min(100%, 84rem);
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 3rem);
+  align-items: center;
+}
+
+@media (min-width: 720px) {
+  .codex-stage {
+    grid-template-columns: minmax(12rem, 18rem) minmax(0, 1fr);
+    gap: clamp(1.6rem, 4vw, 3.5rem);
+  }
+
+  .codex-stage[data-flip="true"] {
+    grid-template-columns: minmax(0, 1fr) minmax(12rem, 18rem);
+  }
+
+  .codex-stage[data-flip="true"] > .codex-stage__copy {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .codex-stage[data-flip="true"] > .codex-stage__mock {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+
+/* ── Text column — overrides per-section centered-hero copy rules ──── */
+
+.codex-stage__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.8rem;
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  text-align: left;
+}
+
+/* Title: tighter and smaller than the original hero size so it wraps
+   to 2–3 short lines beside the mock, matching Codex's compact column. */
+.codex-stage__copy .ob-section-title,
+.codex-stage__copy .radial-hero__title,
+.codex-stage__copy .canvas-hero__title,
+.codex-stage__copy .mobile-hero__title {
+  font-size: clamp(2.2rem, 4.4vw, 3.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+  text-align: left;
+  margin: 0;
+}
+
+.codex-stage__copy .ob-section-eyebrow,
+.codex-stage__copy .radial-hero__eyebrow,
+.codex-stage__copy .canvas-hero__eyebrow,
+.codex-stage__copy .mobile-hero__eyebrow {
+  text-align: left;
+}
+
+.codex-stage__copy .ob-section-lede,
+.codex-stage__copy .radial-hero__lede,
+.codex-stage__copy .canvas-hero__lede,
+.codex-stage__copy .mobile-hero__lede {
+  margin: 0.3rem 0 0;
+  max-width: 22rem;
+  font-size: 1rem;
+  line-height: 1.55;
+  text-align: left;
+}
+
+/* ── Mock column ───────────────────────────────────────────────────── */
+
+.codex-stage__mock {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+/* ── The gradient "frame" around the mock ────────────────────────── */
+
+/* Gradient palette mirrors the Stella logo (sky-cyan → accent blue) and
+   the body's `--page-glow-cyan` / `--page-glow-blue` background washes,
+   so the frame feels like a saturated extension of the page itself
+   instead of a foreign violet card. */
+.codex-frame {
+  position: relative;
+  border-radius: clamp(1rem, 2vw, 1.6rem);
+  padding: clamp(1rem, 2.6vw, 2.2rem);
+  background:
+    radial-gradient(
+      120% 100% at 8% 6%,
+      rgba(178, 224, 248, 0.95),
+      rgba(104, 180, 232, 0.92) 30%,
+      rgba(45, 132, 224, 0.9) 60%,
+      rgba(20, 86, 180, 0.86) 100%
+    ),
+    linear-gradient(180deg, #62b0e8, #155fb6);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 30px 70px rgba(18, 70, 150, 0.26),
+    0 8px 24px rgba(18, 70, 150, 0.16);
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.codex-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      80% 60% at 100% 100%,
+      rgba(180, 230, 255, 0.18),
+      transparent 60%
+    ),
+    radial-gradient(
+      50% 40% at 0% 100%,
+      rgba(255, 255, 255, 0.12),
+      transparent 60%
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.codex-frame > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Per-section adjustments inside the frame ─────────────────────── */
+
+/* Radial hero stage: was a 2-col dial+mock grid filling the page width.
+   Inside the frame we keep the side-by-side relationship but tighten
+   spacing and let the dial scale relative to the column, not viewport. */
+.codex-frame .radial-hero__stage {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  grid-template-columns: minmax(180px, 0.7fr) minmax(0, 1fr);
+}
+
+.codex-frame .radial-hero__dial .radial-dial-interactive {
+  width: clamp(180px, 18vw, 240px);
+  height: clamp(180px, 18vw, 240px);
+}
+
+.codex-frame .radial-hero__dial .radial-dial-interactive__center {
+  width: clamp(54px, 5vw, 70px);
+  height: clamp(54px, 5vw, 70px);
+}
+
+.codex-frame .radial-hero__dial .radial-dial-caption {
+  min-height: 5rem;
+}
+
+.codex-frame .radial-hero__dial .radial-dial-caption strong,
+.codex-frame .radial-hero__dial .radial-dial-caption p {
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.codex-frame .radial-hero__dial .radial-dial-caption p {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.codex-frame .radial-hero__mock {
+  min-height: clamp(260px, 32vw, 420px);
+}
+
+/* Canvas hero stage: tabs above mock — keep that vertical stack but
+   centered inside the frame. */
+.codex-frame .canvas-hero__stage {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+  gap: clamp(1rem, 2vw, 1.6rem);
+}
+
+.codex-frame .canvas-hero__menu {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(10px);
+}
+
+.codex-frame .canvas-hero__menu-item {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.codex-frame .canvas-hero__menu-item:hover {
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.codex-frame .canvas-hero__menu-item[data-active] {
+  background: rgba(255, 255, 255, 0.96);
+  color: rgba(20, 30, 60, 0.95);
+}
+
+.codex-frame .canvas-hero__mock {
+  max-width: none;
+  min-height: clamp(320px, 38vw, 480px);
+}
+
+/* Mobile hero stage: was channels-list + phones grid. Inside the frame
+   keep that grid, but compress the right column width. */
+.codex-frame .mobile-hero__stage {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+  gap: clamp(1rem, 3vw, 2rem);
+  grid-template-columns: minmax(160px, 0.55fr) minmax(0, 1.6fr);
+}
+
+.codex-frame .mobile-hero__channels .mobile-channels__label,
+.codex-frame .mobile-hero__channels .mobile-channel__name {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.codex-frame .mobile-hero__channels .mobile-channel {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.codex-frame .mobile-hero__mock .mobile-phone-col {
+  max-width: 18rem;
+}
+
+.codex-frame .mobile-hero__mock .mobile-phone-label {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+/* ob-* sections: their existing __stage already has a max-width — let
+   it fill the frame instead. */
+.codex-frame .ob-memory__stage,
+.codex-frame .ob-together__stage,
+.codex-frame .ob-actions__stage,
+.codex-frame .ob-voice__stage,
+.codex-frame .ob-extension__stage {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ── Mobile / narrow layout ───────────────────────────────────────── */
+
+@media (max-width: 719px) {
+  .codex-stage__copy {
+    align-items: center;
+    text-align: center;
+  }
+
+  .codex-stage__copy .ob-section-title,
+  .codex-stage__copy .radial-hero__title,
+  .codex-stage__copy .canvas-hero__title,
+  .codex-stage__copy .mobile-hero__title,
+  .codex-stage__copy .ob-section-eyebrow,
+  .codex-stage__copy .radial-hero__eyebrow,
+  .codex-stage__copy .canvas-hero__eyebrow,
+  .codex-stage__copy .mobile-hero__eyebrow,
+  .codex-stage__copy .ob-section-lede,
+  .codex-stage__copy .radial-hero__lede,
+  .codex-stage__copy .canvas-hero__lede,
+  .codex-stage__copy .mobile-hero__lede {
+    text-align: center;
+  }
+
+  .codex-stage__copy .ob-section-lede,
+  .codex-stage__copy .radial-hero__lede,
+  .codex-stage__copy .canvas-hero__lede,
+  .codex-stage__copy .mobile-hero__lede {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 32rem;
+  }
+
+  .codex-frame .radial-hero__stage {
+    grid-template-columns: 1fr;
+  }
+
+  .codex-frame .mobile-hero__stage {
+    grid-template-columns: 1fr;
+  }
+}

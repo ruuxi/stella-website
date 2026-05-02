@@ -101,45 +101,51 @@ export function RadialDialSection() {
   const activeWedge = RADIAL_WEDGES[selectedIndex];
 
   return (
-    <section className="radial-hero" data-reveal suppressHydrationWarning>
-      <header
-        className="radial-hero__copy"
-        data-reveal-child
-        style={{ ["--reveal-index" as string]: 0 }}
-      >
-        <span className="radial-hero__eyebrow">Anywhere</span>
-        <h2 className="radial-hero__title">Stella, on call.</h2>
-        <p className="radial-hero__lede">
-          One gesture summons Stella anywhere on your screen. Flick toward an
-          action — no menus, no window switching.
-        </p>
-      </header>
+    <section className="radial-hero codex-section" data-reveal suppressHydrationWarning>
+      <div className="codex-stage">
+        <header
+          className="radial-hero__copy codex-stage__copy"
+          data-reveal-child
+          style={{ ["--reveal-index" as string]: 0 }}
+        >
+          <span className="radial-hero__eyebrow">Anywhere</span>
+          <h2 className="radial-hero__title">Stella, on call.</h2>
+          <p className="radial-hero__lede">
+            One gesture summons Stella anywhere on your screen. Flick toward
+            an action — no menus, no window switching.
+          </p>
+        </header>
 
-      <div
-        className="radial-hero__stage"
-        data-reveal-child
-        style={{ ["--reveal-index" as string]: 1 }}
-      >
-        <div className="radial-hero__dial" aria-label="Stella radial dial">
-          <RadialDialInteractive
-            selectedIndex={selectedIndex}
-            onSelect={handleSelect}
-          />
-          <div className="radial-dial-caption" aria-live="polite">
-            <div key={activeWedge.id} className="radial-dial-caption__inner">
-              <strong>{activeWedge.heading}</strong>
-              <p>{activeWedge.detail}</p>
+        <div
+          className="codex-stage__mock"
+          data-reveal-child
+          style={{ ["--reveal-index" as string]: 1 }}
+        >
+          <div className="codex-frame">
+            <div className="radial-hero__stage">
+              <div className="radial-hero__dial" aria-label="Stella radial dial">
+                <RadialDialInteractive
+                  selectedIndex={selectedIndex}
+                  onSelect={handleSelect}
+                />
+                <div className="radial-dial-caption" aria-live="polite">
+                  <div key={activeWedge.id} className="radial-dial-caption__inner">
+                    <strong>{activeWedge.heading}</strong>
+                    <p>{activeWedge.detail}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div ref={ref} className="radial-hero__mock">
+                <DeferInView fallback={<DemoChunkPlaceholder />}>
+                  <RadialDialVisual
+                    selectedIndex={selectedIndex}
+                    isActive={isActive}
+                  />
+                </DeferInView>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div ref={ref} className="radial-hero__mock">
-          <DeferInView fallback={<DemoChunkPlaceholder />}>
-            <RadialDialVisual
-              selectedIndex={selectedIndex}
-              isActive={isActive}
-            />
-          </DeferInView>
         </div>
       </div>
     </section>
@@ -163,53 +169,59 @@ export function CanvasSection() {
   }, [isActive]);
 
   return (
-    <section className="canvas-hero" data-reveal suppressHydrationWarning>
-      <header
-        className="canvas-hero__copy"
-        data-reveal-child
-        style={{ ["--reveal-index" as string]: 0 }}
-      >
-        <span className="canvas-hero__eyebrow">Display</span>
-        <h2 className="canvas-hero__title">Ask. Watch it appear.</h2>
-        <p className="canvas-hero__lede">
-          The chat stays in the centre. Whatever Stella is making — a sheet,
-          a doc, or a few side quests at once — opens beside it in a panel
-          that&apos;s always there.
-        </p>
-      </header>
-
-      <div
-        className="canvas-hero__stage"
-        data-reveal-child
-        style={{ ["--reveal-index" as string]: 1 }}
-      >
-        <div
-          className="canvas-hero__menu"
-          role="tablist"
-          aria-label="Display examples"
+    <section className="canvas-hero codex-section" data-reveal suppressHydrationWarning>
+      <div className="codex-stage" data-flip="true">
+        <header
+          className="canvas-hero__copy codex-stage__copy"
+          data-reveal-child
+          style={{ ["--reveal-index" as string]: 0 }}
         >
-          {CANVAS_CONCEPTS.map((concept, index) => (
-            <button
-              key={concept.id}
-              type="button"
-              role="tab"
-              aria-selected={conceptIndex === index}
-              className="canvas-hero__menu-item"
-              data-active={conceptIndex === index || undefined}
-              onClick={() => setConceptIndex(index)}
-            >
-              {concept.label}
-            </button>
-          ))}
-        </div>
+          <span className="canvas-hero__eyebrow">Display</span>
+          <h2 className="canvas-hero__title">Ask. Watch it appear.</h2>
+          <p className="canvas-hero__lede">
+            The chat stays in the centre. Whatever Stella is making — a
+            sheet, a doc, or a few side quests at once — opens beside it in
+            a panel that&apos;s always there.
+          </p>
+        </header>
 
-        <div ref={ref} className="canvas-hero__mock">
-          <DeferInView fallback={<DemoChunkPlaceholder />}>
-            <CanvasVisual
-              conceptIndex={conceptIndex}
-              isActive={isActive}
-            />
-          </DeferInView>
+        <div
+          className="codex-stage__mock"
+          data-reveal-child
+          style={{ ["--reveal-index" as string]: 1 }}
+        >
+          <div className="codex-frame">
+            <div className="canvas-hero__stage">
+              <div
+                className="canvas-hero__menu"
+                role="tablist"
+                aria-label="Display examples"
+              >
+                {CANVAS_CONCEPTS.map((concept, index) => (
+                  <button
+                    key={concept.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={conceptIndex === index}
+                    className="canvas-hero__menu-item"
+                    data-active={conceptIndex === index || undefined}
+                    onClick={() => setConceptIndex(index)}
+                  >
+                    {concept.label}
+                  </button>
+                ))}
+              </div>
+
+              <div ref={ref} className="canvas-hero__mock">
+                <DeferInView fallback={<DemoChunkPlaceholder />}>
+                  <CanvasVisual
+                    conceptIndex={conceptIndex}
+                    isActive={isActive}
+                  />
+                </DeferInView>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -291,65 +303,71 @@ export function MobileSection() {
   }, [isActive, cycle]);
 
   return (
-    <section className="mobile-hero" data-reveal suppressHydrationWarning>
-      <header
-        className="mobile-hero__copy"
-        data-reveal-child
-        style={{ ["--reveal-index" as string]: 0 }}
-      >
-        <span className="mobile-hero__eyebrow">Anywhere</span>
-        <h2 className="mobile-hero__title">
-          Control your computer from anywhere
-        </h2>
-        <p className="mobile-hero__lede">
-          Away from your desk? Message Stella from anywhere and she&apos;ll take
-          action on your computer in real time.
-        </p>
-      </header>
+    <section className="mobile-hero codex-section" data-reveal suppressHydrationWarning>
+      <div className="codex-stage">
+        <header
+          className="mobile-hero__copy codex-stage__copy"
+          data-reveal-child
+          style={{ ["--reveal-index" as string]: 0 }}
+        >
+          <span className="mobile-hero__eyebrow">Anywhere</span>
+          <h2 className="mobile-hero__title">
+            Control your computer from anywhere
+          </h2>
+          <p className="mobile-hero__lede">
+            Away from your desk? Message Stella from anywhere and she&apos;ll
+            take action on your computer in real time.
+          </p>
+        </header>
 
-      <div
-        className="mobile-hero__stage"
-        data-reveal-child
-        style={{ ["--reveal-index" as string]: 1 }}
-      >
-        <div className="mobile-hero__channels">
-          <MobileChannels />
-        </div>
-
-        <div ref={ref} className="mobile-hero__mock">
-          <DeferInView fallback={<DemoChunkPlaceholder />}>
-            {isMobile ? (
-              <div className="mobile-phone-single">
-                <div className="mobile-phone-swap">
-                  <MobilePhoneVisual
-                    key={activePlatform}
-                    activeConvo={0}
-                    platform={activePlatform}
-                  />
-                </div>
-                <span className="mobile-phone-label">
-                  {PLATFORM_LABELS[activePlatform]}
-                </span>
+        <div
+          className="codex-stage__mock"
+          data-reveal-child
+          style={{ ["--reveal-index" as string]: 1 }}
+        >
+          <div className="codex-frame">
+            <div className="mobile-hero__stage">
+              <div className="mobile-hero__channels">
+                <MobileChannels />
               </div>
-            ) : (
-              <div className="mobile-phone-row">
-                {slots.map((platform, i) => (
-                  <div key={i} className="mobile-phone-col">
-                    <div className="mobile-phone-swap">
-                      <MobilePhoneVisual
-                        key={platform}
-                        activeConvo={i}
-                        platform={platform}
-                      />
+
+              <div ref={ref} className="mobile-hero__mock">
+                <DeferInView fallback={<DemoChunkPlaceholder />}>
+                  {isMobile ? (
+                    <div className="mobile-phone-single">
+                      <div className="mobile-phone-swap">
+                        <MobilePhoneVisual
+                          key={activePlatform}
+                          activeConvo={0}
+                          platform={activePlatform}
+                        />
+                      </div>
+                      <span className="mobile-phone-label">
+                        {PLATFORM_LABELS[activePlatform]}
+                      </span>
                     </div>
-                    <span className="mobile-phone-label">
-                      {PLATFORM_LABELS[platform]}
-                    </span>
-                  </div>
-                ))}
+                  ) : (
+                    <div className="mobile-phone-row">
+                      {slots.map((platform, i) => (
+                        <div key={i} className="mobile-phone-col">
+                          <div className="mobile-phone-swap">
+                            <MobilePhoneVisual
+                              key={platform}
+                              activeConvo={i}
+                              platform={platform}
+                            />
+                          </div>
+                          <span className="mobile-phone-label">
+                            {PLATFORM_LABELS[platform]}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </DeferInView>
               </div>
-            )}
-          </DeferInView>
+            </div>
+          </div>
         </div>
       </div>
     </section>

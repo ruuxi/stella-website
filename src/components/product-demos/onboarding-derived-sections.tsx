@@ -97,9 +97,10 @@ function LabeledCursor({
 
 export function MemorySection() {
   return (
-    <section className="ob-memory" data-reveal suppressHydrationWarning>
+    <section className="ob-memory codex-section" data-reveal suppressHydrationWarning>
+      <div className="codex-stage" data-flip="true">
       <header
-        className="ob-memory__copy"
+        className="ob-memory__copy codex-stage__copy"
         data-reveal-child
         style={{ ["--reveal-index" as string]: 0 }}
       >
@@ -113,10 +114,12 @@ export function MemorySection() {
       </header>
 
       <div
-        className="ob-memory__stage"
+        className="codex-stage__mock"
         data-reveal-child
         style={{ ["--reveal-index" as string]: 1 }}
       >
+        <div className="codex-frame">
+        <div className="ob-memory__stage">
         <article className="ob-memory__pane" data-variant="off">
           <span className="ob-memory__label">Without memory</span>
           <div className="ob-memory__convo">
@@ -159,6 +162,9 @@ export function MemorySection() {
             </ul>
           </div>
         </article>
+        </div>
+        </div>
+      </div>
       </div>
     </section>
   );
@@ -168,9 +174,10 @@ export function MemorySection() {
 
 export function TogetherSection() {
   return (
-    <section className="ob-together" data-reveal suppressHydrationWarning>
+    <section className="ob-together codex-section" data-reveal suppressHydrationWarning>
+      <div className="codex-stage">
       <header
-        className="ob-together__copy"
+        className="ob-together__copy codex-stage__copy"
         data-reveal-child
         style={{ ["--reveal-index" as string]: 0 }}
       >
@@ -184,10 +191,12 @@ export function TogetherSection() {
       </header>
 
       <div
-        className="ob-together__stage"
+        className="codex-stage__mock"
         data-reveal-child
         style={{ ["--reveal-index" as string]: 1 }}
       >
+        <div className="codex-frame">
+        <div className="ob-together__stage">
         <MacWindow title="Lisbon · shared">
           <div className="ob-together__convo">
             <Bubble role="user" delay={250} byline="You">
@@ -213,6 +222,9 @@ export function TogetherSection() {
             className="ob-together__cursor"
           />
         </MacWindow>
+        </div>
+        </div>
+      </div>
       </div>
     </section>
   );
@@ -224,9 +236,10 @@ const ACTION_TIME_SLOTS = ["7:00", "7:30", "8:00", "8:30", "9:00"];
 
 export function ActionsSection() {
   return (
-    <section className="ob-actions" data-reveal suppressHydrationWarning>
+    <section className="ob-actions codex-section" data-reveal suppressHydrationWarning>
+      <div className="codex-stage">
       <header
-        className="ob-actions__copy"
+        className="ob-actions__copy codex-stage__copy"
         data-reveal-child
         style={{ ["--reveal-index" as string]: 0 }}
       >
@@ -240,10 +253,12 @@ export function ActionsSection() {
       </header>
 
       <div
-        className="ob-actions__stage"
+        className="codex-stage__mock"
         data-reveal-child
         style={{ ["--reveal-index" as string]: 1 }}
       >
+        <div className="codex-frame">
+        <div className="ob-actions__stage">
         <MacWindow title="opentable.com / luna-cucina">
           <div className="ob-actions__rest">
             <div className="ob-actions__rest-name">Luna Cucina</div>
@@ -279,6 +294,9 @@ export function ActionsSection() {
             />
           </div>
         </MacWindow>
+        </div>
+        </div>
+      </div>
       </div>
     </section>
   );
@@ -299,9 +317,10 @@ const VOICE_WAVEFORM_BARS = Array.from({ length: 56 }, (_, i) => {
 
 export function VoiceSection() {
   return (
-    <section className="ob-voice" data-reveal suppressHydrationWarning>
+    <section className="ob-voice codex-section" data-reveal suppressHydrationWarning>
+      <div className="codex-stage" data-flip="true">
       <header
-        className="ob-voice__copy"
+        className="ob-voice__copy codex-stage__copy"
         data-reveal-child
         style={{ ["--reveal-index" as string]: 0 }}
       >
@@ -315,10 +334,12 @@ export function VoiceSection() {
       </header>
 
       <div
-        className="ob-voice__stage"
+        className="codex-stage__mock"
         data-reveal-child
         style={{ ["--reveal-index" as string]: 1 }}
       >
+        <div className="codex-frame">
+        <div className="ob-voice__stage">
         {/* Generic "any app" surface — a Mail draft — to make it clear the
             dictation overlay floats above whatever the user is in. Mirrors
             the layout of `OnboardingVoicePhase`'s dictate card, which in
@@ -379,6 +400,9 @@ export function VoiceSection() {
             </button>
           </div>
         </div>
+        </div>
+        </div>
+      </div>
       </div>
     </section>
   );
@@ -425,9 +449,10 @@ const EXTENSION_BROWSERS = ["Chrome", "Arc", "Brave", "Edge", "Vivaldi"];
 
 export function ExtensionSection() {
   return (
-    <section className="ob-extension" data-reveal suppressHydrationWarning>
+    <section className="ob-extension codex-section" data-reveal suppressHydrationWarning>
+      <div className="codex-stage" data-flip="true">
       <header
-        className="ob-extension__copy"
+        className="ob-extension__copy codex-stage__copy"
         data-reveal-child
         style={{ ["--reveal-index" as string]: 0 }}
       >
@@ -440,10 +465,12 @@ export function ExtensionSection() {
       </header>
 
       <div
-        className="ob-extension__stage"
+        className="codex-stage__mock"
         data-reveal-child
         style={{ ["--reveal-index" as string]: 1 }}
       >
+        <div className="codex-frame">
+        <div className="ob-extension__stage">
         <div className="ob-extension__card">
           <span className="ob-extension__logo" aria-hidden="true">
             <Image
@@ -470,6 +497,9 @@ export function ExtensionSection() {
             Add to browser
           </a>
         </div>
+        </div>
+        </div>
+      </div>
       </div>
     </section>
   );
