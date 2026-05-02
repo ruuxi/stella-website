@@ -128,10 +128,10 @@
 /* Gradient palette mirrors the Stella logo (sky-cyan → accent blue) and
    the body's `--page-glow-cyan` / `--page-glow-blue` background washes,
    so the frame feels like a saturated extension of the page itself
-   instead of a foreign violet card. */
+   instead of a foreign violet card. Squared corners by request. */
 .codex-frame {
   position: relative;
-  border-radius: clamp(1rem, 2vw, 1.6rem);
+  border-radius: 0;
   padding: clamp(1rem, 2.6vw, 2.2rem);
   background:
     radial-gradient(

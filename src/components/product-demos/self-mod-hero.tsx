@@ -70,12 +70,14 @@ export function SelfModHero() {
         {isNarrow ? (
           <MobileSelfModMock />
         ) : (
-          <div className="self-mod-hero__stage-inner">
-            <StellaAppMock
-              interactive
-              toggles={toggles}
-              onToggleSection={handleToggle}
-            />
+          <div className="codex-frame self-mod-hero__frame">
+            <div className="self-mod-hero__stage-inner">
+              <StellaAppMock
+                interactive
+                toggles={toggles}
+                onToggleSection={handleToggle}
+              />
+            </div>
           </div>
         )}
       </div>

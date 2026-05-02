@@ -255,13 +255,39 @@ select {
 
 .button--primary,
 .button--accent {
-  background: var(--page-accent);
+  /* Mirrors `.codex-frame` — sky-cyan → Stella accent → deep ocean —
+     so primary CTAs read as a saturated chip cut from the same cloth
+     as the gradient cards. */
+  background:
+    radial-gradient(
+      120% 140% at 8% 0%,
+      rgba(190, 228, 250, 0.92),
+      rgba(108, 178, 232, 0.85) 30%,
+      rgba(45, 132, 224, 0.95) 65%,
+      rgba(20, 86, 180, 1) 100%
+    ),
+    linear-gradient(180deg, #62b0e8, #155fb6);
   color: var(--page-accent-foreground);
+  border-color: rgba(15, 60, 130, 0.32);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.28) inset,
+    0 6px 14px -6px rgba(20, 86, 180, 0.45);
 }
 
 .button--primary:hover,
 .button--accent:hover {
-  background: var(--page-accent-hover);
+  background:
+    radial-gradient(
+      120% 140% at 8% 0%,
+      rgba(170, 214, 244, 0.95),
+      rgba(82, 158, 220, 0.92) 30%,
+      rgba(30, 116, 210, 1) 65%,
+      rgba(14, 70, 156, 1) 100%
+    ),
+    linear-gradient(180deg, #4f9fda, #0f55a8);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.32) inset,
+    0 8px 18px -6px rgba(20, 86, 180, 0.55);
 }
 
 .button--primary {

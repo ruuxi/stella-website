@@ -75,11 +75,11 @@
 
 .self-mod-hero__stage-inner {
   position: relative;
-  width: min(100%, 1240px);
+  width: 100%;
   aspect-ratio: 16 / 10;
   min-height: 520px;
   max-height: 760px;
-  border-radius: 22px;
+  border-radius: 0;
   overflow: visible;
   box-shadow:
     0 30px 80px -32px rgba(15, 23, 42, 0.28),
@@ -175,8 +175,16 @@
   .self-mod-hero__stage-inner {
     aspect-ratio: auto;
     min-height: 600px;
-    border-radius: 18px;
+    border-radius: 0;
   }
+}
+
+/* The frame around the self-mod mock keeps the centered hero rhythm —
+   no codex-stage 2-col layout — but borrows the gradient and squared
+   corners so it reads as a peer of the other product mocks. */
+.self-mod-hero__frame {
+  width: min(100%, 1240px);
+  margin: 0 auto;
 }
 
 @media (max-width: 640px) {
