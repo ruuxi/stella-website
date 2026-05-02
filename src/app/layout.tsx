@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, IBM_Plex_Mono, Manrope } from "next/font/google";
 import { getSiteUrl } from "@/lib/site-url";
+import { ConvexAuthProvider } from "@/components/auth/convex-auth-provider";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import "./globals.css";
 /* Product demos (self-mod, radial, canvas) — partials in ./demos/ */
@@ -129,7 +130,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        {children}
+        <ConvexAuthProvider>{children}</ConvexAuthProvider>
         <RevealOnScroll />
       </body>
     </html>

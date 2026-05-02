@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
+import { SiteHeaderAccount } from "@/components/auth/site-header-account";
 import "./pricing.css";
 
 export const metadata: Metadata = {
@@ -119,6 +120,7 @@ export default function Pricing() {
               {item.label}
             </a>
           ))}
+          <SiteHeaderAccount />
         </nav>
       </header>
 

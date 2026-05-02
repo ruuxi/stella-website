@@ -3,6 +3,7 @@ import Image from "next/image";
 import { DownloadButton } from "@/components/download-button";
 import { HeroStellaOrb } from "@/components/hero-stella-orb-dynamic";
 import { DeferInView } from "@/components/product-demos/defer-in-view";
+import { SiteHeaderAccount } from "@/components/auth/site-header-account";
 
 const SelfModHero = dynamic(
   () => import("@/components/product-demos/self-mod-hero").then((mod) => mod.SelfModHero),
@@ -166,6 +167,7 @@ export default function Home() {
               {item.label}
             </a>
           ))}
+          <SiteHeaderAccount />
         </nav>
       </header>
 
