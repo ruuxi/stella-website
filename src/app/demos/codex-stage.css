@@ -198,11 +198,6 @@
   height: clamp(54px, 5vw, 70px);
 }
 
-.codex-frame .radial-hero__dial .radial-dial-caption {
-  min-height: 5rem;
-}
-
-.codex-frame .radial-hero__dial .radial-dial-caption strong,
 .codex-frame .radial-hero__dial .radial-dial-caption p {
   color: rgba(255, 255, 255, 0.94);
 }

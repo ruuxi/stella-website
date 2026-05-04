@@ -98,8 +98,6 @@ export function RadialDialSection() {
     setSelectedIndex(index);
   }, []);
 
-  const activeWedge = RADIAL_WEDGES[selectedIndex];
-
   return (
     <section className="radial-hero codex-section" data-reveal suppressHydrationWarning>
       <div className="codex-stage">
@@ -129,10 +127,25 @@ export function RadialDialSection() {
                   onSelect={handleSelect}
                 />
                 <div className="radial-dial-caption" aria-live="polite">
-                  <div key={activeWedge.id} className="radial-dial-caption__inner">
-                    <strong>{activeWedge.heading}</strong>
-                    <p>{activeWedge.detail}</p>
-                  </div>
+                  {RADIAL_WEDGES.map((wedge, i) => {
+                    const active = i === selectedIndex;
+                    return (
+                      <div
+                        key={wedge.id}
+                        className={[
+                          "radial-dial-caption__inner",
+                          "radial-dial-caption__inner--stacked",
+                          active
+                            ? "radial-dial-caption__inner--active radial-dial-caption__inner--enter"
+                            : "radial-dial-caption__inner--inactive",
+                        ].join(" ")}
+                        aria-hidden={!active}
+                      >
+                        <strong>{wedge.heading}</strong>
+                        <p>{wedge.detail}</p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 

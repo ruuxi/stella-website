@@ -1092,23 +1092,29 @@
   height: 100%;
 }
 
-/* Reserve a fixed slot for the caption so the longest wedge copy
-   doesn't push the mock down when shorter copy is shown. The slot
-   sizes itself off the tallest expected caption (heading + 3 lines of
-   detail) and stays put as the auto-cycling caption swaps in/out. */
+/* Caption panes overlap in one grid cell: inactive wedges stay visibility:hidden
+   so their intrinsic height participates in sizing — tallest copy sets the slot
+   and the dial/mock no longer shift when wedges rotate. */
 .radial-hero__dial .radial-dial-caption {
   margin-top: 0;
   text-align: center;
   width: min(100%, 24rem);
-  min-height: 6.5rem;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
+  display: grid;
+  justify-items: center;
+  grid-template-columns: minmax(0, 1fr);
 }
-.radial-hero__dial .radial-dial-caption__inner {
+.radial-hero__dial .radial-dial-caption__inner--stacked {
+  grid-area: 1 / 1;
   width: 100%;
   justify-items: center;
   text-align: center;
+}
+.radial-hero__dial .radial-dial-caption__inner--inactive {
+  visibility: hidden;
+  pointer-events: none;
+}
+.radial-hero__dial .radial-dial-caption__inner--active {
+  visibility: visible;
 }
 
 .radial-hero__mock {
@@ -1493,6 +1499,9 @@
 .radial-dial-caption__inner {
   display: grid;
   gap: 0.35rem;
+}
+
+.radial-dial-caption__inner--enter {
   animation: radial-caption-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -1506,6 +1515,12 @@
     opacity: 1;
     transform: none;
     filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .radial-dial-caption__inner--enter {
+    animation: none;
   }
 }
 
