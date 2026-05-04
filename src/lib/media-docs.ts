@@ -6,6 +6,7 @@
  *   - https://stella.sh/docs/media/images   (image generation + edit)
  *   - https://stella.sh/docs/media/video    (image-to-video, video-to-video, extend)
  *   - https://stella.sh/docs/media/audio    (TTS, sound effects, transcription, separation)
+ *   - https://stella.sh/docs/media/music    (text-to-music)
  *   - https://stella.sh/docs/media/3d       (text-to-3d)
  *
  * Audience: AI agents driving the Stella desktop app, not human readers.
@@ -16,7 +17,13 @@
  * in sync when that catalog changes.
  */
 
-export const MEDIA_DOCS_KINDS = ["images", "video", "audio", "3d"] as const;
+export const MEDIA_DOCS_KINDS = [
+  "images",
+  "video",
+  "audio",
+  "music",
+  "3d",
+] as const;
 export type MediaDocsKind = (typeof MEDIA_DOCS_KINDS)[number];
 
 const isMediaDocsKind = (value: string): value is MediaDocsKind =>
@@ -115,7 +122,9 @@ rate limits) are parsed and forwarded as-is — show the message to the user.
 const KIND_DESCRIPTIONS: Record<MediaDocsKind, string> = {
   images: "image generation and editing",
   video: "image-to-video, video extension, and video-to-video",
-  audio: "speech-to-text, text-to-dialogue, sound effects, and audio separation",
+  audio:
+    "speech-to-text, text-to-dialogue, sound effects, and audio separation",
+  music: "text-to-music generation",
   "3d": "text-to-3d asset generation",
 };
 
@@ -282,6 +291,65 @@ curl -X POST "$STELLA_API/api/media/v1/generate" \\
   updated only if the job is still pending after ~30s.
 `.trim();
 
+const SECTION_MUSIC = `
+## Capabilities
+
+### \`text_to_music\` — generate a short music clip
+
+- Single profile (\`default\`); Google Lyria 3 Pro preview.
+- Convenience field: \`prompt\` becomes a single weighted prompt if \`weightedPrompts\` is not supplied.
+- Useful \`input\` fields: \`promptLabel\`, \`weightedPrompts\`, \`musicGenerationConfig\`.
+- \`musicGenerationConfig\` fields: \`bpm\` (55–145), \`density\` (0.05–0.9), \`brightness\` (0.1–0.8), \`guidance\` (2–5), \`temperature\` (0.6–1.4), optional \`musicGenerationMode: "VOCALIZATION"\`.
+
+\`\`\`bash
+curl -X POST "$STELLA_API/api/media/v1/generate" \\
+  -H "Authorization: Bearer $STELLA_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "capability": "text_to_music",
+    "prompt": "warm lo-fi keys, soft vinyl texture, gentle drums",
+    "input": {
+      "promptLabel": "Rainy tape",
+      "musicGenerationConfig": {
+        "bpm": 85,
+        "density": 0.5,
+        "brightness": 0.4,
+        "guidance": 4,
+        "temperature": 1.1
+      }
+    }
+  }'
+\`\`\`
+
+For more control, pass explicit weighted prompts:
+
+\`\`\`json
+{
+  "capability": "text_to_music",
+  "input": {
+    "promptLabel": "Neon focus",
+    "weightedPrompts": [
+      { "text": "steady ambient electronica with soft arpeggios", "weight": 1 },
+      { "text": "harsh distorted guitars", "weight": -0.6 }
+    ],
+    "musicGenerationConfig": {
+      "bpm": 104,
+      "density": 0.45,
+      "brightness": 0.5,
+      "guidance": 4,
+      "temperature": 1
+    }
+  }
+}
+\`\`\`
+
+## Notes for agents
+
+- Music jobs return a normal media job and also materialize into \`state/media/outputs/\`.
+- The generated clip is about 30 seconds. Use \`musicGenerationMode: "VOCALIZATION"\` only when the user asks for sung elements; otherwise keep it instrumental.
+- Do not use real artist names, song titles, or copyrighted material in the prompt.
+`.trim();
+
 const SECTION_3D = `
 ## Capabilities
 
@@ -312,6 +380,7 @@ const SECTIONS: Record<MediaDocsKind, string> = {
   images: SECTION_IMAGES,
   video: SECTION_VIDEO,
   audio: SECTION_AUDIO,
+  music: SECTION_MUSIC,
   "3d": SECTION_3D,
 };
 
@@ -319,12 +388,16 @@ const KIND_TITLES: Record<MediaDocsKind, string> = {
   images: "Stella Managed Media — Images",
   video: "Stella Managed Media — Video",
   audio: "Stella Managed Media — Audio",
+  music: "Stella Managed Media — Music",
   "3d": "Stella Managed Media — 3D",
 };
 
 export const renderMediaDocsForKind = (kind: MediaDocsKind): string =>
   [
-    renderHeader(KIND_TITLES[kind], `Capabilities for ${KIND_DESCRIPTIONS[kind]}.`),
+    renderHeader(
+      KIND_TITLES[kind],
+      `Capabilities for ${KIND_DESCRIPTIONS[kind]}.`,
+    ),
     "",
     SECTIONS[kind],
     "",
