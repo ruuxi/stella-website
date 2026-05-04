@@ -339,6 +339,46 @@ select {
   font-style: italic;
 }
 
+.hero-title__morph {
+  position: relative;
+  display: inline-block;
+  font-style: italic;
+  vertical-align: top;
+}
+
+.hero-title__ghost {
+  visibility: hidden;
+  pointer-events: none;
+  font-style: italic;
+}
+
+.hero-title__phrase {
+  position: absolute;
+  inset: 0;
+  font-style: italic;
+  white-space: nowrap;
+  animation: hero-title-morph-in 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes hero-title-morph-in {
+  0% {
+    opacity: 0;
+    transform: translateY(0.22em);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-title__phrase {
+    animation: none;
+  }
+}
+
 .hero-copy {
   display: flex;
   flex-direction: column;

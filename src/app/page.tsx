@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { DownloadButton } from "@/components/download-button";
+import { HeroMorphTitle } from "@/components/hero-morph-title";
 import { HeroStellaOrb } from "@/components/hero-stella-orb-dynamic";
 import { DeferInView } from "@/components/product-demos/defer-in-view";
 import { SiteHeaderAccount } from "@/components/auth/site-header-account";
@@ -174,17 +175,12 @@ export default function Home() {
       <main>
         <section className="grid-shell hero-section section-border">
           <div className="hero-title reveal">
-            <h1>
-              <span>Your Personal</span> AI Assistant
-            </h1>
+            <HeroMorphTitle />
           </div>
 
           <div className="hero-copy reveal reveal-delay-1">
             <p>
-              Stella lives on your computer to do anything you need.
-            </p>
-            <p className="hero-copy__subtle">
-              Private by design. Entirely yours.
+              Private. Open source. Lives on your computer.
             </p>
           </div>
 
