@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { ArrowRight, Lock, X } from "lucide-react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { ArrowRight } from "lucide-react";
 
 const DOWNLOADS = {
   macArm64:
@@ -10,8 +10,6 @@ const DOWNLOADS = {
     "https://github.com/ruuxi/stella/releases/latest/download/Stella-darwin-x64.dmg",
   windows: "https://github.com/ruuxi/stella/releases/latest/download/Stella.exe",
 } as const;
-
-const DOWNLOAD_PASSWORD = "2326";
 
 type Platform = "macArm64" | "macX64" | "windows";
 
@@ -55,10 +53,6 @@ export function DownloadButton() {
   );
   const resolvedPlatform: Platform =
     platform === "macArm64" && macArchitecture === "x64" ? "macX64" : platform;
-  const [showModal, setShowModal] = useState(false);
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (typeof navigator === "undefined" || platform !== "macArm64") {
@@ -84,74 +78,17 @@ export function DownloadButton() {
 
   function handleClick(e: React.MouseEvent) {
     e.preventDefault();
-    setShowModal(true);
-    setPassword("");
-    setError(false);
-    setTimeout(() => inputRef.current?.focus(), 50);
-  }
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (password === DOWNLOAD_PASSWORD) {
-      setShowModal(false);
-      window.location.href = DOWNLOADS[resolvedPlatform];
-    } else {
-      setError(true);
-    }
+    window.location.href = DOWNLOADS[resolvedPlatform];
   }
 
   return (
-    <>
-      <button
-        className="button button--primary"
-        onClick={handleClick}
-        type="button"
-      >
-        {labels[resolvedPlatform]}
-        <ArrowRight size={18} />
-      </button>
-
-      {showModal && (
-        <div className="dl-modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="dl-modal" onClick={(e) => e.stopPropagation()}>
-            <button
-              className="dl-modal__close"
-              onClick={() => setShowModal(false)}
-              type="button"
-              aria-label="Close"
-            >
-              <X size={16} />
-            </button>
-            <div className="dl-modal__icon">
-              <Lock size={20} />
-            </div>
-            <h3 className="dl-modal__title">Enter password to download</h3>
-            <p className="dl-modal__desc">
-              Stella is in early access. Enter the password to continue.
-            </p>
-            <form onSubmit={handleSubmit} className="dl-modal__form">
-              <input
-                ref={inputRef}
-                type="password"
-                className={`dl-modal__input${error ? " dl-modal__input--error" : ""}`}
-                placeholder="Password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setError(false);
-                }}
-              />
-              {error && (
-                <span className="dl-modal__error">Incorrect password</span>
-              )}
-              <button type="submit" className="button button--primary dl-modal__submit">
-                Download
-                <ArrowRight size={16} />
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-    </>
+    <button
+      className="button button--primary"
+      onClick={handleClick}
+      type="button"
+    >
+      {labels[resolvedPlatform]}
+      <ArrowRight size={18} />
+    </button>
   );
 }
