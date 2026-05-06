@@ -4,27 +4,44 @@
 
 .store-root {
   --shell-topbar-height: 0px;
-  --background: #f6f7f8;
-  --foreground: #0f1115;
+  --background: #f2f4f8;
+  --foreground: #161616;
   --surface-1: rgba(255, 255, 255, 0.76);
   --surface-2: rgba(255, 255, 255, 0.58);
   --surface-3: rgba(255, 255, 255, 0.42);
-  --text-strong: #101216;
-  --text: #23262d;
-  --text-base: #23262d;
-  --text-muted: rgba(35, 38, 45, 0.72);
-  --text-weak: rgba(35, 38, 45, 0.64);
-  --text-weaker: rgba(35, 38, 45, 0.52);
-  --border: rgba(15, 17, 21, 0.12);
-  --border-strong: rgba(15, 17, 21, 0.2);
-  --accent: #1478ff;
-  --accent-strong: #095fd2;
+  --surface-raised: color-mix(in srgb, #ffffff 65%, transparent);
+  --surface-raised-hover: color-mix(in srgb, #ffffff 80%, transparent);
+  --text-strong: color-mix(in srgb, var(--foreground) 95%, transparent);
+  --text: color-mix(in srgb, var(--foreground) 80%, transparent);
+  --text-base: color-mix(in srgb, var(--foreground) 75%, transparent);
+  --text-muted: color-mix(in srgb, var(--foreground) 60%, transparent);
+  --text-weak: color-mix(in srgb, var(--foreground) 50%, transparent);
+  --text-weaker: color-mix(in srgb, var(--foreground) 35%, transparent);
+  --border: rgba(22, 22, 22, 0.12);
+  --border-strong: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --border-base: color-mix(in srgb, var(--foreground) 8%, transparent);
+  --border-weak: color-mix(in srgb, var(--foreground) 5%, transparent);
+  --accent: #0f62fe;
+  --accent-strong: #0043ce;
   --accent-foreground: #ffffff;
-  --interactive: #1478ff;
-  --primary: #1478ff;
+  --interactive: var(--foreground);
+  --primary: #0f62fe;
+  --primary-foreground: #ffffff;
+  --ring: #0f62fe;
+  --glass-bg: color-mix(in srgb, var(--background) 40%, transparent);
+  --glass-blur: blur(40px) saturate(180%);
+  --button-secondary-base: color-mix(in srgb, rgba(105, 112, 119, 0.16) 40%, var(--background));
+  --button-secondary-hover: rgba(105, 112, 119, 0.16);
+  --destructive: #d84040;
   --danger: #d84040;
   --radius-full: 999px;
+  --font-family-sans: var(--font-sans), sans-serif;
+  --font-family-display: Georgia, serif;
   min-height: 100vh;
+}
+
+body:has(.store-root) {
+  background: var(--background, #f2f4f8);
 }
 
 @keyframes store-fade-up {
@@ -123,6 +140,28 @@
   border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
   padding: 26px;
+}
+
+.store-web-dialog:has(.pet-detail-dialog) {
+  display: flex;
+  width: min(540px, 100%);
+  height: min(calc(100vh - 16px), 720px);
+  min-height: min(calc(100vh - 16px), 640px);
+  max-height: min(calc(100vh - 16px), 720px);
+  overflow: hidden;
+  padding: 0;
+}
+
+.store-web-dialog:has(.store-confirm-dialog),
+.store-web-dialog:has(.credential-modal-content) {
+  width: min(460px, 100%);
+  padding: 0;
+  overflow: hidden;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  background-clip: padding-box;
+  border: 1px solid var(--border-weak);
 }
 
 .store-web-dialog-close {
@@ -588,10 +627,8 @@
 /*
  * Apple System UI–style tinted pills. The accent color (`--interactive`)
  * tints the background lightly and carries the label, with a soft same-
- * color border. `--interactive` is currently undefined project-wide, so
- * every rule falls back to `--primary` and a hard-coded blue so the
- * buttons always render with a visible fill (the previous saturated solid
- * fill silently disappeared when the variable wasn't set).
+ * color border. Store sets it to the foreground color so hosted buttons
+ * keep the same neutral desktop treatment instead of defaulting blue.
  */
 .store-action-btn[data-variant="get"] {
   background: color-mix(
@@ -1211,8 +1248,9 @@
 }
 
 .store-search {
-  flex: 1;
+  flex: 0 1 420px;
   min-width: 220px;
+  max-width: 420px;
   position: relative;
   display: flex;
   align-items: center;
@@ -1401,6 +1439,10 @@
   padding: 24px 28px 20px;
 }
 
+.store-web-dialog .store-confirm-dialog {
+  padding: 24px 28px 20px;
+}
+
 .store-confirm-title {
   font-size: 16px;
   font-weight: 620;
@@ -1420,6 +1462,97 @@
   justify-content: flex-end;
   gap: 10px;
   margin-top: 18px;
+}
+
+.credential-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  padding: 28px;
+}
+
+.credential-modal-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.credential-modal-icon {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: var(--text-strong);
+  background: color-mix(in oklch, var(--foreground) 6%, transparent);
+  border: 1px solid var(--border-base);
+}
+
+.credential-modal-headline {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 650;
+  color: var(--text-strong);
+  letter-spacing: -0.015em;
+}
+
+.credential-modal-sub {
+  margin: 0;
+  max-width: 320px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-base);
+}
+
+.credential-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.credential-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.credential-modal-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-weaker);
+}
+
+.credential-modal-field input {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: 10px;
+  border: 1px solid var(--border-weak);
+  background: color-mix(in srgb, var(--background) 60%, transparent);
+  color: var(--text-strong);
+  outline: none;
+}
+
+.credential-modal-field input:focus {
+  border-color: var(--border-base);
+  background: color-mix(in srgb, var(--background) 80%, transparent);
+}
+
+.credential-modal-error {
+  font-size: 12.5px;
+  color: var(--destructive);
+}
+
+.credential-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 /* The Store tab strip lives in the shell's top bar
@@ -2894,6 +3027,17 @@
   max-height: 100%;
 }
 
+.store-web-dialog > .pet-detail-dialog {
+  --pet-dialog-pad-x: 28px;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
 [data-component="dialog"][data-fit]:has([data-slot="dialog-content"].pet-detail-dialog)
   [data-slot="dialog-container"] {
   --dialog-width: 540px;
@@ -2901,6 +3045,7 @@
   min-height: min(calc(100vh - 16px), 640px);
 }
 
+.pet-detail-header,
 .pet-detail-dialog [data-slot="dialog-header"] {
   display: flex;
   flex-direction: column;
@@ -2930,6 +3075,7 @@
   letter-spacing: -0.005em;
 }
 
+.store-web-dialog .pet-detail-body,
 .pet-detail-dialog [data-slot="dialog-body"] {
   flex: 1;
   min-height: 0;
@@ -2938,6 +3084,7 @@
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  overflow-y: auto;
 }
 
 .pet-detail-body {
@@ -4047,6 +4194,27 @@
   max-width: min(880px, 100%);
 }
 
+.store-web-dialog:has(.emoji-details-dialog) {
+  display: flex;
+  width: min(880px, 100%);
+  height: min(calc(100vh - 16px), 720px);
+  min-height: min(calc(100vh - 16px), 520px);
+  overflow: hidden;
+  padding: 0;
+}
+
+.store-web-dialog > .emoji-details-dialog {
+  --emoji-details-pad-x: 28px;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  max-height: 100%;
+  flex-direction: column;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
 [data-component="dialog"][data-fit]:has([data-slot="dialog-content"].emoji-details-dialog)
   [data-slot="dialog-container"] {
   --dialog-width: 880px;
@@ -4054,6 +4222,7 @@
   min-height: min(calc(100vh - 16px), 520px);
 }
 
+.emoji-details-header,
 .emoji-details-dialog [data-slot="dialog-header"] {
   display: flex;
   flex-direction: column;
@@ -4083,10 +4252,12 @@
   letter-spacing: -0.005em;
 }
 
+.store-web-dialog .emoji-details-body,
 .emoji-details-dialog [data-slot="dialog-body"].emoji-details-body {
   flex: 1;
   min-height: 0;
   padding: 24px var(--emoji-details-pad-x) 28px;
+  overflow: auto;
 }
 
 .emoji-details-body {
