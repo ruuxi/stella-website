@@ -20,16 +20,20 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Compass,
   Copy,
   Download,
   Layers,
   Package,
   Plug,
+  Plus,
   Search,
   Share2,
+  User,
   X,
 } from "lucide-react";
-import { isConvexConfigured } from "@/lib/convex-urls";
+import { getConvexToken } from "@/lib/auth-token";
+import { isConvexConfigured, readConvexSiteUrl } from "@/lib/convex-urls";
 
 type StoreCategory =
   | "apps-games"
@@ -113,6 +117,47 @@ type PublicPet = {
   downloads: number;
 };
 
+type UserPetVisibility = "public" | "unlisted" | "private";
+
+type UserPetRecord = {
+  _id: string;
+  _creationTime?: number;
+  ownerId: string;
+  petId: string;
+  displayName: string;
+  description: string;
+  tags?: string[];
+  prompt?: string;
+  spritesheetUrl: string;
+  previewUrl?: string;
+  visibility: UserPetVisibility;
+  searchText?: string;
+  authorDisplayName?: string;
+  authorHandle?: string;
+  installCount?: number;
+  createdAt: number;
+  updatedAt: number;
+};
+
+type UserPetUploadTarget = {
+  key: string;
+  publicUrl: string;
+  putUrl: string;
+  headers: Record<string, string>;
+};
+
+type UserPetUploadUrl = {
+  uploadId: string;
+  spritesheet: UserPetUploadTarget;
+  preview?: UserPetUploadTarget;
+};
+
+type MediaJobSnapshot = {
+  status?: string;
+  output?: unknown;
+  error?: { message?: string };
+};
+
 type EmojiPack = {
   _id: string;
   packId: string;
@@ -127,6 +172,8 @@ type EmojiPack = {
   authorHandle?: string;
   installCount?: number;
 };
+
+type EmojiPackVisibility = "public" | "unlisted" | "private";
 
 type FashionProfile = {
   _id: string;
@@ -289,7 +336,9 @@ type DesktopStoreBridge = {
   getPetState?: () => Promise<{
     installedPetIds: string[];
     selectedPetId: string | null;
+    petOpen?: boolean;
   }>;
+  setPetOpen?: (payload: { open: boolean }) => Promise<unknown>;
   installEmojiPack?: (payload: {
     packId: string;
     sheetUrls: string[];
@@ -304,6 +353,7 @@ type DesktopStoreBridge = {
 type PetBridgeState = {
   installedPetIds: string[];
   selectedPetId: string | null;
+  petOpen: boolean;
 };
 
 type EmojiBridgeState = {
@@ -372,6 +422,58 @@ const incrementPetDownloads = makeFunctionReference<
   null
 >("data/pets:incrementDownloads");
 
+const listMyUserPets = makeFunctionReference<
+  "query",
+  Record<string, never>,
+  UserPetRecord[]
+>("data/user_pets:listMine");
+
+const listPublicUserPets = makeFunctionReference<
+  "query",
+  {
+    paginationOpts: { numItems: number; cursor: string | null };
+    search?: string;
+  },
+  { page: UserPetRecord[]; isDone: boolean; continueCursor: string }
+>("data/user_pets:listPublicPage");
+
+const createUserPet = makeFunctionReference<
+  "mutation",
+  {
+    petId: string;
+    displayName: string;
+    description: string;
+    prompt?: string;
+    spritesheetUrl: string;
+    previewUrl?: string;
+    visibility: UserPetVisibility;
+  },
+  UserPetRecord
+>("data/user_pets:createPet");
+
+const recordUserPetInstall = makeFunctionReference<
+  "mutation",
+  { petId: string },
+  null
+>("data/user_pets:recordInstall");
+
+const createUserPetUploadUrl = makeFunctionReference<
+  "action",
+  {
+    petId: string;
+    spritesheetSha256: string;
+    previewSha256?: string;
+    contentType?: string;
+  },
+  UserPetUploadUrl
+>("data/user_pet_uploads:createUploadUrl");
+
+const getMediaJobByJobId = makeFunctionReference<
+  "query",
+  { jobId: string },
+  MediaJobSnapshot | null
+>("media_jobs:getByJobId");
+
 const listPublicEmojiPacks = makeFunctionReference<
   "query",
   {
@@ -394,6 +496,18 @@ const recordEmojiInstall = makeFunctionReference<
   { packId: string },
   null
 >("data/emoji_packs:recordInstall");
+
+const listMyEmojiPacks = makeFunctionReference<
+  "query",
+  Record<string, never>,
+  EmojiPack[]
+>("data/emoji_packs:listMine");
+
+const generateEmojiPack = makeFunctionReference<
+  "action",
+  { prompt: string; visibility: EmojiPackVisibility },
+  EmojiPack
+>("data/emoji_pack_generation:generatePack");
 
 const getFashionFeatureStatus = makeFunctionReference<
   "query",
@@ -546,6 +660,18 @@ const isPetBridgeState = (value: unknown): value is PetBridgeState => {
     record.installedPetIds.every((id) => typeof id === "string") &&
     (typeof record.selectedPetId === "string" || record.selectedPetId === null)
   );
+};
+
+const normalizePetBridgeState = (value: unknown): PetBridgeState | null => {
+  if (!isPetBridgeState(value)) return null;
+  return {
+    installedPetIds: value.installedPetIds,
+    selectedPetId: value.selectedPetId,
+    petOpen:
+      typeof (value as { petOpen?: unknown }).petOpen === "boolean"
+        ? Boolean((value as { petOpen?: unknown }).petOpen)
+        : false,
+  };
 };
 
 const isEmojiBridgeState = (value: unknown): value is EmojiBridgeState => {
@@ -820,6 +946,310 @@ function PetSprite({
     />
   );
 }
+
+type UserPetSpritesheetBlob = {
+  blob: Blob;
+  sha256: string;
+  objectUrl: string;
+  warnings: string[];
+  preview: UserPetPreviewBlob | null;
+};
+
+type UserPetPreviewBlob = {
+  blob: Blob;
+  sha256: string;
+  objectUrl: string;
+};
+
+const USER_PET_ATLAS = {
+  width: 2560,
+  height: 3240,
+  columns: 8,
+  rows: 9,
+  cellWidth: 320,
+  cellHeight: 360,
+  chroma: "#00ff00",
+} as const;
+
+const PREVIEW_STRIP = {
+  width: 640,
+  height: 90,
+} as const;
+
+const PET_GENERATION_ROWS = [
+  {
+    state: "idle",
+    intent:
+      "ambient breathing loop spread across all eight cells. Subtle chest/head movement only; no walking or waving.",
+  },
+  {
+    state: "running-right",
+    intent:
+      "facing right, scampering across all eight cells. Body and limbs in motion; no speed lines, dust, or shadows.",
+  },
+  {
+    state: "running-left",
+    intent:
+      "facing left, scampering across all eight cells, mirrored from running-right when symmetric. No speed lines, dust, or shadows.",
+  },
+  {
+    state: "waving",
+    intent:
+      "warm greeting paw wave spread across all eight cells. Convey through paw pose only; no wave marks, motion arcs, sparkles, or symbols.",
+  },
+  {
+    state: "jumping",
+    intent:
+      "vertical hop arc spread across all eight cells. Convey through body position only; no shadows, dust, landing marks, or impact bursts.",
+  },
+  {
+    state: "failed",
+    intent:
+      "dizzy, shocked, or shaken reaction across all eight cells. Attached opaque tears, stars, or smoke puffs may overlap the silhouette; no detached symbols.",
+  },
+  {
+    state: "waiting",
+    intent:
+      "polite needs-input loop across all eight cells. Looking up, tapping, or glancing; no question marks or thought bubbles.",
+  },
+  {
+    state: "success",
+    intent:
+      "happy celebratory loop across all eight cells. Use pose and face only; no confetti, sparkles, floating hearts, or detached props.",
+  },
+  {
+    state: "review",
+    intent:
+      "focused review loop across all eight cells. Lean, blink, eye direction, head tilt, or paw position; no papers, code, UI, or punctuation.",
+  },
+] as const;
+
+const buildUserPetAtlasPrompt = (description: string): string => {
+  const rowsTable = PET_GENERATION_ROWS.map(
+    (row, index) => `| ${index} | ${row.state.padEnd(13)} | ${row.intent}`,
+  ).join("\n");
+  return `# Stella pet sprite atlas - Custom Pet
+
+Generate a single ${USER_PET_ATLAS.width} x ${USER_PET_ATLAS.height} sprite sheet of the same pet performing nine animation states.
+
+## Layout
+
+- The image is exactly ${USER_PET_ATLAS.width} x ${USER_PET_ATLAS.height} pixels.
+- ${USER_PET_ATLAS.rows} rows x ${USER_PET_ATLAS.columns} columns of ${USER_PET_ATLAS.cellWidth} x ${USER_PET_ATLAS.cellHeight} cells.
+- Every row contains exactly ${USER_PET_ATLAS.columns} frames. Frames within each row read left to right.
+- Each pet silhouette fits fully inside its single cell with breathing room on all sides. No silhouette crosses into a neighboring cell.
+
+## Rows
+
+| row | state         | animation intent
+| --- | ------------- | ----------------
+${rowsTable}
+
+## Pet identity
+
+${description.trim() || "A friendly Stella mascot pet."}
+
+Identity must stay consistent across every cell: same head shape, face, markings, palette, prop, outline weight, and body proportions.
+
+## Style
+
+Small pixel-art-adjacent mascot. Chunky readable silhouette. Thick dark 1-2 px outline. Visible stepped pixel edges. Limited palette. Flat cel shading. Simple expressive face. Tiny limbs.
+
+## Background
+
+Background everywhere outside the pet silhouette is a single flat ${USER_PET_ATLAS.chroma} (true RGB, no gradient, no noise, no other green tones in the pet). The same ${USER_PET_ATLAS.chroma} fills the gutters between cells.
+
+## Forbidden
+
+- No detached effects, shadows, labels, frame numbers, captions, speech bubbles, thought bubbles, UI, code, punctuation marks, watermarks, or grid guidelines.
+- No chroma-key-adjacent colors inside the pet, prop, or any allowed attached effect.
+- No silhouette crossing into a neighboring cell. Scale the silhouette down when needed.`;
+};
+
+const getServiceAuthHeaders = async (headers: Record<string, string>) => {
+  const token =
+    (await getDesktopStoreBridge()?.getAuthToken?.().catch(() => null)) ??
+    (await getConvexToken().catch(() => null));
+  return token ? { ...headers, Authorization: `Bearer ${token}` } : headers;
+};
+
+const submitUserPetAtlasJob = async (
+  description: string,
+): Promise<{ jobId: string }> => {
+  const endpoint = new URL(
+    "/api/media/v1/generate",
+    readConvexSiteUrl(),
+  ).toString();
+  const headers = await getServiceAuthHeaders({
+    "Content-Type": "application/json",
+  });
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      capability: "text_to_image",
+      profile: "best",
+      prompt: buildUserPetAtlasPrompt(description),
+      input: {
+        image_size: {
+          width: USER_PET_ATLAS.width,
+          height: USER_PET_ATLAS.height,
+        },
+        quality: "medium",
+        output_format: "png",
+      },
+    }),
+  });
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(
+      `Generation failed (${response.status})${text ? `: ${text}` : ""}`,
+    );
+  }
+  const json = (await response.json()) as { jobId?: string };
+  if (!json.jobId) throw new Error("Generation response missing jobId");
+  return { jobId: json.jobId };
+};
+
+const extractFirstImageUrl = (output: unknown): string | null => {
+  if (!output || typeof output !== "object") return null;
+  const images = (output as { images?: Array<{ url?: string }> }).images;
+  if (!Array.isArray(images)) return null;
+  for (const entry of images) {
+    if (entry?.url) return entry.url;
+  }
+  return null;
+};
+
+const blobToWebP = (canvas: HTMLCanvasElement): Promise<Blob> =>
+  new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => (blob ? resolve(blob) : reject(new Error("toBlob returned null"))),
+      "image/webp",
+      0.92,
+    );
+  });
+
+const sha256Hex = async (blob: Blob): Promise<string> => {
+  const buffer = await blob.arrayBuffer();
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+};
+
+const keyChromaToAlpha = (imageData: ImageData): void => {
+  const pixels = imageData.data;
+  const key = { r: 0, g: 255, b: 0 };
+  for (let i = 0; i < pixels.length; i += 4) {
+    const dr = pixels[i]! - key.r;
+    const dg = pixels[i + 1]! - key.g;
+    const db = pixels[i + 2]! - key.b;
+    const dist = Math.sqrt(dr * dr + dg * dg + db * db);
+    if (dist <= 80) {
+      pixels[i + 3] = 0;
+    } else if (dist <= 130) {
+      pixels[i + 3] = Math.round(255 * ((dist - 80) / 50));
+    }
+  }
+};
+
+const buildIdlePreviewStrip = async (
+  atlasCanvas: HTMLCanvasElement,
+): Promise<UserPetPreviewBlob> => {
+  const previewCanvas = document.createElement("canvas");
+  previewCanvas.width = PREVIEW_STRIP.width;
+  previewCanvas.height = PREVIEW_STRIP.height;
+  const ctx = previewCanvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas2D unavailable for preview");
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(
+    atlasCanvas,
+    0,
+    0,
+    USER_PET_ATLAS.cellWidth * USER_PET_ATLAS.columns,
+    USER_PET_ATLAS.cellHeight,
+    0,
+    0,
+    PREVIEW_STRIP.width,
+    PREVIEW_STRIP.height,
+  );
+  const blob = await blobToWebP(previewCanvas);
+  return {
+    blob,
+    sha256: await sha256Hex(blob),
+    objectUrl: URL.createObjectURL(blob),
+  };
+};
+
+const processUserPetAtlasImage = async (
+  imageUrl: string,
+): Promise<UserPetSpritesheetBlob> => {
+  const warnings: string[] = [];
+  const response = await fetch(imageUrl);
+  if (!response.ok) throw new Error(`Image download failed (${response.status})`);
+  const bitmap = await createImageBitmap(await response.blob());
+  if (
+    bitmap.width !== USER_PET_ATLAS.width ||
+    bitmap.height !== USER_PET_ATLAS.height
+  ) {
+    warnings.push(
+      `Generated atlas was ${bitmap.width}x${bitmap.height}; resized to ${USER_PET_ATLAS.width}x${USER_PET_ATLAS.height}.`,
+    );
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = USER_PET_ATLAS.width;
+  canvas.height = USER_PET_ATLAS.height;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) throw new Error("Canvas2D unavailable");
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  keyChromaToAlpha(imageData);
+  ctx.putImageData(imageData, 0, 0);
+  const blob = await blobToWebP(canvas);
+  return {
+    blob,
+    sha256: await sha256Hex(blob),
+    objectUrl: URL.createObjectURL(blob),
+    warnings,
+    preview: await buildIdlePreviewStrip(canvas).catch(() => null),
+  };
+};
+
+const uploadUserPetSpritesheetToR2 = async (
+  blob: Blob,
+  target: UserPetUploadTarget,
+): Promise<void> => {
+  const response = await fetch(target.putUrl, {
+    method: "PUT",
+    headers: target.headers,
+    body: blob,
+  });
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(
+      `Pet upload failed (${response.status})${text ? `: ${text}` : ""}`,
+    );
+  }
+};
+
+const buildUserPetId = (): string =>
+  `pet-${Date.now().toString(36).slice(-6)}`;
+
+const userPetToPublicPet = (pet: UserPetRecord): PublicPet => ({
+  id: pet.petId,
+  displayName: pet.displayName,
+  description: pet.description,
+  kind: "custom",
+  tags: pet.tags ?? ["custom"],
+  ownerName: pet.authorDisplayName ?? null,
+  spritesheetUrl: pet.spritesheetUrl,
+  ...(pet.previewUrl ? { previewUrl: pet.previewUrl } : {}),
+  downloads: pet.installCount ?? 0,
+});
 
 function EmojiCellPreview({
   sheetUrl,
@@ -1743,6 +2173,410 @@ function ConnectTab({
   );
 }
 
+function CreatePetDialog({
+  onClose,
+  onCreated,
+}: {
+  onClose: () => void;
+  onCreated: (pet: UserPetRecord) => void;
+}) {
+  const createUploadUrl = useAction(createUserPetUploadUrl);
+  const createPet = useMutation(createUserPet);
+  const [prompt, setPrompt] = useState("");
+  const [visibility, setVisibility] = useState<UserPetVisibility>("private");
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [blob, setBlob] = useState<UserPetSpritesheetBlob | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [previewState, setPreviewState] = useState<PetAnimationState>("idle");
+  const objectUrlsRef = useRef<string[]>([]);
+  const processedJobsRef = useRef<Set<string>>(new Set());
+  const job = useQuery(getMediaJobByJobId, jobId ? { jobId } : "skip");
+
+  const revokeObjectUrls = useCallback(() => {
+    for (const url of objectUrlsRef.current) URL.revokeObjectURL(url);
+    objectUrlsRef.current = [];
+  }, []);
+
+  useEffect(() => revokeObjectUrls, [revokeObjectUrls]);
+
+  useEffect(() => {
+    if (!blob) return;
+    const id = window.setInterval(() => {
+      setPreviewState((current) => {
+        const states: PetAnimationState[] = [
+          "idle",
+          "running-right",
+          "waving",
+          "jumping",
+        ];
+        const index = states.indexOf(current);
+        return states[(index + 1) % states.length] ?? "idle";
+      });
+    }, 3500);
+    return () => window.clearInterval(id);
+  }, [blob]);
+
+  useEffect(() => {
+    if (!jobId || !job) return;
+    if (job.status === "succeeded") {
+      if (processedJobsRef.current.has(jobId)) return;
+      processedJobsRef.current.add(jobId);
+      const url = extractFirstImageUrl(job.output);
+      if (!url) {
+        Promise.resolve().then(() => {
+          setBusy(false);
+          setError("Generation finished without an image.");
+        });
+        return;
+      }
+      void (async () => {
+        try {
+          const processed = await processUserPetAtlasImage(url);
+          revokeObjectUrls();
+          objectUrlsRef.current = [processed.objectUrl];
+          if (processed.preview) objectUrlsRef.current.push(processed.preview.objectUrl);
+          setBlob(processed);
+          setBusy(false);
+          setError(null);
+        } catch (err) {
+          setBusy(false);
+          setError(
+            err instanceof Error ? err.message : "Couldn't process pet atlas.",
+          );
+        }
+      })();
+    } else if (job.status === "failed" || job.status === "canceled") {
+      Promise.resolve().then(() => {
+        setBusy(false);
+        setError(job.error?.message ?? "Generation failed.");
+      });
+    }
+  }, [job, jobId, revokeObjectUrls]);
+
+  const handleGenerate = useCallback(async () => {
+    const trimmed = prompt.trim();
+    if (!trimmed || busy) return;
+    revokeObjectUrls();
+    processedJobsRef.current = new Set();
+    setBlob(null);
+    setError(null);
+    setBusy(true);
+    try {
+      const result = await submitUserPetAtlasJob(trimmed);
+      setJobId(result.jobId);
+    } catch (err) {
+      setBusy(false);
+      setError(err instanceof Error ? err.message : "Couldn't start generation.");
+    }
+  }, [busy, prompt, revokeObjectUrls]);
+
+  const handleSave = useCallback(async () => {
+    if (!blob || saving) return;
+    const trimmed = prompt.trim() || "A custom Stella pet.";
+    setSaving(true);
+    try {
+      const petId = buildUserPetId();
+      const upload = await createUploadUrl({
+        petId,
+        spritesheetSha256: blob.sha256,
+        ...(blob.preview ? { previewSha256: blob.preview.sha256 } : {}),
+        contentType: "image/webp",
+      });
+      const uploads = [
+        uploadUserPetSpritesheetToR2(blob.blob, upload.spritesheet),
+      ];
+      if (blob.preview && upload.preview) {
+        uploads.push(uploadUserPetSpritesheetToR2(blob.preview.blob, upload.preview));
+      }
+      await Promise.all(uploads);
+      const created = await createPet({
+        petId,
+        displayName: "Stella pet",
+        description: trimmed,
+        prompt: trimmed,
+        spritesheetUrl: upload.spritesheet.publicUrl,
+        ...(upload.preview ? { previewUrl: upload.preview.publicUrl } : {}),
+        visibility,
+      });
+      onCreated(created);
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't save pet.");
+    } finally {
+      setSaving(false);
+    }
+  }, [blob, createPet, createUploadUrl, onClose, onCreated, prompt, saving, visibility]);
+
+  return (
+    <StoreModal onClose={saving ? () => undefined : onClose}>
+      <div className="user-pet-create-dialog">
+        <div className="user-pet-create-header">
+          <div className="user-pet-create-title">Create a pet</div>
+          <p className="user-pet-create-caption">
+            Describe your pet - Stella draws a full animated spritesheet and
+            names it for you.
+          </p>
+        </div>
+        <div className="user-pet-create-body">
+          <section
+            className="user-pet-create-stage"
+            data-state={blob ? "ready" : busy ? "busy" : error ? "error" : "empty"}
+          >
+            {blob ? (
+              <PetSprite
+                spritesheetUrl={blob.objectUrl}
+                state={previewState}
+                size={180}
+              />
+            ) : (
+              <div className="user-pet-create-empty">
+                <Package size={22} aria-hidden />
+                <span className="user-pet-create-empty-text">
+                  {busy
+                    ? "Drawing your pet..."
+                    : error
+                      ? error
+                      : "Your animated pet appears here"}
+                </span>
+              </div>
+            )}
+          </section>
+          {blob ? (
+            <div className="user-pet-create-state-row" aria-label="Preview state">
+              {(["idle", "running-right", "waving", "jumping"] as PetAnimationState[]).map(
+                (state) => (
+                  <button
+                    key={state}
+                    type="button"
+                    className="user-pet-create-state-pill"
+                    data-active={previewState === state || undefined}
+                    onClick={() => setPreviewState(state)}
+                  >
+                    {state.replace("-", " ")}
+                  </button>
+                ),
+              )}
+            </div>
+          ) : null}
+          {blob?.warnings.length ? (
+            <p className="user-pet-create-warning">
+              {blob.warnings.slice(0, 2).join(" ")}
+            </p>
+          ) : null}
+          <form
+            className="user-pet-create-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void handleGenerate();
+            }}
+          >
+            <label className="user-pet-create-field">
+              <span className="user-pet-create-field-label">Describe the pet</span>
+              <textarea
+                className="user-pet-create-textarea"
+                value={prompt}
+                onChange={(event) => setPrompt(event.target.value)}
+                placeholder="Tiny moon fox, sleepy desk dragon, glassy pixel jelly..."
+                rows={3}
+                maxLength={2000}
+                autoFocus
+              />
+            </label>
+            <div className="user-pet-create-field">
+              <span className="user-pet-create-field-label">Visibility</span>
+              <div className="user-pet-create-visibility">
+                {(["public", "unlisted", "private"] as UserPetVisibility[]).map(
+                  (option) => (
+                    <button
+                      type="button"
+                      key={option}
+                      className="user-pet-create-visibility-pill"
+                      data-active={visibility === option || undefined}
+                      onClick={() => setVisibility(option)}
+                      disabled={saving}
+                    >
+                      <span className="user-pet-create-visibility-title">
+                        {option[0]!.toUpperCase() + option.slice(1)}
+                      </span>
+                      <span className="user-pet-create-visibility-sub">
+                        {option === "public"
+                          ? "Listed on the Store"
+                          : option === "unlisted"
+                            ? "Anyone with the link"
+                            : "Only you"}
+                      </span>
+                    </button>
+                  ),
+                )}
+              </div>
+            </div>
+            <div className="user-pet-create-actions">
+              <button
+                type="button"
+                className="store-action-btn user-pet-create-discard"
+                data-variant="subtle"
+                onClick={onClose}
+                disabled={saving}
+              >
+                Discard
+              </button>
+              <button
+                type="submit"
+                className="store-action-btn store-action-btn--lg"
+                data-variant={busy ? "working" : "get"}
+                disabled={busy || prompt.trim().length === 0}
+              >
+                {busy ? "Generating..." : blob ? "Regenerate" : "Generate"}
+              </button>
+              <button
+                type="button"
+                className="store-action-btn store-action-btn--lg"
+                data-variant={saving ? "working" : "get"}
+                disabled={!blob || saving}
+                onClick={() => void handleSave()}
+              >
+                {saving ? "Saving..." : "Save pet"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </StoreModal>
+  );
+}
+
+function CreateEmojiPackDialog({
+  onClose,
+  onCreated,
+}: {
+  onClose: () => void;
+  onCreated: (pack: EmojiPack) => void;
+}) {
+  const generatePack = useAction(generateEmojiPack);
+  const [prompt, setPrompt] = useState("");
+  const [visibility, setVisibility] = useState<EmojiPackVisibility>("private");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = useCallback(async () => {
+    const trimmed = prompt.trim();
+    if (!trimmed || submitting) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const created = await generatePack({ prompt: trimmed, visibility });
+      onCreated(created);
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't create pack.");
+    } finally {
+      setSubmitting(false);
+    }
+  }, [generatePack, onClose, onCreated, prompt, submitting, visibility]);
+
+  return (
+    <StoreModal onClose={submitting ? () => undefined : onClose}>
+      <div className="emoji-create-dialog">
+        <div className="emoji-create-header">
+          <div className="emoji-create-title">Create emoji pack</div>
+          <p className="emoji-create-caption">
+            Describe the vibe - Stella paints custom emojis across sheets and
+            names the pack for you.
+          </p>
+        </div>
+        <div className="emoji-create-body">
+          <section className="emoji-create-stage" aria-label="Generated emoji preview">
+            <div
+              className="emoji-create-empty"
+              data-state={submitting ? "busy" : error ? "error" : "empty"}
+            >
+              <Package size={22} aria-hidden />
+              <span className="emoji-create-empty-text">
+                {submitting
+                  ? "Painting your pack..."
+                  : error
+                    ? error
+                    : "Stella's emojis appear after save"}
+              </span>
+            </div>
+          </section>
+          <form
+            className="emoji-create-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void handleSubmit();
+            }}
+          >
+            <label className="emoji-create-field">
+              <span className="emoji-create-field-label">
+                How should the pack feel?
+              </span>
+              <textarea
+                className="emoji-create-textarea"
+                value={prompt}
+                onChange={(event) => setPrompt(event.target.value)}
+                placeholder="Neon synthwave, soft pastel, claymation..."
+                rows={3}
+                maxLength={2000}
+                autoFocus
+              />
+            </label>
+            <div className="emoji-create-field">
+              <span className="emoji-create-field-label">Visibility</span>
+              <div className="emoji-create-visibility">
+                {(["public", "unlisted", "private"] as EmojiPackVisibility[]).map(
+                  (option) => (
+                    <button
+                      type="button"
+                      key={option}
+                      className="emoji-create-visibility-pill"
+                      data-active={visibility === option || undefined}
+                      onClick={() => setVisibility(option)}
+                      disabled={submitting}
+                    >
+                      <span className="emoji-create-visibility-title">
+                        {option[0]!.toUpperCase() + option.slice(1)}
+                      </span>
+                      <span className="emoji-create-visibility-sub">
+                        {option === "public"
+                          ? "Listed on the Store"
+                          : option === "unlisted"
+                            ? "Anyone with the link"
+                            : "Only you"}
+                      </span>
+                    </button>
+                  ),
+                )}
+              </div>
+            </div>
+            <div className="emoji-create-actions">
+              <button
+                type="button"
+                className="store-action-btn emoji-create-discard"
+                data-variant="subtle"
+                onClick={onClose}
+                disabled={submitting}
+              >
+                Discard
+              </button>
+              <button
+                type="submit"
+                className="store-action-btn store-action-btn--lg"
+                data-variant={submitting ? "working" : "get"}
+                disabled={submitting || prompt.trim().length === 0}
+              >
+                {submitting ? "Saving..." : "Save pack"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </StoreModal>
+  );
+}
+
 function PetDetailsDialog({
   pet,
   installed,
@@ -1870,15 +2704,109 @@ function PetDetailsDialog({
   );
 }
 
+function PetCard({
+  pet,
+  installed,
+  selected,
+  working,
+  onOpen,
+  onGet,
+  onSelect,
+  onRemove,
+}: {
+  pet: PublicPet;
+  installed: boolean;
+  selected: boolean;
+  working: boolean;
+  onOpen: () => void;
+  onGet: () => void;
+  onSelect: () => Promise<void> | void;
+  onRemove: () => Promise<void> | void;
+}) {
+  return (
+    <article
+      className="pets-card pets-card-wrapper"
+      data-selected={selected ? "true" : "false"}
+      data-pet-state={selected ? "selected" : installed ? "installed" : "uninstalled"}
+      onClick={onOpen}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onOpen();
+        }
+      }}
+    >
+      <div className="pets-card-sprite">
+        <PetSprite spritesheetUrl={pet.spritesheetUrl} state="idle" size={84} />
+      </div>
+      <div className="pets-card-name-row">
+        <span className="pets-card-name">{pet.displayName}</span>
+      </div>
+      <div className="pets-card-meta">
+        <span className="pets-card-creator">by {pet.ownerName || "Stella"}</span>
+        <span
+          className="pets-card-downloads"
+          title={`${pet.downloads.toLocaleString()} selections`}
+        >
+          <Download size={11} aria-hidden="true" />
+          {formatDownloads(pet.downloads)}
+        </span>
+      </div>
+      <div
+        className="pets-card-actions"
+        onClick={(event) => event.stopPropagation()}
+      >
+        {!installed ? (
+          <button
+            className="store-action-btn"
+            data-variant={working ? "working" : "get"}
+            disabled={working}
+            onClick={onGet}
+            type="button"
+          >
+            {working ? "Getting..." : "Get"}
+          </button>
+        ) : (
+          <>
+            <button
+              className="store-action-btn"
+              data-variant={selected ? "added" : working ? "working" : "get"}
+              disabled={selected || working}
+              onClick={() => void onSelect()}
+              type="button"
+            >
+              {selected ? "Selected" : working ? "Selecting..." : "Select"}
+            </button>
+            <button
+              className="store-action-btn"
+              data-variant={working ? "working" : "remove"}
+              disabled={working}
+              onClick={() => void onRemove()}
+              type="button"
+            >
+              {working ? "Removing..." : "Remove"}
+            </button>
+          </>
+        )}
+      </div>
+    </article>
+  );
+}
+
 function PetsTab() {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string>(ALL_TAG);
   const [sort, setSort] = useState<PetSort>("downloads");
+  const [viewMode, setViewMode] = useState<"discover" | "mine">("discover");
+  const [createOpen, setCreateOpen] = useState(false);
   const [detailsPet, setDetailsPet] = useState<PublicPet | null>(null);
   const [petState, setPetState] = useState<PetBridgeState>({
     installedPetIds: [],
     selectedPetId: null,
+    petOpen: false,
   });
   const [workingPetId, setWorkingPetId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -1901,8 +2829,23 @@ function PetsTab() {
     status: "LoadingFirstPage" | "CanLoadMore" | "LoadingMore" | "Exhausted";
     loadMore: (numItems: number) => void;
   };
+  const {
+    results: publicUserPets,
+    status: publicUserPetStatus,
+    loadMore: loadMorePublicUserPets,
+  } = usePaginatedQuery(
+    listPublicUserPets,
+    trimmedSearch ? { search: trimmedSearch } : {},
+    { initialNumItems: PAGE_SIZE },
+  ) as {
+    results: UserPetRecord[];
+    status: "LoadingFirstPage" | "CanLoadMore" | "LoadingMore" | "Exhausted";
+    loadMore: (numItems: number) => void;
+  };
+  const myUserPets = useQuery(listMyUserPets, {});
   const tagFacets = useQuery(listPetTagFacets, {});
   const incrementDownloads = useMutation(incrementPetDownloads);
+  const recordUserInstall = useMutation(recordUserPetInstall);
   const installedPetIds = useMemo(
     () => new Set(petState.installedPetIds),
     [petState.installedPetIds],
@@ -1910,9 +2853,47 @@ function PetsTab() {
   const canLoadMore = status === "CanLoadMore";
   const isLoadingMore = status === "LoadingMore";
   const isLoadingFirstPage = status === "LoadingFirstPage";
+  const canLoadMoreUserPets = publicUserPetStatus === "CanLoadMore";
+  const isLoadingMoreUserPets = publicUserPetStatus === "LoadingMore";
   const tagOptions = useMemo(() => (tagFacets ?? []).map((facet) => facet.tag), [
     tagFacets,
   ]);
+  const ownedUserPetIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const pet of myUserPets ?? []) ids.add(pet.petId);
+    return ids;
+  }, [myUserPets]);
+  const userPetIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const pet of publicUserPets) ids.add(pet.petId);
+    for (const pet of myUserPets ?? []) ids.add(pet.petId);
+    return ids;
+  }, [myUserPets, publicUserPets]);
+  const publicUserPetCards = useMemo(
+    () =>
+      publicUserPets
+        .filter((pet) => !ownedUserPetIds.has(pet.petId))
+        .map(userPetToPublicPet),
+    [ownedUserPetIds, publicUserPets],
+  );
+  const discoverPets = useMemo(() => {
+    const seen = new Set(pets.map((pet) => pet.id));
+    return [
+      ...pets,
+      ...publicUserPetCards.filter((pet) => {
+        if (seen.has(pet.id)) return false;
+        if (activeTag !== ALL_TAG && !pet.tags.includes(activeTag)) return false;
+        return true;
+      }),
+    ];
+  }, [activeTag, pets, publicUserPetCards]);
+  const myPetCards = useMemo(
+    () => (myUserPets ?? []).map(userPetToPublicPet),
+    [myUserPets],
+  );
+  const visiblePets = viewMode === "mine" ? myPetCards : discoverPets;
+  const visibleCountSuffix =
+    viewMode === "discover" && (canLoadMore || canLoadMoreUserPets) ? "+" : "";
 
   useEffect(() => {
     const handle = window.setTimeout(() => {
@@ -1927,7 +2908,8 @@ function PetsTab() {
     if (!request) return;
     void request
       .then((state) => {
-        if (isPetBridgeState(state)) setPetState(state);
+        const next = normalizePetBridgeState(state);
+        if (next) setPetState(next);
       })
       .catch((error) => {
         console.error("Failed to read pet state", error);
@@ -1950,8 +2932,32 @@ function PetsTab() {
     return () => observer.disconnect();
   }, [canLoadMore, loadMore]);
 
+  useEffect(() => {
+    if (!canLoadMoreUserPets) return;
+    const node = sentinelRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          loadMorePublicUserPets(PAGE_SIZE);
+        }
+      },
+      { rootMargin: "600px 0px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [canLoadMoreUserPets, loadMorePublicUserPets]);
+
   const applyPetStateResult = (result: unknown, fallback: PetBridgeState) => {
-    setPetState(isPetBridgeState(result) ? result : fallback);
+    setPetState(normalizePetBridgeState(result) ?? fallback);
+  };
+
+  const recordOneInstall = async (petId: string) => {
+    if (userPetIds.has(petId)) {
+      await recordUserInstall({ petId });
+    } else {
+      await incrementDownloads({ id: petId });
+    }
   };
 
   const installPet = async (pet: PublicPet) => {
@@ -1967,8 +2973,9 @@ function PetsTab() {
       applyPetStateResult(result, {
         installedPetIds: Array.from(new Set([...petState.installedPetIds, pet.id])),
         selectedPetId: pet.id,
+        petOpen: true,
       });
-      void incrementDownloads({ id: pet.id }).catch((error) => {
+      void recordOneInstall(pet.id).catch((error) => {
         console.error("Failed to record pet download", error);
       });
     } catch (error) {
@@ -1991,6 +2998,7 @@ function PetsTab() {
       applyPetStateResult(result, {
         installedPetIds: petState.installedPetIds,
         selectedPetId: petId,
+        petOpen: true,
       });
     } catch (error) {
       setActionError(error instanceof Error ? error.message : "Couldn't select pet");
@@ -2009,6 +3017,7 @@ function PetsTab() {
       applyPetStateResult(result, {
         installedPetIds: petState.installedPetIds.filter((id) => id !== petId),
         selectedPetId: petState.selectedPetId === petId ? null : petState.selectedPetId,
+        petOpen: petState.petOpen,
       });
     } catch (error) {
       setActionError(error instanceof Error ? error.message : "Couldn't remove pet");
@@ -2017,14 +3026,37 @@ function PetsTab() {
     }
   };
 
+  const setPetOpen = async (open: boolean) => {
+    const bridge = getDesktopStoreBridge();
+    if (!bridge?.setPetOpen) return;
+    setActionError(null);
+    try {
+      const result = await bridge.setPetOpen({ open });
+      applyPetStateResult(result, {
+        ...petState,
+        petOpen: open,
+      });
+    } catch (error) {
+      setActionError(
+        error instanceof Error ? error.message : "Couldn't update pet visibility",
+      );
+    }
+  };
+
+  const handleCreatedPet = (pet: UserPetRecord) => {
+    setCreateOpen(false);
+    const publicPet = userPetToPublicPet(pet);
+    void installPet(publicPet);
+  };
+
   return (
     <main className="pets-page">
       <header className="pets-page-header">
         <div className="pets-page-heading">
           <h1 className="pets-page-title">Pets</h1>
           <span className="pets-page-count">
-            {pets.length}
-            {canLoadMore ? "+" : ""} loaded
+            {visiblePets.length}
+            {visibleCountSuffix} loaded
           </span>
         </div>
         <p className="pets-page-subtitle">
@@ -2058,149 +3090,152 @@ function PetsTab() {
             ))}
           </select>
         </label>
-      </div>
-      <div className="pets-tags" role="tablist" aria-label="Filter by tag">
-        <button
-          type="button"
-          role="tab"
-          className="pets-tag-pill"
-          data-active={activeTag === ALL_TAG ? "true" : "false"}
-          aria-selected={activeTag === ALL_TAG}
-          onClick={() => setActiveTag(ALL_TAG)}
-        >
-          All
-        </button>
-        {tagOptions.map((tag) => (
+        <div className="pets-toolbar-actions">
           <button
-            key={tag}
+            type="button"
+            className="store-action-btn store-action-btn--lg"
+            data-variant="subtle"
+            onClick={() =>
+              setViewMode((current) => (current === "mine" ? "discover" : "mine"))
+            }
+          >
+            {viewMode === "mine" ? (
+              <>
+                <Compass size={14} aria-hidden />
+                Discover
+              </>
+            ) : (
+              <>
+                <User size={14} aria-hidden />
+                My pets
+              </>
+            )}
+          </button>
+          <button
+            type="button"
+            className="store-action-btn store-action-btn--lg"
+            data-variant="get"
+            onClick={() => setCreateOpen(true)}
+          >
+            <Plus size={14} aria-hidden />
+            Create pet
+          </button>
+          <button
+            type="button"
+            className="store-action-btn store-action-btn--lg"
+            data-variant={petState.petOpen ? "subtle" : "get"}
+            onClick={() => void setPetOpen(!petState.petOpen)}
+          >
+            {petState.petOpen ? "Hide pet" : "Show pet"}
+          </button>
+        </div>
+      </div>
+      {viewMode === "discover" ? (
+        <div className="pets-tags" role="tablist" aria-label="Filter by tag">
+          <button
             type="button"
             role="tab"
             className="pets-tag-pill"
-            data-active={activeTag === tag ? "true" : "false"}
-            aria-selected={activeTag === tag}
-            onClick={() => setActiveTag(tag)}
+            data-active={activeTag === ALL_TAG ? "true" : "false"}
+            aria-selected={activeTag === ALL_TAG}
+            onClick={() => setActiveTag(ALL_TAG)}
           >
-            {tag}
+            All
           </button>
-        ))}
-      </div>
+          {tagOptions.map((tag) => (
+            <button
+              key={tag}
+              type="button"
+              role="tab"
+              className="pets-tag-pill"
+              data-active={activeTag === tag ? "true" : "false"}
+              aria-selected={activeTag === tag}
+              onClick={() => setActiveTag(tag)}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      ) : null}
       {actionError ? (
         <div className="store-status" data-variant="error">
           {actionError}
         </div>
       ) : null}
-      {isLoadingFirstPage ? (
+      {viewMode === "discover" && myUserPets && myUserPets.length > 0 ? (
+        <section className="pets-your-section">
+          <div className="pets-your-header">
+            <span className="pets-your-title">Your pets</span>
+            <span className="pets-your-count">{myUserPets.length}</span>
+          </div>
+          <div className="pets-grid">
+            {myPetCards.map((pet) => {
+              const selected = petState.selectedPetId === pet.id;
+              const working = workingPetId === pet.id;
+              return (
+                <PetCard
+                  key={`mine-${pet.id}`}
+                  pet={pet}
+                  installed
+                  selected={selected}
+                  working={working}
+                  onOpen={() => setDetailsPet(pet)}
+                  onGet={() => installPet(pet)}
+                  onSelect={() => selectPet(pet.id)}
+                  onRemove={() => removePet(pet.id)}
+                />
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+      {isLoadingFirstPage && viewMode === "discover" ? (
         <div className="store-grid">
           {Array.from({ length: 8 }).map((_, index) => (
             <div className="store-skeleton-card" key={index} />
           ))}
         </div>
-      ) : pets.length === 0 ? (
+      ) : viewMode === "mine" && myUserPets === undefined ? (
+        <div className="pets-empty">Loading...</div>
+      ) : visiblePets.length === 0 ? (
         <div className="pets-empty">
-          No pets match that filter. Try a different tag or clear the search.
+          {viewMode === "mine"
+            ? "You haven't created any pets yet."
+            : "No pets match that filter. Try a different tag or clear the search."}
         </div>
       ) : (
         <>
           <div className="pets-grid">
-            {pets.map((pet) => {
+            {visiblePets.map((pet) => {
               const installed = installedPetIds.has(pet.id);
               const selected = petState.selectedPetId === pet.id;
               const working = workingPetId === pet.id;
               return (
-                <article
-                  className="pets-card pets-card-wrapper"
-                  data-selected={selected ? "true" : "false"}
-                  data-pet-state={
-                    selected ? "selected" : installed ? "installed" : "uninstalled"
-                  }
+                <PetCard
                   key={pet.id}
-                  onClick={() => setDetailsPet(pet)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault();
-                      setDetailsPet(pet);
-                    }
-                  }}
-                >
-                  <div className="pets-card-sprite">
-                    <PetSprite
-                      spritesheetUrl={pet.spritesheetUrl}
-                      state="idle"
-                      size={84}
-                    />
-                  </div>
-                  <div className="pets-card-name-row">
-                    <span className="pets-card-name">{pet.displayName}</span>
-                  </div>
-                  <div className="pets-card-meta">
-                    <span className="pets-card-creator">
-                      by {pet.ownerName || "Stella"}
-                    </span>
-                    <span
-                      className="pets-card-downloads"
-                      title={`${pet.downloads.toLocaleString()} selections`}
-                    >
-                      <Download size={11} aria-hidden="true" />
-                      {formatDownloads(pet.downloads)}
-                    </span>
-                  </div>
-                  <div
-                    className="pets-card-actions"
-                    onClick={(event) => event.stopPropagation()}
-                  >
-                    {!installed ? (
-                      <button
-                        className="store-action-btn"
-                        data-variant={working ? "working" : "get"}
-                        disabled={working}
-                        onClick={() => setDetailsPet(pet)}
-                        type="button"
-                      >
-                        {working ? "Getting..." : "Get"}
-                      </button>
-                    ) : (
-                      <>
-                        <button
-                          className="store-action-btn"
-                          data-variant={
-                            selected ? "added" : working ? "working" : "get"
-                          }
-                          disabled={selected || working}
-                          onClick={() => void selectPet(pet.id)}
-                          type="button"
-                        >
-                          {selected
-                            ? "Selected"
-                            : working
-                              ? "Selecting..."
-                              : "Select"}
-                        </button>
-                        <button
-                          className="store-action-btn"
-                          data-variant={working ? "working" : "remove"}
-                          disabled={working}
-                          onClick={() => void removePet(pet.id)}
-                          type="button"
-                        >
-                          {working ? "Removing..." : "Remove"}
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </article>
+                  pet={pet}
+                  installed={installed}
+                  selected={selected}
+                  working={working}
+                  onOpen={() => setDetailsPet(pet)}
+                  onGet={() => setDetailsPet(pet)}
+                  onSelect={() => selectPet(pet.id)}
+                  onRemove={() => removePet(pet.id)}
+                />
               );
             })}
           </div>
-          {canLoadMore || isLoadingMore ? (
+          {viewMode === "discover" &&
+          (canLoadMore || isLoadingMore || canLoadMoreUserPets || isLoadingMoreUserPets) ? (
             <div
               ref={sentinelRef}
               className="pets-grid-sentinel"
-              data-loading={isLoadingMore ? "true" : "false"}
+              data-loading={
+                isLoadingMore || isLoadingMoreUserPets ? "true" : "false"
+              }
               aria-hidden="true"
             >
-              {isLoadingMore ? "Loading more..." : ""}
+              {isLoadingMore || isLoadingMoreUserPets ? "Loading more..." : ""}
             </div>
           ) : null}
         </>
@@ -2218,7 +3253,77 @@ function PetsTab() {
           onClose={() => setDetailsPet(null)}
         />
       ) : null}
+      {createOpen ? (
+        <CreatePetDialog
+          onClose={() => setCreateOpen(false)}
+          onCreated={handleCreatedPet}
+        />
+      ) : null}
     </main>
+  );
+}
+
+function EmojiPackCard({
+  pack,
+  active,
+  onOpen,
+}: {
+  pack: EmojiPack;
+  active: boolean;
+  onOpen: () => void;
+}) {
+  return (
+    <article className="emoji-pack-card" data-active={active || undefined}>
+      <button
+        type="button"
+        className="emoji-pack-cover"
+        aria-label={`Open ${pack.displayName}`}
+        onClick={onOpen}
+      >
+        {pack.coverUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img alt="" className="emoji-pack-cover-img" src={pack.coverUrl} />
+        ) : (
+          <span className="emoji-pack-cover-glyph" aria-hidden>
+            {pack.coverEmoji}
+          </span>
+        )}
+      </button>
+      <div className="emoji-pack-body">
+        <div className="emoji-pack-name-row">
+          <span className="emoji-pack-name">{pack.displayName}</span>
+          {pack.visibility && pack.visibility !== "public" ? (
+            <span
+              className="emoji-pack-visibility-badge"
+              data-tier={pack.visibility}
+            >
+              {pack.visibility === "private" ? "Private" : "Unlisted"}
+            </span>
+          ) : null}
+        </div>
+        {pack.description ? (
+          <span className="emoji-pack-desc">{pack.description}</span>
+        ) : null}
+        <div className="emoji-pack-meta">
+          <span className="emoji-pack-author">
+            by {pack.authorDisplayName || pack.authorHandle || "Stella"}
+          </span>
+          <span className="emoji-pack-installs">
+            {formatEmojiUseCount(pack.installCount)}
+          </span>
+        </div>
+      </div>
+      <div className="emoji-pack-actions">
+        <button
+          className="store-action-btn"
+          data-variant={active ? "added" : "get"}
+          onClick={onOpen}
+          type="button"
+        >
+          {active ? "Active" : "Get"}
+        </button>
+      </div>
+    </article>
   );
 }
 
@@ -2227,6 +3332,8 @@ function EmojisTab() {
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string>(ALL_TAG);
   const [sort, setSort] = useState<EmojiPackSort>("installs");
+  const [viewMode, setViewMode] = useState<"discover" | "mine">("discover");
+  const [createOpen, setCreateOpen] = useState(false);
   const [detailsPack, setDetailsPack] = useState<EmojiPack | null>(null);
   const [previewSheet, setPreviewSheet] = useState(0);
   const [emojiState, setEmojiState] = useState<EmojiBridgeState>({
@@ -2254,6 +3361,7 @@ function EmojisTab() {
     loadMore: (numItems: number) => void;
   };
   const tagFacets = useQuery(listEmojiPackTagFacets, {});
+  const myPacks = useQuery(listMyEmojiPacks, {});
   const recordInstall = useMutation(recordEmojiInstall);
   const activePackId = emojiState.activePack?.packId ?? null;
   const canLoadMore = status === "CanLoadMore";
@@ -2262,6 +3370,16 @@ function EmojisTab() {
   const tagOptions = useMemo(() => (tagFacets ?? []).map((facet) => facet.tag), [
     tagFacets,
   ]);
+  const ownedPackIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const pack of myPacks ?? []) ids.add(pack.packId);
+    return ids;
+  }, [myPacks]);
+  const visiblePublicPacks = useMemo(
+    () => packs.filter((pack) => !ownedPackIds.has(pack.packId)),
+    [ownedPackIds, packs],
+  );
+  const visiblePacks = viewMode === "mine" ? (myPacks ?? []) : visiblePublicPacks;
 
   useEffect(() => {
     const bridge = getDesktopStoreBridge();
@@ -2350,6 +3468,11 @@ function EmojisTab() {
     }
   };
 
+  const handleCreatedPack = (pack: EmojiPack) => {
+    setCreateOpen(false);
+    void installEmojiPack(pack);
+  };
+
   return (
     <main className="emoji-page">
       <header className="emoji-page-header">
@@ -2400,130 +3523,142 @@ function EmojisTab() {
             ))}
           </select>
         </label>
-      </div>
-      <div
-        className="emoji-page-tags"
-        role="tablist"
-        aria-label="Filter emoji packs by tag"
-      >
-        <button
-          type="button"
-          role="tab"
-          className="emoji-page-tag-pill"
-          data-active={activeTag === ALL_TAG ? "true" : "false"}
-          aria-selected={activeTag === ALL_TAG}
-          onClick={() => setActiveTag(ALL_TAG)}
-        >
-          All
-        </button>
-        {tagOptions.map((tag) => (
+        <div className="emoji-page-toolbar-actions">
           <button
-            key={tag}
+            type="button"
+            className="store-action-btn store-action-btn--lg"
+            data-variant="subtle"
+            onClick={() =>
+              setViewMode((current) => (current === "mine" ? "discover" : "mine"))
+            }
+          >
+            {viewMode === "mine" ? (
+              <>
+                <Compass size={14} aria-hidden />
+                Discover
+              </>
+            ) : (
+              <>
+                <User size={14} aria-hidden />
+                My emojis
+              </>
+            )}
+          </button>
+          <button
+            type="button"
+            className="store-action-btn store-action-btn--lg"
+            data-variant="get"
+            onClick={() => setCreateOpen(true)}
+          >
+            <Plus size={14} aria-hidden />
+            Create pack
+          </button>
+        </div>
+      </div>
+      {viewMode === "discover" ? (
+        <div
+          className="emoji-page-tags"
+          role="tablist"
+          aria-label="Filter emoji packs by tag"
+        >
+          <button
             type="button"
             role="tab"
             className="emoji-page-tag-pill"
-            data-active={activeTag === tag ? "true" : "false"}
-            aria-selected={activeTag === tag}
-            onClick={() => setActiveTag(tag)}
+            data-active={activeTag === ALL_TAG ? "true" : "false"}
+            aria-selected={activeTag === ALL_TAG}
+            onClick={() => setActiveTag(ALL_TAG)}
           >
-            {tag}
+            All
           </button>
-        ))}
-      </div>
+          {tagOptions.map((tag) => (
+            <button
+              key={tag}
+              type="button"
+              role="tab"
+              className="emoji-page-tag-pill"
+              data-active={activeTag === tag ? "true" : "false"}
+              aria-selected={activeTag === tag}
+              onClick={() => setActiveTag(tag)}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      ) : null}
       {actionError ? (
         <div className="store-status" data-variant="error">
           {actionError}
         </div>
       ) : null}
-      {isLoadingFirstPage ? (
+      {viewMode === "discover" && myPacks && myPacks.length > 0 ? (
+        <section className="emoji-page-section">
+          <div className="emoji-page-section-header">
+            <span className="emoji-page-section-title">Your packs</span>
+            <span className="emoji-page-section-count">{myPacks.length}</span>
+          </div>
+          <div className="emoji-pack-grid">
+            {myPacks.map((pack) => {
+              const active = activePackId === pack.packId;
+              return (
+                <EmojiPackCard
+                  key={`mine-${pack.packId}`}
+                  pack={pack}
+                  active={active}
+                  onOpen={() => {
+                    setPreviewSheet(0);
+                    setDetailsPack(pack);
+                  }}
+                />
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+      {isLoadingFirstPage && viewMode === "discover" ? (
         <div className="emoji-pack-grid">
           {Array.from({ length: 8 }).map((_, index) => (
             <div className="store-skeleton-card" key={index} />
           ))}
         </div>
-      ) : packs.length === 0 ? (
+      ) : viewMode === "mine" && myPacks === undefined ? (
+        <div className="emoji-page-empty">Loading...</div>
+      ) : visiblePacks.length === 0 ? (
         <div className="emoji-page-empty">
-          {trimmedSearch
-            ? "No packs match that search."
-            : "No community packs yet."}
+          {viewMode === "mine"
+            ? "You haven't created any emoji packs yet."
+            : trimmedSearch
+              ? "No packs match that search."
+              : "No community packs yet."}
         </div>
       ) : (
         <section className="emoji-page-section">
           <div className="emoji-page-section-header">
-            <span className="emoji-page-section-title">Discover</span>
+            <span className="emoji-page-section-title">
+              {viewMode === "mine" ? "My emojis" : "Discover"}
+            </span>
             <span className="emoji-page-section-count">
-              {packs.length}
-              {canLoadMore ? "+" : ""}
+              {visiblePacks.length}
+              {viewMode === "discover" && canLoadMore ? "+" : ""}
             </span>
           </div>
           <div className="emoji-pack-grid">
-            {packs.map((pack) => {
+            {visiblePacks.map((pack) => {
               const active = activePackId === pack.packId;
               return (
-                <article
-                  className="emoji-pack-card"
-                  data-active={active || undefined}
+                <EmojiPackCard
                   key={pack._id}
-                >
-                  <button
-                    type="button"
-                    className="emoji-pack-cover"
-                    aria-label={`Open ${pack.displayName}`}
-                    onClick={() => {
-                      setPreviewSheet(0);
-                      setDetailsPack(pack);
-                    }}
-                  >
-                    {pack.coverUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        alt=""
-                        className="emoji-pack-cover-img"
-                        src={pack.coverUrl}
-                      />
-                    ) : (
-                      <span className="emoji-pack-cover-glyph" aria-hidden>
-                        {pack.coverEmoji}
-                      </span>
-                    )}
-                  </button>
-                  <div className="emoji-pack-body">
-                    <div className="emoji-pack-name-row">
-                      <span className="emoji-pack-name">{pack.displayName}</span>
-                    </div>
-                    {pack.description ? (
-                      <span className="emoji-pack-desc">{pack.description}</span>
-                    ) : null}
-                    <div className="emoji-pack-meta">
-                      <span className="emoji-pack-author">
-                        by{" "}
-                        {pack.authorDisplayName ||
-                          pack.authorHandle ||
-                          "Stella"}
-                      </span>
-                      <span className="emoji-pack-installs">
-                        {formatEmojiUseCount(pack.installCount)}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="emoji-pack-actions">
-                    <button
-                      className="store-action-btn"
-                      data-variant={active ? "added" : "get"}
-                      onClick={() => {
-                        setPreviewSheet(0);
-                        setDetailsPack(pack);
-                      }}
-                      type="button"
-                    >
-                      {active ? "Active" : "Get"}
-                    </button>
-                  </div>
-                </article>
+                  pack={pack}
+                  active={active}
+                  onOpen={() => {
+                    setPreviewSheet(0);
+                    setDetailsPack(pack);
+                  }}
+                />
               );
             })}
           </div>
-          {canLoadMore || isLoadingMore ? (
+          {viewMode === "discover" && (canLoadMore || isLoadingMore) ? (
             <div
               ref={sentinelRef}
               className="emoji-page-sentinel"
@@ -2646,6 +3781,12 @@ function EmojisTab() {
             </div>
           </div>
         </StoreModal>
+      ) : null}
+      {createOpen ? (
+        <CreateEmojiPackDialog
+          onClose={() => setCreateOpen(false)}
+          onCreated={handleCreatedPack}
+        />
       ) : null}
     </main>
   );

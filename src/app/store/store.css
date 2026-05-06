@@ -3195,6 +3195,26 @@ body:has(.store-root) {
   max-height: 100%;
 }
 
+.store-web-dialog:has(.user-pet-create-dialog) {
+  display: flex;
+  width: min(540px, 100%);
+  height: min(calc(100vh - 16px), 720px);
+  min-height: min(calc(100vh - 16px), 640px);
+  overflow: hidden;
+  padding: 0;
+}
+
+.store-web-dialog > .user-pet-create-dialog {
+  --pet-create-pad-x: 28px;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
 [data-component="dialog"][data-fit]:has([data-slot="dialog-content"].user-pet-create-dialog)
   [data-slot="dialog-container"] {
   --dialog-width: 540px;
@@ -3202,6 +3222,7 @@ body:has(.store-root) {
   min-height: min(calc(100vh - 16px), 640px);
 }
 
+.user-pet-create-header,
 .user-pet-create-dialog [data-slot="dialog-header"] {
   display: flex;
   flex-direction: column;
@@ -3232,6 +3253,7 @@ body:has(.store-root) {
   max-width: 420px;
 }
 
+.store-web-dialog .user-pet-create-body,
 .user-pet-create-dialog [data-slot="dialog-body"] {
   flex: 1;
   min-height: 0;
@@ -3862,6 +3884,26 @@ body:has(.store-root) {
   max-height: 100%;
 }
 
+.store-web-dialog:has(.emoji-create-dialog) {
+  display: flex;
+  width: min(540px, 100%);
+  height: min(calc(100vh - 16px), 760px);
+  min-height: min(calc(100vh - 16px), 660px);
+  overflow: hidden;
+  padding: 0;
+}
+
+.store-web-dialog > .emoji-create-dialog {
+  --emoji-create-pad-x: 28px;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
 [data-component="dialog"][data-fit]:has([data-slot="dialog-content"].emoji-create-dialog)
   [data-slot="dialog-container"] {
   --dialog-width: 540px;
@@ -3869,6 +3911,7 @@ body:has(.store-root) {
   min-height: min(calc(100vh - 16px), 660px);
 }
 
+.emoji-create-header,
 .emoji-create-dialog [data-slot="dialog-header"] {
   display: flex;
   flex-direction: column;
@@ -3899,6 +3942,7 @@ body:has(.store-root) {
   max-width: 440px;
 }
 
+.store-web-dialog .emoji-create-body,
 .emoji-create-dialog [data-slot="dialog-body"] {
   flex: 1;
   min-height: 0;
