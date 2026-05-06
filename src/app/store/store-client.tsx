@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
-import { Check, Download, Search, Upload } from "lucide-react";
+import { Check, Download, Search, Upload, Sparkles } from "lucide-react";
 import { isConvexConfigured } from "@/lib/convex-urls";
 
 type StoreCategory =
@@ -40,6 +40,30 @@ type StoreInstall = {
   packageId: string;
   displayName?: string;
   installedAt?: number;
+};
+
+type PublicPet = {
+  id: string;
+  displayName: string;
+  description: string;
+  kind: string;
+  tags: string[];
+  ownerName: string | null;
+  spritesheetUrl: string;
+  previewUrl?: string;
+  downloads: number;
+};
+
+type EmojiPack = {
+  _id: string;
+  packId: string;
+  displayName: string;
+  description?: string;
+  coverEmoji: string;
+  coverUrl?: string;
+  authorDisplayName?: string;
+  authorHandle?: string;
+  installCount?: number;
 };
 
 type DesktopStoreBridge = {
@@ -96,6 +120,44 @@ const recordPackageInstall = makeFunctionReference<
   { packageId: string },
   null
 >("data/store_packages:recordPackageInstall");
+
+const listPublicPets = makeFunctionReference<
+  "query",
+  {
+    paginationOpts: { numItems: number; cursor: string | null };
+    sort: "downloads" | "name";
+    search?: string;
+  },
+  { page: PublicPet[]; isDone: boolean; continueCursor: string }
+>("data/pets:listPublicPage");
+
+const incrementPetDownloads = makeFunctionReference<
+  "mutation",
+  { id: string },
+  null
+>("data/pets:incrementDownloads");
+
+const listPublicEmojiPacks = makeFunctionReference<
+  "query",
+  {
+    paginationOpts: { numItems: number; cursor: string | null };
+    sort?: "installs" | "name";
+    search?: string;
+  },
+  { page: EmojiPack[]; isDone: boolean; continueCursor: string }
+>("data/emoji_packs:listPublicPage");
+
+const recordEmojiInstall = makeFunctionReference<
+  "mutation",
+  { packId: string },
+  null
+>("data/emoji_packs:recordInstall");
+
+const getFashionFeatureStatus = makeFunctionReference<
+  "query",
+  Record<string, never>,
+  { shopifyConfigured: boolean }
+>("data/fashion:getFashionFeatureStatus");
 
 const categories: Array<{ key: StoreCategory | "all"; label: string }> = [
   { key: "all", label: "All" },
@@ -288,14 +350,184 @@ function Detail({
   );
 }
 
-function StandaloneTab({ tab }: { tab: string }) {
-  const copy =
-    tab === "fashion"
-      ? "Fashion items are available inside the Stella desktop Store."
-      : tab === "pets"
-        ? "Pet previews are available inside the Stella desktop Store."
-        : "Emoji packs are available inside the Stella desktop Store.";
-  return <EmptyState title="Open in Stella" description={copy} />;
+function PetsTab() {
+  const [query, setQuery] = useState("");
+  const pets = useQuery(listPublicPets, {
+    paginationOpts: { numItems: 48, cursor: null },
+    sort: "downloads",
+    ...(query.trim() ? { search: query.trim() } : {}),
+  });
+  const incrementDownloads = useMutation(incrementPetDownloads);
+
+  return (
+    <div className="pets-root">
+      <div className="pets-page-header">
+        <div>
+          <div className="pets-page-eyebrow">Pets</div>
+          <h1 className="pets-page-title">Choose a companion</h1>
+          <p className="pets-page-subtitle">
+            Browse animated Stella pets and get the one you want on your desktop.
+          </p>
+        </div>
+      </div>
+      <div className="pets-toolbar">
+        <label className="pets-search">
+          <Search className="pets-search-icon" size={15} />
+          <input
+            className="pets-search-input"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search pets"
+            value={query}
+          />
+        </label>
+      </div>
+      {!pets ? (
+        <div className="store-grid">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <div className="store-skeleton-card" key={index} />
+          ))}
+        </div>
+      ) : (
+        <div className="pets-grid">
+          {pets.page.map((pet) => (
+            <article className="pets-card pets-card-wrapper" key={pet.id}>
+              <div className="pets-card-sprite">
+                {pet.previewUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img alt="" src={pet.previewUrl} />
+                ) : (
+                  <Sparkles size={28} />
+                )}
+              </div>
+              <div className="pets-card-body">
+                <div className="pets-card-name">{pet.displayName}</div>
+                <div className="pets-card-desc">{pet.description}</div>
+                <div className="pets-card-meta">
+                  <span>{pet.ownerName || "Stella"}</span>
+                  <span>{pet.downloads} downloads</span>
+                </div>
+              </div>
+              <button
+                className="store-action-btn"
+                data-variant="get"
+                onClick={() => void incrementDownloads({ id: pet.id })}
+                type="button"
+              >
+                Get
+              </button>
+            </article>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EmojisTab() {
+  const [query, setQuery] = useState("");
+  const packs = useQuery(listPublicEmojiPacks, {
+    paginationOpts: { numItems: 48, cursor: null },
+    sort: "installs",
+    ...(query.trim() ? { search: query.trim() } : {}),
+  });
+  const recordInstall = useMutation(recordEmojiInstall);
+
+  return (
+    <div className="emoji-page">
+      <div className="emoji-page-header">
+        <div>
+          <div className="emoji-page-heading">Emoji Store</div>
+          <h1 className="emoji-page-title">Browse emoji packs</h1>
+          <p className="emoji-page-subtitle">
+            Add expressive emoji sheets to Stella chat.
+          </p>
+        </div>
+      </div>
+      <div className="emoji-page-toolbar">
+        <label className="emoji-page-search">
+          <Search className="emoji-page-search-icon" size={15} />
+          <input
+            className="emoji-page-search-input"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search emoji packs"
+            value={query}
+          />
+        </label>
+      </div>
+      {!packs ? (
+        <div className="emoji-pack-grid">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <div className="store-skeleton-card" key={index} />
+          ))}
+        </div>
+      ) : (
+        <div className="emoji-pack-grid">
+          {packs.page.map((pack) => (
+            <article className="emoji-pack-card" key={pack._id}>
+              <div className="emoji-pack-cover">
+                {pack.coverUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img alt="" className="emoji-pack-cover-img" src={pack.coverUrl} />
+                ) : (
+                  <span className="emoji-pack-cover-glyph">{pack.coverEmoji}</span>
+                )}
+              </div>
+              <div className="emoji-pack-body">
+                <div className="emoji-pack-name-row">
+                  <span className="emoji-pack-name">{pack.displayName}</span>
+                </div>
+                {pack.description ? (
+                  <span className="emoji-pack-desc">{pack.description}</span>
+                ) : null}
+                <div className="emoji-pack-meta">
+                  <span className="emoji-pack-author">
+                    by {pack.authorDisplayName || pack.authorHandle || "Stella"}
+                  </span>
+                  <span className="emoji-pack-installs">
+                    {(pack.installCount ?? 0) || "New"} uses
+                  </span>
+                </div>
+              </div>
+              <div className="emoji-pack-actions">
+                <button
+                  className="store-action-btn"
+                  data-variant="get"
+                  onClick={() => void recordInstall({ packId: pack.packId })}
+                  type="button"
+                >
+                  Get
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FashionTab() {
+  const status = useQuery(getFashionFeatureStatus, {});
+  return (
+    <div className="fashion-root">
+      <div className="fashion-blank">
+        <div className="fashion-blank-inner">
+          <div className="fashion-blank-eyebrow">Fashion</div>
+          <div className="fashion-blank-title">
+            {status?.shopifyConfigured === false
+              ? "Fashion is not set up yet"
+              : "Find your next look"}
+          </div>
+          <div className="fashion-blank-subtitle">
+            Generate outfits, save pieces, and check out from Stella.
+          </div>
+          <button className="fashion-blank-cta" type="button">
+            Start styling
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function StoreClientInner() {
@@ -390,9 +622,17 @@ function StoreClientInner() {
   if (activeTab !== "discover") {
     return (
       <main className="store-root" data-tab={activeTab}>
-        <div className="store-scroll">
-          <StandaloneTab tab={activeTab} />
-        </div>
+        {activeTab === "pets" ? (
+          <PetsTab />
+        ) : activeTab === "emojis" ? (
+          <EmojisTab />
+        ) : activeTab === "fashion" ? (
+          <FashionTab />
+        ) : (
+          <div className="store-scroll">
+            <EmptyState title="Store unavailable" description="Unknown Store tab." />
+          </div>
+        )}
       </main>
     );
   }
