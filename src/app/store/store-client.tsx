@@ -3,7 +3,16 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
-import { Check, ChevronLeft, ChevronRight, Download, Search, Upload, X } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Layers,
+  Package,
+  Search,
+  Share2,
+  X,
+} from "lucide-react";
 import { isConvexConfigured } from "@/lib/convex-urls";
 
 type StoreCategory =
@@ -25,7 +34,15 @@ type StorePackage = {
   iconUrl?: string;
   authorDisplayName?: string;
   authorHandle?: string;
+  featured?: boolean;
   updatedAt: number;
+};
+
+type StoreReleaseManifest = {
+  files?: string[];
+  changedFiles?: string[];
+  releaseNotes?: string;
+  summary?: string;
 };
 
 type StoreRelease = {
@@ -34,6 +51,8 @@ type StoreRelease = {
   blueprintMarkdown: string;
   commits?: Array<{ hash: string; subject: string; diff: string }>;
   releaseNotes?: string;
+  manifest?: StoreReleaseManifest;
+  createdAt: number;
 };
 
 type StoreInstall = {
@@ -111,11 +130,11 @@ const getPublicPackage = makeFunctionReference<
   StorePackage | null
 >("data/store_packages:getPublicPackage");
 
-const getPublicRelease = makeFunctionReference<
+const listPublicReleases = makeFunctionReference<
   "query",
-  { packageId: string; releaseNumber: number },
-  StoreRelease | null
->("data/store_packages:getPublicRelease");
+  { packageId: string },
+  StoreRelease[]
+>("data/store_packages:listPublicReleases");
 
 const recordPackageInstall = makeFunctionReference<
   "mutation",
@@ -161,12 +180,14 @@ const getFashionFeatureStatus = makeFunctionReference<
   { shopifyConfigured: boolean }
 >("data/fashion:getFashionFeatureStatus");
 
-const categories: Array<{ key: StoreCategory | "all"; label: string }> = [
-  { key: "all", label: "All" },
-  { key: "apps-games", label: "Apps" },
-  { key: "productivity", label: "Productivity" },
-  { key: "customization", label: "Customize" },
-  { key: "skills-agents", label: "Skills" },
+const DISCOVER_FILTERS: Array<{ id: StoreCategory | "all"; label: string }> = [
+  { id: "all", label: "All" },
+  { id: "apps-games", label: "Apps & games" },
+  { id: "productivity", label: "Productivity" },
+  { id: "customization", label: "Customization" },
+  { id: "skills-agents", label: "Skills & agents" },
+  { id: "integrations", label: "Integrations" },
+  { id: "other", label: "Other" },
 ];
 
 const storeTabs = [
@@ -183,10 +204,72 @@ const normalizeHostedStoreTab = (value: string | null): HostedStoreTab =>
     ? (value as HostedStoreTab)
     : "discover";
 
-const gradientFor = (id: string) => {
-  const hue = Array.from(id).reduce((sum, char) => sum + char.charCodeAt(0), 0) % 360;
-  return `linear-gradient(135deg, hsl(${hue} 74% 52%), hsl(${(hue + 46) % 360} 68% 44%))`;
-};
+// Deterministic gradient picker — same palette as desktop's StoreView.
+const GRADIENTS = [
+  "linear-gradient(135deg, oklch(0.72 0.15 25), oklch(0.58 0.20 50))",
+  "linear-gradient(135deg, oklch(0.68 0.13 205), oklch(0.52 0.17 230))",
+  "linear-gradient(135deg, oklch(0.70 0.15 145), oklch(0.55 0.18 170))",
+  "linear-gradient(135deg, oklch(0.68 0.16 280), oklch(0.52 0.20 305))",
+  "linear-gradient(135deg, oklch(0.73 0.12 80), oklch(0.60 0.16 55))",
+  "linear-gradient(135deg, oklch(0.66 0.17 340), oklch(0.52 0.22 10))",
+  "linear-gradient(135deg, oklch(0.66 0.11 215), oklch(0.50 0.15 240))",
+  "linear-gradient(135deg, oklch(0.70 0.14 165), oklch(0.54 0.17 190))",
+];
+
+function hashString(value: string): number {
+  let h = 0;
+  for (const ch of value) h = ((h << 5) - h + ch.charCodeAt(0)) | 0;
+  return Math.abs(h);
+}
+
+function getGradient(name: string): string {
+  return GRADIENTS[hashString(name) % GRADIENTS.length]!;
+}
+
+function getInitial(name: string): string {
+  return (name.trim()[0] ?? "S").toUpperCase();
+}
+
+function formatDate(ms: number): string {
+  return new Date(ms).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function formatTimeAgo(ms: number): string {
+  const seconds = Math.floor((Date.now() - ms) / 1000);
+  if (seconds < 60) return "Just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days}d ago`;
+  return formatDate(ms);
+}
+
+function formatInstallCount(count: number | undefined): string {
+  const n = count ?? 0;
+  if (n <= 0) return "New";
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M installs`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K installs`;
+  return `${n} install${n === 1 ? "" : "s"}`;
+}
+
+function getReleaseFileCount(release: StoreRelease): number {
+  const files = release.manifest?.files ?? release.manifest?.changedFiles;
+  return Array.isArray(files) ? files.length : 0;
+}
+
+function getReleaseNotes(release: StoreRelease): string | undefined {
+  const notes =
+    release.releaseNotes ??
+    release.manifest?.releaseNotes ??
+    release.manifest?.summary;
+  return typeof notes === "string" && notes.trim() ? notes.trim() : undefined;
+}
 
 const PET_COLUMNS = 8;
 const PET_ROWS = 9;
@@ -286,47 +369,103 @@ function StoreModal({
   );
 }
 
-function PackageArtwork({ pkg, size = "card" }: { pkg: StorePackage; size?: "card" | "hero" | "detail" }) {
-  const className =
-    size === "hero"
-      ? "store-featured-icon"
-      : size === "detail"
-        ? "store-detail-image"
-        : "store-card-image";
-  const letterClass =
-    size === "hero"
-      ? "store-featured-icon-letter"
-      : size === "detail"
-        ? "store-detail-image-letter"
-        : "store-card-image-letter";
+function PackageArtwork({
+  iconUrl,
+  name,
+  className,
+  letterClassName,
+}: {
+  iconUrl?: string;
+  name: string;
+  className: string;
+  letterClassName: string;
+}) {
+  const [failed, setFailed] = useState(false);
+  const showImage = Boolean(iconUrl) && !failed;
   return (
-    <div className={className} style={{ background: gradientFor(pkg.packageId) }}>
-      {pkg.iconUrl ? (
+    <div
+      className={`store-artwork ${className}`}
+      style={{ background: getGradient(name) }}
+    >
+      {showImage ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img alt="" className="store-artwork-img" src={pkg.iconUrl} />
+        <img
+          alt=""
+          className="store-artwork-img"
+          src={iconUrl}
+          onError={() => setFailed(true)}
+          draggable={false}
+          loading="lazy"
+        />
       ) : (
-        <span className={letterClass}>{pkg.displayName.slice(0, 1).toUpperCase()}</span>
+        <span className={letterClassName}>{getInitial(name)}</span>
       )}
     </div>
   );
 }
 
-function Author({ pkg }: { pkg: StorePackage }) {
-  const name = pkg.authorDisplayName || pkg.authorHandle || "Stella";
+function AuthorChip({
+  name,
+  handle,
+  variant = "card",
+}: {
+  name?: string;
+  handle?: string;
+  variant?: "card" | "featured" | "detail";
+}) {
+  if (!name && !handle) return null;
+  const displayed = name?.trim() || handle!;
+  const initial = getInitial(displayed);
+  const className =
+    variant === "featured"
+      ? "store-featured-author"
+      : variant === "detail"
+        ? "store-detail-author"
+        : "store-card-author";
+  const avatarClassName =
+    variant === "featured"
+      ? "store-featured-author-avatar"
+      : variant === "detail"
+        ? "store-detail-author-avatar"
+        : "store-card-author-avatar";
   return (
-    <span className="store-card-author">
-      <span className="store-card-author-avatar">{name.slice(0, 1).toUpperCase()}</span>
-      {name}
-    </span>
+    <div className={className}>
+      <span className={avatarClassName}>{initial}</span>
+      <span>by {displayed}</span>
+    </div>
   );
 }
 
-function EmptyState({ title, description }: { title: string; description: string }) {
+function EmptyState({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
   return (
     <div className="store-empty">
-      <div className="store-empty-icon">S</div>
+      <div className="store-empty-icon">{icon}</div>
       <div className="store-empty-title">{title}</div>
       <div className="store-empty-desc">{description}</div>
+    </div>
+  );
+}
+
+function SkeletonGrid() {
+  return (
+    <div className="store-grid">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="store-skeleton-card">
+          <div className="store-skeleton-image" />
+          <div className="store-skeleton-body">
+            <div className="store-skeleton-line" />
+            <div className="store-skeleton-line store-skeleton-line--short" />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -354,130 +493,298 @@ function PackageCard({
   installing,
   onOpen,
   onInstall,
+  onShare,
 }: {
   pkg: StorePackage;
   installed: boolean;
   installing: boolean;
   onOpen: () => void;
   onInstall: () => void;
+  onShare: () => void;
 }) {
+  const actionLabel = installing ? "Adding..." : installed ? "Added" : "Get";
+  const actionVariant = installing ? "working" : installed ? "added" : "get";
   return (
-    <article className="store-card" data-clickable="true" onClick={onOpen}>
-      <PackageArtwork pkg={pkg} />
+    <div
+      className="store-card"
+      data-clickable="true"
+      onClick={onOpen}
+    >
+      <PackageArtwork
+        iconUrl={pkg.iconUrl}
+        name={pkg.displayName}
+        className="store-card-image"
+        letterClassName="store-card-image-letter"
+      />
       <div className="store-card-body">
         <div className="store-card-top">
-          <h3 className="store-card-name">{pkg.displayName}</h3>
-          <button
-            className="store-action-btn"
-            data-variant={installed ? "added" : "get"}
-            disabled={installed || installing}
-            onClick={(event) => {
-              event.stopPropagation();
-              onInstall();
-            }}
-            type="button"
-          >
-            {installed ? "Added" : installing ? "Adding" : "Get"}
-          </button>
+          <span className="store-card-name">{pkg.displayName}</span>
+          <div className="store-card-actions">
+            <button
+              type="button"
+              className="store-icon-btn"
+              aria-label="Share add-on"
+              onClick={(event) => {
+                event.stopPropagation();
+                onShare();
+              }}
+            >
+              <Share2 size={14} />
+            </button>
+            <button
+              className="store-action-btn"
+              data-variant={actionVariant}
+              disabled={installed || installing}
+              onClick={(event) => {
+                event.stopPropagation();
+                onInstall();
+              }}
+              type="button"
+            >
+              {actionLabel}
+            </button>
+          </div>
         </div>
-        <p className="store-card-desc">{pkg.description}</p>
-        <Author pkg={pkg} />
+        <div className="store-card-desc">{pkg.description}</div>
         <div className="store-card-footer">
-          <span className="store-card-installs">{pkg.installCount ?? 0} installs</span>
-          <span className="store-card-meta">v{pkg.latestReleaseNumber}</span>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function Featured({
-  pkg,
-  onOpen,
-}: {
-  pkg: StorePackage;
-  onOpen: () => void;
-}) {
-  return (
-    <section className="store-featured" onClick={onOpen}>
-      <div className="store-featured-bg" style={{ background: gradientFor(pkg.packageId) }} />
-      <div className="store-featured-overlay" />
-      <div className="store-featured-content">
-        <PackageArtwork pkg={pkg} size="hero" />
-        <div className="store-featured-text">
-          <div className="store-featured-label">Featured</div>
-          <h2 className="store-featured-name">{pkg.displayName}</h2>
-          <p className="store-featured-desc">{pkg.description}</p>
-          <span className="store-featured-author">
-            {pkg.authorDisplayName || pkg.authorHandle || "Stella"}
+          <AuthorChip name={pkg.authorDisplayName} handle={pkg.authorHandle} />
+          <span className="store-card-installs">
+            {formatInstallCount(pkg.installCount)}
           </span>
         </div>
       </div>
-    </section>
+    </div>
+  );
+}
+
+function FeaturedCard({
+  pkg,
+  installed,
+  installing,
+  onAction,
+  onClick,
+}: {
+  pkg: StorePackage;
+  installed: boolean;
+  installing: boolean;
+  onAction: () => void;
+  onClick: () => void;
+}) {
+  const label = installing ? "Adding..." : installed ? "Added" : "Get";
+  const variant = installing ? "working" : installed ? "added" : "get";
+  return (
+    <div className="store-featured" onClick={onClick}>
+      <div
+        className="store-featured-bg"
+        style={{ background: getGradient(pkg.displayName) }}
+      />
+      <div className="store-featured-overlay" />
+      <div className="store-featured-content">
+        <PackageArtwork
+          iconUrl={pkg.iconUrl}
+          name={pkg.displayName}
+          className="store-featured-icon"
+          letterClassName="store-featured-icon-letter"
+        />
+        <div className="store-featured-text">
+          <div className="store-featured-label">Featured</div>
+          <div className="store-featured-name">{pkg.displayName}</div>
+          <div className="store-featured-desc">{pkg.description}</div>
+          <AuthorChip
+            name={pkg.authorDisplayName}
+            handle={pkg.authorHandle}
+            variant="featured"
+          />
+        </div>
+        <button
+          className="store-action-btn store-action-btn--lg"
+          data-variant={variant}
+          disabled={installed || installing}
+          onClick={(event) => {
+            event.stopPropagation();
+            onAction();
+          }}
+          type="button"
+        >
+          {label}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function pickFeaturedPackage(packages: StorePackage[]): StorePackage | null {
+  if (packages.length === 0) return null;
+  const editorial = packages
+    .filter((pkg) => pkg.featured === true)
+    .sort((a, b) => b.updatedAt - a.updatedAt);
+  return (
+    editorial[0] ??
+    packages.slice().sort((a, b) => b.updatedAt - a.updatedAt)[0] ??
+    null
   );
 }
 
 function Detail({
   pkg,
+  releases,
   installed,
   installing,
   onBack,
   onInstall,
+  onShare,
 }: {
   pkg: StorePackage;
+  releases: StoreRelease[];
   installed: boolean;
   installing: boolean;
   onBack: () => void;
   onInstall: () => void;
+  onShare: () => void;
 }) {
+  const latestRelease = releases[0];
+  const latestNotes = latestRelease ? getReleaseNotes(latestRelease) : undefined;
+  const actionLabel = installing ? "Adding..." : installed ? "Added" : "Add to Stella";
+  const actionVariant = installing ? "working" : installed ? "added" : "get";
   return (
     <div className="store-detail">
       <button className="store-detail-back" onClick={onBack} type="button">
+        <ChevronLeft size={16} />
         Back
       </button>
-      <section className="store-detail-hero">
-        <PackageArtwork pkg={pkg} size="detail" />
+      <div className="store-detail-hero">
+        <PackageArtwork
+          iconUrl={pkg.iconUrl}
+          name={pkg.displayName}
+          className="store-detail-image"
+          letterClassName="store-detail-image-letter"
+        />
         <div className="store-detail-info">
-          <h1 className="store-detail-name">{pkg.displayName}</h1>
-          <p className="store-detail-desc">{pkg.description}</p>
-          <div className="store-detail-author">
-            <span className="store-detail-author-avatar">
-              {(pkg.authorDisplayName || pkg.authorHandle || "S").slice(0, 1).toUpperCase()}
-            </span>
-            {pkg.authorDisplayName || pkg.authorHandle || "Stella"}
-          </div>
+          <div className="store-detail-name">{pkg.displayName}</div>
+          <div className="store-detail-desc">{pkg.description}</div>
+          <AuthorChip
+            name={pkg.authorDisplayName}
+            handle={pkg.authorHandle}
+            variant="detail"
+          />
           <div className="store-detail-meta store-detail-meta--spaced">
-            <span className="store-detail-meta-item">{pkg.installCount ?? 0} installs</span>
-            <span className="store-detail-meta-item">Version {pkg.latestReleaseNumber}</span>
+            <span className="store-detail-meta-item">
+              <Layers size={13} />
+              Version {pkg.latestReleaseNumber}
+            </span>
+            <span className="store-detail-meta-item">
+              <Clock size={13} />
+              Updated {formatTimeAgo(pkg.updatedAt)}
+            </span>
+            <span className="store-detail-meta-item">
+              {formatInstallCount(pkg.installCount)}
+            </span>
           </div>
           <div className="store-detail-actions">
             <button
-              className="store-action-btn"
-              data-variant={installed ? "added" : "get"}
+              className="store-action-btn store-action-btn--lg"
+              data-variant={actionVariant}
               disabled={installed || installing}
               onClick={onInstall}
               type="button"
             >
-              {installed ? (
-                <>
-                  <Check size={14} /> Added
-                </>
-              ) : installing ? (
-                "Adding"
-              ) : (
-                <>
-                  <Download size={14} /> Get
-                </>
-              )}
+              {actionLabel}
+            </button>
+            <button
+              type="button"
+              className="store-icon-btn store-icon-btn--lg"
+              aria-label="Share add-on"
+              onClick={onShare}
+            >
+              <Share2 size={16} />
             </button>
           </div>
         </div>
-      </section>
-      <section className="store-detail-section">
-        <h2 className="store-detail-section-title">About</h2>
-        <p className="store-detail-desc">{pkg.description}</p>
-      </section>
+      </div>
+
+      {latestNotes ? (
+        <div className="store-whats-new">
+          <div className="store-whats-new-eyebrow">What&apos;s New</div>
+          <div className="store-whats-new-version">
+            Version {latestRelease!.releaseNumber}
+            {latestRelease ? ` · ${formatDate(latestRelease.createdAt)}` : ""}
+          </div>
+          <div className="store-whats-new-body">{latestNotes}</div>
+        </div>
+      ) : null}
+
+      {releases.length > 1 ? (
+        <>
+          <hr className="store-detail-divider" />
+          <div className="store-detail-section">
+            <div className="store-detail-section-title">Version History</div>
+            <div className="store-version-list">
+              {releases.slice(1).map((release) => {
+                const notes = getReleaseNotes(release);
+                const fileCount = getReleaseFileCount(release);
+                return (
+                  <div
+                    key={release.releaseNumber}
+                    className="store-version-item"
+                  >
+                    <div className="store-version-label">
+                      Version {release.releaseNumber}
+                    </div>
+                    {notes ? (
+                      <div className="store-version-notes">{notes}</div>
+                    ) : null}
+                    <div className="store-version-date">
+                      {formatDate(release.createdAt)}
+                      {fileCount > 0 ? ` · ${fileCount} items customized` : ""}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      ) : null}
     </div>
+  );
+}
+
+function ShareDialog({
+  pkg,
+  onClose,
+}: {
+  pkg: StorePackage;
+  onClose: () => void;
+}) {
+  const [copied, setCopied] = useState(false);
+  const url =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/store?package=${encodeURIComponent(pkg.packageId)}`
+      : `/store?package=${encodeURIComponent(pkg.packageId)}`;
+  return (
+    <StoreModal onClose={onClose}>
+      <div className="store-share-dialog">
+        <div className="store-share-dialog-title">Share {pkg.displayName}</div>
+        <p className="store-share-dialog-caption">
+          Anyone with this link can open this add-on in the Stella Store.
+        </p>
+        <div className="store-share-dialog-link">
+          <input readOnly value={url} className="store-share-dialog-input" />
+          <button
+            type="button"
+            className="store-action-btn"
+            data-variant="get"
+            onClick={() => {
+              void navigator.clipboard.writeText(url).then(() => {
+                setCopied(true);
+                window.setTimeout(() => setCopied(false), 1600);
+              });
+            }}
+          >
+            {copied ? "Copied" : "Copy link"}
+          </button>
+        </div>
+      </div>
+    </StoreModal>
   );
 }
 
@@ -492,16 +799,18 @@ function PetsTab() {
   const incrementDownloads = useMutation(incrementPetDownloads);
 
   return (
-    <div className="pets-root">
-      <div className="pets-page-header">
-        <div>
-          <div className="pets-page-eyebrow">Pets</div>
-          <h1 className="pets-page-title">Choose a companion</h1>
-          <p className="pets-page-subtitle">
-            Browse animated Stella pets and get the one you want on your desktop.
-          </p>
+    <main className="pets-page">
+      <header className="pets-page-header">
+        <div className="pets-page-heading">
+          <h1 className="pets-page-title">Pets</h1>
+          <span className="pets-page-count">
+            {pets ? `${pets.page.length}` : ""}
+          </span>
         </div>
-      </div>
+        <p className="pets-page-subtitle">
+          Browse animated Stella pets and pick a companion for your desktop.
+        </p>
+      </header>
       <div className="pets-toolbar">
         <label className="pets-search">
           <Search className="pets-search-icon" size={15} />
@@ -543,12 +852,12 @@ function PetsTab() {
               </div>
               <div className="pets-card-meta">
                 <span className="pets-card-creator">by {pet.ownerName || "Stella"}</span>
-                <span className="pets-card-downloads">
-                  <Download size={11} aria-hidden="true" />
-                  {pet.downloads}
-                </span>
+                <span className="pets-card-downloads">{pet.downloads}</span>
               </div>
-              <div className="pets-card-actions" onClick={(event) => event.stopPropagation()}>
+              <div
+                className="pets-card-actions"
+                onClick={(event) => event.stopPropagation()}
+              >
                 <button
                   className="store-action-btn"
                   data-variant="get"
@@ -576,7 +885,7 @@ function PetsTab() {
               <p className="pet-detail-blurb">{detailsPet.description}</p>
               <div className="pet-detail-actions">
                 <button
-                  className="store-action-btn"
+                  className="store-action-btn store-action-btn--lg"
                   data-variant="get"
                   onClick={() => void incrementDownloads({ id: detailsPet.id })}
                   type="button"
@@ -588,7 +897,7 @@ function PetsTab() {
           </div>
         </StoreModal>
       ) : null}
-    </div>
+    </main>
   );
 }
 
@@ -604,16 +913,15 @@ function EmojisTab() {
   const recordInstall = useMutation(recordEmojiInstall);
 
   return (
-    <div className="emoji-page">
-      <div className="emoji-page-header">
-        <div>
-          <div className="emoji-page-heading">Emoji Store</div>
-          <h1 className="emoji-page-title">Browse emoji packs</h1>
-          <p className="emoji-page-subtitle">
-            Add expressive emoji sheets to Stella chat.
-          </p>
+    <main className="emoji-page">
+      <header className="emoji-page-header">
+        <div className="emoji-page-heading">
+          <h1 className="emoji-page-title">Emojis</h1>
         </div>
-      </div>
+        <p className="emoji-page-subtitle">
+          Browse expressive emoji packs to use in Stella chat.
+        </p>
+      </header>
       <div className="emoji-page-toolbar">
         <label className="emoji-page-search">
           <Search className="emoji-page-search-icon" size={15} />
@@ -688,7 +996,8 @@ function EmojisTab() {
           <div className="emoji-details-dialog">
             <div className="emoji-details-title">{detailsPack.displayName}</div>
             <p className="emoji-details-caption">
-              {detailsPack.description || `Pack by ${detailsPack.authorDisplayName || detailsPack.authorHandle || "Stella"}`}
+              {detailsPack.description ||
+                `Pack by ${detailsPack.authorDisplayName || detailsPack.authorHandle || "Stella"}`}
             </p>
             <div className="emoji-details-body">
               <div className="emoji-details-preview">
@@ -723,7 +1032,11 @@ function EmojisTab() {
                   {Array.from({ length: 64 }).map((_, index) => (
                     <div key={index} className="emoji-create-cell">
                       <EmojiCellPreview
-                        sheetUrl={detailsPack.sheetUrls[previewSheet] ?? detailsPack.sheetUrls[0] ?? ""}
+                        sheetUrl={
+                          detailsPack.sheetUrls[previewSheet] ??
+                          detailsPack.sheetUrls[0] ??
+                          ""
+                        }
                         cell={index}
                         gridSize={8}
                       />
@@ -735,23 +1048,27 @@ function EmojisTab() {
                 <div className="emoji-details-meta">
                   <div className="emoji-details-meta-row">
                     <span className="emoji-details-meta-label">Cover</span>
-                    <span className="emoji-details-meta-value">{detailsPack.coverEmoji}</span>
+                    <span className="emoji-details-meta-value">
+                      {detailsPack.coverEmoji}
+                    </span>
                   </div>
                   <div className="emoji-details-meta-row">
                     <span className="emoji-details-meta-label">Author</span>
                     <span className="emoji-details-meta-value">
-                      {detailsPack.authorDisplayName || detailsPack.authorHandle || "Stella"}
+                      {detailsPack.authorDisplayName ||
+                        detailsPack.authorHandle ||
+                        "Stella"}
                     </span>
                   </div>
                 </div>
                 <div className="emoji-details-actions">
                   <button
-                    className="store-action-btn"
+                    className="store-action-btn store-action-btn--lg"
                     data-variant="get"
                     onClick={() => void recordInstall({ packId: detailsPack.packId })}
                     type="button"
                   >
-                    Get & use pack
+                    Get &amp; use pack
                   </button>
                 </div>
               </div>
@@ -759,7 +1076,7 @@ function EmojisTab() {
           </div>
         </StoreModal>
       ) : null}
-    </div>
+    </main>
   );
 }
 
@@ -789,11 +1106,15 @@ function FashionTab() {
 
 function StoreClientInner() {
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<StoreCategory | "all">("all");
+  const [filter, setFilter] = useState<StoreCategory | "all">("all");
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null);
   const [installedIds, setInstalledIds] = useState<Set<string>>(new Set());
   const [installingId, setInstallingId] = useState<string | null>(null);
-  const [urlState, setUrlState] = useState({ tab: "discover", packageId: null as string | null });
+  const [sharePkg, setSharePkg] = useState<StorePackage | null>(null);
+  const [urlState, setUrlState] = useState({
+    tab: "discover",
+    packageId: null as string | null,
+  });
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -812,10 +1133,9 @@ function StoreClientInner() {
     }
   }, [initialPackageId, selectedPackageId]);
 
-  const selectedCategory = category === "all" ? undefined : category;
+  const selectedCategory = filter === "all" ? undefined : filter;
   const browse = useQuery(listPublicPackages, {
-    category: selectedCategory,
-    paginationOpts: { numItems: 40, cursor: null },
+    paginationOpts: { numItems: 80, cursor: null },
   });
   const search = useQuery(
     searchPublicPackages,
@@ -825,20 +1145,26 @@ function StoreClientInner() {
     getPublicPackage,
     selectedPackageId ? { packageId: selectedPackageId } : "skip",
   );
-  const selectedRelease = useQuery(
-    getPublicRelease,
-    selectedPackage
-      ? {
-          packageId: selectedPackage.packageId,
-          releaseNumber: selectedPackage.latestReleaseNumber,
-        }
-      : "skip",
+  const selectedReleases = useQuery(
+    listPublicReleases,
+    selectedPackageId ? { packageId: selectedPackageId } : "skip",
   );
   const recordInstall = useMutation(recordPackageInstall);
 
-  const packages = query.trim() ? search : browse?.page;
-  const featured = packages?.[0] ?? null;
-  const rest = featured ? packages?.slice(1) : packages;
+  const allPackages = query.trim() ? search : browse?.page;
+  const filtered = (allPackages ?? []).filter((pkg) => {
+    if (filter !== "all") {
+      const category = pkg.category ?? "other";
+      if (category !== filter) return false;
+    }
+    return true;
+  });
+  const featured = pickFeaturedPackage(allPackages ?? []);
+  const showFeatured =
+    featured !== null && filter === "all" && query.trim() === "";
+  const rest = filtered.filter(
+    (pkg) => !showFeatured || pkg.packageId !== featured!.packageId,
+  );
 
   const installPackage = async (pkg: StorePackage, release?: StoreRelease | null) => {
     if (!window.stellaDesktopStore) {
@@ -888,92 +1214,147 @@ function StoreClientInner() {
           <FashionTab />
         ) : (
           <div className="store-scroll">
-            <EmptyState title="Store unavailable" description="Unknown Store tab." />
+            <EmptyState
+              icon={<Package size={32} />}
+              title="Store unavailable"
+              description="Unknown Store tab."
+            />
           </div>
         )}
       </main>
     );
   }
 
+  const detailRelease =
+    selectedReleases?.find(
+      (release) =>
+        selectedPackage &&
+        release.releaseNumber === selectedPackage.latestReleaseNumber,
+    ) ?? selectedReleases?.[0];
+
   return (
     <main className="store-root" data-tab="discover">
       <StoreWebTabs activeTab="discover" />
-      <button className="store-action-btn store-upload-btn" data-variant="share" type="button">
-        <Upload size={14} /> Upload
-      </button>
+      {!selectedPackage ? (
+        <button
+          className="store-action-btn store-action-btn--lg store-upload-btn"
+          data-variant="get"
+          type="button"
+          onClick={() => {
+            window.location.href = "/sign-in?next=/store";
+          }}
+        >
+          Upload to Store
+        </button>
+      ) : null}
       <div className="store-scroll">
         {selectedPackage ? (
           <Detail
+            pkg={selectedPackage}
+            releases={selectedReleases ?? []}
             installed={installedIds.has(selectedPackage.packageId)}
             installing={installingId === selectedPackage.packageId}
-            onBack={() => setSelectedPackageId(null)}
-            onInstall={() => installPackage(selectedPackage, selectedRelease)}
-            pkg={selectedPackage}
+            onBack={() => {
+              setSelectedPackageId(null);
+              if (initialPackageId) {
+                const next = new URL(window.location.href);
+                next.searchParams.delete("package");
+                window.history.replaceState({}, "", next.toString());
+              }
+            }}
+            onInstall={() => installPackage(selectedPackage, detailRelease)}
+            onShare={() => setSharePkg(selectedPackage)}
           />
         ) : (
           <>
             <div className="store-toolbar">
-              <label className="store-search">
-                <Search className="store-search-icon" size={15} />
+              <div className="store-search">
+                <Search size={14} className="store-search-icon" />
                 <input
                   className="store-search-input"
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search Store"
+                  placeholder="Search the Store"
                   value={query}
+                  spellCheck={false}
+                  autoComplete="off"
                 />
-              </label>
+              </div>
               <div className="store-filter">
-                {categories.map((item) => (
+                {DISCOVER_FILTERS.map((entry) => (
                   <button
+                    key={entry.id}
                     className="store-filter-pill"
-                    data-active={category === item.key ? "" : undefined}
-                    key={item.key}
-                    onClick={() => setCategory(item.key)}
+                    data-active={filter === entry.id || undefined}
+                    onClick={() => setFilter(entry.id)}
                     type="button"
                   >
-                    {item.label}
+                    {entry.label}
                   </button>
                 ))}
               </div>
             </div>
-            {featured ? <Featured pkg={featured} onOpen={() => setSelectedPackageId(featured.packageId)} /> : null}
-            <section className="store-section">
-              <div className="store-section-header">
-                <h1 className="store-section-title">Discover</h1>
-                <span className="store-section-count">{packages?.length ?? 0}</span>
-              </div>
-              {!packages ? (
-                <div className="store-grid">
-                  {Array.from({ length: 6 }).map((_, index) => (
-                    <div className="store-skeleton-card" key={index}>
-                      <div className="store-skeleton-image" />
-                      <div className="store-skeleton-body">
-                        <div className="store-skeleton-line" />
-                        <div className="store-skeleton-line store-skeleton-line--short" />
-                      </div>
-                    </div>
-                  ))}
+            {showFeatured && featured ? (
+              <FeaturedCard
+                pkg={featured}
+                installed={installedIds.has(featured.packageId)}
+                installing={installingId === featured.packageId}
+                onAction={() => void installPackage(featured)}
+                onClick={() => setSelectedPackageId(featured.packageId)}
+              />
+            ) : null}
+            {!allPackages ? (
+              <SkeletonGrid />
+            ) : rest.length === 0 ? (
+              <EmptyState
+                icon={
+                  query.trim() !== "" || filter !== "all" ? (
+                    <Search size={32} />
+                  ) : (
+                    <Package size={32} />
+                  )
+                }
+                title={
+                  query.trim() !== "" || filter !== "all"
+                    ? "No matches"
+                    : "Nothing here yet"
+                }
+                description={
+                  query.trim() !== "" || filter !== "all"
+                    ? "Try a different search or category."
+                    : "Add-ons for Stella will appear here as they become available."
+                }
+              />
+            ) : (
+              <div className="store-section">
+                <div className="store-section-header">
+                  <span className="store-section-title">
+                    {query.trim() === "" && filter === "all"
+                      ? "All Add-ons"
+                      : "Results"}
+                  </span>
+                  <span className="store-section-count">{rest.length}</span>
                 </div>
-              ) : packages.length === 0 ? (
-                <EmptyState title="Nothing here yet" description="Try another search or category." />
-              ) : (
                 <div className="store-grid">
-                  {rest?.map((pkg) => (
+                  {rest.map((pkg) => (
                     <PackageCard
+                      key={pkg.packageId}
+                      pkg={pkg}
                       installed={installedIds.has(pkg.packageId)}
                       installing={installingId === pkg.packageId}
-                      key={pkg._id}
-                      onInstall={() => installPackage(pkg)}
                       onOpen={() => setSelectedPackageId(pkg.packageId)}
-                      pkg={pkg}
+                      onInstall={() => void installPackage(pkg)}
+                      onShare={() => setSharePkg(pkg)}
                     />
                   ))}
                 </div>
-              )}
-            </section>
+              </div>
+            )}
           </>
         )}
       </div>
+      {sharePkg ? (
+        <ShareDialog pkg={sharePkg} onClose={() => setSharePkg(null)} />
+      ) : null}
     </main>
   );
 }
@@ -984,6 +1365,7 @@ export function StoreClient() {
       <main className="store-root" data-tab="discover">
         <div className="store-scroll">
           <EmptyState
+            icon={<Package size={32} />}
             title="Store unavailable"
             description="Convex is not configured for this website build."
           />
