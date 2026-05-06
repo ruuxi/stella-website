@@ -2691,8 +2691,15 @@ body:has(.store-root) {
    width so they don't reflow as their labels swap (e.g. Show ↔ Hide
    pet, My pets ↔ Discover). */
 .pets-toolbar-actions > .pill-btn,
-.pets-toolbar-actions > .pill-btn[data-component="button"] {
+.pets-toolbar-actions > .pill-btn[data-component="button"],
+.pets-toolbar-actions > .store-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   min-width: 124px;
+  min-height: 32px;
+  padding: 6px 16px;
+  font-size: 12.5px;
   justify-content: center;
 }
 
@@ -3580,8 +3587,15 @@ body:has(.store-root) {
 /* Toolbar pills (My emojis / Create pack) share a uniform width so
    the toolbar doesn't shift when labels swap (My emojis ↔ Discover). */
 .emoji-page-toolbar-actions > .pill-btn,
-.emoji-page-toolbar-actions > .pill-btn[data-component="button"] {
+.emoji-page-toolbar-actions > .pill-btn[data-component="button"],
+.emoji-page-toolbar-actions > .store-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   min-width: 124px;
+  min-height: 32px;
+  padding: 6px 16px;
+  font-size: 12.5px;
   justify-content: center;
 }
 
