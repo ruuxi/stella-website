@@ -6,6 +6,7 @@ import { useCallback, useState } from "react";
 import { ArrowRight, CheckCircle2, MailCheck } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { clearCachedToken } from "@/lib/auth-token";
+import { useDesktopBridgeAuthUser } from "@/lib/desktop-bridge-auth";
 import { useMagicLinkAuth } from "@/lib/use-magic-link-auth";
 import { isConvexConfigured } from "@/lib/convex-urls";
 import styles from "./sign-in.module.css";
@@ -49,8 +50,9 @@ export function SignInView() {
 
 function ConfiguredSignInView() {
   const session = authClient.useSession();
+  const desktopUser = useDesktopBridgeAuthUser();
   const sessionData = session.data as { user?: SessionUser } | null | undefined;
-  const user = sessionData?.user;
+  const user = sessionData?.user ?? desktopUser;
   const isSignedIn = Boolean(user) && user?.isAnonymous !== true;
 
   if (isSignedIn && user) {

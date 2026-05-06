@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import { useDesktopBridgeAuthUser } from "@/lib/desktop-bridge-auth";
 import { isConvexConfigured } from "@/lib/convex-urls";
 
 type SessionUser = {
@@ -34,7 +35,10 @@ export function SiteHeaderAccount() {
 
 function InnerImpl() {
   const session = authClient.useSession();
-  const user = (session.data as { user?: SessionUser } | null | undefined)?.user;
+  const desktopUser = useDesktopBridgeAuthUser();
+  const user =
+    (session.data as { user?: SessionUser } | null | undefined)?.user ??
+    desktopUser;
   const isSignedIn = Boolean(user) && user?.isAnonymous !== true;
 
   if (isSignedIn && user) {
