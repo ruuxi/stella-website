@@ -149,50 +149,54 @@
   margin: 14px 20px 0 0;
 }
 
-.store-share-dialog {
+/* Hosted blueprint / install-confirm dialog: rendered through the
+   simple `StoreModal` (not Radix) so we cannot rely on the
+   `[data-slot="dialog-content"]` selectors used by the desktop dialog.
+   We keep `.store-blueprint-dialog-viewer` / `.store-blueprint-dialog-actions`
+   from the shared block above and add the missing inline header /
+   markdown body so the dialog reads the same as the desktop one. */
+.store-web-dialog .store-blueprint-dialog-header {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 4px 6px 6px;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-weak, color-mix(in oklch, var(--foreground) 8%, transparent));
 }
 
-.store-share-dialog-title {
-  font-size: 18px;
-  font-weight: 700;
+.store-blueprint-dialog-title {
+  font-size: 16px;
+  font-weight: 650;
   color: var(--text-strong);
   letter-spacing: -0.01em;
 }
 
-.store-share-dialog-caption {
-  margin: 0;
+.store-blueprint-dialog-loading {
   font-size: 13px;
   color: var(--text-weak);
-  line-height: 1.5;
+  text-align: center;
+  padding: 28px 0;
 }
 
-.store-share-dialog-link {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.store-share-dialog-input {
-  flex: 1;
-  min-width: 0;
-  padding: 9px 12px;
-  border-radius: var(--radius-full);
-  border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
-  background: color-mix(in oklch, var(--foreground) 3%, transparent);
-  color: var(--text-strong);
-  font-family: inherit;
+.store-blueprint-dialog-markdown {
+  margin: 0;
+  font-family: var(--font-mono, ui-monospace);
   font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-strong);
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
-.store-share-dialog-input:focus {
-  outline: none;
-  border-color: color-mix(in oklch, var(--interactive) 35%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--interactive) 12%, transparent);
+.store-web-dialog:has(.store-blueprint-dialog-viewer) {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: min(720px, calc(100vh - 48px));
+}
+.store-web-dialog .store-blueprint-dialog-viewer {
+  flex: 1;
+  min-height: 320px;
 }
 
 .store-scroll {
