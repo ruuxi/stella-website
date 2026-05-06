@@ -89,6 +89,7 @@ type EmojiPack = {
 
 type DesktopStoreBridge = {
   getAuthToken?: () => Promise<string | null>;
+  openStorePanel?: () => Promise<unknown>;
   getRelease: (payload: {
     packageId: string;
     releaseNumber: number;
@@ -101,6 +102,30 @@ type DesktopStoreBridge = {
     commits?: Array<{ hash: string; subject: string; diff: string }>;
   }) => Promise<StoreInstall>;
   listInstalledMods: () => Promise<StoreInstall[]>;
+  installPet?: (payload: { pet: PublicPet }) => Promise<unknown>;
+  selectPet?: (payload: { petId: string }) => Promise<unknown>;
+  removePet?: (payload: { petId: string }) => Promise<unknown>;
+  getPetState?: () => Promise<{
+    installedPetIds: string[];
+    selectedPetId: string | null;
+  }>;
+  installEmojiPack?: (payload: {
+    packId: string;
+    sheetUrls: string[];
+  }) => Promise<unknown>;
+  clearEmojiPack?: (payload?: { packId?: string }) => Promise<unknown>;
+  getEmojiPackState?: () => Promise<{
+    activePack: { packId: string; sheetUrls: string[] } | null;
+  }>;
+};
+
+type PetBridgeState = {
+  installedPetIds: string[];
+  selectedPetId: string | null;
+};
+
+type EmojiBridgeState = {
+  activePack: { packId: string; sheetUrls: string[] } | null;
 };
 
 declare global {
@@ -203,6 +228,44 @@ const normalizeHostedStoreTab = (value: string | null): HostedStoreTab =>
   storeTabs.some((tab) => tab.key === value)
     ? (value as HostedStoreTab)
     : "discover";
+
+const getDesktopStoreBridge = (): DesktopStoreBridge | undefined =>
+  typeof window === "undefined" ? undefined : window.stellaDesktopStore;
+
+const redirectToStoreSignIn = () => {
+  if (typeof window === "undefined") return;
+  window.location.href = "/sign-in?next=/store";
+};
+
+const isPetBridgeState = (value: unknown): value is PetBridgeState => {
+  if (!value || typeof value !== "object") return false;
+  const record = value as Record<string, unknown>;
+  return (
+    Array.isArray(record.installedPetIds) &&
+    record.installedPetIds.every((id) => typeof id === "string") &&
+    (typeof record.selectedPetId === "string" || record.selectedPetId === null)
+  );
+};
+
+const isEmojiBridgeState = (value: unknown): value is EmojiBridgeState => {
+  if (!value || typeof value !== "object") return false;
+  const activePack = (value as Record<string, unknown>).activePack;
+  if (activePack === null) return true;
+  if (!activePack || typeof activePack !== "object") return false;
+  const record = activePack as Record<string, unknown>;
+  return (
+    typeof record.packId === "string" &&
+    Array.isArray(record.sheetUrls) &&
+    record.sheetUrls.every((url) => typeof url === "string")
+  );
+};
+
+const openNativeStorePanel = async (): Promise<boolean> => {
+  const bridge = getDesktopStoreBridge();
+  if (!bridge?.openStorePanel) return false;
+  await bridge.openStorePanel();
+  return true;
+};
 
 // Deterministic gradient picker — same palette as desktop's StoreView.
 const GRADIENTS = [
@@ -791,12 +854,99 @@ function ShareDialog({
 function PetsTab() {
   const [query, setQuery] = useState("");
   const [detailsPet, setDetailsPet] = useState<PublicPet | null>(null);
+  const [petState, setPetState] = useState<PetBridgeState>({
+    installedPetIds: [],
+    selectedPetId: null,
+  });
+  const [workingPetId, setWorkingPetId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const pets = useQuery(listPublicPets, {
     paginationOpts: { numItems: 48, cursor: null },
     sort: "downloads",
     ...(query.trim() ? { search: query.trim() } : {}),
   });
   const incrementDownloads = useMutation(incrementPetDownloads);
+  const installedPetIds = new Set(petState.installedPetIds);
+
+  useEffect(() => {
+    const bridge = getDesktopStoreBridge();
+    const request = bridge?.getPetState?.();
+    if (!request) return;
+    void request
+      .then((state) => {
+        if (isPetBridgeState(state)) setPetState(state);
+      })
+      .catch((error) => {
+        console.error("Failed to read pet state", error);
+      });
+  }, []);
+
+  const applyPetStateResult = (result: unknown, fallback: PetBridgeState) => {
+    setPetState(isPetBridgeState(result) ? result : fallback);
+  };
+
+  const installPet = async (pet: PublicPet) => {
+    const bridge = getDesktopStoreBridge();
+    if (!bridge?.installPet) {
+      redirectToStoreSignIn();
+      return;
+    }
+    setActionError(null);
+    setWorkingPetId(pet.id);
+    try {
+      const result = await bridge.installPet({ pet });
+      applyPetStateResult(result, {
+        installedPetIds: Array.from(new Set([...petState.installedPetIds, pet.id])),
+        selectedPetId: pet.id,
+      });
+      void incrementDownloads({ id: pet.id }).catch((error) => {
+        console.error("Failed to record pet download", error);
+      });
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Couldn't get pet");
+    } finally {
+      setWorkingPetId(null);
+    }
+  };
+
+  const selectPet = async (petId: string) => {
+    const bridge = getDesktopStoreBridge();
+    if (!bridge?.selectPet) {
+      redirectToStoreSignIn();
+      return;
+    }
+    setActionError(null);
+    setWorkingPetId(petId);
+    try {
+      const result = await bridge.selectPet({ petId });
+      applyPetStateResult(result, {
+        installedPetIds: petState.installedPetIds,
+        selectedPetId: petId,
+      });
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Couldn't select pet");
+    } finally {
+      setWorkingPetId(null);
+    }
+  };
+
+  const removePet = async (petId: string) => {
+    const bridge = getDesktopStoreBridge();
+    if (!bridge?.removePet) return;
+    setActionError(null);
+    setWorkingPetId(petId);
+    try {
+      const result = await bridge.removePet({ petId });
+      applyPetStateResult(result, {
+        installedPetIds: petState.installedPetIds.filter((id) => id !== petId),
+        selectedPetId: petState.selectedPetId === petId ? null : petState.selectedPetId,
+      });
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Couldn't remove pet");
+    } finally {
+      setWorkingPetId(null);
+    }
+  };
 
   return (
     <main className="pets-page">
@@ -822,6 +972,11 @@ function PetsTab() {
           />
         </label>
       </div>
+      {actionError ? (
+        <div className="store-status" data-variant="error">
+          {actionError}
+        </div>
+      ) : null}
       {!pets ? (
         <div className="store-grid">
           {Array.from({ length: 8 }).map((_, index) => (
@@ -830,45 +985,78 @@ function PetsTab() {
         </div>
       ) : (
         <div className="pets-grid">
-          {pets.page.map((pet) => (
-            <article
-              className="pets-card pets-card-wrapper"
-              key={pet.id}
-              onClick={() => setDetailsPet(pet)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  setDetailsPet(pet);
+          {pets.page.map((pet) => {
+            const installed = installedPetIds.has(pet.id);
+            const selected = petState.selectedPetId === pet.id;
+            const working = workingPetId === pet.id;
+            return (
+              <article
+                className="pets-card pets-card-wrapper"
+                data-selected={selected ? "true" : "false"}
+                data-pet-state={
+                  selected ? "selected" : installed ? "installed" : "uninstalled"
                 }
-              }}
-            >
-              <div className="pets-card-sprite">
-                <PetSpritePreview spritesheetUrl={pet.spritesheetUrl} size={84} />
-              </div>
-              <div className="pets-card-name-row">
-                <span className="pets-card-name">{pet.displayName}</span>
-              </div>
-              <div className="pets-card-meta">
-                <span className="pets-card-creator">by {pet.ownerName || "Stella"}</span>
-                <span className="pets-card-downloads">{pet.downloads}</span>
-              </div>
-              <div
-                className="pets-card-actions"
-                onClick={(event) => event.stopPropagation()}
+                key={pet.id}
+                onClick={() => setDetailsPet(pet)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setDetailsPet(pet);
+                  }
+                }}
               >
-                <button
-                  className="store-action-btn"
-                  data-variant="get"
-                  onClick={() => void incrementDownloads({ id: pet.id })}
-                  type="button"
+                <div className="pets-card-sprite">
+                  <PetSpritePreview spritesheetUrl={pet.spritesheetUrl} size={84} />
+                </div>
+                <div className="pets-card-name-row">
+                  <span className="pets-card-name">{pet.displayName}</span>
+                </div>
+                <div className="pets-card-meta">
+                  <span className="pets-card-creator">by {pet.ownerName || "Stella"}</span>
+                  <span className="pets-card-downloads">{pet.downloads}</span>
+                </div>
+                <div
+                  className="pets-card-actions"
+                  onClick={(event) => event.stopPropagation()}
                 >
-                  Get
-                </button>
-              </div>
-            </article>
-          ))}
+                  {!installed ? (
+                    <button
+                      className="store-action-btn"
+                      data-variant={working ? "working" : "get"}
+                      disabled={working}
+                      onClick={() => void installPet(pet)}
+                      type="button"
+                    >
+                      {working ? "Getting..." : "Get"}
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        className="store-action-btn"
+                        data-variant={selected ? "added" : working ? "working" : "get"}
+                        disabled={selected || working}
+                        onClick={() => void selectPet(pet.id)}
+                        type="button"
+                      >
+                        {selected ? "Selected" : working ? "Selecting..." : "Select"}
+                      </button>
+                      <button
+                        className="store-action-btn"
+                        data-variant={working ? "working" : "remove"}
+                        disabled={working}
+                        onClick={() => void removePet(pet.id)}
+                        type="button"
+                      >
+                        {working ? "Removing..." : "Remove"}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
       {detailsPet ? (
@@ -884,14 +1072,51 @@ function PetsTab() {
               </div>
               <p className="pet-detail-blurb">{detailsPet.description}</p>
               <div className="pet-detail-actions">
-                <button
-                  className="store-action-btn store-action-btn--lg"
-                  data-variant="get"
-                  onClick={() => void incrementDownloads({ id: detailsPet.id })}
-                  type="button"
-                >
-                  Get
-                </button>
+                {installedPetIds.has(detailsPet.id) ? (
+                  <>
+                    <button
+                      className="store-action-btn store-action-btn--lg"
+                      data-variant={
+                        petState.selectedPetId === detailsPet.id ? "added" : "get"
+                      }
+                      disabled={
+                        petState.selectedPetId === detailsPet.id ||
+                        workingPetId === detailsPet.id
+                      }
+                      onClick={() => void selectPet(detailsPet.id)}
+                      type="button"
+                    >
+                      {petState.selectedPetId === detailsPet.id
+                        ? "Selected"
+                        : workingPetId === detailsPet.id
+                          ? "Selecting..."
+                          : "Select"}
+                    </button>
+                    <button
+                      className="store-action-btn store-action-btn--lg"
+                      data-variant={
+                        workingPetId === detailsPet.id ? "working" : "remove"
+                      }
+                      disabled={workingPetId === detailsPet.id}
+                      onClick={() => {
+                        void removePet(detailsPet.id).then(() => setDetailsPet(null));
+                      }}
+                      type="button"
+                    >
+                      {workingPetId === detailsPet.id ? "Removing..." : "Remove"}
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className="store-action-btn store-action-btn--lg"
+                    data-variant={workingPetId === detailsPet.id ? "working" : "get"}
+                    disabled={workingPetId === detailsPet.id}
+                    onClick={() => void installPet(detailsPet)}
+                    type="button"
+                  >
+                    {workingPetId === detailsPet.id ? "Getting..." : "Get"}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -905,12 +1130,81 @@ function EmojisTab() {
   const [query, setQuery] = useState("");
   const [detailsPack, setDetailsPack] = useState<EmojiPack | null>(null);
   const [previewSheet, setPreviewSheet] = useState(0);
+  const [emojiState, setEmojiState] = useState<EmojiBridgeState>({
+    activePack: null,
+  });
+  const [workingPackId, setWorkingPackId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const packs = useQuery(listPublicEmojiPacks, {
     paginationOpts: { numItems: 48, cursor: null },
     sort: "installs",
     ...(query.trim() ? { search: query.trim() } : {}),
   });
   const recordInstall = useMutation(recordEmojiInstall);
+
+  useEffect(() => {
+    const bridge = getDesktopStoreBridge();
+    const request = bridge?.getEmojiPackState?.();
+    if (!request) return;
+    void request
+      .then((state) => {
+        if (isEmojiBridgeState(state)) setEmojiState(state);
+      })
+      .catch((error) => {
+        console.error("Failed to read emoji pack state", error);
+      });
+  }, []);
+
+  const applyEmojiStateResult = (result: unknown, fallback: EmojiBridgeState) => {
+    setEmojiState(isEmojiBridgeState(result) ? result : fallback);
+  };
+
+  const installEmojiPack = async (pack: EmojiPack) => {
+    const bridge = getDesktopStoreBridge();
+    if (!bridge?.installEmojiPack) {
+      redirectToStoreSignIn();
+      return;
+    }
+    setActionError(null);
+    setWorkingPackId(pack.packId);
+    try {
+      const result = await bridge.installEmojiPack({
+        packId: pack.packId,
+        sheetUrls: pack.sheetUrls,
+      });
+      applyEmojiStateResult(result, {
+        activePack: { packId: pack.packId, sheetUrls: pack.sheetUrls },
+      });
+      void recordInstall({ packId: pack.packId }).catch((error) => {
+        console.error("Failed to record emoji pack install", error);
+      });
+      setDetailsPack(null);
+    } catch (error) {
+      setActionError(
+        error instanceof Error ? error.message : "Couldn't use emoji pack",
+      );
+    } finally {
+      setWorkingPackId(null);
+    }
+  };
+
+  const clearEmojiPack = async (packId: string) => {
+    const bridge = getDesktopStoreBridge();
+    if (!bridge?.clearEmojiPack) return;
+    setActionError(null);
+    setWorkingPackId(packId);
+    try {
+      const result = await bridge.clearEmojiPack({ packId });
+      applyEmojiStateResult(result, { activePack: null });
+      setDetailsPack(null);
+    } catch (error) {
+      setActionError(
+        error instanceof Error ? error.message : "Couldn't stop using pack",
+      );
+    } finally {
+      setWorkingPackId(null);
+    }
+  };
 
   return (
     <main className="emoji-page">
@@ -933,6 +1227,11 @@ function EmojisTab() {
           />
         </label>
       </div>
+      {actionError ? (
+        <div className="store-status" data-variant="error">
+          {actionError}
+        </div>
+      ) : null}
       {!packs ? (
         <div className="emoji-pack-grid">
           {Array.from({ length: 8 }).map((_, index) => (
@@ -941,54 +1240,61 @@ function EmojisTab() {
         </div>
       ) : (
         <div className="emoji-pack-grid">
-          {packs.page.map((pack) => (
-            <article className="emoji-pack-card" key={pack._id}>
-              <button
-                type="button"
-                className="emoji-pack-cover"
-                onClick={() => {
-                  setPreviewSheet(0);
-                  setDetailsPack(pack);
-                }}
+          {packs.page.map((pack) => {
+            const active = emojiState.activePack?.packId === pack.packId;
+            return (
+              <article
+                className="emoji-pack-card"
+                data-active={active || undefined}
+                key={pack._id}
               >
-                {pack.coverUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img alt="" className="emoji-pack-cover-img" src={pack.coverUrl} />
-                ) : (
-                  <span className="emoji-pack-cover-glyph">{pack.coverEmoji}</span>
-                )}
-              </button>
-              <div className="emoji-pack-body">
-                <div className="emoji-pack-name-row">
-                  <span className="emoji-pack-name">{pack.displayName}</span>
-                </div>
-                {pack.description ? (
-                  <span className="emoji-pack-desc">{pack.description}</span>
-                ) : null}
-                <div className="emoji-pack-meta">
-                  <span className="emoji-pack-author">
-                    by {pack.authorDisplayName || pack.authorHandle || "Stella"}
-                  </span>
-                  <span className="emoji-pack-installs">
-                    {(pack.installCount ?? 0) || "New"} uses
-                  </span>
-                </div>
-              </div>
-              <div className="emoji-pack-actions">
                 <button
-                  className="store-action-btn"
-                  data-variant="get"
+                  type="button"
+                  className="emoji-pack-cover"
                   onClick={() => {
                     setPreviewSheet(0);
                     setDetailsPack(pack);
                   }}
-                  type="button"
                 >
-                  Get
+                  {pack.coverUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img alt="" className="emoji-pack-cover-img" src={pack.coverUrl} />
+                  ) : (
+                    <span className="emoji-pack-cover-glyph">{pack.coverEmoji}</span>
+                  )}
                 </button>
-              </div>
-            </article>
-          ))}
+                <div className="emoji-pack-body">
+                  <div className="emoji-pack-name-row">
+                    <span className="emoji-pack-name">{pack.displayName}</span>
+                  </div>
+                  {pack.description ? (
+                    <span className="emoji-pack-desc">{pack.description}</span>
+                  ) : null}
+                  <div className="emoji-pack-meta">
+                    <span className="emoji-pack-author">
+                      by {pack.authorDisplayName || pack.authorHandle || "Stella"}
+                    </span>
+                    <span className="emoji-pack-installs">
+                      {(pack.installCount ?? 0) || "New"} uses
+                    </span>
+                  </div>
+                </div>
+                <div className="emoji-pack-actions">
+                  <button
+                    className="store-action-btn"
+                    data-variant={active ? "added" : "get"}
+                    onClick={() => {
+                      setPreviewSheet(0);
+                      setDetailsPack(pack);
+                    }}
+                    type="button"
+                  >
+                    {active ? "Active" : "Get"}
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
       {detailsPack ? (
@@ -1064,11 +1370,28 @@ function EmojisTab() {
                 <div className="emoji-details-actions">
                   <button
                     className="store-action-btn store-action-btn--lg"
-                    data-variant="get"
-                    onClick={() => void recordInstall({ packId: detailsPack.packId })}
+                    data-variant={
+                      workingPackId === detailsPack.packId
+                        ? "working"
+                        : emojiState.activePack?.packId === detailsPack.packId
+                          ? "added"
+                          : "get"
+                    }
+                    disabled={workingPackId === detailsPack.packId}
+                    onClick={() => {
+                      if (emojiState.activePack?.packId === detailsPack.packId) {
+                        void clearEmojiPack(detailsPack.packId);
+                        return;
+                      }
+                      void installEmojiPack(detailsPack);
+                    }}
                     type="button"
                   >
-                    Get &amp; use pack
+                    {workingPackId === detailsPack.packId
+                      ? "Working..."
+                      : emojiState.activePack?.packId === detailsPack.packId
+                        ? "Stop using"
+                        : "Get & use pack"}
                   </button>
                 </div>
               </div>
@@ -1082,6 +1405,7 @@ function EmojisTab() {
 
 function FashionTab() {
   const status = useQuery(getFashionFeatureStatus, {});
+  const [actionError, setActionError] = useState<string | null>(null);
   return (
     <div className="fashion-root">
       <div className="fashion-blank">
@@ -1095,7 +1419,23 @@ function FashionTab() {
           <div className="fashion-blank-subtitle">
             Generate outfits, save pieces, and check out from Stella.
           </div>
-          <button className="fashion-blank-cta" type="button">
+          {actionError ? (
+            <div className="store-status" data-variant="error">
+              {actionError}
+            </div>
+          ) : null}
+          <button
+            className="fashion-blank-cta"
+            onClick={() => {
+              setActionError(null);
+              void openNativeStorePanel().then((opened) => {
+                if (!opened) {
+                  setActionError("Open Fashion from Stella to start styling.");
+                }
+              });
+            }}
+            type="button"
+          >
             Start styling
           </button>
         </div>
@@ -1241,7 +1581,9 @@ function StoreClientInner() {
           data-variant="get"
           type="button"
           onClick={() => {
-            window.location.href = "/sign-in?next=/store";
+            void openNativeStorePanel().then((opened) => {
+              if (!opened) redirectToStoreSignIn();
+            });
           }}
         >
           Upload to Store
