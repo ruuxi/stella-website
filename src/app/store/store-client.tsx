@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import {
+  Check,
   ChevronLeft,
   ChevronRight,
   Clock,
+  Copy,
   Layers,
   Package,
   Search,
@@ -811,6 +813,10 @@ function Detail({
   );
 }
 
+function buildShareLink(authorHandle: string, packageId: string): string {
+  return `stella://store/${authorHandle.trim().toLowerCase()}/${packageId.trim().toLowerCase()}`;
+}
+
 function ShareDialog({
   pkg,
   onClose,
@@ -819,33 +825,110 @@ function ShareDialog({
   onClose: () => void;
 }) {
   const [copied, setCopied] = useState(false);
-  const url =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/store?package=${encodeURIComponent(pkg.packageId)}`
-      : `/store?package=${encodeURIComponent(pkg.packageId)}`;
+  const link = pkg.authorHandle
+    ? buildShareLink(pkg.authorHandle, pkg.packageId)
+    : null;
+
+  const handleCopy = async () => {
+    if (!link) return;
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // best-effort copy
+    }
+  };
+
   return (
     <StoreModal onClose={onClose}>
-      <div className="store-share-dialog">
-        <div className="store-share-dialog-title">Share {pkg.displayName}</div>
-        <p className="store-share-dialog-caption">
-          Anyone with this link can open this add-on in the Stella Store.
+      <div className="share-addon-dialog-intro">
+        <div className="share-addon-dialog-title">Share {pkg.displayName}</div>
+        <p className="share-addon-dialog-description">
+          {!link
+            ? "This add-on doesn't have a public author handle yet, so it can't be shared. Claim a handle in Store settings first."
+            : "Copy a link to share this add-on anywhere. Pasted into a Stella chat, it embeds as a card."}
         </p>
-        <div className="store-share-dialog-link">
-          <input readOnly value={url} className="store-share-dialog-input" />
+      </div>
+      {link ? (
+        <div className="share-addon-link-row">
+          <code className="share-addon-link">{link}</code>
           <button
             type="button"
             className="store-action-btn"
-            data-variant="get"
-            onClick={() => {
-              void navigator.clipboard.writeText(url).then(() => {
-                setCopied(true);
-                window.setTimeout(() => setCopied(false), 1600);
-              });
-            }}
+            data-variant={copied ? "added" : "get"}
+            onClick={() => void handleCopy()}
           >
-            {copied ? "Copied" : "Copy link"}
+            {copied ? (
+              <>
+                <Check size={14} /> Copied
+              </>
+            ) : (
+              <>
+                <Copy size={14} /> Copy link
+              </>
+            )}
           </button>
         </div>
+      ) : null}
+    </StoreModal>
+  );
+}
+
+function InstallConfirmDialog({
+  pkg,
+  release,
+  loading,
+  onConfirm,
+  onCancel,
+}: {
+  pkg: StorePackage;
+  release: StoreRelease | null | undefined;
+  loading: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  const blueprint = release?.blueprintMarkdown ?? "";
+  return (
+    <StoreModal onClose={onCancel}>
+      <div className="store-blueprint-dialog-header">
+        <div className="store-blueprint-dialog-title">
+          Add {pkg.displayName}?
+        </div>
+      </div>
+      <div className="store-blueprint-dialog-viewer">
+        {loading ? (
+          <div className="store-blueprint-dialog-loading">Loading blueprint…</div>
+        ) : blueprint ? (
+          <pre className="store-blueprint-dialog-markdown">{blueprint}</pre>
+        ) : (
+          <div className="store-blueprint-dialog-loading">
+            This release doesn&apos;t have a blueprint yet.
+          </div>
+        )}
+      </div>
+      <div className="store-install-confirm-copy">
+        Stella will implement this blueprint locally and commit the resulting
+        changes so you can remove it later.
+      </div>
+      <div className="store-blueprint-dialog-actions">
+        <button
+          type="button"
+          className="store-action-btn"
+          data-variant="subtle"
+          onClick={onCancel}
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          className="store-action-btn"
+          data-variant="get"
+          onClick={onConfirm}
+          disabled={loading || !blueprint}
+        >
+          Add to Stella
+        </button>
       </div>
     </StoreModal>
   );
@@ -1451,6 +1534,7 @@ function StoreClientInner() {
   const [installedIds, setInstalledIds] = useState<Set<string>>(new Set());
   const [installingId, setInstallingId] = useState<string | null>(null);
   const [sharePkg, setSharePkg] = useState<StorePackage | null>(null);
+  const [pendingInstall, setPendingInstall] = useState<StorePackage | null>(null);
   const [urlState, setUrlState] = useState({
     tab: "discover",
     packageId: null as string | null,
@@ -1505,6 +1589,21 @@ function StoreClientInner() {
   const rest = filtered.filter(
     (pkg) => !showFeatured || pkg.packageId !== featured!.packageId,
   );
+
+  const pendingInstallReleases = useQuery(
+    listPublicReleases,
+    pendingInstall ? { packageId: pendingInstall.packageId } : "skip",
+  );
+  const pendingInstallRelease =
+    pendingInstallReleases?.find(
+      (release) =>
+        pendingInstall &&
+        release.releaseNumber === pendingInstall.latestReleaseNumber,
+    ) ?? pendingInstallReleases?.[0];
+
+  const requestInstall = (pkg: StorePackage) => {
+    setPendingInstall(pkg);
+  };
 
   const installPackage = async (pkg: StorePackage, release?: StoreRelease | null) => {
     if (!window.stellaDesktopStore) {
@@ -1565,13 +1664,6 @@ function StoreClientInner() {
     );
   }
 
-  const detailRelease =
-    selectedReleases?.find(
-      (release) =>
-        selectedPackage &&
-        release.releaseNumber === selectedPackage.latestReleaseNumber,
-    ) ?? selectedReleases?.[0];
-
   return (
     <main className="store-root" data-tab="discover">
       <StoreWebTabs activeTab="discover" />
@@ -1604,7 +1696,7 @@ function StoreClientInner() {
                 window.history.replaceState({}, "", next.toString());
               }
             }}
-            onInstall={() => installPackage(selectedPackage, detailRelease)}
+            onInstall={() => requestInstall(selectedPackage)}
             onShare={() => setSharePkg(selectedPackage)}
           />
         ) : (
@@ -1640,7 +1732,7 @@ function StoreClientInner() {
                 pkg={featured}
                 installed={installedIds.has(featured.packageId)}
                 installing={installingId === featured.packageId}
-                onAction={() => void installPackage(featured)}
+                onAction={() => requestInstall(featured)}
                 onClick={() => setSelectedPackageId(featured.packageId)}
               />
             ) : null}
@@ -1684,7 +1776,7 @@ function StoreClientInner() {
                       installed={installedIds.has(pkg.packageId)}
                       installing={installingId === pkg.packageId}
                       onOpen={() => setSelectedPackageId(pkg.packageId)}
-                      onInstall={() => void installPackage(pkg)}
+                      onInstall={() => requestInstall(pkg)}
                       onShare={() => setSharePkg(pkg)}
                     />
                   ))}
@@ -1696,6 +1788,20 @@ function StoreClientInner() {
       </div>
       {sharePkg ? (
         <ShareDialog pkg={sharePkg} onClose={() => setSharePkg(null)} />
+      ) : null}
+      {pendingInstall ? (
+        <InstallConfirmDialog
+          pkg={pendingInstall}
+          release={pendingInstallRelease ?? null}
+          loading={pendingInstallReleases === undefined}
+          onCancel={() => setPendingInstall(null)}
+          onConfirm={() => {
+            const pkg = pendingInstall;
+            const release = pendingInstallRelease ?? null;
+            setPendingInstall(null);
+            void installPackage(pkg, release);
+          }}
+        />
       ) : null}
     </main>
   );
