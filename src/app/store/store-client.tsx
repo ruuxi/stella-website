@@ -167,6 +167,20 @@ const categories: Array<{ key: StoreCategory | "all"; label: string }> = [
   { key: "skills-agents", label: "Skills" },
 ];
 
+const storeTabs = [
+  { key: "discover", label: "Discover" },
+  { key: "pets", label: "Pets" },
+  { key: "emojis", label: "Emojis" },
+  { key: "fashion", label: "Fashion" },
+] as const;
+
+type HostedStoreTab = (typeof storeTabs)[number]["key"];
+
+const normalizeHostedStoreTab = (value: string | null): HostedStoreTab =>
+  storeTabs.some((tab) => tab.key === value)
+    ? (value as HostedStoreTab)
+    : "discover";
+
 const gradientFor = (id: string) => {
   const hue = Array.from(id).reduce((sum, char) => sum + char.charCodeAt(0), 0) % 360;
   return `linear-gradient(135deg, hsl(${hue} 74% 52%), hsl(${(hue + 46) % 360} 68% 44%))`;
@@ -214,6 +228,23 @@ function EmptyState({ title, description }: { title: string; description: string
       <div className="store-empty-title">{title}</div>
       <div className="store-empty-desc">{description}</div>
     </div>
+  );
+}
+
+function StoreWebTabs({ activeTab }: { activeTab: HostedStoreTab }) {
+  return (
+    <nav className="store-web-tabs" aria-label="Store sections">
+      {storeTabs.map((tab) => (
+        <a
+          className="store-web-tab"
+          data-active={activeTab === tab.key ? "true" : undefined}
+          href={`/store?tab=${tab.key}`}
+          key={tab.key}
+        >
+          {tab.label}
+        </a>
+      ))}
+    </nav>
   );
 }
 
@@ -546,7 +577,7 @@ function StoreClientInner() {
     });
   }, []);
 
-  const activeTab = urlState.tab;
+  const activeTab = normalizeHostedStoreTab(urlState.tab);
   const initialPackageId = urlState.packageId;
 
   useEffect(() => {
@@ -622,6 +653,7 @@ function StoreClientInner() {
   if (activeTab !== "discover") {
     return (
       <main className="store-root" data-tab={activeTab}>
+        <StoreWebTabs activeTab={activeTab} />
         {activeTab === "pets" ? (
           <PetsTab />
         ) : activeTab === "emojis" ? (
@@ -639,6 +671,7 @@ function StoreClientInner() {
 
   return (
     <main className="store-root" data-tab="discover">
+      <StoreWebTabs activeTab="discover" />
       <button className="store-action-btn store-upload-btn" data-variant="share" type="button">
         <Upload size={14} /> Upload
       </button>
