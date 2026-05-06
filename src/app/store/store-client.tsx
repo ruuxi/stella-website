@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
-import { Check, Download, Search, Upload, Sparkles } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Download, Search, Upload, X } from "lucide-react";
 import { isConvexConfigured } from "@/lib/convex-urls";
 
 type StoreCategory =
@@ -61,6 +61,8 @@ type EmojiPack = {
   description?: string;
   coverEmoji: string;
   coverUrl?: string;
+  sheetUrls: string[];
+  visibility?: "public" | "unlisted" | "private";
   authorDisplayName?: string;
   authorHandle?: string;
   installCount?: number;
@@ -185,6 +187,104 @@ const gradientFor = (id: string) => {
   const hue = Array.from(id).reduce((sum, char) => sum + char.charCodeAt(0), 0) % 360;
   return `linear-gradient(135deg, hsl(${hue} 74% 52%), hsl(${(hue + 46) % 360} 68% 44%))`;
 };
+
+const PET_COLUMNS = 8;
+const PET_ROWS = 9;
+const petIdleFrames = [
+  { column: 0, duration: 280 },
+  { column: 1, duration: 110 },
+  { column: 2, duration: 110 },
+  { column: 3, duration: 140 },
+  { column: 4, duration: 140 },
+  { column: 5, duration: 320 },
+];
+
+function PetSpritePreview({
+  spritesheetUrl,
+  size = 84,
+}: {
+  spritesheetUrl: string;
+  size?: number;
+}) {
+  const [frame, setFrame] = useState(0);
+
+  useEffect(() => {
+    const current = petIdleFrames[frame] ?? petIdleFrames[0]!;
+    const timer = window.setTimeout(() => {
+      setFrame((value) => (value + 1) % petIdleFrames.length);
+    }, current.duration);
+    return () => window.clearTimeout(timer);
+  }, [frame]);
+
+  const current = petIdleFrames[frame] ?? petIdleFrames[0]!;
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        width: size,
+        height: Math.round(size * (208 / 192)),
+        backgroundImage: `url(${spritesheetUrl})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: `${PET_COLUMNS * 100}% ${PET_ROWS * 100}%`,
+        backgroundPosition: `${(current.column / (PET_COLUMNS - 1)) * 100}% 0%`,
+        imageRendering: "pixelated",
+      }}
+    />
+  );
+}
+
+function EmojiCellPreview({
+  sheetUrl,
+  cell,
+  size = 36,
+  gridSize = 8,
+}: {
+  sheetUrl: string;
+  cell: number;
+  size?: number;
+  gridSize?: number;
+}) {
+  const row = Math.floor(cell / gridSize);
+  const col = cell % gridSize;
+  const last = Math.max(1, gridSize - 1);
+  return (
+    <span
+      className="emoji-cell-preview"
+      style={{
+        width: size,
+        height: size,
+        backgroundImage: `url("${sheetUrl}")`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: `${gridSize * 100}% ${gridSize * 100}%`,
+        backgroundPosition: `${(col / last) * 100}% ${(row / last) * 100}%`,
+      }}
+    />
+  );
+}
+
+function StoreModal({
+  children,
+  onClose,
+}: {
+  children: React.ReactNode;
+  onClose: () => void;
+}) {
+  return (
+    <div className="store-web-dialog-backdrop" onClick={onClose}>
+      <div className="store-web-dialog" onClick={(event) => event.stopPropagation()}>
+        <button
+          type="button"
+          className="store-web-dialog-close"
+          onClick={onClose}
+          aria-label="Close"
+        >
+          <X size={16} />
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 function PackageArtwork({ pkg, size = "card" }: { pkg: StorePackage; size?: "card" | "hero" | "detail" }) {
   const className =
@@ -383,6 +483,7 @@ function Detail({
 
 function PetsTab() {
   const [query, setQuery] = useState("");
+  const [detailsPet, setDetailsPet] = useState<PublicPet | null>(null);
   const pets = useQuery(listPublicPets, {
     paginationOpts: { numItems: 48, cursor: null },
     sort: "downloads",
@@ -421,41 +522,80 @@ function PetsTab() {
       ) : (
         <div className="pets-grid">
           {pets.page.map((pet) => (
-            <article className="pets-card pets-card-wrapper" key={pet.id}>
+            <article
+              className="pets-card pets-card-wrapper"
+              key={pet.id}
+              onClick={() => setDetailsPet(pet)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setDetailsPet(pet);
+                }
+              }}
+            >
               <div className="pets-card-sprite">
-                {pet.previewUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img alt="" src={pet.previewUrl} />
-                ) : (
-                  <Sparkles size={28} />
-                )}
+                <PetSpritePreview spritesheetUrl={pet.spritesheetUrl} size={84} />
               </div>
-              <div className="pets-card-body">
-                <div className="pets-card-name">{pet.displayName}</div>
-                <div className="pets-card-desc">{pet.description}</div>
-                <div className="pets-card-meta">
-                  <span>{pet.ownerName || "Stella"}</span>
-                  <span>{pet.downloads} downloads</span>
-                </div>
+              <div className="pets-card-name-row">
+                <span className="pets-card-name">{pet.displayName}</span>
               </div>
-              <button
-                className="store-action-btn"
-                data-variant="get"
-                onClick={() => void incrementDownloads({ id: pet.id })}
-                type="button"
-              >
-                Get
-              </button>
+              <div className="pets-card-meta">
+                <span className="pets-card-creator">by {pet.ownerName || "Stella"}</span>
+                <span className="pets-card-downloads">
+                  <Download size={11} aria-hidden="true" />
+                  {pet.downloads}
+                </span>
+              </div>
+              <div className="pets-card-actions" onClick={(event) => event.stopPropagation()}>
+                <button
+                  className="store-action-btn"
+                  data-variant="get"
+                  onClick={() => void incrementDownloads({ id: pet.id })}
+                  type="button"
+                >
+                  Get
+                </button>
+              </div>
             </article>
           ))}
         </div>
       )}
+      {detailsPet ? (
+        <StoreModal onClose={() => setDetailsPet(null)}>
+          <div className="pet-detail-dialog">
+            <div className="pet-detail-title">{detailsPet.displayName}</div>
+            <p className="pet-detail-caption">
+              by {detailsPet.ownerName || "Stella"} · {detailsPet.downloads} selections
+            </p>
+            <div className="pet-detail-body">
+              <div className="pet-detail-stage">
+                <PetSpritePreview spritesheetUrl={detailsPet.spritesheetUrl} size={220} />
+              </div>
+              <p className="pet-detail-blurb">{detailsPet.description}</p>
+              <div className="pet-detail-actions">
+                <button
+                  className="store-action-btn"
+                  data-variant="get"
+                  onClick={() => void incrementDownloads({ id: detailsPet.id })}
+                  type="button"
+                >
+                  Get
+                </button>
+              </div>
+            </div>
+          </div>
+        </StoreModal>
+      ) : null}
     </div>
   );
 }
 
 function EmojisTab() {
   const [query, setQuery] = useState("");
+  const [detailsPack, setDetailsPack] = useState<EmojiPack | null>(null);
+  const [previewSheet, setPreviewSheet] = useState(0);
   const packs = useQuery(listPublicEmojiPacks, {
     paginationOpts: { numItems: 48, cursor: null },
     sort: "installs",
@@ -495,14 +635,21 @@ function EmojisTab() {
         <div className="emoji-pack-grid">
           {packs.page.map((pack) => (
             <article className="emoji-pack-card" key={pack._id}>
-              <div className="emoji-pack-cover">
+              <button
+                type="button"
+                className="emoji-pack-cover"
+                onClick={() => {
+                  setPreviewSheet(0);
+                  setDetailsPack(pack);
+                }}
+              >
                 {pack.coverUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img alt="" className="emoji-pack-cover-img" src={pack.coverUrl} />
                 ) : (
                   <span className="emoji-pack-cover-glyph">{pack.coverEmoji}</span>
                 )}
-              </div>
+              </button>
               <div className="emoji-pack-body">
                 <div className="emoji-pack-name-row">
                   <span className="emoji-pack-name">{pack.displayName}</span>
@@ -523,7 +670,10 @@ function EmojisTab() {
                 <button
                   className="store-action-btn"
                   data-variant="get"
-                  onClick={() => void recordInstall({ packId: pack.packId })}
+                  onClick={() => {
+                    setPreviewSheet(0);
+                    setDetailsPack(pack);
+                  }}
                   type="button"
                 >
                   Get
@@ -533,6 +683,82 @@ function EmojisTab() {
           ))}
         </div>
       )}
+      {detailsPack ? (
+        <StoreModal onClose={() => setDetailsPack(null)}>
+          <div className="emoji-details-dialog">
+            <div className="emoji-details-title">{detailsPack.displayName}</div>
+            <p className="emoji-details-caption">
+              {detailsPack.description || `Pack by ${detailsPack.authorDisplayName || detailsPack.authorHandle || "Stella"}`}
+            </p>
+            <div className="emoji-details-body">
+              <div className="emoji-details-preview">
+                <div className="emoji-details-preview-tabs">
+                  <button
+                    type="button"
+                    className="emoji-create-arrow"
+                    disabled={previewSheet === 0}
+                    onClick={() => setPreviewSheet((sheet) => Math.max(0, sheet - 1))}
+                    aria-label="Previous sheet"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <span className="emoji-create-preview-label">
+                    Sheet {previewSheet + 1} of {Math.max(1, detailsPack.sheetUrls.length)}
+                  </span>
+                  <button
+                    type="button"
+                    className="emoji-create-arrow"
+                    disabled={previewSheet >= detailsPack.sheetUrls.length - 1}
+                    onClick={() =>
+                      setPreviewSheet((sheet) =>
+                        Math.min(detailsPack.sheetUrls.length - 1, sheet + 1),
+                      )
+                    }
+                    aria-label="Next sheet"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+                <div className="emoji-create-grid" data-state="ready">
+                  {Array.from({ length: 64 }).map((_, index) => (
+                    <div key={index} className="emoji-create-cell">
+                      <EmojiCellPreview
+                        sheetUrl={detailsPack.sheetUrls[previewSheet] ?? detailsPack.sheetUrls[0] ?? ""}
+                        cell={index}
+                        gridSize={8}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="emoji-details-side">
+                <div className="emoji-details-meta">
+                  <div className="emoji-details-meta-row">
+                    <span className="emoji-details-meta-label">Cover</span>
+                    <span className="emoji-details-meta-value">{detailsPack.coverEmoji}</span>
+                  </div>
+                  <div className="emoji-details-meta-row">
+                    <span className="emoji-details-meta-label">Author</span>
+                    <span className="emoji-details-meta-value">
+                      {detailsPack.authorDisplayName || detailsPack.authorHandle || "Stella"}
+                    </span>
+                  </div>
+                </div>
+                <div className="emoji-details-actions">
+                  <button
+                    className="store-action-btn"
+                    data-variant="get"
+                    onClick={() => void recordInstall({ packId: detailsPack.packId })}
+                    type="button"
+                  >
+                    Get & use pack
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </StoreModal>
+      ) : null}
     </div>
   );
 }
