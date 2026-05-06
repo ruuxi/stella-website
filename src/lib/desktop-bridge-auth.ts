@@ -11,6 +11,11 @@ export type DesktopBridgeUser = {
 
 type DesktopStoreBridge = {
   getAuthToken?: () => Promise<string | null>;
+  getAuthSession?: () => Promise<unknown>;
+};
+
+type BetterAuthSessionPayload = {
+  user?: DesktopBridgeUser | null;
 };
 
 const decodeJwtPayload = (token: string): Record<string, unknown> | null => {
@@ -38,6 +43,19 @@ const userFromToken = (token: string): DesktopBridgeUser | null => {
   return { id, email, name, isAnonymous };
 };
 
+const userFromSession = (session: unknown): DesktopBridgeUser | null => {
+  const payload = session as BetterAuthSessionPayload | null | undefined;
+  const user = payload?.user;
+  if (!user || typeof user !== "object") return null;
+  const id = typeof user.id === "string" ? user.id : undefined;
+  const email = typeof user.email === "string" ? user.email : undefined;
+  const name = typeof user.name === "string" ? user.name : undefined;
+  const isAnonymous =
+    typeof user.isAnonymous === "boolean" ? user.isAnonymous : null;
+  if (!id && !email) return null;
+  return { id, email, name, isAnonymous };
+};
+
 export function useDesktopBridgeAuthUser(): DesktopBridgeUser | null {
   const [user, setUser] = useState<DesktopBridgeUser | null>(null);
 
@@ -47,11 +65,17 @@ export function useDesktopBridgeAuthUser(): DesktopBridgeUser | null {
       .stellaDesktopStore;
     if (!bridge?.getAuthToken) return;
 
-    void bridge
-      .getAuthToken()
-      .then((token) => {
-        if (cancelled || !token) return;
-        setUser(userFromToken(token));
+    void Promise.resolve()
+      .then(async () => {
+        const session = await bridge.getAuthSession?.();
+        const sessionUser = userFromSession(session);
+        if (sessionUser) return sessionUser;
+        const token = await bridge.getAuthToken?.();
+        return token ? userFromToken(token) : null;
+      })
+      .then((nextUser) => {
+        if (cancelled) return;
+        setUser(nextUser);
       })
       .catch(() => {
         if (!cancelled) setUser(null);
