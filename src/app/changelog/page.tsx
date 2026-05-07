@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { SiteHeaderAccount } from "@/components/auth/site-header-account";
+import { SiteNav } from "@/components/site-nav";
 import "./changelog.css";
 
 export const metadata: Metadata = {
@@ -11,12 +11,6 @@ export const metadata: Metadata = {
     "A running log of what's changed in Stella — new features, fixes, and polish, in plain English.",
   alternates: { canonical: "/changelog" },
 };
-
-const navItems = [
-  { label: "How It Works", href: "/how-it-works" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "What's New", href: "/changelog" },
-];
 
 const footerGroups = [
   {
@@ -713,14 +707,7 @@ export default function Changelog() {
             <span className="brand-text">Stella</span>
           </Link>
         </div>
-        <nav className="site-nav" aria-label="Primary">
-          {navItems.map((item) => (
-            <a key={item.label} href={item.href}>
-              {item.label}
-            </a>
-          ))}
-          <SiteHeaderAccount />
-        </nav>
+        <SiteNav />
       </header>
 
       <main>

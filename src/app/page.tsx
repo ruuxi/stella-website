@@ -4,7 +4,7 @@ import { DownloadButton } from "@/components/download-button";
 import { HeroMorphTitle } from "@/components/hero-morph-title";
 import { HeroStellaOrb } from "@/components/hero-stella-orb-dynamic";
 import { DeferInView } from "@/components/product-demos/defer-in-view";
-import { SiteHeaderAccount } from "@/components/auth/site-header-account";
+import { SiteNav } from "@/components/site-nav";
 
 const SelfModHero = dynamic(
   () => import("@/components/product-demos/self-mod-hero").then((mod) => mod.SelfModHero),
@@ -50,12 +50,6 @@ const ExtensionSection = dynamic(
   () => import("@/components/product-demos/onboarding-derived-sections").then((mod) => mod.ExtensionSection),
   { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
 );
-
-const navItems = [
-  { label: "How It Works", href: "/how-it-works" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "What's New", href: "/changelog" },
-];
 
 const showcaseCards = [
   {
@@ -162,14 +156,7 @@ export default function Home() {
           </a>
         </div>
 
-        <nav className="site-nav" aria-label="Primary">
-          {navItems.map((item) => (
-            <a key={item.label} href={item.href}>
-              {item.label}
-            </a>
-          ))}
-          <SiteHeaderAccount />
-        </nav>
+        <SiteNav />
       </header>
 
       <main>

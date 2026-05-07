@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
-import { SiteHeaderAccount } from "@/components/auth/site-header-account";
+import { SiteNav } from "@/components/site-nav";
 import "./pricing.css";
 
 export const metadata: Metadata = {
@@ -11,12 +11,6 @@ export const metadata: Metadata = {
     "Stella pricing — start free, upgrade when you need more. Simple plans from $0 to $200/month.",
   alternates: { canonical: "/pricing" },
 };
-
-const navItems = [
-  { label: "How It Works", href: "/how-it-works" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "What's New", href: "/changelog" },
-];
 
 const plans = [
   {
@@ -114,14 +108,7 @@ export default function Pricing() {
             <span className="brand-text">Stella</span>
           </Link>
         </div>
-        <nav className="site-nav" aria-label="Primary">
-          {navItems.map((item) => (
-            <a key={item.label} href={item.href}>
-              {item.label}
-            </a>
-          ))}
-          <SiteHeaderAccount />
-        </nav>
+        <SiteNav />
       </header>
 
       <main>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { SiteHeaderAccount } from "@/components/auth/site-header-account";
+import { SiteNav } from "@/components/site-nav";
 import "./how-it-works.css";
 
 export const metadata: Metadata = {
@@ -11,12 +11,6 @@ export const metadata: Metadata = {
     "Learn how Stella works — a personal AI assistant that runs on your computer, keeps your data private, and handles anything you need.",
   alternates: { canonical: "/how-it-works" },
 };
-
-const navItems = [
-  { label: "How It Works", href: "/how-it-works" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "What's New", href: "/changelog" },
-];
 
 const footerGroups = [
   {
@@ -57,14 +51,7 @@ export default function HowItWorks() {
             <span className="brand-text">Stella</span>
           </Link>
         </div>
-        <nav className="site-nav" aria-label="Primary">
-          {navItems.map((item) => (
-            <a key={item.label} href={item.href}>
-              {item.label}
-            </a>
-          ))}
-          <SiteHeaderAccount />
-        </nav>
+        <SiteNav />
       </header>
 
       <main>
