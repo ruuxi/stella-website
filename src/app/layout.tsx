@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, IBM_Plex_Mono, Manrope } from "next/font/google";
 import { getSiteUrl } from "@/lib/site-url";
 import { ConvexAuthProvider } from "@/components/auth/convex-auth-provider";
+import { SignInDialogProvider } from "@/components/auth/sign-in-dialog";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import "./globals.css";
 /* Product demos (self-mod, radial, canvas) — partials in ./demos/ */
@@ -130,7 +131,9 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <ConvexAuthProvider>{children}</ConvexAuthProvider>
+        <ConvexAuthProvider>
+          <SignInDialogProvider>{children}</SignInDialogProvider>
+        </ConvexAuthProvider>
         <RevealOnScroll />
       </body>
     </html>

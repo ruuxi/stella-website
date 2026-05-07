@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import { getConvexToken } from "@/lib/auth-token";
 import { isConvexConfigured, readConvexSiteUrl } from "@/lib/convex-urls";
+import { openSignInDialog } from "@/components/auth/sign-in-dialog";
 
 type StoreCategory =
   | "apps-games"
@@ -647,8 +648,7 @@ const getDesktopStoreBridge = (): DesktopStoreBridge | undefined =>
   typeof window === "undefined" ? undefined : window.stellaDesktopStore;
 
 const redirectToStoreSignIn = () => {
-  if (typeof window === "undefined") return;
-  window.location.href = "/sign-in?next=/store";
+  openSignInDialog();
 };
 
 const isPetBridgeState = (value: unknown): value is PetBridgeState => {
@@ -5130,7 +5130,7 @@ function StoreClientInner() {
 
   const installPackage = async (pkg: StorePackage, release?: StoreRelease | null) => {
     if (!window.stellaDesktopStore) {
-      window.location.href = "/sign-in?next=/store";
+      openSignInDialog();
       return;
     }
     setInstallingId(pkg.packageId);

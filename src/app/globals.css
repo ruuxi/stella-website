@@ -191,7 +191,8 @@ select {
   gap: 0.35rem;
 }
 
-.site-nav a {
+.site-nav a,
+.site-nav button.site-nav__signin {
   padding: 0.48rem 0.7rem;
   color: rgba(18, 18, 15, 0.68);
   font-size: 0.78rem;
@@ -200,6 +201,14 @@ select {
   transition:
     color 150ms ease,
     background-color 150ms ease;
+}
+
+.site-nav button.site-nav__signin {
+  appearance: none;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
 }
 
 .site-nav > .button {
@@ -211,7 +220,8 @@ select {
     gap: 0.05rem;
   }
 
-  .site-nav a {
+  .site-nav a,
+  .site-nav button.site-nav__signin {
     padding: 0.4rem 0.45rem;
     font-size: 0.72rem;
     letter-spacing: -0.04em;
@@ -227,7 +237,8 @@ select {
     font-size: 1.2rem;
   }
 
-  .site-nav a {
+  .site-nav a,
+  .site-nav button.site-nav__signin {
     padding: 0.35rem 0.35rem;
     font-size: 0.68rem;
   }
@@ -972,7 +983,8 @@ select {
 
 .legal-links a:hover,
 .footer-column a:hover,
-.site-nav a:hover {
+.site-nav a:hover,
+.site-nav button.site-nav__signin:hover {
   color: var(--page-foreground);
   opacity: 1;
 }

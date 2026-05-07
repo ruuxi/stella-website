@@ -1,0 +1,83 @@
+.dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  padding: 0;
+  border: none;
+  background: transparent;
+  max-width: min(100%, 30rem);
+  width: 100%;
+  max-height: calc(100dvh - 2rem);
+  overflow: visible;
+  color: var(--page-foreground);
+}
+
+.dialog::backdrop {
+  background: rgba(12, 18, 30, 0.42);
+  backdrop-filter: blur(6px);
+}
+
+.shell {
+  position: relative;
+  display: grid;
+  gap: 1.1rem;
+  padding: clamp(1.4rem, 3vw, 2rem);
+  border: 1px solid rgba(82, 104, 134, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(244, 249, 255, 0.94)),
+    var(--page-panel);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(18px);
+  margin: 1rem;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: fit-content;
+  text-decoration: none;
+  color: inherit;
+}
+
+.brandLogo {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.brandText {
+  font-family: var(--font-display), serif;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid rgba(82, 104, 134, 0.16);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--page-muted);
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.close:hover {
+  background: rgba(255, 255, 255, 1);
+  color: var(--page-foreground);
+}
+
+.close:focus-visible {
+  outline: 2px solid rgba(79, 118, 255, 0.55);
+  outline-offset: 2px;
+}
