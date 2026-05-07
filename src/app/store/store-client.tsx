@@ -620,7 +620,6 @@ const storeTabs = [
   { key: "discover", label: "Discover" },
   { key: "pets", label: "Pets" },
   { key: "emojis", label: "Emojis" },
-  { key: "fashion", label: "Fashion" },
 ] as const;
 
 type HostedStoreTab = (typeof storeTabs)[number]["key"];
