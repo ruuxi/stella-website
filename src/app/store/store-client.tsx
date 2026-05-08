@@ -312,23 +312,17 @@ type DesktopStoreFashionBridge = {
 type DesktopStoreBridge = {
   getAuthToken?: () => Promise<string | null>;
   openStorePanel?: () => Promise<unknown>;
+  openSignIn?: () => Promise<unknown>;
   listConnectors?: () => Promise<StellaConnectorSummary[]>;
   installConnector?: (
     marketplaceKey: string,
     credential?: string,
     config?: Record<string, string>,
   ) => Promise<unknown>;
-  getRelease: (payload: {
+  requestPackageInstall?: (payload: {
     packageId: string;
     releaseNumber: number;
-  }) => Promise<StoreRelease | null>;
-  installFromBlueprint: (payload: {
-    packageId: string;
-    releaseNumber: number;
-    displayName: string;
-    blueprintMarkdown: string;
-    commits?: Array<{ hash: string; subject: string; diff: string }>;
-  }) => Promise<StoreInstall>;
+  }) => Promise<StoreInstall | null>;
   listInstalledMods: () => Promise<StoreInstall[]>;
   uninstallPackage?: (packageId: string) => Promise<unknown>;
   installPet?: (payload: { pet: PublicPet }) => Promise<unknown>;
@@ -647,8 +641,44 @@ const normalizeHostedStoreTab = (value: string | null): HostedStoreTab =>
 const getDesktopStoreBridge = (): DesktopStoreBridge | undefined =>
   typeof window === "undefined" ? undefined : window.stellaDesktopStore;
 
-const redirectToStoreSignIn = () => {
+const redirectToStoreSignIn = async () => {
+  const bridge = getDesktopStoreBridge();
+  if (bridge?.openSignIn) {
+    await bridge.openSignIn().catch(() => undefined);
+    return;
+  }
   openSignInDialog();
+};
+
+const getStoreAuthToken = async (): Promise<string | null> =>
+  (await getDesktopStoreBridge()?.getAuthToken?.().catch(() => null)) ??
+  (await getConvexToken().catch(() => null));
+
+const decodeJwtPayload = (token: string): Record<string, unknown> | null => {
+  const encoded = token.split(".")[1];
+  if (!encoded) return null;
+  try {
+    const normalized = encoded.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(
+      normalized.length + ((4 - (normalized.length % 4)) % 4),
+      "=",
+    );
+    return JSON.parse(atob(padded)) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+};
+
+const isConnectedStoreToken = (token: string): boolean => {
+  const payload = decodeJwtPayload(token);
+  return payload !== null && payload.isAnonymous !== true;
+};
+
+const ensureStoreAuth = async (): Promise<boolean> => {
+  const token = await getStoreAuthToken();
+  if (token && isConnectedStoreToken(token)) return true;
+  await redirectToStoreSignIn();
+  return false;
 };
 
 const isPetBridgeState = (value: unknown): value is PetBridgeState => {
@@ -1066,9 +1096,7 @@ Background everywhere outside the pet silhouette is a single flat ${USER_PET_ATL
 };
 
 const getServiceAuthHeaders = async (headers: Record<string, string>) => {
-  const token =
-    (await getDesktopStoreBridge()?.getAuthToken?.().catch(() => null)) ??
-    (await getConvexToken().catch(() => null));
+  const token = await getStoreAuthToken();
   return token ? { ...headers, Authorization: `Bearer ${token}` } : headers;
 };
 
@@ -1855,65 +1883,6 @@ function ShareDialog({
   );
 }
 
-function InstallConfirmDialog({
-  pkg,
-  release,
-  loading,
-  onConfirm,
-  onCancel,
-}: {
-  pkg: StorePackage;
-  release: StoreRelease | null | undefined;
-  loading: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
-}) {
-  const blueprint = release?.blueprintMarkdown ?? "";
-  return (
-    <StoreModal onClose={onCancel}>
-      <div className="store-blueprint-dialog-header">
-        <div className="store-blueprint-dialog-title">
-          Add {pkg.displayName}?
-        </div>
-      </div>
-      <div className="store-blueprint-dialog-viewer">
-        {loading ? (
-          <div className="store-blueprint-dialog-loading">Loading blueprint…</div>
-        ) : blueprint ? (
-          <pre className="store-blueprint-dialog-markdown">{blueprint}</pre>
-        ) : (
-          <div className="store-blueprint-dialog-loading">
-            This release doesn&apos;t have a blueprint yet.
-          </div>
-        )}
-      </div>
-      <div className="store-install-confirm-copy">
-        Stella will implement this blueprint locally and commit the resulting
-        changes so you can remove it later.
-      </div>
-      <div className="store-blueprint-dialog-actions">
-        <button
-          type="button"
-          className="store-action-btn"
-          data-variant="subtle"
-          onClick={onCancel}
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          className="store-action-btn"
-          data-variant="get"
-          onClick={onConfirm}
-          disabled={loading || !blueprint}
-        >
-          Add to Stella
-        </button>
-      </div>
-    </StoreModal>
-  );
-}
-
 type ConnectorCredentialPayload = {
   credential?: string;
   config: Record<string, string>;
@@ -2257,6 +2226,7 @@ function CreatePetDialog({
   const handleGenerate = useCallback(async () => {
     const trimmed = prompt.trim();
     if (!trimmed || busy) return;
+    if (!(await ensureStoreAuth())) return;
     revokeObjectUrls();
     processedJobsRef.current = new Set();
     setBlob(null);
@@ -2273,6 +2243,7 @@ function CreatePetDialog({
 
   const handleSave = useCallback(async () => {
     if (!blob || saving) return;
+    if (!(await ensureStoreAuth())) return;
     const trimmed = prompt.trim() || "A custom Stella pet.";
     setSaving(true);
     try {
@@ -2462,6 +2433,7 @@ function CreateEmojiPackDialog({
   const handleSubmit = useCallback(async () => {
     const trimmed = prompt.trim();
     if (!trimmed || submitting) return;
+    if (!(await ensureStoreAuth())) return;
     setSubmitting(true);
     setError(null);
     try {
@@ -2962,9 +2934,10 @@ function PetsTab() {
   const installPet = async (pet: PublicPet) => {
     const bridge = getDesktopStoreBridge();
     if (!bridge?.installPet) {
-      redirectToStoreSignIn();
+      await redirectToStoreSignIn();
       return;
     }
+    if (!(await ensureStoreAuth())) return;
     setActionError(null);
     setWorkingPetId(pet.id);
     try {
@@ -2987,7 +2960,7 @@ function PetsTab() {
   const selectPet = async (petId: string) => {
     const bridge = getDesktopStoreBridge();
     if (!bridge?.selectPet) {
-      redirectToStoreSignIn();
+      await redirectToStoreSignIn();
       return;
     }
     setActionError(null);
@@ -3423,9 +3396,10 @@ function EmojisTab() {
   const installEmojiPack = async (pack: EmojiPack) => {
     const bridge = getDesktopStoreBridge();
     if (!bridge?.installEmojiPack) {
-      redirectToStoreSignIn();
+      await redirectToStoreSignIn();
       return;
     }
+    if (!(await ensureStoreAuth())) return;
     setActionError(null);
     setWorkingPackId(pack.packId);
     try {
@@ -4973,7 +4947,6 @@ function StoreClientInner() {
   const [installedIds, setInstalledIds] = useState<Set<string>>(new Set());
   const [installingId, setInstallingId] = useState<string | null>(null);
   const [sharePkg, setSharePkg] = useState<StorePackage | null>(null);
-  const [pendingInstall, setPendingInstall] = useState<StorePackage | null>(null);
   const [installedMods, setInstalledMods] = useState<StoreInstall[]>([]);
   const [connectors, setConnectors] = useState<StellaConnectorSummary[]>([]);
   const [connectorsLoading, setConnectorsLoading] = useState(true);
@@ -5042,21 +5015,6 @@ function StoreClientInner() {
     (pkg) => !showFeatured || pkg.packageId !== featured!.packageId,
   );
 
-  const pendingInstallReleases = useQuery(
-    listPublicReleases,
-    pendingInstall ? { packageId: pendingInstall.packageId } : "skip",
-  );
-  const pendingInstallRelease =
-    pendingInstallReleases?.find(
-      (release) =>
-        pendingInstall &&
-        release.releaseNumber === pendingInstall.latestReleaseNumber,
-    ) ?? pendingInstallReleases?.[0];
-
-  const requestInstall = (pkg: StorePackage) => {
-    setPendingInstall(pkg);
-  };
-
   const loadConnectors = useCallback(async () => {
     const bridge = getDesktopStoreBridge();
     if (!bridge?.listConnectors) {
@@ -5082,9 +5040,10 @@ function StoreClientInner() {
     async (marketplaceKey: string) => {
       const bridge = getDesktopStoreBridge();
       if (!bridge?.installConnector) {
-        redirectToStoreSignIn();
+        await redirectToStoreSignIn();
         return;
       }
+      if (!(await ensureStoreAuth())) return;
       const connector = connectors.find(
         (entry) => entry.marketplaceKey === marketplaceKey,
       );
@@ -5101,6 +5060,7 @@ function StoreClientInner() {
   const confirmInstallConnector = useCallback(async () => {
     const bridge = getDesktopStoreBridge();
     if (!bridge?.installConnector || !confirmConnector) return;
+    if (!(await ensureStoreAuth())) return;
     const connector = confirmConnector;
     setConfirmConnector(null);
     try {
@@ -5117,6 +5077,7 @@ function StoreClientInner() {
     async ({ credential, config }: ConnectorCredentialPayload) => {
       const bridge = getDesktopStoreBridge();
       if (!bridge?.installConnector || !credentialConnector) return;
+      if (!(await ensureStoreAuth())) return;
       await bridge.installConnector(
         credentialConnector.marketplaceKey,
         credential,
@@ -5128,29 +5089,20 @@ function StoreClientInner() {
     [credentialConnector, loadConnectors],
   );
 
-  const installPackage = async (pkg: StorePackage, release?: StoreRelease | null) => {
-    if (!window.stellaDesktopStore) {
-      openSignInDialog();
+  const installPackage = async (pkg: StorePackage) => {
+    const bridge = getDesktopStoreBridge();
+    if (!bridge?.requestPackageInstall) {
+      await redirectToStoreSignIn();
       return;
     }
+    if (!(await ensureStoreAuth())) return;
     setInstallingId(pkg.packageId);
     try {
-      const targetRelease =
-        release ??
-        (await window.stellaDesktopStore.getRelease({
-          packageId: pkg.packageId,
-          releaseNumber: pkg.latestReleaseNumber,
-        }));
-      if (!targetRelease?.blueprintMarkdown) {
-        throw new Error("This package is missing its install blueprint.");
-      }
-      await window.stellaDesktopStore.installFromBlueprint({
+      const installRecord = await bridge.requestPackageInstall({
         packageId: pkg.packageId,
-        releaseNumber: targetRelease.releaseNumber,
-        displayName: pkg.displayName,
-        blueprintMarkdown: targetRelease.blueprintMarkdown,
-        commits: targetRelease.commits,
+        releaseNumber: pkg.latestReleaseNumber,
       });
+      if (!installRecord) return;
       await recordInstall({ packageId: pkg.packageId });
       setInstalledIds((previous) => new Set(previous).add(pkg.packageId));
       setInstalledMods((previous) => [
@@ -5158,7 +5110,7 @@ function StoreClientInner() {
         {
           packageId: pkg.packageId,
           displayName: pkg.displayName,
-          releaseNumber: targetRelease.releaseNumber,
+          releaseNumber: installRecord.releaseNumber,
           installedAt: Date.now(),
         },
       ]);
@@ -5230,7 +5182,7 @@ function StoreClientInner() {
           type="button"
           onClick={() => {
             void openNativeStorePanel().then((opened) => {
-              if (!opened) redirectToStoreSignIn();
+              if (!opened) void redirectToStoreSignIn();
             });
           }}
         >
@@ -5252,7 +5204,7 @@ function StoreClientInner() {
                 window.history.replaceState({}, "", next.toString());
               }
             }}
-            onInstall={() => requestInstall(selectedPackage)}
+            onInstall={() => void installPackage(selectedPackage)}
             onRemove={() => void removePackage(selectedPackage)}
             onShare={() => setSharePkg(selectedPackage)}
           />
@@ -5293,7 +5245,7 @@ function StoreClientInner() {
                   installedMap.get(featured.packageId),
                 )}
                 installing={installingId === featured.packageId}
-                onAction={() => requestInstall(featured)}
+                onAction={() => void installPackage(featured)}
                 onClick={() => setSelectedPackageId(featured.packageId)}
               />
             ) : null}
@@ -5348,7 +5300,7 @@ function StoreClientInner() {
                       )}
                       installing={installingId === pkg.packageId}
                       onOpen={() => setSelectedPackageId(pkg.packageId)}
-                      onInstall={() => requestInstall(pkg)}
+                      onInstall={() => void installPackage(pkg)}
                       onShare={() => setSharePkg(pkg)}
                     />
                   ))}
@@ -5368,20 +5320,6 @@ function StoreClientInner() {
       </div>
       {sharePkg ? (
         <ShareDialog pkg={sharePkg} onClose={() => setSharePkg(null)} />
-      ) : null}
-      {pendingInstall ? (
-        <InstallConfirmDialog
-          pkg={pendingInstall}
-          release={pendingInstallRelease ?? null}
-          loading={pendingInstallReleases === undefined}
-          onCancel={() => setPendingInstall(null)}
-          onConfirm={() => {
-            const pkg = pendingInstall;
-            const release = pendingInstallRelease ?? null;
-            setPendingInstall(null);
-            void installPackage(pkg, release);
-          }}
-        />
       ) : null}
       {confirmConnector ? (
         <ConnectorConfirmDialog

@@ -10,7 +10,9 @@ import { isConvexConfigured } from "@/lib/convex-urls";
 
 function useWebsiteConvexAuth() {
   const session = authClient.useSession();
-  const [desktopAuthAvailable, setDesktopAuthAvailable] = useState(false);
+  const [desktopAuthState, setDesktopAuthState] = useState<
+    "checking" | "unavailable" | "signed-in" | "signed-out"
+  >("checking");
 
   const sessionUserId =
     (session.data as { user?: { id?: string } } | null | undefined)?.user?.id ??
@@ -20,15 +22,29 @@ function useWebsiteConvexAuth() {
     const bridge = window as Window & {
       stellaDesktopStore?: { getAuthToken?: () => Promise<string | null> };
     };
-    setDesktopAuthAvailable(
-      typeof window !== "undefined" &&
-        typeof bridge.stellaDesktopStore?.getAuthToken === "function",
-    );
+    const getDesktopToken = bridge.stellaDesktopStore?.getAuthToken;
+    if (typeof getDesktopToken !== "function") {
+      setDesktopAuthState("unavailable");
+      return;
+    }
+    let cancelled = false;
+    void getDesktopToken()
+      .then((token) => {
+        if (!cancelled) {
+          setDesktopAuthState(token ? "signed-in" : "signed-out");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setDesktopAuthState("signed-out");
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
     clearCachedToken();
-  }, [desktopAuthAvailable, sessionUserId]);
+  }, [desktopAuthState, sessionUserId]);
 
   const fetchAccessToken = useCallback(
     async ({ forceRefreshToken = false }: { forceRefreshToken?: boolean } = {}) => {
@@ -48,11 +64,13 @@ function useWebsiteConvexAuth() {
 
   return useMemo(
     () => ({
-      isLoading: Boolean(session.isPending) && !desktopAuthAvailable,
-      isAuthenticated: desktopAuthAvailable || Boolean(session.data),
+      isLoading:
+        desktopAuthState === "checking" ||
+        (Boolean(session.isPending) && desktopAuthState !== "signed-in"),
+      isAuthenticated: desktopAuthState === "signed-in" || Boolean(session.data),
       fetchAccessToken,
     }),
-    [desktopAuthAvailable, fetchAccessToken, session.data, session.isPending],
+    [desktopAuthState, fetchAccessToken, session.data, session.isPending],
   );
 }
 
