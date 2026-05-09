@@ -3,6 +3,8 @@ import { Cormorant_Garamond, IBM_Plex_Mono, Manrope } from "next/font/google";
 import { getSiteUrl } from "@/lib/site-url";
 import { ConvexAuthProvider } from "@/components/auth/convex-auth-provider";
 import { SignInDialogProvider } from "@/components/auth/sign-in-dialog";
+import { EmbeddedInitScript } from "@/components/embedded/embedded-init-script";
+import { EmbeddedThemeBridge } from "@/components/embedded/embedded-theme-bridge";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import "./globals.css";
 /* Product demos (self-mod, radial, canvas) — partials in ./demos/ */
@@ -126,6 +128,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <EmbeddedInitScript />
+      </head>
       <body className={`${sans.variable} ${display.variable} ${mono.variable}`}>
         <script
           type="application/ld+json"
@@ -134,6 +139,7 @@ export default function RootLayout({
         <ConvexAuthProvider>
           <SignInDialogProvider>{children}</SignInDialogProvider>
         </ConvexAuthProvider>
+        <EmbeddedThemeBridge />
         <RevealOnScroll />
       </body>
     </html>

@@ -40,9 +40,9 @@
   min-height: 100vh;
 }
 
-body:has(.store-root) {
-  background: var(--background, #f2f4f8);
-}
+/* Store keeps its own internal palette tokens (cards, surfaces) but does not
+ * override the global body background, so marketing pages and the Store
+ * share the radial-gradient backdrop defined in `globals.css`. */
 
 @keyframes store-fade-up {
   from { opacity: 0; transform: translateY(8px); }
@@ -5289,4 +5289,40 @@ body:has(.store-root) {
   }
   .fashion-product { max-width: 140px; }
   .fashion-product-actions { opacity: 1; }
+}
+
+/* ── Embedded mode (desktop WebContentsView) ──
+ * Theme tokens flow in via `--embedded-*` custom properties on `<html>`.
+ * We rebind the Store palette to them so cards, text, and dividers stay
+ * legible on every desktop theme without forking the rest of the layout.
+ * The internal surface tokens (`--surface-*`) are intentionally kept the
+ * same off-white so cards still read as a "raised" surface against the
+ * desktop's transparent backdrop. */
+html[data-embedded="true"] .store-root {
+  --foreground: var(--embedded-fg, #161616);
+  --text-muted: color-mix(
+    in srgb,
+    var(--embedded-fg-weak, var(--foreground)) 90%,
+    transparent
+  );
+  --text-weak: color-mix(
+    in srgb,
+    var(--embedded-fg-weak, var(--foreground)) 70%,
+    transparent
+  );
+  --text-weaker: color-mix(
+    in srgb,
+    var(--embedded-fg-weak, var(--foreground)) 50%,
+    transparent
+  );
+  --border: var(--embedded-border, rgba(22, 22, 22, 0.12));
+  --border-strong: color-mix(
+    in srgb,
+    var(--embedded-border, var(--foreground)) 100%,
+    transparent
+  );
+  --primary: var(--embedded-primary, #0f62fe);
+  --accent: var(--embedded-primary, #0f62fe);
+  --interactive: var(--embedded-primary, var(--foreground));
+  --ring: var(--embedded-primary, #0f62fe);
 }

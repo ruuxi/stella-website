@@ -94,6 +94,26 @@ select {
   pointer-events: none;
 }
 
+/* ── Embedded mode ──
+ * When the website is loaded inside Stella's desktop `WebContentsView`
+ * (Store, Billing, etc.), the body becomes transparent so the desktop's
+ * shifting-gradient theme canvas shows through. Theme-aware text/border
+ * tokens are pushed in via URL params (initial paint) or the
+ * `stellaDesktopStore.onThemeChanged` bridge (live updates) and applied
+ * to the `--embedded-*` custom properties on `<html>`. */
+html[data-embedded="true"] {
+  background: transparent !important;
+}
+
+html[data-embedded="true"] body {
+  background: transparent !important;
+  color: var(--embedded-fg, var(--page-foreground));
+}
+
+html[data-embedded="true"] .stella-page::before {
+  display: none;
+}
+
 .grid-shell {
   width: min(100%, var(--page-max-width));
   padding-inline: var(--page-margin);

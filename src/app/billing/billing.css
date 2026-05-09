@@ -1,0 +1,436 @@
+@keyframes billing-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.billing-root {
+  --billing-fg: var(--foreground, var(--page-foreground, #0f1728));
+  --billing-muted: color-mix(in oklch, var(--billing-fg) 70%, transparent);
+  --billing-faint: color-mix(in oklch, var(--billing-fg) 8%, transparent);
+  --billing-border: color-mix(in oklch, var(--billing-fg) 16%, transparent);
+  --billing-border-strong: color-mix(in oklch, var(--billing-fg) 32%, transparent);
+  --billing-serif: var(--font-display, "Cormorant Garamond", Georgia, serif);
+  --billing-mono: var(--font-mono, "IBM Plex Mono", monospace);
+
+  min-height: 100vh;
+  overflow-y: auto;
+  color: var(--billing-fg);
+  background: transparent;
+  animation: billing-fade-in 0.35s ease both;
+}
+
+.billing-shell {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.billing-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.billing-eyebrow,
+.billing-status-label,
+.billing-features-head {
+  font-family: var(--billing-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--billing-muted);
+  margin: 0;
+}
+
+.billing-title {
+  font-family: var(--billing-serif);
+  font-size: clamp(2.4rem, 4vw, 3.2rem);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 0;
+}
+
+.billing-title em {
+  font-weight: 300;
+  font-style: italic;
+}
+
+.billing-lead,
+.billing-section-sub {
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--billing-muted);
+  margin: 0;
+  max-width: 560px;
+  letter-spacing: -0.01em;
+}
+
+.billing-notice {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--billing-muted);
+  padding: 10px 14px;
+  border-left: 1.5px solid var(--billing-border-strong);
+  background: var(--billing-faint);
+  border-radius: 0 4px 4px 0;
+  margin: 0;
+}
+
+.billing-notice--error {
+  color: #c44;
+  border-left-color: #c44;
+  background: color-mix(in oklch, #c44 6%, transparent);
+}
+
+.billing-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 0;
+  border-top: 1px solid var(--billing-border);
+  border-bottom: 1px solid var(--billing-border);
+}
+
+.billing-status-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.billing-status-value {
+  font-family: var(--billing-serif);
+  font-size: 1.6rem;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.billing-status-meter {
+  flex: 1;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.billing-status-meter-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--billing-mono);
+  font-size: 11px;
+  color: var(--billing-muted);
+  letter-spacing: 0.02em;
+}
+
+.billing-meter-track {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--billing-faint);
+  overflow: hidden;
+}
+
+.billing-meter-fill {
+  height: 100%;
+  background: var(--billing-fg);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.billing-link-button {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  background: none;
+  border: none;
+  color: var(--billing-fg);
+  cursor: pointer;
+  padding: 6px 0;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--billing-border);
+  transition: text-decoration-color 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+
+.billing-link-button:hover:not(:disabled) {
+  text-decoration-color: var(--billing-fg);
+}
+
+.billing-link-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.billing-plans-section,
+.billing-features,
+.billing-checkout-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.billing-section-head,
+.billing-checkout-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.billing-section-head {
+  flex-direction: column;
+  gap: 4px;
+}
+
+.billing-checkout-head {
+  align-items: flex-end;
+}
+
+.billing-section-title {
+  font-family: var(--billing-serif);
+  font-size: 1.8rem;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.billing-plans-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.billing-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 18px 20px;
+  border: 1px solid var(--billing-border);
+  border-radius: 8px;
+  background: transparent;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  position: relative;
+}
+
+.billing-plan:hover {
+  border-color: var(--billing-border-strong);
+}
+
+.billing-plan[data-active="true"] {
+  border-color: var(--billing-fg);
+  box-shadow: 0 0 0 1px var(--billing-fg) inset;
+}
+
+.billing-plan[data-recommended="true"]::before {
+  content: "Recommended";
+  position: absolute;
+  top: -9px;
+  left: 14px;
+  font-family: var(--billing-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  background: var(--billing-fg);
+  color: var(--page-background, #fff);
+  border-radius: 2px;
+}
+
+.billing-plan-name {
+  font-family: var(--billing-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--billing-muted);
+}
+
+.billing-plan[data-active="true"] .billing-plan-name {
+  color: var(--billing-fg);
+}
+
+.billing-plan-price {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: var(--billing-serif);
+}
+
+.billing-plan-price-value {
+  font-size: 2.6rem;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.billing-plan-price-period {
+  font-family: var(--billing-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--billing-muted);
+  text-transform: lowercase;
+}
+
+.billing-plan-allotment {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--billing-muted);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.billing-plan-rule {
+  border: none;
+  border-top: 1px solid var(--billing-border);
+  margin: 0;
+}
+
+.billing-plan-cta {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  padding: 9px 14px;
+  border: 1px solid var(--billing-border-strong);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--billing-fg);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s;
+  margin-top: auto;
+}
+
+.billing-plan-cta:hover:not(:disabled) {
+  background: var(--billing-fg);
+  color: var(--page-background, #fff);
+  border-color: var(--billing-fg);
+}
+
+.billing-plan-cta:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.billing-plan-cta--current:disabled {
+  opacity: 1;
+  border-style: dashed;
+  border-color: var(--billing-border);
+  color: var(--billing-muted);
+}
+
+.billing-features {
+  padding: 24px 4px 0;
+  gap: 18px;
+}
+
+.billing-features-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 32px;
+}
+
+.billing-features-list li {
+  font-size: 13.5px;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  position: relative;
+  padding-left: 18px;
+}
+
+.billing-features-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 8px;
+  height: 1.5px;
+  background: var(--billing-border-strong);
+}
+
+.billing-checkout-section {
+  padding-top: 6px;
+}
+
+.billing-checkout-frame {
+  border: 1px solid var(--billing-border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  min-height: 720px;
+}
+
+@media (max-width: 1100px) {
+  .billing-plans-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .billing-shell {
+    padding: 36px 18px 72px;
+    gap: 36px;
+  }
+
+  .billing-status,
+  .billing-checkout-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .billing-status-meter {
+    max-width: none;
+    width: 100%;
+  }
+
+  .billing-plans-grid,
+  .billing-features-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Embedded mode (desktop WebContentsView) ──
+ * The desktop app pushes theme tokens via `stellaDesktopStore.onThemeChanged`
+ * (and as URL params on first paint), which land as `--embedded-*` custom
+ * properties on `<html>`. We rebind the billing palette to those so the
+ * page reads correctly on top of any desktop theme. */
+html[data-embedded="true"] .billing-root {
+  --billing-fg: var(--embedded-fg, var(--billing-fg));
+  --billing-muted: color-mix(
+    in oklch,
+    var(--embedded-fg-weak, var(--billing-fg)) 92%,
+    transparent
+  );
+  --billing-faint: color-mix(in oklch, var(--billing-fg) 8%, transparent);
+  --billing-border: color-mix(
+    in oklch,
+    var(--embedded-border, var(--billing-fg)) 90%,
+    transparent
+  );
+  --billing-border-strong: color-mix(
+    in oklch,
+    var(--embedded-border, var(--billing-fg)) 100%,
+    transparent
+  );
+}
+
+/* The Stripe checkout iframe ships its own white surface; surrounding it
+ * with a faint surface tile keeps it from looking like a slab of card
+ * stock dropped onto a dark theme. */
+html[data-embedded="true"] .billing-checkout-frame {
+  border-color: var(--billing-border-strong);
+}
