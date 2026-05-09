@@ -30,6 +30,8 @@ type StellaDesktopStoreBridge = {
   ) => (() => void) | void;
 };
 
+const STORAGE_KEY = "stella-embedded-theme";
+
 const applyTheme = (theme: EmbeddedTheme) => {
   const html = document.documentElement;
   const setVar = (name: string, value: string | undefined) => {
@@ -45,6 +47,32 @@ const applyTheme = (theme: EmbeddedTheme) => {
   setVar("--embedded-bg", theme.background);
   if (theme.mode === "light" || theme.mode === "dark") {
     html.style.setProperty("color-scheme", theme.mode);
+  }
+
+  // Keep the sessionStorage cache used by `embedded-init-script.tsx`
+  // in sync so the next in-session navigation (e.g. clicking a Store
+  // tab link) restores the latest theme synchronously, not the one
+  // captured on the very first load.
+  try {
+    const cached: Record<string, string> = {};
+    const remember = (key: string, value: string | undefined) => {
+      if (value && value.trim().length > 0) cached[key] = value;
+    };
+    remember("fg", theme.foreground);
+    remember("fgWeak", theme.foregroundWeak);
+    remember("border", theme.border);
+    remember("primary", theme.primary);
+    remember("surface", theme.surface);
+    remember("bg", theme.background);
+    if (theme.mode === "light" || theme.mode === "dark") {
+      cached.mode = theme.mode;
+    }
+    if (Object.keys(cached).length > 0) {
+      window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(cached));
+    }
+  } catch {
+    // sessionStorage can throw in private mode; embedded styles still
+    // work via the URL params on the next navigation.
   }
 };
 
