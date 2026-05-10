@@ -5325,4 +5325,70 @@ html[data-embedded="true"] .store-root {
   --accent: var(--embedded-primary, #0f62fe);
   --interactive: var(--embedded-primary, var(--foreground));
   --ring: var(--embedded-primary, #0f62fe);
+
+  /* Rebind surface / background tokens so cards, tab strips, filter
+     pills, and pet/emoji surfaces read correctly against the desktop's
+     transparent canvas in both light and dark themes. Without these,
+     `--background` stays at the hard-coded light gray, which made the
+     "active" state of the Discover/Pets/Emojis tab strip and the
+     category filter pills paint a near-white pill — invisible against
+     a dark theme canvas.
+
+     The fallbacks preserve the original light-theme look when the
+     desktop bridge hasn't pushed a theme yet (e.g. first paint before
+     the IPC arrives, or non-Stella embeds). */
+  --background: var(--embedded-bg, #f2f4f8);
+  --surface-1: color-mix(
+    in srgb,
+    var(--embedded-surface, #ffffff) 76%,
+    transparent
+  );
+  --surface-2: color-mix(
+    in srgb,
+    var(--embedded-surface, #ffffff) 58%,
+    transparent
+  );
+  --surface-3: color-mix(
+    in srgb,
+    var(--embedded-surface, #ffffff) 42%,
+    transparent
+  );
+  --surface-raised: color-mix(
+    in srgb,
+    var(--embedded-surface, #ffffff) 65%,
+    transparent
+  );
+  --surface-raised-hover: color-mix(
+    in srgb,
+    var(--embedded-surface, #ffffff) 80%,
+    transparent
+  );
+  --button-secondary-base: color-mix(
+    in srgb,
+    var(--embedded-surface, rgba(105, 112, 119, 0.16)) 40%,
+    transparent
+  );
+  --button-secondary-hover: color-mix(
+    in srgb,
+    var(--embedded-surface, rgba(105, 112, 119, 0.16)) 70%,
+    transparent
+  );
+  --glass-bg: color-mix(
+    in srgb,
+    var(--embedded-bg, var(--background)) 60%,
+    transparent
+  );
+}
+
+/* Active tab / filter pill: in standalone (light) mode `var(--background)`
+   gives a light raised pill on the page's gradient. In embedded mode the
+   page background is transparent, so we switch the active fill to the
+   theme-aware `--surface-raised` so it always reads as a raised state
+   regardless of light/dark. */
+html[data-embedded="true"] .store-web-tab:hover,
+html[data-embedded="true"] .store-web-tab[data-active="true"] {
+  background: var(--surface-raised);
+}
+html[data-embedded="true"] .store-filter-pill[data-active] {
+  background: var(--surface-raised);
 }
