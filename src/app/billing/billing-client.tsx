@@ -2,13 +2,7 @@
 
 import { useAction, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
-import {
-  CheckoutElementsProvider,
-  PaymentElement,
-  useCheckoutElements,
-} from "@stripe/react-stripe-js/checkout";
-import { loadStripe, type Stripe } from "@stripe/stripe-js";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { openSignInDialog } from "@/components/auth/sign-in-dialog";
 import { isConvexConfigured } from "@/lib/convex-urls";
 
@@ -46,8 +40,7 @@ type BillingStatus = {
 };
 
 type CheckoutSessionPayload = {
-  publishableKey: string;
-  clientSecret: string;
+  url: string;
   sessionId: string;
 };
 
@@ -106,16 +99,6 @@ const SHARED_FEATURES: readonly string[] = [
   "Files stay on your device",
 ];
 
-const stripePromiseByKey = new Map<string, Promise<Stripe | null>>();
-
-const getStripePromise = (publishableKey: string) => {
-  const existing = stripePromiseByKey.get(publishableKey);
-  if (existing) return existing;
-  const created = loadStripe(publishableKey);
-  stripePromiseByKey.set(publishableKey, created);
-  return created;
-};
-
 const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
@@ -143,53 +126,19 @@ const getBillingReturnUrl = () => {
 const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error && error.message ? error.message : fallback;
 
-// Stripe Appearance API tokens that mirror Stella's design language.
-// `CheckoutElementsProvider` uses Stripe's Elements SDK and supports
-// theme + variables + rules; keep this aligned with `billing.css` so
-// the embedded `PaymentElement` reads as a native Stella surface.
-const stripeAppearance = {
-  theme: "flat" as const,
-  variables: {
-    fontFamily:
-      'var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-    fontSizeBase: "14px",
-    spacingUnit: "4px",
-    borderRadius: "6px",
-    colorPrimary: "#0f1728",
-    colorText: "#0f1728",
-    colorTextSecondary: "#5f7186",
-    colorBackground: "#ffffff",
-    colorDanger: "#c44",
-  },
-  rules: {
-    ".Input": {
-      border: "1px solid rgba(82, 104, 134, 0.28)",
-      boxShadow: "none",
-      padding: "10px 12px",
-    },
-    ".Input:focus": {
-      border: "1px solid #0f1728",
-      boxShadow: "0 0 0 1px #0f1728",
-    },
-    ".Label": {
-      fontSize: "11px",
-      fontWeight: "500",
-      letterSpacing: "0.08em",
-      textTransform: "uppercase",
-      color: "#5f7186",
-    },
-    ".Tab": {
-      border: "1px solid rgba(82, 104, 134, 0.18)",
-      boxShadow: "none",
-    },
-    ".Tab:hover": {
-      border: "1px solid rgba(82, 104, 134, 0.36)",
-    },
-    ".Tab--selected": {
-      border: "1px solid #0f1728",
-      boxShadow: "0 0 0 1px #0f1728",
-    },
-  },
+// Stripe hosted checkout lives on `checkout.stripe.com`. On the website we
+// open it in a new tab via `window.open`; inside Stella's desktop
+// WebContentsView the same call is intercepted by `setWindowOpenHandler`
+// and routed to `shell.openExternal`, which opens it in the user's system
+// browser. Either way the user lands back on `/billing?checkout=success`
+// when Stripe finishes redirecting.
+const openStripeCheckoutUrl = (url: string) => {
+  const opened = window.open(url, "_blank", "noopener,noreferrer");
+  if (!opened) {
+    // Popup blocker (or some embedded contexts) can return null; fall back
+    // to a same-tab navigation so the user always reaches checkout.
+    window.location.href = url;
+  }
 };
 
 export function BillingClient() {
@@ -220,18 +169,31 @@ export function BillingClient() {
 
 function BillingInteractive() {
   const [billingNowMs, setBillingNowMs] = useState(() => Date.now());
-  const [checkoutSession, setCheckoutSession] =
-    useState<CheckoutSessionPayload | null>(null);
-  const [pendingPlan, setPendingPlan] = useState<PaidBillingPlan | null>(null);
   const [startingPlan, setStartingPlan] = useState<PaidBillingPlan | null>(null);
   const [openingPortal, setOpeningPortal] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const checkoutRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const id = window.setInterval(() => setBillingNowMs(Date.now()), 60_000);
     return () => window.clearInterval(id);
+  }, []);
+
+  // Stripe redirects back to /billing with ?checkout=success or
+  // ?checkout=cancel — surface a friendly notice and clear the param so a
+  // page refresh doesn't keep showing it.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("checkout");
+    if (!status) return;
+    if (status === "success") {
+      setNotice("Payment received. Your updated plan will appear in a moment.");
+    } else if (status === "cancel") {
+      setNotice("Checkout cancelled. You can pick a plan whenever you're ready.");
+    }
+    const url = new URL(window.location.href);
+    url.searchParams.delete("checkout");
+    window.history.replaceState(null, "", url.toString());
   }, []);
 
   const billingStatus = useQuery(getSubscriptionStatus, {
@@ -269,21 +231,13 @@ function BillingInteractive() {
       setError(null);
       setNotice(null);
       setStartingPlan(plan);
-      setPendingPlan(plan);
       try {
         const session = await startCheckout({
           plan,
           returnUrl: getBillingReturnUrl(),
         });
-        setCheckoutSession(session);
-        window.requestAnimationFrame(() => {
-          checkoutRef.current?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        });
+        openStripeCheckoutUrl(session.url);
       } catch (err) {
-        setPendingPlan(null);
         setError(getErrorMessage(err, "Unable to start checkout right now."));
       } finally {
         setStartingPlan(null);
@@ -302,36 +256,13 @@ function BillingInteractive() {
     setOpeningPortal(true);
     try {
       const session = await openPortal({ returnUrl: getBillingReturnUrl() });
-      window.location.href = session.url;
+      openStripeCheckoutUrl(session.url);
     } catch (err) {
       setError(getErrorMessage(err, "Unable to open billing right now."));
     } finally {
       setOpeningPortal(false);
     }
   }, [hasAccount, openPortal]);
-
-  const handleCheckoutSuccess = useCallback(() => {
-    setCheckoutSession(null);
-    setPendingPlan(null);
-    setNotice("Payment received. Your updated plan will appear in a moment.");
-  }, []);
-
-  const handleCheckoutClose = useCallback(() => {
-    setCheckoutSession(null);
-    setPendingPlan(null);
-  }, []);
-
-  // Elements provider options: client secret comes back directly from
-  // our Convex action; appearance lives under `elementsOptions`.
-  const checkoutOptions = useMemo(() => {
-    if (!checkoutSession) return null;
-    return {
-      clientSecret: checkoutSession.clientSecret,
-      elementsOptions: { appearance: stripeAppearance },
-    };
-  }, [checkoutSession]);
-
-  const checkoutPlanDisplay = pendingPlan ? getPlanDisplay(pendingPlan) : null;
 
   return (
     <main className="billing-root">
@@ -480,175 +411,7 @@ function BillingInteractive() {
             </ul>
           </div>
         </section>
-
-        {checkoutSession && checkoutOptions && checkoutPlanDisplay ? (
-          <section ref={checkoutRef} className="billing-checkout-section">
-            <div className="billing-checkout-head">
-              <div className="billing-checkout-headline">
-                <p className="billing-eyebrow">Checkout</p>
-                <h2 className="billing-section-title">
-                  Stella {checkoutPlanDisplay.label}
-                </h2>
-              </div>
-              <button
-                type="button"
-                className="billing-link-button"
-                onClick={handleCheckoutClose}
-              >
-                Cancel
-              </button>
-            </div>
-            <CheckoutElementsProvider
-              stripe={getStripePromise(checkoutSession.publishableKey)}
-              options={checkoutOptions}
-            >
-              <CheckoutForm
-                planLabel={checkoutPlanDisplay.label}
-                planMonthlyPriceCents={checkoutPlanDisplay.monthlyPriceCents}
-                onSuccess={handleCheckoutSuccess}
-              />
-            </CheckoutElementsProvider>
-          </section>
-        ) : null}
       </div>
     </main>
-  );
-}
-
-type CheckoutFormProps = {
-  planLabel: string;
-  planMonthlyPriceCents: number;
-  onSuccess: () => void;
-};
-
-function CheckoutForm({
-  planLabel,
-  planMonthlyPriceCents,
-  onSuccess,
-}: CheckoutFormProps) {
-  const result = useCheckoutElements();
-  const [email, setEmail] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-
-  // The form SDK is async-loaded — show a placeholder until the SDK
-  // resolves. `useCheckoutForm` returns a discriminated union; only
-  // `success` exposes the `checkout` action surface.
-  const checkout = result.type === "success" ? result.checkout : null;
-  const sdkError = result.type === "error" ? result.error.message : null;
-
-  // Seed the local email field from whatever Stripe already has on the
-  // session (set when we passed a `customer` with a stored email).
-  useEffect(() => {
-    if (!checkout) return;
-    if (checkout.email && !email) {
-      setEmail(checkout.email);
-    }
-  }, [checkout, email]);
-
-  const onSubmit = useCallback(
-    async (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      if (submitting || !checkout) return;
-      setSubmitting(true);
-      setSubmitError(null);
-      try {
-        if (email && email !== checkout.email) {
-          const updateResult = await checkout.updateEmail(email);
-          if (updateResult.type === "error") {
-            setSubmitError(updateResult.error.message);
-            return;
-          }
-        }
-        const confirmResult = await checkout.confirm();
-        if (confirmResult.type === "error") {
-          setSubmitError(confirmResult.error.message);
-          return;
-        }
-        onSuccess();
-      } catch (err) {
-        setSubmitError(
-          getErrorMessage(err, "Payment could not be completed."),
-        );
-      } finally {
-        setSubmitting(false);
-      }
-    },
-    [checkout, email, onSuccess, submitting],
-  );
-
-  // `checkout.total.total.amount` is a pre-formatted display string from
-  // Stripe (e.g. "$20.00"). Fall back to the static plan price while the
-  // SDK is loading so the summary doesn't flicker.
-  const fallbackFormatted = currencyFormatter.format(
-    planMonthlyPriceCents / 100,
-  );
-  const totalFormatted =
-    checkout?.total?.total?.amount ?? fallbackFormatted;
-
-  return (
-    <form className="billing-checkout-form" onSubmit={onSubmit} noValidate>
-      <div className="billing-checkout-summary">
-        <div>
-          <span className="billing-checkout-summary-label">Plan</span>
-          <span className="billing-checkout-summary-value">
-            Stella {planLabel}
-          </span>
-        </div>
-        <div>
-          <span className="billing-checkout-summary-label">Billed monthly</span>
-          <span className="billing-checkout-summary-value">
-            {totalFormatted}
-          </span>
-        </div>
-      </div>
-
-      <label className="billing-checkout-field">
-        <span className="billing-checkout-field-label">Email</span>
-        <input
-          type="email"
-          required
-          autoComplete="email"
-          inputMode="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          placeholder="you@example.com"
-          className="billing-checkout-input"
-        />
-      </label>
-
-      <div className="billing-checkout-payment">
-        <span className="billing-checkout-field-label">Payment</span>
-        <PaymentElement options={{ layout: "tabs" }} />
-      </div>
-
-      {sdkError ? (
-        <p className="billing-notice billing-notice--error" role="alert">
-          {sdkError}
-        </p>
-      ) : null}
-      {submitError ? (
-        <p className="billing-notice billing-notice--error" role="alert">
-          {submitError}
-        </p>
-      ) : null}
-
-      <button
-        type="submit"
-        className="billing-checkout-submit"
-        disabled={submitting || !email || !checkout}
-      >
-        {submitting
-          ? "Processing..."
-          : checkout
-            ? `Subscribe — ${totalFormatted}/mo`
-            : "Loading..."}
-      </button>
-
-      <p className="billing-checkout-fineprint">
-        By subscribing you authorize Stella to charge you {totalFormatted} each
-        month until you cancel. You can cancel anytime from Manage billing.
-      </p>
-    </form>
   );
 }
