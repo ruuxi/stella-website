@@ -3,12 +3,14 @@
 import { useAction, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import {
-  EmbeddedCheckout,
-  EmbeddedCheckoutProvider,
-} from "@stripe/react-stripe-js";
+  CheckoutElementsProvider,
+  PaymentElement,
+  useCheckoutElements,
+} from "@stripe/react-stripe-js/checkout";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { openSignInDialog } from "@/components/auth/sign-in-dialog";
+import { isConvexConfigured } from "@/lib/convex-urls";
 
 type BillingPlan = "free" | "go" | "pro" | "plus" | "ultra";
 type PaidBillingPlan = Exclude<BillingPlan, "free">;
@@ -43,7 +45,7 @@ type BillingStatus = {
   plans: Record<BillingPlan, BillingPlanConfig>;
 };
 
-type EmbeddedCheckoutSessionPayload = {
+type CheckoutSessionPayload = {
   publishableKey: string;
   clientSecret: string;
   sessionId: string;
@@ -59,11 +61,11 @@ const getSubscriptionStatus = makeFunctionReference<
   BillingStatus
 >("billing:getSubscriptionStatus");
 
-const createEmbeddedCheckoutSession = makeFunctionReference<
+const createCheckoutSession = makeFunctionReference<
   "action",
   { plan: PaidBillingPlan; returnUrl: string },
-  EmbeddedCheckoutSessionPayload
->("billing:createEmbeddedCheckoutSession");
+  CheckoutSessionPayload
+>("billing:createCheckoutSession");
 
 const createBillingPortalSession = makeFunctionReference<
   "action",
@@ -141,10 +143,85 @@ const getBillingReturnUrl = () => {
 const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error && error.message ? error.message : fallback;
 
+// Stripe Appearance API tokens that mirror Stella's design language.
+// `CheckoutElementsProvider` uses Stripe's Elements SDK and supports
+// theme + variables + rules; keep this aligned with `billing.css` so
+// the embedded `PaymentElement` reads as a native Stella surface.
+const stripeAppearance = {
+  theme: "flat" as const,
+  variables: {
+    fontFamily:
+      'var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    fontSizeBase: "14px",
+    spacingUnit: "4px",
+    borderRadius: "6px",
+    colorPrimary: "#0f1728",
+    colorText: "#0f1728",
+    colorTextSecondary: "#5f7186",
+    colorBackground: "#ffffff",
+    colorDanger: "#c44",
+  },
+  rules: {
+    ".Input": {
+      border: "1px solid rgba(82, 104, 134, 0.28)",
+      boxShadow: "none",
+      padding: "10px 12px",
+    },
+    ".Input:focus": {
+      border: "1px solid #0f1728",
+      boxShadow: "0 0 0 1px #0f1728",
+    },
+    ".Label": {
+      fontSize: "11px",
+      fontWeight: "500",
+      letterSpacing: "0.08em",
+      textTransform: "uppercase",
+      color: "#5f7186",
+    },
+    ".Tab": {
+      border: "1px solid rgba(82, 104, 134, 0.18)",
+      boxShadow: "none",
+    },
+    ".Tab:hover": {
+      border: "1px solid rgba(82, 104, 134, 0.36)",
+    },
+    ".Tab--selected": {
+      border: "1px solid #0f1728",
+      boxShadow: "0 0 0 1px #0f1728",
+    },
+  },
+};
+
 export function BillingClient() {
+  // Skip the Convex-bound interactive flow when no deployment is configured
+  // (e.g. preview builds without env vars). Lets `/billing` still SSG with a
+  // marketing-style hero instead of crashing on `useQuery`.
+  if (!isConvexConfigured()) {
+    return (
+      <main className="billing-root">
+        <div className="billing-shell">
+          <header className="billing-hero">
+            <p className="billing-eyebrow">Billing</p>
+            <h1 className="billing-title">
+              Choose how much <em>Stella</em>.
+            </h1>
+            <p className="billing-lead">
+              Billing is available inside Stella once the backend connection is
+              configured.
+            </p>
+          </header>
+        </div>
+      </main>
+    );
+  }
+
+  return <BillingInteractive />;
+}
+
+function BillingInteractive() {
   const [billingNowMs, setBillingNowMs] = useState(() => Date.now());
   const [checkoutSession, setCheckoutSession] =
-    useState<EmbeddedCheckoutSessionPayload | null>(null);
+    useState<CheckoutSessionPayload | null>(null);
   const [pendingPlan, setPendingPlan] = useState<PaidBillingPlan | null>(null);
   const [startingPlan, setStartingPlan] = useState<PaidBillingPlan | null>(null);
   const [openingPortal, setOpeningPortal] = useState(false);
@@ -157,20 +234,10 @@ export function BillingClient() {
     return () => window.clearInterval(id);
   }, []);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.has("checkoutSessionId")) {
-      setNotice("Checkout complete. Stella is syncing your billing now.");
-      const url = new URL(window.location.href);
-      url.searchParams.delete("checkoutSessionId");
-      window.history.replaceState(null, "", url.toString());
-    }
-  }, []);
-
   const billingStatus = useQuery(getSubscriptionStatus, {
     now: billingNowMs,
   });
-  const startCheckout = useAction(createEmbeddedCheckoutSession);
+  const startCheckout = useAction(createCheckoutSession);
   const openPortal = useAction(createBillingPortalSession);
 
   const planCatalog = billingStatus?.plans;
@@ -191,23 +258,6 @@ export function BillingClient() {
       };
     },
     [planCatalog],
-  );
-
-  const checkoutOptions = useMemo(
-    () =>
-      checkoutSession
-        ? {
-            clientSecret: checkoutSession.clientSecret,
-            onComplete: () => {
-              setCheckoutSession(null);
-              setPendingPlan(null);
-              setNotice(
-                "Payment received. Your updated plan will appear in a moment.",
-              );
-            },
-          }
-        : null,
-    [checkoutSession],
   );
 
   const handleStartCheckout = useCallback(
@@ -259,6 +309,29 @@ export function BillingClient() {
       setOpeningPortal(false);
     }
   }, [hasAccount, openPortal]);
+
+  const handleCheckoutSuccess = useCallback(() => {
+    setCheckoutSession(null);
+    setPendingPlan(null);
+    setNotice("Payment received. Your updated plan will appear in a moment.");
+  }, []);
+
+  const handleCheckoutClose = useCallback(() => {
+    setCheckoutSession(null);
+    setPendingPlan(null);
+  }, []);
+
+  // Elements provider options: client secret comes back directly from
+  // our Convex action; appearance lives under `elementsOptions`.
+  const checkoutOptions = useMemo(() => {
+    if (!checkoutSession) return null;
+    return {
+      clientSecret: checkoutSession.clientSecret,
+      elementsOptions: { appearance: stripeAppearance },
+    };
+  }, [checkoutSession]);
+
+  const checkoutPlanDisplay = pendingPlan ? getPlanDisplay(pendingPlan) : null;
 
   return (
     <main className="billing-root">
@@ -408,37 +481,174 @@ export function BillingClient() {
           </div>
         </section>
 
-        {checkoutSession && checkoutOptions ? (
+        {checkoutSession && checkoutOptions && checkoutPlanDisplay ? (
           <section ref={checkoutRef} className="billing-checkout-section">
             <div className="billing-checkout-head">
-              <div>
+              <div className="billing-checkout-headline">
                 <p className="billing-eyebrow">Checkout</p>
                 <h2 className="billing-section-title">
-                  Stella {pendingPlan ? getPlanDisplay(pendingPlan).label : ""}
+                  Stella {checkoutPlanDisplay.label}
                 </h2>
               </div>
               <button
                 type="button"
                 className="billing-link-button"
-                onClick={() => {
-                  setCheckoutSession(null);
-                  setPendingPlan(null);
-                }}
+                onClick={handleCheckoutClose}
               >
-                Close checkout
+                Cancel
               </button>
             </div>
-            <div className="billing-checkout-frame">
-              <EmbeddedCheckoutProvider
-                stripe={getStripePromise(checkoutSession.publishableKey)}
-                options={checkoutOptions}
-              >
-                <EmbeddedCheckout />
-              </EmbeddedCheckoutProvider>
-            </div>
+            <CheckoutElementsProvider
+              stripe={getStripePromise(checkoutSession.publishableKey)}
+              options={checkoutOptions}
+            >
+              <CheckoutForm
+                planLabel={checkoutPlanDisplay.label}
+                planMonthlyPriceCents={checkoutPlanDisplay.monthlyPriceCents}
+                onSuccess={handleCheckoutSuccess}
+              />
+            </CheckoutElementsProvider>
           </section>
         ) : null}
       </div>
     </main>
+  );
+}
+
+type CheckoutFormProps = {
+  planLabel: string;
+  planMonthlyPriceCents: number;
+  onSuccess: () => void;
+};
+
+function CheckoutForm({
+  planLabel,
+  planMonthlyPriceCents,
+  onSuccess,
+}: CheckoutFormProps) {
+  const result = useCheckoutElements();
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // The form SDK is async-loaded — show a placeholder until the SDK
+  // resolves. `useCheckoutForm` returns a discriminated union; only
+  // `success` exposes the `checkout` action surface.
+  const checkout = result.type === "success" ? result.checkout : null;
+  const sdkError = result.type === "error" ? result.error.message : null;
+
+  // Seed the local email field from whatever Stripe already has on the
+  // session (set when we passed a `customer` with a stored email).
+  useEffect(() => {
+    if (!checkout) return;
+    if (checkout.email && !email) {
+      setEmail(checkout.email);
+    }
+  }, [checkout, email]);
+
+  const onSubmit = useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (submitting || !checkout) return;
+      setSubmitting(true);
+      setSubmitError(null);
+      try {
+        if (email && email !== checkout.email) {
+          const updateResult = await checkout.updateEmail(email);
+          if (updateResult.type === "error") {
+            setSubmitError(updateResult.error.message);
+            return;
+          }
+        }
+        const confirmResult = await checkout.confirm();
+        if (confirmResult.type === "error") {
+          setSubmitError(confirmResult.error.message);
+          return;
+        }
+        onSuccess();
+      } catch (err) {
+        setSubmitError(
+          getErrorMessage(err, "Payment could not be completed."),
+        );
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [checkout, email, onSuccess, submitting],
+  );
+
+  // `checkout.total.total.amount` is a pre-formatted display string from
+  // Stripe (e.g. "$20.00"). Fall back to the static plan price while the
+  // SDK is loading so the summary doesn't flicker.
+  const fallbackFormatted = currencyFormatter.format(
+    planMonthlyPriceCents / 100,
+  );
+  const totalFormatted =
+    checkout?.total?.total?.amount ?? fallbackFormatted;
+
+  return (
+    <form className="billing-checkout-form" onSubmit={onSubmit} noValidate>
+      <div className="billing-checkout-summary">
+        <div>
+          <span className="billing-checkout-summary-label">Plan</span>
+          <span className="billing-checkout-summary-value">
+            Stella {planLabel}
+          </span>
+        </div>
+        <div>
+          <span className="billing-checkout-summary-label">Billed monthly</span>
+          <span className="billing-checkout-summary-value">
+            {totalFormatted}
+          </span>
+        </div>
+      </div>
+
+      <label className="billing-checkout-field">
+        <span className="billing-checkout-field-label">Email</span>
+        <input
+          type="email"
+          required
+          autoComplete="email"
+          inputMode="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="you@example.com"
+          className="billing-checkout-input"
+        />
+      </label>
+
+      <div className="billing-checkout-payment">
+        <span className="billing-checkout-field-label">Payment</span>
+        <PaymentElement options={{ layout: "tabs" }} />
+      </div>
+
+      {sdkError ? (
+        <p className="billing-notice billing-notice--error" role="alert">
+          {sdkError}
+        </p>
+      ) : null}
+      {submitError ? (
+        <p className="billing-notice billing-notice--error" role="alert">
+          {submitError}
+        </p>
+      ) : null}
+
+      <button
+        type="submit"
+        className="billing-checkout-submit"
+        disabled={submitting || !email || !checkout}
+      >
+        {submitting
+          ? "Processing..."
+          : checkout
+            ? `Subscribe — ${totalFormatted}/mo`
+            : "Loading..."}
+      </button>
+
+      <p className="billing-checkout-fineprint">
+        By subscribing you authorize Stella to charge you {totalFormatted} each
+        month until you cancel. You can cancel anytime from Manage billing.
+      </p>
+    </form>
   );
 }
