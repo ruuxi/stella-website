@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
-import { SiteNav } from "@/components/site-nav";
+import { SiteHeader } from "@/components/site-header";
 import "./pricing.css";
 
 export const metadata: Metadata = {
@@ -12,53 +12,53 @@ export const metadata: Metadata = {
   alternates: { canonical: "/pricing" },
 };
 
-const plans = [
+// Mirrors `BILLING_PLAN_FALLBACKS`, `PLAN_USAGE_TAGLINE`,
+// `BASE_PLAN_FEATURES` and `PRIORITY_PLAN_FEATURE` in
+// `src/app/billing/billing-client.tsx` so /pricing and /billing always
+// describe the same plans.
+const BASE_FEATURES = [
+  "Voice features",
+  "Image, video, audio and 3D generation",
+];
+const PRIORITY_FEATURE = "Higher priority, increased speeds";
+
+const plans: {
+  name: string;
+  price: number;
+  tagline: string;
+  features: string[];
+  featured?: boolean;
+}[] = [
   {
     name: "Free",
     price: 0,
-    tagline: "Get started with Stella",
-    features: ["Basic chat & assistance", "Limited daily usage"],
+    tagline: "Light usage to try Stella",
+    features: [...BASE_FEATURES],
   },
   {
     name: "Go",
     price: 20,
-    tagline: "For everyday personal use",
-    features: [
-      "More conversations per day",
-      "Browser automation",
-      "Voice conversations",
-    ],
+    tagline: "Baseline monthly usage",
+    features: [...BASE_FEATURES],
   },
   {
     name: "Pro",
     price: 60,
-    tagline: "For power users",
+    tagline: "3x the usage of Go",
     featured: true,
-    features: [
-      "3x the usage of Go",
-      "Priority response times",
-      "All automation features",
-    ],
+    features: [PRIORITY_FEATURE, ...BASE_FEATURES],
   },
   {
     name: "Plus",
     price: 100,
-    tagline: "For professionals",
-    features: [
-      "Heavy daily usage",
-      "Advanced agent workflows",
-      "Priority support",
-    ],
+    tagline: "5x the usage of Go",
+    features: [PRIORITY_FEATURE, ...BASE_FEATURES],
   },
   {
     name: "Ultra",
     price: 200,
-    tagline: "Unlimited productivity",
-    features: [
-      "Maximum usage limits",
-      "Fastest response times",
-      "Everything in Plus",
-    ],
+    tagline: "10x the usage of Go",
+    features: [PRIORITY_FEATURE, ...BASE_FEATURES],
   },
 ];
 
@@ -69,47 +69,26 @@ const included = [
   "Desktop and mobile access",
 ];
 
-const footerGroups = [
+const footerGroups: { title: string; items: { label: string; href: string }[] }[] = [
   {
     title: "Product",
-    items: ["Get Started", "Sign In", "Download", "Pricing"],
+    items: [
+      { label: "How It Works", href: "/how-it-works" },
+      { label: "Store", href: "/store" },
+      { label: "Pricing", href: "/pricing" },
+      { label: "Sign In", href: "/sign-in" },
+    ],
   },
   {
     title: "Resources",
-    items: ["What's New", "Help Center", "Podcast", "Press Kit"],
-  },
-  {
-    title: "Learn",
-    items: ["Getting Started Guide", "Tips & Tricks"],
-  },
-  {
-    title: "Community",
-    items: ["X @stella", "Stella Community", "YouTube"],
+    items: [{ label: "What's New", href: "/changelog" }],
   },
 ];
 
 export default function Pricing() {
   return (
     <div className="stella-page">
-      {/* ── Header ─────────────────────────────────── */}
-      <header className="grid-shell grid-shell--dense site-header">
-        <div className="brand-wrap">
-          <Link className="brand-mark" href="/">
-            <span className="brand-mark__logo">
-              <Image
-                className="brand-mark__logo-img"
-                src="/stella-logo.svg"
-                alt=""
-                width={64}
-                height={64}
-                priority
-              />
-            </span>
-            <span className="brand-text">Stella</span>
-          </Link>
-        </div>
-        <SiteNav />
-      </header>
+      <SiteHeader />
 
       <main>
         {/* ── Hero ─────────────────────────────────── */}
@@ -119,7 +98,8 @@ export default function Pricing() {
               <span>Simple,</span> transparent pricing
             </h1>
             <p className="pr-subtitle reveal reveal-delay-1">
-              Start free. Upgrade when you need more.
+              Every plan includes the full Stella experience. The only thing
+              that changes between tiers is how much you can use each month.
             </p>
           </div>
         </section>
@@ -186,10 +166,10 @@ export default function Pricing() {
             <p>
               No credit card required. Download Stella and try it today.
             </p>
-            <a className="button button--primary" href="#">
+            <Link className="button button--primary" href="/">
               Get Started
               <ArrowRight size={16} />
-            </a>
+            </Link>
           </div>
         </section>
       </main>
@@ -221,8 +201,8 @@ export default function Pricing() {
               <h3>{group.title}</h3>
               <ul>
                 {group.items.map((item) => (
-                  <li key={item}>
-                    <a href="#">{item}</a>
+                  <li key={item.label}>
+                    <a href={item.href}>{item.label}</a>
                   </li>
                 ))}
               </ul>

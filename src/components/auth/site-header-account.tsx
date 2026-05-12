@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { useDesktopBridgeAuthUser } from "@/lib/desktop-bridge-auth";
 import { isConvexConfigured } from "@/lib/convex-urls";
@@ -46,7 +47,15 @@ function InnerImpl() {
 
   if (isSignedIn && user) {
     const label = user.name?.trim() || user.email?.trim() || "Account";
-    return <SignInButton label={label} ariaLabel="Manage your Stella account" />;
+    return (
+      <Link
+        className="site-nav__signin"
+        href="/billing"
+        aria-label="Manage your Stella account"
+      >
+        {label}
+      </Link>
+    );
   }
 
   return <SignInButton />;

@@ -117,22 +117,19 @@ const features = [
   },
 ];
 
-const footerGroups = [
+const footerGroups: { title: string; items: { label: string; href: string }[] }[] = [
   {
     title: "Product",
-    items: ["Get Started", "Sign In", "Download", "Pricing"],
+    items: [
+      { label: "How It Works", href: "/how-it-works" },
+      { label: "Store", href: "/store" },
+      { label: "Pricing", href: "/pricing" },
+      { label: "Sign In", href: "/sign-in" },
+    ],
   },
   {
     title: "Resources",
-    items: ["What's New", "Help Center", "Podcast", "Press Kit"],
-  },
-  {
-    title: "Learn",
-    items: ["Getting Started Guide", "Tips & Tricks"],
-  },
-  {
-    title: "Community",
-    items: ["X @stella", "Stella Community", "YouTube"],
+    items: [{ label: "What's New", href: "/changelog" }],
   },
 ];
 
@@ -332,7 +329,7 @@ export default function Home() {
 
       <footer className="grid-shell site-footer section-deferred-render section-border">
         <div className="footer-brand">
-          <a className="brand-mark brand-mark--footer" href="#">
+          <a className="brand-mark brand-mark--footer" href="/">
             <Image src="/stella-logo.svg" alt="Stella" width={42} height={42} />
             <span className="brand-text">Stella</span>
           </a>
@@ -353,8 +350,8 @@ export default function Home() {
               <h3>{group.title}</h3>
               <ul>
                 {group.items.map((item) => (
-                  <li key={item}>
-                    <a href="#">{item}</a>
+                  <li key={item.label}>
+                    <a href={item.href}>{item.label}</a>
                   </li>
                 ))}
               </ul>
