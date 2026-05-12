@@ -48,6 +48,21 @@ type BillingPortalSessionPayload = {
   url: string;
 };
 
+type UsageCreditPurchaseOptions = {
+  currency: string;
+  minAmountCents: number;
+  maxAmountCents: number;
+  presetAmountCents: number[];
+};
+
+type UsageCreditStatus = {
+  authenticated: boolean;
+  currency: string;
+  balanceUsd: number;
+  totalPurchasedUsd: number;
+  totalConsumedUsd: number;
+};
+
 const getSubscriptionStatus = makeFunctionReference<
   "query",
   { now: number },
@@ -65,6 +80,24 @@ const createBillingPortalSession = makeFunctionReference<
   { returnUrl: string },
   BillingPortalSessionPayload
 >("billing:createBillingPortalSession");
+
+const getUsageCreditPurchaseOptions = makeFunctionReference<
+  "query",
+  Record<string, never>,
+  UsageCreditPurchaseOptions
+>("billing:getUsageCreditPurchaseOptions");
+
+const getUsageCreditStatus = makeFunctionReference<
+  "query",
+  Record<string, never>,
+  UsageCreditStatus
+>("billing:getUsageCreditStatus");
+
+const createUsageCreditCheckoutSession = makeFunctionReference<
+  "action",
+  { amountCents: number; returnUrl: string },
+  CheckoutSessionPayload
+>("billing:createUsageCreditCheckoutSession");
 
 const PLAN_ORDER: BillingPlan[] = ["free", "go", "pro", "plus", "ultra"];
 const RECOMMENDED_PLAN: BillingPlan = "pro";
@@ -173,6 +206,11 @@ function BillingInteractive() {
   const [openingPortal, setOpeningPortal] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [creditCustomAmount, setCreditCustomAmount] = useState("");
+  const [creditSelectedPresetCents, setCreditSelectedPresetCents] = useState<
+    number | null
+  >(null);
+  const [startingCredit, setStartingCredit] = useState(false);
 
   useEffect(() => {
     const id = window.setInterval(() => setBillingNowMs(Date.now()), 60_000);
@@ -199,8 +237,11 @@ function BillingInteractive() {
   const billingStatus = useQuery(getSubscriptionStatus, {
     now: billingNowMs,
   });
+  const creditOptions = useQuery(getUsageCreditPurchaseOptions, {});
+  const creditStatus = useQuery(getUsageCreditStatus, {});
   const startCheckout = useAction(createCheckoutSession);
   const openPortal = useAction(createBillingPortalSession);
+  const startCreditCheckout = useAction(createUsageCreditCheckoutSession);
 
   const planCatalog = billingStatus?.plans;
   const currentPlan = billingStatus?.plan ?? "free";
@@ -245,6 +286,82 @@ function BillingInteractive() {
     },
     [hasAccount, startCheckout],
   );
+
+  // The custom-amount input is the source of truth for "what will Stripe
+  // charge". Preset chips just write into it. We parse on submit instead of
+  // on every keystroke so users can type freely (e.g. "5.5") without the
+  // selected-preset state thrashing.
+  const parseCustomAmountCents = useCallback(
+    (raw: string): { amountCents: number; error: string | null } => {
+      if (!creditOptions) {
+        return { amountCents: 0, error: "Credit options are still loading." };
+      }
+      const trimmed = raw.trim();
+      if (!trimmed) {
+        return { amountCents: 0, error: "Enter an amount." };
+      }
+      const parsed = Number(trimmed);
+      if (!Number.isFinite(parsed) || parsed <= 0) {
+        return { amountCents: 0, error: "Enter a valid amount in dollars." };
+      }
+      const amountCents = Math.round(parsed * 100);
+      if (amountCents < creditOptions.minAmountCents) {
+        return {
+          amountCents,
+          error: `Minimum is ${usdFormatter.format(
+            creditOptions.minAmountCents / 100,
+          )}.`,
+        };
+      }
+      if (amountCents > creditOptions.maxAmountCents) {
+        return {
+          amountCents,
+          error: `Maximum is ${usdFormatter.format(
+            creditOptions.maxAmountCents / 100,
+          )}.`,
+        };
+      }
+      return { amountCents, error: null };
+    },
+    [creditOptions],
+  );
+
+  const handleSelectCreditPreset = useCallback((amountCents: number) => {
+    setCreditSelectedPresetCents(amountCents);
+    setCreditCustomAmount((amountCents / 100).toFixed(2).replace(/\.00$/, ""));
+  }, []);
+
+  const handleStartCreditCheckout = useCallback(async () => {
+    if (!hasAccount) {
+      openSignInDialog();
+      return;
+    }
+    setError(null);
+    setNotice(null);
+    const { amountCents, error: amountError } =
+      parseCustomAmountCents(creditCustomAmount);
+    if (amountError) {
+      setError(amountError);
+      return;
+    }
+    setStartingCredit(true);
+    try {
+      const session = await startCreditCheckout({
+        amountCents,
+        returnUrl: getBillingReturnUrl(),
+      });
+      openStripeCheckoutUrl(session.url);
+    } catch (err) {
+      setError(getErrorMessage(err, "Unable to start checkout right now."));
+    } finally {
+      setStartingCredit(false);
+    }
+  }, [
+    creditCustomAmount,
+    hasAccount,
+    parseCustomAmountCents,
+    startCreditCheckout,
+  ]);
 
   const handleOpenPortal = useCallback(async () => {
     if (!hasAccount) {
@@ -401,6 +518,89 @@ function BillingInteractive() {
               );
             })}
           </div>
+
+          <section className="billing-credit" aria-label="Top up usage">
+            <div className="billing-section-head">
+              <h2 className="billing-section-title">Extra usage credit</h2>
+              <p className="billing-section-sub">
+                One-time top-up. Stella spends it automatically once your
+                included monthly usage is gone, then resumes from your plan
+                next month.
+              </p>
+            </div>
+
+            {creditStatus?.authenticated ? (
+              <div className="billing-credit-balance">
+                <span className="billing-status-label">Available credit</span>
+                <span className="billing-credit-balance-value">
+                  {usdFormatter.format(creditStatus.balanceUsd)}
+                </span>
+              </div>
+            ) : null}
+
+            {creditOptions ? (
+              <div className="billing-credit-presets" role="radiogroup" aria-label="Preset amounts">
+                {creditOptions.presetAmountCents.map((amountCents) => {
+                  const isSelected = creditSelectedPresetCents === amountCents;
+                  return (
+                    <button
+                      key={amountCents}
+                      type="button"
+                      role="radio"
+                      aria-checked={isSelected}
+                      className="billing-credit-preset"
+                      data-active={isSelected || undefined}
+                      onClick={() => handleSelectCreditPreset(amountCents)}
+                      disabled={startingCredit}
+                    >
+                      {currencyFormatter.format(amountCents / 100)}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            <div className="billing-credit-form">
+              <label className="billing-credit-input-wrap">
+                <span className="billing-credit-input-prefix">$</span>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  className="billing-credit-input"
+                  placeholder={
+                    creditOptions
+                      ? `${creditOptions.minAmountCents / 100}–${
+                          creditOptions.maxAmountCents / 100
+                        }`
+                      : "Custom amount"
+                  }
+                  value={creditCustomAmount}
+                  onChange={(event) => {
+                    setCreditCustomAmount(event.target.value);
+                    setCreditSelectedPresetCents(null);
+                  }}
+                  disabled={!creditOptions || startingCredit}
+                  aria-label="Custom credit amount in dollars"
+                />
+              </label>
+              <button
+                type="button"
+                className="billing-plan-cta billing-credit-cta"
+                onClick={() => void handleStartCreditCheckout()}
+                disabled={
+                  !creditOptions ||
+                  startingCredit ||
+                  !creditCustomAmount.trim()
+                }
+              >
+                {startingCredit
+                  ? "Opening..."
+                  : !hasAccount
+                    ? "Sign in to top up"
+                    : "Add credit"}
+              </button>
+            </div>
+          </section>
 
           <div className="billing-features">
             <div className="billing-features-head">Included on every plan</div>

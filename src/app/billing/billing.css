@@ -319,6 +319,118 @@
   color: var(--billing-muted);
 }
 
+.billing-credit {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 0 0;
+  border-top: 1px solid var(--billing-border);
+}
+
+.billing-credit-balance {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.billing-credit-balance-value {
+  font-family: var(--billing-serif);
+  font-size: 1.4rem;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.billing-credit-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.billing-credit-preset {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  padding: 8px 14px;
+  border: 1px solid var(--billing-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--billing-fg);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s;
+}
+
+.billing-credit-preset:hover:not(:disabled) {
+  border-color: var(--billing-border-strong);
+}
+
+.billing-credit-preset[data-active="true"] {
+  background: var(--billing-fg);
+  color: var(--page-background, #fff);
+  border-color: var(--billing-fg);
+}
+
+.billing-credit-preset:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.billing-credit-form {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.billing-credit-input-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: 1px solid var(--billing-border-strong);
+  border-radius: 6px;
+  background: transparent;
+  min-width: 160px;
+  flex: 0 1 220px;
+}
+
+.billing-credit-input-prefix {
+  font-family: var(--billing-serif);
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--billing-muted);
+}
+
+.billing-credit-input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  border: none;
+  background: transparent;
+  color: var(--billing-fg);
+  padding: 9px 0;
+  outline: none;
+  min-width: 0;
+}
+
+.billing-credit-input::placeholder {
+  color: var(--billing-muted);
+  font-weight: 400;
+}
+
+.billing-credit-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.billing-credit-cta {
+  margin-top: 0;
+}
+
 .billing-features {
   padding: 24px 4px 0;
   gap: 18px;
