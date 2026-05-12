@@ -175,6 +175,10 @@ export default function Home() {
             <HeroStellaOrb />
             <DownloadButton />
           </div>
+
+          <p className="hero-research-note reveal reveal-delay-2">
+            Stella is in research preview
+          </p>
         </section>
 
         <DeferInView

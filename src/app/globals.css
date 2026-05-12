@@ -527,6 +527,21 @@ html[data-embedded="true"] .stella-page::before {
   justify-content: flex-start;
 }
 
+.hero-research-note {
+  margin: 0.6rem 0 0;
+  color: var(--page-muted);
+  font-family: var(--font-display), serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 767px) {
+  .hero-research-note {
+    text-align: center;
+  }
+}
+
 @media (max-width: 767px) {
   .hero-actions {
     flex-direction: column;
