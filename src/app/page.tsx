@@ -152,12 +152,13 @@ export default function Home() {
 
           <div className="hero-actions reveal reveal-delay-2">
             <HeroStellaOrb />
-            <DownloadButton />
+            <div className="hero-actions__cta">
+              <DownloadButton />
+              <p className="hero-research-note">
+                Stella is in research preview
+              </p>
+            </div>
           </div>
-
-          <p className="hero-research-note reveal reveal-delay-2">
-            Stella is in research preview
-          </p>
         </section>
 
         <DeferInView
