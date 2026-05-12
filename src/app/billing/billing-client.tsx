@@ -121,16 +121,22 @@ const PLAN_USAGE_TAGLINE: Record<BillingPlan, string> = {
   ultra: "10x the usage of Go",
 };
 
-const SHARED_FEATURES: readonly string[] = [
-  "Unlimited chat with Stella",
-  "Bring any model, local or cloud",
-  "Browser, voice and screen control",
+const BASE_PLAN_FEATURES: readonly string[] = [
+  "Voice features",
   "Image, video, audio and 3D generation",
-  "All apps, integrations and connectors",
-  "Self-modifying personalization",
-  "Priority response times",
-  "Files stay on your device",
 ];
+
+// Pro and above unlock the higher-throughput Standard variant in the
+// model picker, so call it out explicitly on those tiers without using
+// the word "faster" (which to most users implies "dumber").
+const PRIORITY_PLAN_FEATURE = "Higher priority, increased speeds";
+
+const PRIORITY_PLANS = new Set<BillingPlan>(["pro", "plus", "ultra"]);
+
+const getPlanFeatures = (plan: BillingPlan): readonly string[] =>
+  PRIORITY_PLANS.has(plan)
+    ? [PRIORITY_PLAN_FEATURE, ...BASE_PLAN_FEATURES]
+    : BASE_PLAN_FEATURES;
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -498,6 +504,11 @@ function BillingInteractive() {
                   <p className="billing-plan-allotment">
                     {PLAN_USAGE_TAGLINE[plan]}
                   </p>
+                  <ul className="billing-plan-features">
+                    {getPlanFeatures(plan).map((feature) => (
+                      <li key={feature}>{feature}</li>
+                    ))}
+                  </ul>
                   <hr className="billing-plan-rule" />
                   <button
                     type="button"
@@ -602,14 +613,6 @@ function BillingInteractive() {
             </div>
           </section>
 
-          <div className="billing-features">
-            <div className="billing-features-head">Included on every plan</div>
-            <ul className="billing-features-list">
-              {SHARED_FEATURES.map((feature) => (
-                <li key={feature}>{feature}</li>
-              ))}
-            </ul>
-          </div>
         </section>
       </div>
     </main>
