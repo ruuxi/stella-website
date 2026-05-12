@@ -5,10 +5,11 @@ import { ArrowRight } from "lucide-react";
 
 const DOWNLOADS = {
   macArm64:
-    "https://github.com/ruuxi/stella/releases/latest/download/Stella-darwin-arm64.dmg",
+    "https://github.com/ruuxi/stella-launcher/releases/latest/download/Stella-darwin-arm64.dmg",
   macX64:
-    "https://github.com/ruuxi/stella/releases/latest/download/Stella-darwin-x64.dmg",
-  windows: "https://github.com/ruuxi/stella/releases/latest/download/Stella.exe",
+    "https://github.com/ruuxi/stella-launcher/releases/latest/download/Stella-darwin-x64.dmg",
+  windows:
+    "https://github.com/ruuxi/stella-launcher/releases/latest/download/Stella.exe",
 } as const;
 
 type Platform = "macArm64" | "macX64" | "windows";
