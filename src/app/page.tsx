@@ -4,7 +4,7 @@ import { DownloadButton } from "@/components/download-button";
 import { HeroMorphTitle } from "@/components/hero-morph-title";
 import { HeroStellaOrb } from "@/components/hero-stella-orb-dynamic";
 import { DeferInView } from "@/components/product-demos/defer-in-view";
-import { SiteNav } from "@/components/site-nav";
+import { SiteHeader } from "@/components/site-header";
 
 const SelfModHero = dynamic(
   () => import("@/components/product-demos/self-mod-hero").then((mod) => mod.SelfModHero),
@@ -139,25 +139,7 @@ const footerGroups = [
 export default function Home() {
   return (
     <div className="stella-page">
-      <header className="grid-shell grid-shell--dense site-header">
-        <div className="brand-wrap">
-          <a className="brand-mark" href="#">
-            <span className="brand-mark__logo">
-              <Image
-                className="brand-mark__logo-img"
-                src="/stella-logo.svg"
-                alt=""
-                width={64}
-                height={64}
-                priority
-              />
-            </span>
-            <span className="brand-text">Stella</span>
-          </a>
-        </div>
-
-        <SiteNav />
-      </header>
+      <SiteHeader />
 
       <main>
         <section className="grid-shell hero-section section-border">

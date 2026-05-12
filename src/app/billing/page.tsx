@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SiteHeader } from "@/components/site-header";
 import { BillingClient } from "./billing-client";
 import "./billing.css";
 
@@ -10,5 +11,10 @@ export const metadata: Metadata = {
 };
 
 export default function BillingPage() {
-  return <BillingClient />;
+  return (
+    <div className="stella-page">
+      <SiteHeader />
+      <BillingClient />
+    </div>
+  );
 }

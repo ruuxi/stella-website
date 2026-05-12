@@ -60,24 +60,34 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0;
+  padding: clamp(1rem, 2.6vw, 2.2rem);
   overflow: hidden;
-  border: 1px solid rgba(82, 104, 134, 0.14);
-  border-radius: 18px;
+  border-radius: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(246, 250, 255, 0.72)),
-    var(--page-panel);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(18px);
+    radial-gradient(
+      120% 100% at 8% 6%,
+      rgba(178, 224, 248, 0.95),
+      rgba(104, 180, 232, 0.92) 30%,
+      rgba(45, 132, 224, 0.9) 60%,
+      rgba(20, 86, 180, 0.86) 100%
+    ),
+    linear-gradient(180deg, #62b0e8, #155fb6);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 30px 70px rgba(18, 70, 150, 0.26),
+    0 8px 24px rgba(18, 70, 150, 0.16);
+  isolation: isolate;
 }
 
-.privacy-hero__grid::before {
+.privacy-hero__grid::after {
   content: "";
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at top left, rgba(102, 220, 255, 0.16), transparent 30%),
-    radial-gradient(circle at 86% 8%, rgba(79, 118, 255, 0.12), transparent 24%);
+    radial-gradient(80% 60% at 100% 100%, rgba(180, 230, 255, 0.18), transparent 60%),
+    radial-gradient(50% 40% at 0% 100%, rgba(255, 255, 255, 0.12), transparent 60%);
   pointer-events: none;
+  z-index: 0;
 }
 
 .privacy-hero__grid > * {
@@ -92,11 +102,12 @@
   gap: 0.55rem;
   padding: 1.6rem 1.6rem 1.7rem;
   border: 0;
-  border-right: 1px solid rgba(82, 104, 134, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 0;
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
+  color: rgba(255, 255, 255, 0.96);
 }
 
 .privacy-card:last-child {
@@ -104,7 +115,7 @@
 }
 
 .privacy-card__label {
-  color: rgba(18, 18, 15, 0.46);
+  color: rgba(255, 255, 255, 0.7);
   font-family: var(--font-display), serif;
   font-size: 0.82rem;
   font-style: italic;
@@ -118,7 +129,7 @@
   font-weight: 400;
   letter-spacing: -0.04em;
   line-height: 1.15;
-  color: rgba(15, 23, 40, 0.92);
+  color: rgba(255, 255, 255, 0.98);
 }
 
 .privacy-card__github {
@@ -131,9 +142,9 @@
   width: 2rem;
   height: 2rem;
   border-radius: 999px;
-  color: rgba(18, 18, 15, 0.55);
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(82, 104, 134, 0.14);
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   transition:
     color 0.2s ease,
     background-color 0.2s ease,
@@ -141,19 +152,19 @@
 }
 
 .privacy-card__github:hover {
-  color: rgba(18, 18, 15, 0.92);
-  background: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 1);
+  background: rgba(255, 255, 255, 0.24);
   transform: translateY(-1px);
 }
 
 .privacy-card__github:focus-visible {
-  outline: 2px solid rgba(15, 98, 254, 0.55);
+  outline: 2px solid rgba(255, 255, 255, 0.7);
   outline-offset: 2px;
 }
 
 .privacy-card__body {
   margin: 0;
-  color: var(--page-muted, rgba(18, 18, 15, 0.6));
+  color: rgba(255, 255, 255, 0.82);
   font-size: 0.98rem;
   line-height: 1.55;
 }
@@ -166,7 +177,7 @@
 
   .privacy-card {
     border-right: 0;
-    border-bottom: 1px solid rgba(82, 104, 134, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
   }
 
   .privacy-card:last-child {
