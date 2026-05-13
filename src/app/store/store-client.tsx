@@ -44,6 +44,8 @@ type StoreCategory =
   | "integrations"
   | "other";
 
+type StoreBadge = "verified" | "partner";
+
 type StorePackage = {
   _id: string;
   packageId: string;
@@ -54,7 +56,12 @@ type StorePackage = {
   installCount?: number;
   iconUrl?: string;
   authorUsername?: string;
+  authorBadge?: StoreBadge;
   featured?: boolean;
+  promoted?: boolean;
+  promotedAt?: number;
+  promotedUntil?: number;
+  createdAt: number;
   updatedAt: number;
 };
 
@@ -366,6 +373,12 @@ const listPublicPackages = makeFunctionReference<
   },
   { page: StorePackage[]; isDone: boolean; continueCursor: string }
 >("data/store_packages:listPublicPackages");
+
+const listNewPublicPackages = makeFunctionReference<
+  "query",
+  { limit?: number },
+  StorePackage[]
+>("data/store_packages:listNewPublicPackages");
 
 const searchPublicPackages = makeFunctionReference<
   "query",
@@ -1363,11 +1376,79 @@ function PackageArtwork({
   );
 }
 
+function BadgeMark({
+  badge,
+  size = 12,
+}: {
+  badge?: StoreBadge;
+  size?: number;
+}) {
+  if (!badge) return null;
+  // Partner = filled checkmark in a starburst (enterprise/brand);
+  // verified = filled checkmark in a circle (active paid plan).
+  // Tooltip via native title — keeps it lightweight; we can move to a
+  // shared tooltip primitive when more surfaces need it.
+  const title =
+    badge === "partner"
+      ? "Stella partner"
+      : "Verified Stella subscriber";
+  const className = `store-badge-mark store-badge-mark--${badge}`;
+  if (badge === "partner") {
+    return (
+      <svg
+        aria-label={title}
+        className={className}
+        height={size}
+        role="img"
+        viewBox="0 0 24 24"
+        width={size}
+      >
+        <title>{title}</title>
+        <path
+          d="M12 1.6l2.4 2.6 3.5-.6.6 3.5L21 9.6l-1.7 3.1 1.7 3.1-2.5 2.5-.6 3.5-3.5-.6L12 23.4l-2.4-2.8-3.5.6-.6-3.5L3 16l1.7-3.1L3 9.6l2.5-2.5.6-3.5 3.5.6L12 1.6z"
+          fill="currentColor"
+        />
+        <path
+          d="M8.2 12.1l2.7 2.7 4.9-5"
+          fill="none"
+          stroke="#fff"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+        />
+      </svg>
+    );
+  }
+  return (
+    <svg
+      aria-label={title}
+      className={className}
+      height={size}
+      role="img"
+      viewBox="0 0 24 24"
+      width={size}
+    >
+      <title>{title}</title>
+      <circle cx="12" cy="12" fill="currentColor" r="10" />
+      <path
+        d="M7.8 12.4l2.7 2.7 5.7-5.8"
+        fill="none"
+        stroke="#fff"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.1"
+      />
+    </svg>
+  );
+}
+
 function AuthorChip({
   username,
+  badge,
   variant = "card",
 }: {
   username?: string;
+  badge?: StoreBadge;
   variant?: "card" | "featured" | "detail";
 }) {
   if (!username) return null;
@@ -1385,10 +1466,12 @@ function AuthorChip({
       : variant === "detail"
         ? "store-detail-author-avatar"
         : "store-card-author-avatar";
+  const badgeSize = variant === "card" ? 11 : variant === "featured" ? 13 : 14;
   return (
     <div className={className}>
       <span className={avatarClassName}>{initial}</span>
       <span>by {displayed}</span>
+      <BadgeMark badge={badge} size={badgeSize} />
     </div>
   );
 }
@@ -1520,7 +1603,10 @@ function PackageCard({
         </div>
         <div className="store-card-desc">{pkg.description}</div>
         <div className="store-card-footer">
-          <AuthorChip username={pkg.authorUsername} />
+          <AuthorChip
+            username={pkg.authorUsername}
+            badge={pkg.authorBadge}
+          />
           <span className="store-card-installs">
             {formatInstallCount(pkg.installCount)}
           </span>
@@ -1579,7 +1665,11 @@ function FeaturedCard({
           <div className="store-featured-label">Featured</div>
           <div className="store-featured-name">{pkg.displayName}</div>
           <div className="store-featured-desc">{pkg.description}</div>
-          <AuthorChip username={pkg.authorUsername} variant="featured" />
+          <AuthorChip
+            username={pkg.authorUsername}
+            badge={pkg.authorBadge}
+            variant="featured"
+          />
         </div>
         <button
           className="store-action-btn store-action-btn--lg"
@@ -1662,6 +1752,35 @@ function pickFeaturedPackage(packages: StorePackage[]): StorePackage | null {
   );
 }
 
+// "For You" ranking weight. Higher = surfaces earlier. Promotion and
+// partner badges outrank organic listings; verified gets a smaller
+// nudge so it doesn't drown out fresh organic content. Recency is
+// the tiebreaker so the feed still cycles.
+const FOR_YOU_BUCKET_WEIGHT: Record<string, number> = {
+  promoted: 1000,
+  partner: 100,
+  verified: 10,
+  organic: 0,
+};
+
+const getForYouBucket = (pkg: StorePackage): keyof typeof FOR_YOU_BUCKET_WEIGHT => {
+  const promotedActive =
+    pkg.promoted === true &&
+    (pkg.promotedUntil === undefined || pkg.promotedUntil >= Date.now());
+  if (promotedActive) return "promoted";
+  if (pkg.authorBadge === "partner") return "partner";
+  if (pkg.authorBadge === "verified") return "verified";
+  return "organic";
+};
+
+const sortPackagesForYou = (packages: StorePackage[]): StorePackage[] =>
+  packages.slice().sort((a, b) => {
+    const aw = FOR_YOU_BUCKET_WEIGHT[getForYouBucket(a)] ?? 0;
+    const bw = FOR_YOU_BUCKET_WEIGHT[getForYouBucket(b)] ?? 0;
+    if (aw !== bw) return bw - aw;
+    return b.updatedAt - a.updatedAt;
+  });
+
 function Detail({
   pkg,
   releases,
@@ -1701,7 +1820,11 @@ function Detail({
         <div className="store-detail-info">
           <div className="store-detail-name">{pkg.displayName}</div>
           <div className="store-detail-desc">{pkg.description}</div>
-          <AuthorChip username={pkg.authorUsername} variant="detail" />
+          <AuthorChip
+            username={pkg.authorUsername}
+            badge={pkg.authorBadge}
+            variant="detail"
+          />
           <div className="store-detail-meta store-detail-meta--spaced">
             <span className="store-detail-meta-item">
               <Layers size={13} />
@@ -4968,6 +5091,7 @@ function StoreClientInner() {
   const browse = useQuery(listPublicPackages, {
     paginationOpts: { numItems: 80, cursor: null },
   });
+  const newPackages = useQuery(listNewPublicPackages, { limit: 12 });
   const search = useQuery(
     searchPublicPackages,
     query.trim() ? { query: query.trim(), category: selectedCategory } : "skip",
@@ -4996,11 +5120,27 @@ function StoreClientInner() {
     return true;
   });
   const featured = pickFeaturedPackage(allPackages ?? []);
-  const showFeatured =
-    featured !== null && filter === "all" && query.trim() === "";
-  const rest = filtered.filter(
+  const isForYouSurface = filter === "all" && query.trim() === "";
+  const showFeatured = featured !== null && isForYouSurface;
+  const restRaw = filtered.filter(
     (pkg) => !showFeatured || pkg.packageId !== featured!.packageId,
   );
+  // On the unfiltered For You feed, surface promoted/partner/verified
+  // ahead of organic; once the user picks a category or searches we
+  // fall back to recency so they get the result they asked for.
+  const rest = isForYouSurface ? sortPackagesForYou(restRaw) : restRaw;
+  // Hide the New section when it overlaps significantly with what the
+  // main grid would already show — surfacing the same package twice
+  // (Featured + New + All) feels redundant. We keep it when there's
+  // enough fresh content to justify a separate row.
+  const newPackagesFiltered = (newPackages ?? []).filter((pkg) => {
+    if (showFeatured && featured && pkg.packageId === featured.packageId) {
+      return false;
+    }
+    return true;
+  });
+  const showNewSection =
+    isForYouSurface && newPackagesFiltered.length >= 3 && allPackages !== undefined;
 
   const loadConnectors = useCallback(async () => {
     const bridge = getDesktopStoreBridge();
@@ -5243,6 +5383,33 @@ function StoreClientInner() {
                 onSelect={setSelectedPackageId}
               />
             ) : null}
+            {showNewSection ? (
+              <div className="store-section">
+                <div className="store-section-header">
+                  <span className="store-section-title">New on the Store</span>
+                  <span className="store-section-count">
+                    {newPackagesFiltered.length}
+                  </span>
+                </div>
+                <div className="store-grid">
+                  {newPackagesFiltered.map((pkg) => (
+                    <PackageCard
+                      key={pkg.packageId}
+                      pkg={pkg}
+                      installed={installedIds.has(pkg.packageId)}
+                      updateAvailable={isStoreUpdateAvailable(
+                        pkg,
+                        installedMap.get(pkg.packageId),
+                      )}
+                      installing={installingId === pkg.packageId}
+                      onOpen={() => setSelectedPackageId(pkg.packageId)}
+                      onInstall={() => void installPackage(pkg)}
+                      onShare={() => setSharePkg(pkg)}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : null}
             {!allPackages ? (
               <SkeletonGrid />
             ) : rest.length === 0 ? (
@@ -5270,7 +5437,7 @@ function StoreClientInner() {
                 <div className="store-section-header">
                   <span className="store-section-title">
                     {query.trim() === "" && filter === "all"
-                      ? "All Add-ons"
+                      ? "For You"
                       : "Results"}
                   </span>
                   <span className="store-section-count">{rest.length}</span>

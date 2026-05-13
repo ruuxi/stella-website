@@ -1374,6 +1374,26 @@
   color: var(--text-weak);
 }
 
+/* --- Author verification / partner badge --- */
+
+.store-badge-mark {
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.store-badge-mark--verified {
+  /* Subtle Twitter-blue style; uses the canonical link/accent token
+     so it adapts to the embedded WebContentsView theme. */
+  color: oklch(0.65 0.18 245);
+}
+
+.store-badge-mark--partner {
+  /* Warmer gold to read as a distinct higher tier vs. verified.
+     Stays legible against both light and dark backgrounds. */
+  color: oklch(0.72 0.16 75);
+}
+
 /* --- Detail: author row + What's New section --- */
 
 .store-detail-author {
