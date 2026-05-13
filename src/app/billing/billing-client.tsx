@@ -188,18 +188,26 @@ const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error && error.message ? error.message : fallback;
 
 // Stripe hosted checkout lives on `checkout.stripe.com`. On the website we
-// open it in a new tab via `window.open`; inside Stella's desktop
-// WebContentsView the same call is intercepted by `setWindowOpenHandler`
-// and routed to `shell.openExternal`, which opens it in the user's system
-// browser. Either way the user lands back on `/billing?checkout=success`
-// when Stripe finishes redirecting.
+// open it in a new tab; inside Stella's desktop WebContentsView the same
+// click is intercepted by `setWindowOpenHandler` and routed to
+// `shell.openExternal`, which opens it in the user's system browser.
+// Either way the user lands back on `/billing?checkout=success` when
+// Stripe finishes redirecting.
+//
+// Uses a synthesized anchor click rather than `window.open` because
+// `window.open(url, '_blank', 'noopener,noreferrer')` returns `null` per
+// the HTML spec when `noopener` is set — even on success — which made the
+// previous null-check fallback navigate the current tab as well, opening
+// Stripe in two tabs. The anchor-click pattern is treated as a normal
+// user-initiated link, so it's never popup-blocked and only opens once.
 const openStripeCheckoutUrl = (url: string) => {
-  const opened = window.open(url, "_blank", "noopener,noreferrer");
-  if (!opened) {
-    // Popup blocker (or some embedded contexts) can return null; fall back
-    // to a same-tab navigation so the user always reaches checkout.
-    window.location.href = url;
-  }
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.target = "_blank";
+  anchor.rel = "noopener noreferrer";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
 };
 
 export function BillingClient() {
