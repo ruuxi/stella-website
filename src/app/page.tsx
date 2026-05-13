@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import Link from "next/link";
 import { DownloadButton } from "@/components/download-button";
 import { HeroMorphTitle } from "@/components/hero-morph-title";
 import { HeroStellaOrb } from "@/components/hero-stella-orb-dynamic";
@@ -331,10 +332,10 @@ export default function Home() {
 
       <footer className="grid-shell site-footer section-deferred-render section-border">
         <div className="footer-brand">
-          <a className="brand-mark brand-mark--footer" href="/">
+          <Link className="brand-mark brand-mark--footer" href="/">
             <Image src="/stella-logo.svg" alt="Stella" width={42} height={42} />
             <span className="brand-text">Stella</span>
-          </a>
+          </Link>
 
           <FooterLegalLinks />
         </div>
