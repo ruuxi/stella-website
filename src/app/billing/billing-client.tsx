@@ -131,12 +131,20 @@ const BASE_PLAN_FEATURES: readonly string[] = [
 // the word "faster" (which to most users implies "dumber").
 const PRIORITY_PLAN_FEATURE = "Higher priority, increased speeds";
 
-const PRIORITY_PLANS = new Set<BillingPlan>(["pro", "plus", "ultra"]);
+// Every paid plan grants the verified author badge that surfaces next
+// to your username on Store posts. Free doesn't get it.
+const VERIFIED_BADGE_FEATURE = "Verified creator badge on the Store";
 
-const getPlanFeatures = (plan: BillingPlan): readonly string[] =>
-  PRIORITY_PLANS.has(plan)
-    ? [PRIORITY_PLAN_FEATURE, ...BASE_PLAN_FEATURES]
-    : BASE_PLAN_FEATURES;
+const PRIORITY_PLANS = new Set<BillingPlan>(["pro", "plus", "ultra"]);
+const PAID_PLANS = new Set<BillingPlan>(["go", "pro", "plus", "ultra"]);
+
+const getPlanFeatures = (plan: BillingPlan): readonly string[] => {
+  const features: string[] = [];
+  if (PRIORITY_PLANS.has(plan)) features.push(PRIORITY_PLAN_FEATURE);
+  features.push(...BASE_PLAN_FEATURES);
+  if (PAID_PLANS.has(plan)) features.push(VERIFIED_BADGE_FEATURE);
+  return features;
+};
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
