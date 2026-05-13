@@ -151,6 +151,12 @@ const usdFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 2,
 });
 
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+});
+
 const toUsagePercent = (usedUsd: number, limitUsd: number) => {
   if (!Number.isFinite(limitUsd) || limitUsd <= 0) return 0;
   if (!Number.isFinite(usedUsd) || usedUsd <= 0) return 0;
@@ -272,6 +278,11 @@ function BillingInteractive() {
     billingStatus?.authenticated && !billingStatus.isAnonymous,
   );
   const isLoadingStatus = billingStatus === undefined;
+  // Once a user has any active paid plan, all plan changes (upgrade,
+  // downgrade, cancel) must go through Stripe's Customer Portal — the
+  // backend's createCheckoutSession throws CONFLICT for active subs.
+  const isActivePaidSubscriber = hasAccount && currentPlan !== "free";
+  const currentPlanRank = PLAN_ORDER.indexOf(currentPlan);
 
   const getPlanDisplay = useCallback(
     (plan: BillingPlan) => {
@@ -411,10 +422,6 @@ function BillingInteractive() {
           <h1 className="billing-title">
             Choose how much <em>Stella</em>.
           </h1>
-          <p className="billing-lead">
-            Every plan includes the full Stella experience. The only thing that
-            changes between tiers is how much you can use each month.
-          </p>
         </header>
 
         {error ? (
@@ -490,6 +497,52 @@ function BillingInteractive() {
           </button>
         </section>
 
+        {isActivePaidSubscriber && billingStatus ? (
+          <section
+            className="billing-subscription"
+            aria-label="Subscription management"
+          >
+            <div className="billing-subscription-info">
+              <span className="billing-status-label">
+                {billingStatus.cancelAtPeriodEnd
+                  ? "Cancellation pending"
+                  : "Next renewal"}
+              </span>
+              <span className="billing-subscription-detail">
+                {billingStatus.currentPeriodEnd
+                  ? billingStatus.cancelAtPeriodEnd
+                    ? `Access ends ${dateFormatter.format(
+                        new Date(billingStatus.currentPeriodEnd),
+                      )}.`
+                    : `Renews ${dateFormatter.format(
+                        new Date(billingStatus.currentPeriodEnd),
+                      )}.`
+                  : "Managed by Stripe."}
+              </span>
+            </div>
+            <div className="billing-subscription-actions">
+              <button
+                type="button"
+                className="billing-plan-cta"
+                onClick={() => void handleOpenPortal()}
+                disabled={openingPortal}
+              >
+                {openingPortal ? "Opening..." : "Manage subscription"}
+              </button>
+              {!billingStatus.cancelAtPeriodEnd ? (
+                <button
+                  type="button"
+                  className="billing-link-button billing-link-button--danger"
+                  onClick={() => void handleOpenPortal()}
+                  disabled={openingPortal}
+                >
+                  Cancel subscription
+                </button>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
+
         <section className="billing-plans-section">
           <div className="billing-section-head">
             <h2 className="billing-section-title">Plans</h2>
@@ -506,15 +559,49 @@ function BillingInteractive() {
               const isStartingThisPlan = startingPlan === plan;
               const isRecommended =
                 plan === RECOMMENDED_PLAN && currentPlan !== RECOMMENDED_PLAN;
+              // For active paid subscribers, label upgrades/downgrades by
+              // rank so the action reads naturally and the portal route is
+              // unambiguous.
+              const targetRank = PLAN_ORDER.indexOf(plan);
+              const changeVerb =
+                isActivePaidSubscriber && isPaidPlan && !isCurrentPlan
+                  ? targetRank > currentPlanRank
+                    ? "Upgrade to"
+                    : "Downgrade to"
+                  : "Choose";
               const ctaLabel = isCurrentPlan
                 ? "Current plan"
                 : isStartingThisPlan
                   ? "Opening..."
-                  : !hasAccount && isPaidPlan
-                    ? `Sign in for ${display.label}`
-                    : isPaidPlan
-                      ? `Choose ${display.label}`
-                      : "Included";
+                  : isActivePaidSubscriber && !isPaidPlan
+                    ? "Cancel to switch"
+                    : isActivePaidSubscriber && isPaidPlan
+                      ? openingPortal
+                        ? "Opening..."
+                        : `${changeVerb} ${display.label}`
+                      : !hasAccount && isPaidPlan
+                        ? `Sign in for ${display.label}`
+                        : isPaidPlan
+                          ? `Choose ${display.label}`
+                          : "Included";
+
+              const handlePlanClick = () => {
+                if (isCurrentPlan) return;
+                if (isActivePaidSubscriber) {
+                  // Both plan changes and free-downgrade (cancel) flow
+                  // through the Stripe portal for active subscribers.
+                  void handleOpenPortal();
+                  return;
+                }
+                if (isPaidPlan) {
+                  void handleStartCheckout(plan as PaidBillingPlan);
+                }
+              };
+
+              const isDisabled =
+                isCurrentPlan ||
+                startingPlan !== null ||
+                (isActivePaidSubscriber ? openingPortal : !isPaidPlan);
 
               return (
                 <article
@@ -551,12 +638,8 @@ function BillingInteractive() {
                       "billing-plan-cta" +
                       (isCurrentPlan ? " billing-plan-cta--current" : "")
                     }
-                    onClick={() => {
-                      if (isPaidPlan && !isCurrentPlan) {
-                        void handleStartCheckout(plan as PaidBillingPlan);
-                      }
-                    }}
-                    disabled={isCurrentPlan || !isPaidPlan || startingPlan !== null}
+                    onClick={handlePlanClick}
+                    disabled={isDisabled}
                   >
                     {ctaLabel}
                   </button>
