@@ -5,11 +5,14 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { SiteHeaderAccount } from "@/components/auth/site-header-account";
 
-const NAV_ITEMS: { label: string; href: string }[] = [
+type NavItem = { label: string; href: string; external?: boolean };
+
+const NAV_ITEMS: NavItem[] = [
   { label: "How It Works", href: "/how-it-works" },
   { label: "Store", href: "/store" },
   { label: "Pricing", href: "/pricing" },
   { label: "What's New", href: "/changelog" },
+  { label: "Community", href: "https://discord.gg/HXVCCeE542", external: true },
 ];
 
 /**
@@ -44,11 +47,22 @@ export function SiteNav() {
   return (
     <nav className="site-nav" aria-label="Primary">
       <div className="site-nav__inline">
-        {NAV_ITEMS.map((item) => (
-          <Link key={item.label} href={item.href}>
-            {item.label}
-          </Link>
-        ))}
+        {NAV_ITEMS.map((item) =>
+          item.external ? (
+            <a
+              key={item.label}
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {item.label}
+            </a>
+          ) : (
+            <Link key={item.label} href={item.href}>
+              {item.label}
+            </Link>
+          )
+        )}
       </div>
 
       <SiteHeaderAccount />
@@ -82,9 +96,20 @@ export function SiteNav() {
         <ul>
           {NAV_ITEMS.map((item) => (
             <li key={item.label}>
-              <Link href={item.href} onClick={() => setOpen(false)}>
-                {item.label}
-              </Link>
+              {item.external ? (
+                <a
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setOpen(false)}
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <Link href={item.href} onClick={() => setOpen(false)}>
+                  {item.label}
+                </Link>
+              )}
             </li>
           ))}
         </ul>

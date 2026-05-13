@@ -13,22 +13,46 @@ export const metadata: Metadata = {
   alternates: { canonical: "/changelog" },
 };
 
-const footerGroups = [
+const footerGroups: {
+  title: string;
+  items: { label: string; href: string; external?: boolean }[];
+}[] = [
   {
     title: "Product",
-    items: ["Get Started", "Sign In", "Download", "Pricing"],
+    items: [
+      { label: "Get Started", href: "/" },
+      { label: "Sign In", href: "/sign-in" },
+      { label: "Download", href: "/" },
+      { label: "Pricing", href: "/pricing" },
+    ],
   },
   {
     title: "Resources",
-    items: ["What's New", "Help Center", "Podcast", "Press Kit"],
+    items: [
+      { label: "What's New", href: "/changelog" },
+      { label: "Help Center", href: "#" },
+      { label: "Podcast", href: "#" },
+      { label: "Press Kit", href: "#" },
+    ],
   },
   {
     title: "Learn",
-    items: ["Getting Started Guide", "Tips & Tricks"],
+    items: [
+      { label: "Getting Started Guide", href: "#" },
+      { label: "Tips & Tricks", href: "#" },
+    ],
   },
   {
     title: "Community",
-    items: ["X @stella", "Stella Community", "YouTube"],
+    items: [
+      {
+        label: "Discord",
+        href: "https://discord.gg/HXVCCeE542",
+        external: true,
+      },
+      { label: "X @stella", href: "#" },
+      { label: "YouTube", href: "#" },
+    ],
   },
 ];
 
@@ -914,8 +938,18 @@ export default function Changelog() {
               <h3>{group.title}</h3>
               <ul>
                 {group.items.map((item) => (
-                  <li key={item}>
-                    <a href="#">{item}</a>
+                  <li key={item.label}>
+                    {item.external ? (
+                      <a
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <a href={item.href}>{item.label}</a>
+                    )}
                   </li>
                 ))}
               </ul>

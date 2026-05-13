@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
-import { FooterLegalLinks } from "@/components/footer-legal-links";
 import { SiteHeader } from "@/components/site-header";
 import "./pricing.css";
 
@@ -70,7 +69,10 @@ const included = [
   "Desktop and mobile access",
 ];
 
-const footerGroups: { title: string; items: { label: string; href: string }[] }[] = [
+const footerGroups: {
+  title: string;
+  items: { label: string; href: string; external?: boolean }[];
+}[] = [
   {
     title: "Product",
     items: [
@@ -83,6 +85,16 @@ const footerGroups: { title: string; items: { label: string; href: string }[] }[
   {
     title: "Resources",
     items: [{ label: "What's New", href: "/changelog" }],
+  },
+  {
+    title: "Community",
+    items: [
+      {
+        label: "Discord",
+        href: "https://discord.gg/HXVCCeE542",
+        external: true,
+      },
+    ],
   },
 ];
 
@@ -187,7 +199,14 @@ export default function Pricing() {
             />
             <span className="brand-text">Stella</span>
           </Link>
-          <FooterLegalLinks />
+          <ul className="legal-links">
+            <li>
+              <a href="/privacy">Privacy Policy</a>
+            </li>
+            <li>
+              <a href="/terms">Terms of Service</a>
+            </li>
+          </ul>
         </div>
         <div className="footer-columns">
           {footerGroups.map((group) => (
@@ -196,7 +215,17 @@ export default function Pricing() {
               <ul>
                 {group.items.map((item) => (
                   <li key={item.label}>
-                    <a href={item.href}>{item.label}</a>
+                    {item.external ? (
+                      <a
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <a href={item.href}>{item.label}</a>
+                    )}
                   </li>
                 ))}
               </ul>

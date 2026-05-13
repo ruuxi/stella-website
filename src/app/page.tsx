@@ -1,11 +1,9 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import Link from "next/link";
 import { DownloadButton } from "@/components/download-button";
 import { HeroMorphTitle } from "@/components/hero-morph-title";
 import { HeroStellaOrb } from "@/components/hero-stella-orb-dynamic";
 import { DeferInView } from "@/components/product-demos/defer-in-view";
-import { FooterLegalLinks } from "@/components/footer-legal-links";
 import { SiteHeader } from "@/components/site-header";
 
 const SelfModHero = dynamic(
@@ -119,7 +117,10 @@ const features = [
   },
 ];
 
-const footerGroups: { title: string; items: { label: string; href: string }[] }[] = [
+const footerGroups: {
+  title: string;
+  items: { label: string; href: string; external?: boolean }[];
+}[] = [
   {
     title: "Product",
     items: [
@@ -132,6 +133,16 @@ const footerGroups: { title: string; items: { label: string; href: string }[] }[
   {
     title: "Resources",
     items: [{ label: "What's New", href: "/changelog" }],
+  },
+  {
+    title: "Community",
+    items: [
+      {
+        label: "Discord",
+        href: "https://discord.gg/HXVCCeE542",
+        external: true,
+      },
+    ],
   },
 ];
 
@@ -332,12 +343,19 @@ export default function Home() {
 
       <footer className="grid-shell site-footer section-deferred-render section-border">
         <div className="footer-brand">
-          <Link className="brand-mark brand-mark--footer" href="/">
+          <a className="brand-mark brand-mark--footer" href="/">
             <Image src="/stella-logo.svg" alt="Stella" width={42} height={42} />
             <span className="brand-text">Stella</span>
-          </Link>
+          </a>
 
-          <FooterLegalLinks />
+          <ul className="legal-links">
+            <li>
+              <a href="/privacy">Privacy Policy</a>
+            </li>
+            <li>
+              <a href="/terms">Terms of Service</a>
+            </li>
+          </ul>
         </div>
 
         <div className="footer-columns">
@@ -347,7 +365,17 @@ export default function Home() {
               <ul>
                 {group.items.map((item) => (
                   <li key={item.label}>
-                    <a href={item.href}>{item.label}</a>
+                    {item.external ? (
+                      <a
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <a href={item.href}>{item.label}</a>
+                    )}
                   </li>
                 ))}
               </ul>
