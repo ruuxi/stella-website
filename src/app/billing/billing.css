@@ -86,31 +86,54 @@
   background: color-mix(in oklch, #c44 6%, transparent);
 }
 
-.billing-status {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 24px 32px;
-  padding: 18px 0;
-  border-top: 1px solid var(--billing-border);
-  border-bottom: 1px solid var(--billing-border);
-}
-
-.billing-status-meters {
+.billing-account {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  min-width: 0;
-  width: 100%;
-  max-width: 420px;
-  justify-self: center;
+  gap: 22px;
+  padding: 22px 24px;
+  border: 1px solid var(--billing-border);
+  border-radius: 10px;
+  background: var(--billing-faint);
 }
 
-.billing-status-info {
+.billing-account-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.billing-account-plan {
   display: flex;
   flex-direction: column;
   gap: 4px;
   min-width: 0;
+}
+
+.billing-account-renewal {
+  font-size: 12.5px;
+  color: var(--billing-muted);
+  letter-spacing: -0.01em;
+  margin-top: 4px;
+}
+
+.billing-account-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.billing-account .billing-plan-cta {
+  margin-top: 0;
+  min-width: 180px;
+}
+
+.billing-account-meters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px 28px;
 }
 
 .billing-status-value {
@@ -184,58 +207,6 @@
 
 .billing-link-button--danger:hover:not(:disabled) {
   text-decoration-color: #c44;
-}
-
-.billing-subscription {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 18px 0;
-  border-bottom: 1px solid var(--billing-border);
-}
-
-.billing-subscription-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.billing-subscription-detail {
-  font-family: var(--billing-serif);
-  font-size: 1.1rem;
-  font-style: italic;
-  letter-spacing: -0.01em;
-  line-height: 1.25;
-}
-
-.billing-subscription-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.billing-subscription .billing-plan-cta {
-  width: auto;
-  min-width: 200px;
-}
-
-@media (max-width: 720px) {
-  .billing-subscription {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .billing-subscription-actions {
-    justify-content: stretch;
-  }
-
-  .billing-subscription .billing-plan-cta {
-    width: 100%;
-  }
 }
 
 .billing-plans-section {
@@ -420,15 +391,33 @@
 .billing-credit {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 24px 0 0;
-  border-top: 1px solid var(--billing-border);
+  gap: 18px;
+  padding: 22px 24px;
+  border: 1px solid var(--billing-border);
+  border-radius: 10px;
+  background: var(--billing-faint);
+}
+
+.billing-credit-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.billing-credit-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .billing-credit-balance {
   display: flex;
-  align-items: baseline;
-  gap: 12px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
 }
 
 .billing-credit-balance-value {
@@ -538,21 +527,28 @@
 @media (max-width: 720px) {
   .billing-shell {
     padding: 36px 18px 72px;
-    gap: 36px;
+    gap: 32px;
   }
 
-  .billing-status {
-    align-items: stretch;
-    flex-direction: column;
+  .billing-account,
+  .billing-credit {
+    padding: 18px 16px;
   }
 
-  .billing-status {
+  .billing-account-meters {
     grid-template-columns: 1fr;
+    gap: 14px;
   }
 
-  .billing-status-meters {
-    max-width: none;
-    justify-self: stretch;
+  .billing-account-actions,
+  .billing-credit-balance {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .billing-account .billing-plan-cta,
+  .billing-credit-cta {
+    width: 100%;
   }
 
   .billing-plans-grid {

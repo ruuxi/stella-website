@@ -422,6 +422,44 @@ function BillingInteractive() {
     }
   }, [hasAccount, openPortal]);
 
+  const usageMeters: UsageMeter[] | null =
+    usage && planCatalog
+      ? [
+          {
+            key: "rolling",
+            label: `Last ${planCatalog[currentPlan].rollingWindowHours}h`,
+            usedUsd: usage.rollingUsedUsd,
+            limitUsd: usage.rollingLimitUsd,
+          },
+          {
+            key: "weekly",
+            label: "This week",
+            usedUsd: usage.weeklyUsedUsd,
+            limitUsd: usage.weeklyLimitUsd,
+          },
+          {
+            key: "monthly",
+            label: "This month",
+            usedUsd: usage.monthlyUsedUsd,
+            limitUsd: usage.monthlyLimitUsd,
+          },
+        ]
+      : null;
+
+  const renewalLabel = billingStatus?.cancelAtPeriodEnd
+    ? "Cancellation pending"
+    : "Next renewal";
+  const renewalDetail =
+    billingStatus?.currentPeriodEnd
+      ? billingStatus.cancelAtPeriodEnd
+        ? `Access ends ${dateFormatter.format(
+            new Date(billingStatus.currentPeriodEnd),
+          )}`
+        : `Renews ${dateFormatter.format(
+            new Date(billingStatus.currentPeriodEnd),
+          )}`
+      : "Managed by Stripe";
+
   return (
     <main className="billing-root">
       <div className="billing-shell">
@@ -430,6 +468,10 @@ function BillingInteractive() {
           <h1 className="billing-title">
             Choose how much <em>Stella</em>.
           </h1>
+          <p className="billing-lead">
+            Plans are recurring monthly. Cancel or change anytime. Prices in
+            USD.
+          </p>
         </header>
 
         {error ? (
@@ -439,38 +481,44 @@ function BillingInteractive() {
         ) : null}
         {notice ? <p className="billing-notice">{notice}</p> : null}
 
-        <section className="billing-status" aria-label="Current billing status">
-          <div className="billing-status-info">
-            <span className="billing-status-label">Current plan</span>
-            <span className="billing-status-value">
-              {isLoadingStatus ? "..." : getPlanDisplay(currentPlan).label}
-            </span>
+        <section className="billing-account" aria-label="Your account">
+          <div className="billing-account-head">
+            <div className="billing-account-plan">
+              <span className="billing-status-label">Current plan</span>
+              <span className="billing-status-value">
+                {isLoadingStatus ? "..." : getPlanDisplay(currentPlan).label}
+              </span>
+              {isActivePaidSubscriber ? (
+                <span className="billing-account-renewal">{renewalLabel} · {renewalDetail}</span>
+              ) : null}
+            </div>
+            {isActivePaidSubscriber ? (
+              <div className="billing-account-actions">
+                <button
+                  type="button"
+                  className="billing-plan-cta"
+                  onClick={() => void handleOpenPortal()}
+                  disabled={openingPortal}
+                >
+                  {openingPortal ? "Opening..." : "Manage subscription"}
+                </button>
+                {billingStatus && !billingStatus.cancelAtPeriodEnd ? (
+                  <button
+                    type="button"
+                    className="billing-link-button billing-link-button--danger"
+                    onClick={() => void handleOpenPortal()}
+                    disabled={openingPortal}
+                  >
+                    Cancel
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
           </div>
 
-          {usage && planCatalog ? (
-            <div className="billing-status-meters">
-              {(
-                [
-                  {
-                    key: "rolling",
-                    label: `Last ${planCatalog[currentPlan].rollingWindowHours}h`,
-                    usedUsd: usage.rollingUsedUsd,
-                    limitUsd: usage.rollingLimitUsd,
-                  },
-                  {
-                    key: "weekly",
-                    label: "This week",
-                    usedUsd: usage.weeklyUsedUsd,
-                    limitUsd: usage.weeklyLimitUsd,
-                  },
-                  {
-                    key: "monthly",
-                    label: "This month",
-                    usedUsd: usage.monthlyUsedUsd,
-                    limitUsd: usage.monthlyLimitUsd,
-                  },
-                ] satisfies UsageMeter[]
-              ).map((meter) => (
+          {usageMeters ? (
+            <div className="billing-account-meters">
+              {usageMeters.map((meter) => (
                 <div key={meter.key} className="billing-status-meter">
                   <div className="billing-status-meter-label">
                     <span>{meter.label}</span>
@@ -488,77 +536,9 @@ function BillingInteractive() {
               ))}
             </div>
           ) : null}
-
-          <button
-            type="button"
-            className="billing-link-button"
-            onClick={() => void handleOpenPortal()}
-            disabled={
-              !hasAccount ||
-              openingPortal ||
-              isLoadingStatus ||
-              !planCatalog ||
-              currentPlan === "free"
-            }
-          >
-            {openingPortal ? "Opening..." : "Manage billing ->"}
-          </button>
         </section>
 
-        {isActivePaidSubscriber && billingStatus ? (
-          <section
-            className="billing-subscription"
-            aria-label="Subscription management"
-          >
-            <div className="billing-subscription-info">
-              <span className="billing-status-label">
-                {billingStatus.cancelAtPeriodEnd
-                  ? "Cancellation pending"
-                  : "Next renewal"}
-              </span>
-              <span className="billing-subscription-detail">
-                {billingStatus.currentPeriodEnd
-                  ? billingStatus.cancelAtPeriodEnd
-                    ? `Access ends ${dateFormatter.format(
-                        new Date(billingStatus.currentPeriodEnd),
-                      )}.`
-                    : `Renews ${dateFormatter.format(
-                        new Date(billingStatus.currentPeriodEnd),
-                      )}.`
-                  : "Managed by Stripe."}
-              </span>
-            </div>
-            <div className="billing-subscription-actions">
-              <button
-                type="button"
-                className="billing-plan-cta"
-                onClick={() => void handleOpenPortal()}
-                disabled={openingPortal}
-              >
-                {openingPortal ? "Opening..." : "Manage subscription"}
-              </button>
-              {!billingStatus.cancelAtPeriodEnd ? (
-                <button
-                  type="button"
-                  className="billing-link-button billing-link-button--danger"
-                  onClick={() => void handleOpenPortal()}
-                  disabled={openingPortal}
-                >
-                  Cancel subscription
-                </button>
-              ) : null}
-            </div>
-          </section>
-        ) : null}
-
-        <section className="billing-plans-section">
-          <div className="billing-section-head">
-            <h2 className="billing-section-title">Plans</h2>
-            <p className="billing-section-sub">
-              Cancel or change anytime. Prices in USD.
-            </p>
-          </div>
-
+        <section className="billing-plans-section" aria-label="Plans">
           <div className="billing-plans-grid">
             {PLAN_ORDER.map((plan) => {
               const display = getPlanDisplay(plan);
@@ -656,7 +636,10 @@ function BillingInteractive() {
             })}
           </div>
 
-          <section className="billing-credit" aria-label="Top up usage">
+        </section>
+
+        <section className="billing-credit" aria-label="Top up usage">
+          <div className="billing-credit-head">
             <div className="billing-section-head">
               <h2 className="billing-section-title">Extra usage credit</h2>
               <p className="billing-section-sub">
@@ -665,7 +648,6 @@ function BillingInteractive() {
                 next month.
               </p>
             </div>
-
             {creditStatus?.authenticated ? (
               <div className="billing-credit-balance">
                 <span className="billing-status-label">Available credit</span>
@@ -674,9 +656,15 @@ function BillingInteractive() {
                 </span>
               </div>
             ) : null}
+          </div>
 
+          <div className="billing-credit-controls">
             {creditOptions ? (
-              <div className="billing-credit-presets" role="radiogroup" aria-label="Preset amounts">
+              <div
+                className="billing-credit-presets"
+                role="radiogroup"
+                aria-label="Preset amounts"
+              >
                 {creditOptions.presetAmountCents.map((amountCents) => {
                   const isSelected = creditSelectedPresetCents === amountCents;
                   return (
@@ -737,8 +725,7 @@ function BillingInteractive() {
                     : "Add credit"}
               </button>
             </div>
-          </section>
-
+          </div>
         </section>
       </div>
     </main>
