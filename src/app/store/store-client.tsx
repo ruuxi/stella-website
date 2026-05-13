@@ -53,8 +53,7 @@ type StorePackage = {
   latestReleaseNumber: number;
   installCount?: number;
   iconUrl?: string;
-  authorDisplayName?: string;
-  authorHandle?: string;
+  authorUsername?: string;
   featured?: boolean;
   updatedAt: number;
 };
@@ -133,8 +132,7 @@ type UserPetRecord = {
   previewUrl?: string;
   visibility: UserPetVisibility;
   searchText?: string;
-  authorDisplayName?: string;
-  authorHandle?: string;
+  authorUsername?: string;
   installCount?: number;
   createdAt: number;
   updatedAt: number;
@@ -169,8 +167,7 @@ type EmojiPack = {
   coverUrl?: string;
   sheetUrls: string[];
   visibility?: "public" | "unlisted" | "private";
-  authorDisplayName?: string;
-  authorHandle?: string;
+  authorUsername?: string;
   installCount?: number;
 };
 
@@ -1272,7 +1269,7 @@ const userPetToPublicPet = (pet: UserPetRecord): PublicPet => ({
   description: pet.description,
   kind: "custom",
   tags: pet.tags ?? ["custom"],
-  ownerName: pet.authorDisplayName ?? null,
+  ownerName: pet.authorUsername ? `@${pet.authorUsername}` : null,
   spritesheetUrl: pet.spritesheetUrl,
   ...(pet.previewUrl ? { previewUrl: pet.previewUrl } : {}),
   downloads: pet.installCount ?? 0,
@@ -1367,17 +1364,15 @@ function PackageArtwork({
 }
 
 function AuthorChip({
-  name,
-  handle,
+  username,
   variant = "card",
 }: {
-  name?: string;
-  handle?: string;
+  username?: string;
   variant?: "card" | "featured" | "detail";
 }) {
-  if (!name && !handle) return null;
-  const displayed = name?.trim() || handle!;
-  const initial = getInitial(displayed);
+  if (!username) return null;
+  const displayed = `@${username}`;
+  const initial = getInitial(username);
   const className =
     variant === "featured"
       ? "store-featured-author"
@@ -1525,7 +1520,7 @@ function PackageCard({
         </div>
         <div className="store-card-desc">{pkg.description}</div>
         <div className="store-card-footer">
-          <AuthorChip name={pkg.authorDisplayName} handle={pkg.authorHandle} />
+          <AuthorChip username={pkg.authorUsername} />
           <span className="store-card-installs">
             {formatInstallCount(pkg.installCount)}
           </span>
@@ -1584,11 +1579,7 @@ function FeaturedCard({
           <div className="store-featured-label">Featured</div>
           <div className="store-featured-name">{pkg.displayName}</div>
           <div className="store-featured-desc">{pkg.description}</div>
-          <AuthorChip
-            name={pkg.authorDisplayName}
-            handle={pkg.authorHandle}
-            variant="featured"
-          />
+          <AuthorChip username={pkg.authorUsername} variant="featured" />
         </div>
         <button
           className="store-action-btn store-action-btn--lg"
@@ -1710,11 +1701,7 @@ function Detail({
         <div className="store-detail-info">
           <div className="store-detail-name">{pkg.displayName}</div>
           <div className="store-detail-desc">{pkg.description}</div>
-          <AuthorChip
-            name={pkg.authorDisplayName}
-            handle={pkg.authorHandle}
-            variant="detail"
-          />
+          <AuthorChip username={pkg.authorUsername} variant="detail" />
           <div className="store-detail-meta store-detail-meta--spaced">
             <span className="store-detail-meta-item">
               <Layers size={13} />
@@ -1821,8 +1808,8 @@ function Detail({
   );
 }
 
-function buildShareLink(authorHandle: string, packageId: string): string {
-  return `stella://store/${authorHandle.trim().toLowerCase()}/${packageId.trim().toLowerCase()}`;
+function buildShareLink(authorUsername: string, packageId: string): string {
+  return `stella://store/${authorUsername.trim().toLowerCase()}/${packageId.trim().toLowerCase()}`;
 }
 
 function ShareDialog({
@@ -1833,8 +1820,8 @@ function ShareDialog({
   onClose: () => void;
 }) {
   const [copied, setCopied] = useState(false);
-  const link = pkg.authorHandle
-    ? buildShareLink(pkg.authorHandle, pkg.packageId)
+  const link = pkg.authorUsername
+    ? buildShareLink(pkg.authorUsername, pkg.packageId)
     : null;
 
   const handleCopy = async () => {
@@ -3278,7 +3265,7 @@ function EmojiPackCard({
         ) : null}
         <div className="emoji-pack-meta">
           <span className="emoji-pack-author">
-            by {pack.authorDisplayName || pack.authorHandle || "Stella"}
+            by {pack.authorUsername ? `@${pack.authorUsername}` : "Stella"}
           </span>
           <span className="emoji-pack-installs">
             {formatEmojiUseCount(pack.installCount)}
@@ -3649,7 +3636,7 @@ function EmojisTab() {
               <div className="emoji-details-title">{detailsPack.displayName}</div>
               <p className="emoji-details-caption">
                 {detailsPack.description ||
-                  `Pack by ${detailsPack.authorDisplayName || detailsPack.authorHandle || "Stella"}`}
+                  `Pack by ${detailsPack.authorUsername ? `@${detailsPack.authorUsername}` : "Stella"}`}
               </p>
             </div>
             <div className="emoji-details-body">
@@ -3708,9 +3695,9 @@ function EmojisTab() {
                   <div className="emoji-details-meta-row">
                     <span className="emoji-details-meta-label">Author</span>
                     <span className="emoji-details-meta-value">
-                      {detailsPack.authorDisplayName ||
-                        detailsPack.authorHandle ||
-                        "Stella"}
+                      {detailsPack.authorUsername
+                        ? `@${detailsPack.authorUsername}`
+                        : "Stella"}
                     </span>
                   </div>
                   <div className="emoji-details-meta-row">
