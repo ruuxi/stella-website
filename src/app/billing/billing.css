@@ -87,13 +87,23 @@
 }
 
 .billing-status {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  gap: 24px 32px;
   padding: 18px 0;
   border-top: 1px solid var(--billing-border);
   border-bottom: 1px solid var(--billing-border);
+}
+
+.billing-status-meters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  width: 100%;
+  max-width: 420px;
+  justify-self: center;
 }
 
 .billing-status-info {
@@ -113,11 +123,9 @@
 }
 
 .billing-status-meter {
-  flex: 1;
-  max-width: 320px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .billing-status-meter-label {
@@ -478,9 +486,13 @@
     flex-direction: column;
   }
 
-  .billing-status-meter {
+  .billing-status {
+    grid-template-columns: 1fr;
+  }
+
+  .billing-status-meters {
     max-width: none;
-    width: 100%;
+    justify-self: stretch;
   }
 
   .billing-plans-grid {

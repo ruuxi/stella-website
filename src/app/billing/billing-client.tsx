@@ -157,6 +157,22 @@ const toUsagePercent = (usedUsd: number, limitUsd: number) => {
   return Math.min(100, Math.max(0, (usedUsd / limitUsd) * 100));
 };
 
+// Round to a whole percent for display while keeping the meter bar at the
+// precise sub-percent width — avoids "0%" reading next to a visibly non-empty
+// bar (and vice versa) at the edges.
+const formatUsagePercent = (usedUsd: number, limitUsd: number) => {
+  const pct = toUsagePercent(usedUsd, limitUsd);
+  if (pct > 0 && pct < 1) return "<1%";
+  return `${Math.round(pct)}%`;
+};
+
+type UsageMeter = {
+  key: "rolling" | "weekly" | "monthly";
+  label: string;
+  usedUsd: number;
+  limitUsd: number;
+};
+
 const getBillingReturnUrl = () => {
   const url = new URL("/billing", window.location.origin);
   return url.toString();
@@ -417,25 +433,44 @@ function BillingInteractive() {
           </div>
 
           {usage && planCatalog ? (
-            <div className="billing-status-meter">
-              <div className="billing-status-meter-label">
-                <span>Usage this month</span>
-                <span>
-                  {usdFormatter.format(usage.monthlyUsedUsd)} /{" "}
-                  {usdFormatter.format(usage.monthlyLimitUsd)}
-                </span>
-              </div>
-              <div className="billing-meter-track">
-                <div
-                  className="billing-meter-fill"
-                  style={{
-                    width: `${toUsagePercent(
-                      usage.monthlyUsedUsd,
-                      usage.monthlyLimitUsd,
-                    )}%`,
-                  }}
-                />
-              </div>
+            <div className="billing-status-meters">
+              {(
+                [
+                  {
+                    key: "rolling",
+                    label: `Last ${planCatalog[currentPlan].rollingWindowHours}h`,
+                    usedUsd: usage.rollingUsedUsd,
+                    limitUsd: usage.rollingLimitUsd,
+                  },
+                  {
+                    key: "weekly",
+                    label: "This week",
+                    usedUsd: usage.weeklyUsedUsd,
+                    limitUsd: usage.weeklyLimitUsd,
+                  },
+                  {
+                    key: "monthly",
+                    label: "This month",
+                    usedUsd: usage.monthlyUsedUsd,
+                    limitUsd: usage.monthlyLimitUsd,
+                  },
+                ] satisfies UsageMeter[]
+              ).map((meter) => (
+                <div key={meter.key} className="billing-status-meter">
+                  <div className="billing-status-meter-label">
+                    <span>{meter.label}</span>
+                    <span>{formatUsagePercent(meter.usedUsd, meter.limitUsd)}</span>
+                  </div>
+                  <div className="billing-meter-track">
+                    <div
+                      className="billing-meter-fill"
+                      style={{
+                        width: `${toUsagePercent(meter.usedUsd, meter.limitUsd)}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : null}
 
