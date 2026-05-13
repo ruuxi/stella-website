@@ -1118,11 +1118,18 @@ html[data-embedded="true"] .site-header {
   padding: 0;
 }
 
+.footer-operator {
+  margin: 0.85rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: rgba(18, 18, 15, 0.52);
+}
+
 .legal-links {
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
-  margin-top: 1rem;
+  margin-top: 0.85rem;
   font-size: 0.8rem;
   color: rgba(18, 18, 15, 0.62);
 }

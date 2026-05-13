@@ -4,6 +4,7 @@ import { DownloadButton } from "@/components/download-button";
 import { HeroMorphTitle } from "@/components/hero-morph-title";
 import { HeroStellaOrb } from "@/components/hero-stella-orb-dynamic";
 import { DeferInView } from "@/components/product-demos/defer-in-view";
+import { FooterLegalLinks } from "@/components/footer-legal-links";
 import { SiteHeader } from "@/components/site-header";
 
 const SelfModHero = dynamic(
@@ -335,14 +336,7 @@ export default function Home() {
             <span className="brand-text">Stella</span>
           </a>
 
-          <ul className="legal-links">
-            <li>
-              <a href="/privacy">Privacy Policy</a>
-            </li>
-            <li>
-              <a href="/terms">Terms of Service</a>
-            </li>
-          </ul>
+          <FooterLegalLinks />
         </div>
 
         <div className="footer-columns">
