@@ -102,6 +102,28 @@
   background: rgba(255, 255, 255, 0.62);
 }
 
+.cl-entry__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.cl-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.cl-group__label {
+  margin: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--page-muted);
+}
+
 .cl-entry__items {
   list-style: none;
   margin: 0;
