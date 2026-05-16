@@ -434,12 +434,20 @@ function BillingInteractive() {
     }
   }, [hasAccount, openPortal]);
 
+  // Guard against a backend `plans` payload that's missing the current plan
+  // entry — e.g. an older deploy where the validator omitted `ultra`. Fall
+  // back to a sane window length instead of crashing the whole `/billing`
+  // page on `undefined.rollingWindowHours`.
+  const currentPlanCatalogEntry = planCatalog?.[currentPlan];
+  const rollingWindowHours =
+    currentPlanCatalogEntry?.rollingWindowHours ?? 5;
+
   const usageMeters: UsageMeter[] | null =
     usage && planCatalog
       ? [
           {
             key: "rolling",
-            label: `Last ${planCatalog[currentPlan].rollingWindowHours}h`,
+            label: `Last ${rollingWindowHours}h`,
             usedUsd: usage.rollingUsedUsd,
             limitUsd: usage.rollingLimitUsd,
           },
