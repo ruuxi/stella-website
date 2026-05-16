@@ -12,6 +12,7 @@ type PaidBillingPlan = Exclude<BillingPlan, "free">;
 type BillingPlanConfig = {
   label: string;
   monthlyPriceCents: number;
+  introFirstMonthPriceCents?: number;
   rollingLimitUsd: number;
   rollingWindowHours: number;
   weeklyLimitUsd: number;
@@ -307,6 +308,9 @@ function BillingInteractive() {
       return {
         label: live?.label ?? fallback.label,
         monthlyPriceCents: live?.monthlyPriceCents ?? fallback.monthlyPriceCents,
+        ...(typeof live?.introFirstMonthPriceCents === "number"
+          ? { introFirstMonthPriceCents: live.introFirstMonthPriceCents }
+          : {}),
       };
     },
     [planCatalog],
@@ -551,6 +555,15 @@ function BillingInteractive() {
             {PLAN_ORDER.map((plan) => {
               const display = getPlanDisplay(plan);
               const isCurrentPlan = plan === currentPlan;
+              const introCents =
+                plan === "go" &&
+                typeof display.introFirstMonthPriceCents === "number" &&
+                display.introFirstMonthPriceCents > 0 &&
+                display.monthlyPriceCents >
+                  display.introFirstMonthPriceCents &&
+                !(isCurrentPlan && currentPlan === "go")
+                  ? display.introFirstMonthPriceCents
+                  : null;
               const isPaidPlan = plan !== "free";
               const isStartingThisPlan = startingPlan === plan;
               const isRecommended =
@@ -607,17 +620,41 @@ function BillingInteractive() {
                   data-recommended={isRecommended || undefined}
                 >
                   <div className="billing-plan-name">{display.label}</div>
-                  <div className="billing-plan-price">
-                    <span className="billing-plan-price-value">
-                      {display.monthlyPriceCents <= 0
-                        ? "Free"
-                        : currencyFormatter.format(
-                            display.monthlyPriceCents / 100,
-                          )}
-                    </span>
-                    {display.monthlyPriceCents > 0 ? (
-                      <span className="billing-plan-price-period">/mo</span>
-                    ) : null}
+                  <div className="billing-plan-price-block">
+                    {introCents !== null ? (
+                      <>
+                        <div className="billing-plan-price billing-plan-price--intro-offer">
+                          <span className="billing-plan-price-value">
+                            {currencyFormatter.format(introCents / 100)}
+                          </span>
+                          <span className="billing-plan-price-period intro">
+                            first month
+                          </span>
+                        </div>
+                        <p className="billing-plan-price-then">
+                          Then{" "}
+                          <strong>
+                            {currencyFormatter.format(
+                              display.monthlyPriceCents / 100,
+                            )}
+                          </strong>
+                          <span aria-hidden="true">/mo</span> after that
+                        </p>
+                      </>
+                    ) : (
+                      <div className="billing-plan-price">
+                        <span className="billing-plan-price-value">
+                          {display.monthlyPriceCents <= 0
+                            ? "Free"
+                            : currencyFormatter.format(
+                                display.monthlyPriceCents / 100,
+                              )}
+                        </span>
+                        {display.monthlyPriceCents > 0 ? (
+                          <span className="billing-plan-price-period">/mo</span>
+                        ) : null}
+                      </div>
+                    )}
                   </div>
                   <p className="billing-plan-allotment">
                     {PLAN_USAGE_TAGLINE[plan]}

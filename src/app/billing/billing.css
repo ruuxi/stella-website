@@ -286,11 +286,46 @@
   color: var(--billing-fg);
 }
 
+.billing-plan-price-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 3.25rem;
+  justify-content: flex-end;
+}
+
 .billing-plan-price {
   display: flex;
   align-items: baseline;
   gap: 4px;
   font-family: var(--billing-serif);
+}
+
+.billing-plan-price--intro-offer {
+  flex-wrap: wrap;
+}
+
+.billing-plan-price-period.intro {
+  text-transform: none;
+  letter-spacing: -0.02em;
+  font-family: var(--billing-serif);
+  font-size: 1rem;
+  font-weight: 300;
+}
+
+.billing-plan-price-then {
+  font-family: var(--billing-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  color: var(--billing-muted);
+  margin: 0;
+  line-height: 1.35;
+}
+
+.billing-plan-price-then strong {
+  font-weight: 500;
+  color: var(--billing-fg);
 }
 
 .billing-plan-price-value {
