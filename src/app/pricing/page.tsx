@@ -8,14 +8,18 @@ import "./pricing.css";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Stella pricing — start free, upgrade when you need more. Simple plans from $0 to $200/month.",
+    "Stella pricing — start free, upgrade when you need more. Monthly plans; Go starts at $5 for your first month.",
   alternates: { canonical: "/pricing" },
 };
 
-// Mirrors `BILLING_PLAN_FALLBACKS`, `PLAN_USAGE_TAGLINE`,
+// Mirrors `STATIC_PLAN_DISPLAY`, `PLAN_USAGE_TAGLINE`,
 // `BASE_PLAN_FEATURES` and `PRIORITY_PLAN_FEATURE` in
 // `src/app/billing/billing-client.tsx` so /pricing and /billing always
 // describe the same plans.
+//
+// When the Go intro promo runs in Convex
+// (`STELLA_GO_INTRO_FIRST_MONTH_PRICE_CENTS`), keep `introFirstMonthPriceUsd`
+// here in sync so marketing matches `/billing`.
 const BASE_FEATURES = [
   "Voice features",
   "Image, video, audio and 3D generation",
@@ -25,6 +29,8 @@ const PRIORITY_FEATURE = "Higher priority, increased speeds";
 const plans: {
   name: string;
   price: number;
+  /** Shown alongside recurring `price`; must match Convex intro cents ÷ 100. */
+  introFirstMonthPriceUsd?: number;
   tagline: string;
   features: string[];
   featured?: boolean;
@@ -38,6 +44,7 @@ const plans: {
   {
     name: "Go",
     price: 20,
+    introFirstMonthPriceUsd: 5,
     tagline: "Baseline monthly usage",
     features: [...BASE_FEATURES],
   },
@@ -133,12 +140,34 @@ export default function Pricing() {
 
                   <div className="pr-card__head">
                     <h3 className="pr-card__name">{plan.name}</h3>
-                    <div className="pr-card__price">
-                      <span className="pr-card__amount">
-                        ${plan.price}
-                      </span>
-                      <span className="pr-card__period">/mo</span>
-                    </div>
+                    {typeof plan.introFirstMonthPriceUsd === "number" &&
+                    plan.introFirstMonthPriceUsd > 0 &&
+                    plan.introFirstMonthPriceUsd < plan.price ? (
+                      <div className="pr-card__price-bundle">
+                        <div className="pr-card__price pr-card__price--intro-offer">
+                          <span className="pr-card__amount">
+                            ${plan.introFirstMonthPriceUsd}
+                          </span>
+                          <span className="pr-card__period pr-card__period--phrase">
+                            first month
+                          </span>
+                        </div>
+                        <p className="pr-card__price-then">
+                          Then{" "}
+                          <strong>${plan.price}</strong>
+                          <span aria-hidden="true">/mo</span> after that
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="pr-card__price">
+                        <span className="pr-card__amount">
+                          ${plan.price}
+                        </span>
+                        {plan.price > 0 ? (
+                          <span className="pr-card__period">/mo</span>
+                        ) : null}
+                      </div>
+                    )}
                     <p className="pr-card__tagline">{plan.tagline}</p>
                   </div>
 

@@ -128,6 +128,42 @@
   margin-bottom: 0.5rem;
 }
 
+.pr-card__price-bundle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+  min-height: 2.75rem;
+  justify-content: flex-end;
+}
+
+.pr-card__price--intro-offer {
+  flex-wrap: wrap;
+}
+
+.pr-card__period--phrase {
+  text-transform: none;
+  letter-spacing: -0.02em;
+  font-family: var(--font-display), serif;
+  font-size: 0.95rem;
+  font-weight: 300;
+}
+
+.pr-card__price-then {
+  margin: 0;
+  color: var(--page-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  line-height: 1.35;
+}
+
+.pr-card__price-then strong {
+  font-weight: 500;
+  color: rgba(15, 23, 40, 0.88);
+}
+
 .pr-card__amount {
   font-family: var(--font-display), serif;
   font-size: clamp(2rem, 3vw, 2.6rem);
