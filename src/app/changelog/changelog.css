@@ -115,13 +115,13 @@
 }
 
 .cl-group__label {
-  margin: 0;
-  font-family: var(--font-mono), monospace;
-  font-size: 0.66rem;
+  margin: 0 0 0.15rem;
+  font-family: var(--font-display), serif;
+  font-size: 1rem;
   font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--page-muted);
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--page-foreground);
 }
 
 .cl-entry__items {
