@@ -161,7 +161,7 @@ function MiniWindowMock() {
         setRevealed({});
         setWorking(false);
         setStepIndex(0);
-      }, 9000);
+      }, 3000);
       return () => window.clearTimeout(restart);
     }
     const step = SCRIPT[stepIndex]!;

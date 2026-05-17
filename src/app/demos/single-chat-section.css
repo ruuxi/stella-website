@@ -406,12 +406,19 @@
   align-items: center;
   gap: 6px;
   min-width: 0;
+  opacity: 1;
   transform: translateX(0);
-  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    opacity 200ms ease,
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* When work is in flight, hide the chips outright — keeps the bar
+   focused on the working indicator. */
 .mini-context-bar[data-working] .mini-context-bar__chips {
+  opacity: 0;
   transform: translateX(8px);
+  pointer-events: none;
 }
 
 /* ─── Suggestion chip ──────────────────────────────────────── */
@@ -473,17 +480,6 @@
     max-width 320ms cubic-bezier(0.22, 1, 0.36, 1),
     opacity 200ms ease,
     margin-left 320ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.mini-context-bar[data-working] .mini-context-chip {
-  padding-inline: 6px;
-}
-
-.mini-context-bar[data-working] .mini-context-chip__label,
-.mini-context-bar[data-working] .mini-context-chip__meta {
-  max-width: 0;
-  opacity: 0;
-  margin-left: 0;
 }
 
 /* ─── Working indicator (no bubble around the orb) ───────────── */
