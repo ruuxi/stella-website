@@ -1284,6 +1284,67 @@
 }
 
 /* ──────────────────────────────────────────────────────────────────
+   Stacked variant — text on top, pill below it, wide card with the
+   image filling the remaining width. Overrides the codex two-column
+   layout for this section only.
+   ────────────────────────────────────────────────────────────────── */
+.canvas-hero--stacked .canvas-hero__stack {
+  width: min(100%, 92rem);
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.4rem, 3vw, 2.4rem);
+}
+
+.canvas-hero__copy--stacked {
+  width: min(100%, 56rem);
+  padding: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.canvas-hero__copy--stacked .canvas-hero__title {
+  font-size: clamp(2.6rem, 6vw, 4.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  margin: 0;
+  text-align: center;
+}
+
+.canvas-hero__copy--stacked .canvas-hero__eyebrow,
+.canvas-hero__copy--stacked .canvas-hero__lede {
+  text-align: center;
+}
+
+.canvas-hero__copy--stacked .canvas-hero__lede {
+  margin: 0.3rem auto 0;
+  max-width: 38rem;
+}
+
+.canvas-hero__mock-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.canvas-hero__frame {
+  width: 100%;
+  max-width: 1500px;
+  padding: clamp(0.9rem, 2vw, 1.6rem);
+}
+
+.canvas-hero__frame .canvas-hero__mock {
+  max-width: none;
+  width: 100%;
+  min-height: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────────
    Screenshot stack — three real product screenshots cross-faded.
 
    Container locks the 1920:1175 (≈1.634:1) aspect so the canvas

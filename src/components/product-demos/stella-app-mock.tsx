@@ -198,7 +198,67 @@ const css = `
     width: 100%;
     height: 100%;
     display: flex;
+    flex-direction: column;
     position: relative;
+  }
+  /* The horizontal sidebar+main row sits below the top shell bar. */
+  .sam-body-row {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    width: 100%;
+    position: relative;
+  }
+  /* Top shell bar — mirrors the desktop ShellTopBar: macOS traffic
+     lights on the left, sidebar/back-forward affordances next to them,
+     and a panel toggle on the right. */
+  .sam-topbar {
+    flex-shrink: 0;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--border-base);
+    background: color-mix(in oklch, var(--background) 92%, transparent);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    position: relative;
+    z-index: 3;
+  }
+  .sam-traffic {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sam-traffic-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 999px;
+    background: var(--c, #c1c1c1);
+    box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.15);
+  }
+  .sam-topbar-icon-btn {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-weak);
+  }
+  .sam-topbar-icon-btn svg { width: 13px; height: 13px; }
+  .sam-topbar-icon-btn--disabled { opacity: 0.4; }
+  .sam-topbar-spacer { flex: 1; }
+  .sam-topbar-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sam-fakeroot-keep-pos {
+    /* unused placeholder so the file compiles cleanly if referenced */
+    display: none;
     font-family: var(--font-family-sans, "Manrope", system-ui, sans-serif);
     color: var(--text-base);
     background: transparent;
@@ -643,16 +703,65 @@ const css = `
      footer pinned to the bottom — mirrors the real home-content
      layout in the desktop app. */
   .sam-body-default {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: 1fr auto 1fr auto;
     align-items: center;
-    justify-content: flex-start;
-    gap: 18px;
+    justify-items: center;
     width: 100%;
     max-width: 540px;
     flex: 1;
-    padding-top: clamp(20px, 4vw, 56px);
+    padding: 12px 0;
   }
+  .sam-body-default::before,
+  .sam-body-default::after {
+    content: "";
+  }
+  /* The {title, chips, composer} cluster sits in the middle auto row,
+     visually centered between the two 1fr spacer rows. Footer pills
+     occupy the last auto row, pinned to the bottom. */
+  .sam-home-cluster {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+  .sam-home-context {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    max-width: 480px;
+    padding: 0 4px;
+  }
+  .sam-home-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px 3px 7px;
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--background) 70%, transparent);
+    border: 1px dashed color-mix(in oklch, var(--foreground) 22%, transparent);
+    color: var(--text-base);
+    font-size: 11.5px;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .sam-home-chip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    background: color-mix(in oklch, var(--foreground) 8%, transparent);
+    color: var(--text-base);
+  }
+  .sam-home-chip-icon svg { width: 9px; height: 9px; }
+  .sam-home-chip-label { font-weight: 600; }
+  .sam-home-chip-meta { color: var(--text-weak); font-weight: 400; }
   .sam-home-title {
     font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
     font-size: clamp(1.4rem, 2.6vw, 2rem);
@@ -695,7 +804,6 @@ const css = `
     align-items: center;
     justify-content: center;
     gap: 18px;
-    margin-top: auto;
     padding-top: 24px;
     width: 100%;
   }
@@ -1506,21 +1614,8 @@ const css = `
     .sam-studio-meter-bar { animation: none; }
   }
 
-  /* PILL OVERLAY — give the Cozy Mode pill a warm tint to hint that
-     it's a different *kind* of toggle (full-app theme vs section). */
-  .sam-pill[data-section="composer"] {
-    background: linear-gradient(135deg, rgba(254, 243, 226, 0.92), rgba(245, 225, 196, 0.92));
-    border-color: rgba(139, 105, 75, 0.28);
-    color: #5c3d2e;
-  }
-  .sam-pill[data-section="composer"][data-active="true"] {
-    background: linear-gradient(135deg, #1c1c1c, #2d2d2d);
-    color: #fef3e2;
-    border-color: #1c1c1c;
-    box-shadow:
-      0 4px 22px rgba(28, 28, 28, 0.35),
-      0 0 0 5px rgba(212, 134, 154, 0.18);
-  }
+  /* All pills share the same blue-gradient styling for visual
+     consistency — see the unified .sam-pill block further down. */
 
   /* ──────────────────────────────────────────
      COMPOSER — default: pill input mirroring
@@ -1748,8 +1843,8 @@ const css = `
   }
   /* When Mochi is on, hide the regular Stella shell entirely so the
      transformation reads as "different app", not "same app retinted." */
-  .sam-root[data-cozy="true"] > .sam-sidebar,
-  .sam-root[data-cozy="true"] > .sam-main {
+  .sam-root[data-cozy="true"] .sam-body-row > .sam-sidebar,
+  .sam-root[data-cozy="true"] .sam-body-row > .sam-main {
     visibility: hidden;
   }
 
@@ -2161,6 +2256,10 @@ const css = `
   /* ══════════════════════════════════════════
      PILL OVERLAY (interactive mode)
      ══════════════════════════════════════════ */
+  /* Pills share the codex-frame blue gradient so they read as "click
+     me" affordances rather than glassy floating chrome that blends
+     into the mock. All pills use the same fill regardless of active
+     state — only the ring + inset glow change to signal selection. */
   .sam-pill {
     position: absolute;
     display: inline-flex;
@@ -2168,46 +2267,45 @@ const css = `
     gap: 8px;
     padding: 9px 16px 9px 13px;
     border-radius: 999px;
-    border: 1px solid color-mix(in oklch, var(--foreground) 14%, transparent);
-    background: color-mix(in oklch, var(--background) 82%, transparent);
-    backdrop-filter: blur(16px) saturate(1.2);
-    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background:
+      radial-gradient(
+        120% 100% at 8% 6%,
+        rgba(178, 224, 248, 0.95),
+        rgba(104, 180, 232, 0.92) 30%,
+        rgba(45, 132, 224, 0.9) 60%,
+        rgba(20, 86, 180, 0.86) 100%
+      ),
+      linear-gradient(180deg, #62b0e8, #155fb6);
     font-family: inherit;
     font-size: 13px;
     font-weight: 600;
-    color: var(--text-strong);
-    opacity: 0.95;
+    color: #fff;
     cursor: pointer;
     user-select: none;
     z-index: 30;
     box-shadow:
-      0 4px 16px color-mix(in oklch, var(--foreground) 10%, transparent),
-      0 1px 0 color-mix(in oklch, white 12%, transparent) inset;
+      0 6px 18px rgba(18, 70, 150, 0.32),
+      0 1px 0 rgba(255, 255, 255, 0.4) inset;
     animation: samPillIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
     transition:
-      background 0.2s ease,
-      color 0.2s ease,
-      border-color 0.2s ease,
       box-shadow 0.2s ease,
-      opacity 0.2s ease,
       transform 0.2s ease;
   }
   .sam-pill:hover {
-    opacity: 1;
-    border-color: color-mix(in oklch, var(--foreground) 26%, transparent);
     transform: translateY(-1px);
+    box-shadow:
+      0 10px 24px rgba(18, 70, 150, 0.38),
+      0 1px 0 rgba(255, 255, 255, 0.5) inset;
   }
   .sam-pill[data-active="true"] {
-    background: var(--primary);
-    color: var(--primary-foreground);
-    border-color: var(--primary);
     box-shadow:
-      0 4px 22px color-mix(in oklch, var(--primary) 45%, transparent),
-      0 0 0 5px color-mix(in oklch, var(--primary) 14%, transparent);
-    opacity: 1;
+      0 8px 22px rgba(18, 70, 150, 0.42),
+      0 0 0 4px rgba(255, 255, 255, 0.32),
+      0 1px 0 rgba(255, 255, 255, 0.55) inset;
   }
-  .sam-pill-icon { display: inline-flex; opacity: 0.85; }
-  .sam-pill[data-active="true"] .sam-pill-icon { opacity: 1; }
+  .sam-pill-icon { display: inline-flex; color: rgba(255, 255, 255, 0.92); }
+  .sam-pill[data-active="true"] .sam-pill-icon { color: #fff; }
   .sam-pill-label { line-height: 1; white-space: nowrap; }
   .sam-pill-check {
     display: inline-flex;
@@ -2733,6 +2831,43 @@ export function StellaAppMock({
         data-cozy={toggles.composer || undefined}
         data-create-app={toggles.createApp || undefined}
       >
+        {/* TOP SHELL BAR — traffic lights + sidebar/back/forward
+            (left) and panel toggle (right), same chrome as the real
+            desktop app's ShellTopBar. */}
+        <div className="sam-topbar" aria-hidden="true">
+          <span className="sam-traffic">
+            <span className="sam-traffic-dot" style={{ ["--c" as string]: "#ff5f57" }} />
+            <span className="sam-traffic-dot" style={{ ["--c" as string]: "#febc2e" }} />
+            <span className="sam-traffic-dot" style={{ ["--c" as string]: "#28c840" }} />
+          </span>
+          <span className="sam-topbar-icon-btn" title="Toggle sidebar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path d="M9 4v16" />
+            </svg>
+          </span>
+          <span className="sam-topbar-icon-btn sam-topbar-icon-btn--disabled">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </span>
+          <span className="sam-topbar-icon-btn sam-topbar-icon-btn--disabled">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </span>
+          <span className="sam-topbar-spacer" />
+          <span className="sam-topbar-right">
+            <span className="sam-topbar-icon-btn" title="Toggle panel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4" width="18" height="16" rx="2" />
+                <path d="M15 4v16" />
+              </svg>
+            </span>
+          </span>
+        </div>
+
+        <div className="sam-body-row">
         {/* SIDEBAR ─────────────────────────────────────────────── */}
         <aside
           className="sam-sidebar"
@@ -2902,26 +3037,53 @@ export function StellaAppMock({
             data-create-app={toggles.createApp || undefined}
           >
             <div className="sam-body-default">
-              <h1 className="sam-home-title">
-                What can I do for you today?
-              </h1>
+              {/* {title, context chips, composer} are clustered and
+                  vertically centered in the column. The footer pills
+                  remain pinned to the bottom via their own margin. */}
+              <div className="sam-home-cluster">
+                <h1 className="sam-home-title">
+                  What can I do for you today?
+                </h1>
 
-              {/* Composer sits inline directly below the title — the real
-                  desktop home content passes the composer as `children`
-                  to HomeContent, which renders it right after the title
-                  (centered, not pinned to the bottom of the column). */}
-              <div className="sam-home-composer">
-                <span className="sam-composer-add" aria-hidden="true">
-                  {ICON_PLUS}
-                </span>
-                <span className="sam-composer-input">
-                  <span className="sam-composer-input-placeholder">
-                    Ask me anything...
+                {/* Auto-detected context chips (active window / tab)
+                    sit directly above the composer, matching the real
+                    home content's `ComposerContextRow`. */}
+                <div className="sam-home-context" aria-hidden="true">
+                  <span className="sam-home-chip">
+                    <span className="sam-home-chip-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="4" width="18" height="14" rx="2" />
+                        <path d="M3 9h18" />
+                      </svg>
+                    </span>
+                    <span className="sam-home-chip-label">Chrome</span>
+                    <span className="sam-home-chip-meta">Pricing — Linear</span>
                   </span>
-                </span>
-                <span className="sam-composer-submit" aria-hidden="true">
-                  {ICON_SEND}
-                </span>
+                  <span className="sam-home-chip">
+                    <span className="sam-home-chip-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="4" y="3" width="16" height="18" rx="2" />
+                        <path d="M8 7h8M8 11h8M8 15h5" />
+                      </svg>
+                    </span>
+                    <span className="sam-home-chip-label">Notion</span>
+                    <span className="sam-home-chip-meta">Q3 launch plan</span>
+                  </span>
+                </div>
+
+                <div className="sam-home-composer">
+                  <span className="sam-composer-add" aria-hidden="true">
+                    {ICON_PLUS}
+                  </span>
+                  <span className="sam-composer-input">
+                    <span className="sam-composer-input-placeholder">
+                      Ask me anything...
+                    </span>
+                  </span>
+                  <span className="sam-composer-submit" aria-hidden="true">
+                    {ICON_SEND}
+                  </span>
+                </div>
               </div>
 
               {/* Plain-text category footer pills — no boxy chrome, no
@@ -3354,6 +3516,7 @@ export function StellaAppMock({
               <span aria-hidden="true">{"\u2665"}</span>
             </button>
           </footer>
+        </div>
         </div>
 
         {/* TRANSFORMATION PILLS (only when interactive) */}

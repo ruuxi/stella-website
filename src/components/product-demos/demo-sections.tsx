@@ -182,10 +182,14 @@ export function CanvasSection() {
   }, [isActive]);
 
   return (
-    <section className="canvas-hero codex-section" data-reveal suppressHydrationWarning>
-      <div className="codex-stage" data-flip="true">
+    <section
+      className="canvas-hero canvas-hero--stacked codex-section"
+      data-reveal
+      suppressHydrationWarning
+    >
+      <div className="canvas-hero__stack">
         <header
-          className="canvas-hero__copy codex-stage__copy"
+          className="canvas-hero__copy canvas-hero__copy--stacked"
           data-reveal-child
           style={{ ["--reveal-index" as string]: 0 }}
         >
@@ -199,40 +203,40 @@ export function CanvasSection() {
         </header>
 
         <div
-          className="codex-stage__mock"
+          className="canvas-hero__menu"
+          role="tablist"
+          aria-label="Display examples"
           data-reveal-child
           style={{ ["--reveal-index" as string]: 1 }}
         >
-          <div className="codex-frame">
-            <div className="canvas-hero__stage">
-              <div
-                className="canvas-hero__menu"
-                role="tablist"
-                aria-label="Display examples"
-              >
-                {CANVAS_CONCEPTS.map((concept, index) => (
-                  <button
-                    key={concept.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={conceptIndex === index}
-                    className="canvas-hero__menu-item"
-                    data-active={conceptIndex === index || undefined}
-                    onClick={() => setConceptIndex(index)}
-                  >
-                    {concept.label}
-                  </button>
-                ))}
-              </div>
+          {CANVAS_CONCEPTS.map((concept, index) => (
+            <button
+              key={concept.id}
+              type="button"
+              role="tab"
+              aria-selected={conceptIndex === index}
+              className="canvas-hero__menu-item"
+              data-active={conceptIndex === index || undefined}
+              onClick={() => setConceptIndex(index)}
+            >
+              {concept.label}
+            </button>
+          ))}
+        </div>
 
-              <div ref={ref} className="canvas-hero__mock">
-                <DeferInView fallback={<DemoChunkPlaceholder />}>
-                  <CanvasVisual
-                    conceptIndex={conceptIndex}
-                    isActive={isActive}
-                  />
-                </DeferInView>
-              </div>
+        <div
+          className="canvas-hero__mock-wrap"
+          data-reveal-child
+          style={{ ["--reveal-index" as string]: 2 }}
+        >
+          <div className="codex-frame canvas-hero__frame">
+            <div ref={ref} className="canvas-hero__mock">
+              <DeferInView fallback={<DemoChunkPlaceholder />}>
+                <CanvasVisual
+                  conceptIndex={conceptIndex}
+                  isActive={isActive}
+                />
+              </DeferInView>
             </div>
           </div>
         </div>
