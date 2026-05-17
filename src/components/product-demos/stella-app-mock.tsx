@@ -259,31 +259,68 @@ const css = `
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    min-height: 92px;
-    padding: 0 14px;
+    justify-content: flex-start;
+    gap: 12px;
+    /* Logo sits in the same column as the nav icons below
+       (nav padding 12px + nav-item padding 14px ≈ 26px), matching
+       the real desktop sidebar. */
+    padding: 24px 16px 10px 26px;
   }
-  .sam-sidebar-brand-glyph {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(calc(-50% - 38px), -50%);
-    width: 42px;
-    height: 42px;
+  .sam-sidebar-brand-logo {
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0.42;
-    color: var(--foreground);
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    opacity: 0.55;
+  }
+  .sam-sidebar-brand-logo img {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
   .sam-sidebar-brand-text {
-    color: var(--text-weaker);
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
+    color: var(--text-weak);
+    font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+    font-size: 22px;
+    font-weight: 450;
+    font-style: italic;
+    letter-spacing: -0.02em;
     line-height: 1;
-    text-transform: uppercase;
-    transform: translateX(-4px);
+    text-transform: none;
+  }
+
+  /* Account row at the bottom of the sidebar footer — small initials
+     avatar + Upgrade pill, mirrors AccountRow in the real sidebar. */
+  .sam-account-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px 4px;
+    margin-top: 4px;
+  }
+  .sam-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: oklch(0.88 0.06 250);
+    color: oklch(0.32 0.05 250);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid oklch(0.78 0.05 250 / 0.5);
+    flex-shrink: 0;
+  }
+  .sam-account-pill {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-weaker);
+    padding: 4px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
   }
 
   .sam-sidebar-nav {
@@ -602,18 +639,22 @@ const css = `
     min-height: 0;
     overflow: hidden;
   }
+  /* Default home column: title + inline composer + plain-text category
+     footer pinned to the bottom — mirrors the real home-content
+     layout in the desktop app. */
   .sam-body-default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 22px;
+    justify-content: flex-start;
+    gap: 18px;
     width: 100%;
     max-width: 540px;
     flex: 1;
+    padding-top: clamp(20px, 4vw, 56px);
   }
   .sam-home-title {
-    font-family: var(--font-family-display, "Cormorant Garamond", Georgia, serif);
+    font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
     font-size: clamp(1.4rem, 2.6vw, 2rem);
     font-weight: 450;
     font-style: italic;
@@ -624,47 +665,46 @@ const css = `
     margin: 0;
     width: 100%;
   }
-  .sam-home-categories {
+
+  /* Inline composer pill — same look as the bottom .sam-composer but
+     rendered directly under the home title. */
+  .sam-home-composer {
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .sam-home-category {
-    padding: 6px 22px;
-    min-width: 88px;
-    text-align: center;
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--border-strong);
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 480px;
+    min-height: 50px;
+    padding: 8px 10px;
+    background: var(--background);
     border-radius: 999px;
-    color: var(--text-base);
-    font-family: inherit;
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Bottom composer-wrap stays for modern / create-app / cozy stages,
+     but on the default stage the composer lives inline (above), so
+     hide the floor-anchored one. */
+  .sam-root:not([data-create-app]) .sam-main:not(:has(.sam-body[data-modern="true"])) .sam-composer-wrap {
+    display: none;
+  }
+
+  /* Plain-text category footer pills — no boxy chrome, hover-only
+     emphasis. Matches .home-ideas-footer__pill on the desktop. */
+  .sam-home-footer-pills {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: auto;
+    padding-top: 24px;
+    width: 100%;
+  }
+  .sam-home-footer-pill {
+    padding: 4px 2px;
+    color: var(--text-weak);
     font-size: 13px;
     font-weight: 500;
-    cursor: default;
-  }
-  .sam-home-category.active {
-    background: color-mix(in oklch, var(--foreground) 6%, var(--background));
-    color: var(--text-strong);
-  }
-  .sam-home-suggestions {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    width: 100%;
-    margin-top: 4px;
-    padding: 0 24px;
-  }
-  .sam-home-suggestion {
-    font-size: 14.5px;
-    font-weight: 500;
-    color: var(--text-base);
-    line-height: 1.45;
-    letter-spacing: -0.01em;
-    text-align: center;
+    letter-spacing: 0;
   }
 
   /* BODY — modern: cards-as-tools dashboard */
@@ -2700,9 +2740,11 @@ export function StellaAppMock({
         >
           <div className="sam-sidebar-default">
             <div className="sam-sidebar-header" />
+            {/* Brand: small logo on the left + italic "Stella" wordmark,
+                matching `desktop/src/shell/sidebar/sidebar.css`. */}
             <div className="sam-sidebar-brand">
-              <span className="sam-sidebar-brand-glyph" aria-hidden="true">
-                {STELLA_GLYPH}
+              <span className="sam-sidebar-brand-logo" aria-hidden="true">
+                <img src="/stella-logo.svg" alt="" />
               </span>
               <span className="sam-sidebar-brand-text">Stella</span>
             </div>
@@ -2715,10 +2757,6 @@ export function StellaAppMock({
                 <span className="sam-nav-icon">{ICON_USERS}</span>
                 <span>Social</span>
               </button>
-              <button type="button" className="sam-nav-item">
-                <span className="sam-nav-icon">{ICON_PLUS_SQUARE}</span>
-                <span>New App</span>
-              </button>
               <button type="button" className="sam-nav-item sam-nav-item--studio">
                 <span className="sam-nav-icon">{ICON_MUSIC}</span>
                 <span>Music Studio</span>
@@ -2726,26 +2764,18 @@ export function StellaAppMock({
               </button>
             </nav>
             <div className="sam-sidebar-footer">
-              <div className="sam-footer-icons">
-                <button type="button" className="sam-icon-button" aria-label="Theme">
-                  {ICON_PALETTE}
-                </button>
-                <button type="button" className="sam-icon-button" aria-label="Settings">
-                  {ICON_SETTINGS}
-                </button>
-              </div>
               <button type="button" className="sam-nav-item">
                 <span className="sam-nav-icon">{ICON_STORE}</span>
                 <span>Store</span>
               </button>
               <button type="button" className="sam-nav-item">
-                <span className="sam-nav-icon">{ICON_DEVICE}</span>
-                <span>Connect</span>
+                <span className="sam-nav-icon">{ICON_SETTINGS}</span>
+                <span>Settings</span>
               </button>
-              <button type="button" className="sam-nav-item">
-                <span className="sam-nav-icon">{ICON_LOGIN}</span>
-                <span>Sign in</span>
-              </button>
+              <div className="sam-account-row">
+                <span className="sam-avatar" aria-hidden="true">A</span>
+                <span className="sam-account-pill">Upgrade</span>
+              </div>
             </div>
           </div>
 
@@ -2875,21 +2905,31 @@ export function StellaAppMock({
               <h1 className="sam-home-title">
                 What can I do for you today?
               </h1>
-              <div className="sam-home-categories">
-                {HOME_CATEGORIES.map((label, index) => (
-                  <button
-                    key={label}
-                    type="button"
-                    className={`sam-home-category${index === 0 ? " active" : ""}`}
-                  >
-                    {label}
-                  </button>
-                ))}
+
+              {/* Composer sits inline directly below the title — the real
+                  desktop home content passes the composer as `children`
+                  to HomeContent, which renders it right after the title
+                  (centered, not pinned to the bottom of the column). */}
+              <div className="sam-home-composer">
+                <span className="sam-composer-add" aria-hidden="true">
+                  {ICON_PLUS}
+                </span>
+                <span className="sam-composer-input">
+                  <span className="sam-composer-input-placeholder">
+                    Ask me anything...
+                  </span>
+                </span>
+                <span className="sam-composer-submit" aria-hidden="true">
+                  {ICON_SEND}
+                </span>
               </div>
-              <div className="sam-home-suggestions">
-                {HOME_SUGGESTIONS.map((text) => (
-                  <span key={text} className="sam-home-suggestion">
-                    {text}
+
+              {/* Plain-text category footer pills — no boxy chrome, no
+                  inline suggestion list, matches `home-ideas-footer`. */}
+              <div className="sam-home-footer-pills">
+                {HOME_CATEGORIES.map((label) => (
+                  <span key={label} className="sam-home-footer-pill">
+                    {label}
                   </span>
                 ))}
               </div>
