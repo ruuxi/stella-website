@@ -785,8 +785,8 @@ const css = `
     gap: 8px;
     width: 100%;
     max-width: 480px;
-    min-height: 50px;
-    padding: 8px 10px;
+    min-height: 38px;
+    padding: 5px 8px;
     background: var(--background);
     border-radius: 999px;
     box-shadow: var(--shadow-md);
