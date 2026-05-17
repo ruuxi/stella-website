@@ -1,0 +1,446 @@
+/* ──────────────────────────────────────────────────────────────────
+   Single-chat section — text on the left, mini-window mock on the
+   right. Mock uses a "dusk" theme: deep plum surface, warm cream
+   text, rose accent. All tokens scoped to .mini-window so nothing
+   leaks into the surrounding codex-frame.
+   ────────────────────────────────────────────────────────────────── */
+
+.single-chat-hero__eyebrow {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-style: italic;
+  font-size: 18px;
+  font-weight: 450;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.single-chat-hero__title {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  color: white;
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin: 0.4rem 0 0.8rem;
+}
+
+.single-chat-hero__lede {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+  line-height: 1.55;
+  max-width: 34rem;
+}
+
+.single-chat-hero__lede--sub {
+  margin-top: 1rem;
+  color: rgba(255, 255, 255, 0.66);
+}
+
+/* ─── Side-by-side layout ─────────────────────────────────────── */
+/* Inside the codex-frame, switch the stage into a 2-column layout so
+   copy sits on the left and the mock floats on the right. Stack on
+   small screens. */
+.codex-frame .single-chat-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  padding: 0 clamp(0.5rem, 2vw, 1.5rem);
+}
+
+.codex-frame .single-chat-stage .single-chat-hero__copy {
+  margin: 0;
+}
+
+.codex-frame .single-chat-stage .single-chat-hero__mock {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 880px) {
+  .codex-frame .single-chat-stage {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+}
+
+/* ─── Mini window — dusk theme ───────────────────────────────── */
+.mini-window {
+  /* Dusk tokens */
+  --mini-bg: #221a2b;
+  --mini-bg-top: #2a1f33;
+  --mini-surface: #2e2438;
+  --mini-border: rgba(255, 215, 220, 0.10);
+  --mini-border-strong: rgba(255, 215, 220, 0.18);
+  --mini-text-strong: #f3e9ec;
+  --mini-text-base: rgba(243, 233, 236, 0.86);
+  --mini-text-weak: rgba(243, 233, 236, 0.58);
+  --mini-text-weaker: rgba(243, 233, 236, 0.36);
+  --mini-accent: #ff6f8e;
+  --mini-accent-soft: rgba(255, 111, 142, 0.18);
+  --mini-user-bubble: rgba(255, 111, 142, 0.14);
+  --mini-user-bubble-border: rgba(255, 111, 142, 0.32);
+
+  width: 100%;
+  max-width: 420px;
+  height: clamp(520px, 72vh, 620px);
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, var(--mini-bg-top) 0%, var(--mini-bg) 100%);
+  color: var(--mini-text-base);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--mini-border);
+  box-shadow:
+    0 30px 80px -20px rgba(15, 8, 24, 0.55),
+    0 6px 18px rgba(15, 8, 24, 0.35);
+  font-family: var(--font-sans), "Manrope", system-ui, sans-serif;
+}
+
+/* ─── Title bar ──────────────────────────────────────────────── */
+.mini-window__titlebar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--mini-border);
+  user-select: none;
+  -webkit-app-region: drag;
+}
+
+.mini-window__traffic {
+  display: inline-flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.mini-window__traffic span {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: block;
+}
+
+.mini-window__traffic span:first-child { background: #ff6058; }
+.mini-window__traffic span:nth-child(2) { background: #ffbd2e; }
+.mini-window__traffic span:nth-child(3) { background: #28c941; }
+
+.mini-window__rail-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--mini-text-weak);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.mini-window__rail-toggle:hover {
+  color: var(--mini-text-base);
+  background: rgba(243, 233, 236, 0.06);
+}
+
+.mini-window__title {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--mini-text-weak);
+  letter-spacing: -0.01em;
+}
+
+.mini-window__title-spacer {
+  flex: 1;
+}
+
+/* ─── Chat body ──────────────────────────────────────────────── */
+.mini-window__chat {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 14px 12px;
+  scrollbar-width: none;
+}
+
+.mini-window__chat::-webkit-scrollbar {
+  display: none;
+}
+
+.mini-chat {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mini-chat__row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mini-chat__row--user {
+  align-items: flex-end;
+}
+
+.mini-chat__row--stella {
+  align-items: flex-start;
+}
+
+/* ─── Bubbles ────────────────────────────────────────────────── */
+.mini-chat__bubble {
+  font-size: 13.5px;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+  word-wrap: break-word;
+}
+
+.mini-chat__bubble--user {
+  background: var(--mini-user-bubble);
+  border: 1px solid var(--mini-user-bubble-border);
+  color: var(--mini-text-strong);
+  padding: 8px 12px;
+  border-radius: 16px;
+  border-bottom-right-radius: 4px;
+  max-width: 85%;
+}
+
+.mini-chat__bubble--stella {
+  background: transparent;
+  border: none;
+  color: var(--mini-text-base);
+  padding: 2px 0;
+  max-width: 95%;
+}
+
+/* Just-sent entry animation for user messages — port of the desktop
+   `user-message-enter` keyframes. */
+.mini-chat__row--just-sent .mini-chat__bubble--user {
+  animation: mini-chat-user-enter 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: right bottom;
+}
+
+@keyframes mini-chat-user-enter {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+    transform: translate3d(0, 10px, 0) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Subtle blinking caret on streaming assistant text. */
+.mini-chat__cursor {
+  display: inline-block;
+  width: 2px;
+  height: 0.9em;
+  margin-left: 1px;
+  background: var(--mini-accent);
+  vertical-align: -0.1em;
+  border-radius: 1px;
+  animation: mini-chat-cursor-blink 1s steps(2, start) infinite;
+}
+
+@keyframes mini-chat-cursor-blink {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ─── Inline working indicator ──────────────────────────────── */
+.mini-working {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 6px;
+  border-radius: 999px;
+  background: rgba(243, 233, 236, 0.04);
+  border: 1px solid rgba(243, 233, 236, 0.06);
+  color: var(--mini-text-base);
+  font-size: 12.5px;
+  animation: mini-working-enter 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes mini-working-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.mini-working__orb {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--mini-accent);
+  background: var(--mini-accent-soft);
+}
+
+.mini-working__status {
+  position: relative;
+  display: inline-grid;
+  grid-template-areas: "stack";
+  align-items: center;
+  min-width: 0;
+}
+
+.mini-working__status-layer {
+  grid-area: stack;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  background: linear-gradient(
+    90deg,
+    var(--mini-text-weak) 0%,
+    var(--mini-text-strong) 50%,
+    var(--mini-text-weak) 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: mini-working-shimmer 2.2s linear infinite;
+}
+
+@keyframes mini-working-shimmer {
+  from {
+    background-position: 220% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+.mini-working__status-layer--in {
+  animation:
+    mini-working-shimmer 2.2s linear infinite,
+    mini-working-status-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.mini-working__status-layer--out {
+  animation:
+    mini-working-shimmer 2.2s linear infinite,
+    mini-working-status-out 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  pointer-events: none;
+}
+
+@keyframes mini-working-status-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mini-working-status-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* ─── Composer ──────────────────────────────────────────────── */
+.mini-window__composer-wrap {
+  padding: 8px 12px 12px;
+}
+
+.mini-composer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px;
+  background: rgba(243, 233, 236, 0.05);
+  border: 1px solid var(--mini-border-strong);
+  border-radius: 999px;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.mini-composer--focus {
+  border-color: rgba(255, 111, 142, 0.5);
+  background: rgba(255, 111, 142, 0.06);
+}
+
+.mini-composer__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(243, 233, 236, 0.06);
+  color: var(--mini-text-weak);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.mini-composer__btn:hover:not(:disabled) {
+  background: rgba(243, 233, 236, 0.12);
+  color: var(--mini-text-base);
+}
+
+.mini-composer__send {
+  background: var(--mini-accent);
+  color: #2b1923;
+}
+
+.mini-composer__send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.mini-composer__mic {
+  background: transparent;
+}
+
+.mini-composer__input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--mini-text-strong);
+  padding: 2px 4px;
+}
+
+.mini-composer__input::placeholder {
+  color: var(--mini-text-weaker);
+}
+
+/* The .mini-window inherits StellaAnimation's container so the orb
+   sizes correctly. The animation itself paints via WebGL/canvas with
+   theme-independent colors. */
+.mini-working__orb canvas {
+  display: block !important;
+  width: 20px !important;
+  height: 20px !important;
+}

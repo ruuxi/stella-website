@@ -56,6 +56,11 @@ const ComposerSection = dynamic(
   { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
 );
 
+const SingleChatSection = dynamic(
+  () => import("@/components/product-demos/single-chat-section").then((mod) => mod.SingleChatSection),
+  { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
+);
+
 const showcaseCards = [
   {
     title: "Plan my week and check in every morning with a summary",
@@ -262,6 +267,8 @@ export default function Home() {
         <CanvasSection />
 
         <ComposerSection />
+
+        <SingleChatSection />
 
         <ActionsSection />
 
