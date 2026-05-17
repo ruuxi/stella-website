@@ -1334,8 +1334,8 @@
 
 .canvas-hero__frame {
   width: 100%;
-  max-width: 1500px;
-  padding: clamp(0.9rem, 2vw, 1.6rem);
+  max-width: 1240px;
+  padding: clamp(0.8rem, 1.6vw, 1.3rem);
 }
 
 .canvas-hero__frame .canvas-hero__mock {
