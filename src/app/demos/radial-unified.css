@@ -1300,15 +1300,9 @@
 .canvas-screenshot-stack {
   position: relative;
   width: 100%;
-  max-width: 1180px;
   aspect-ratio: 1920 / 1175;
-  border-radius: 18px;
+  border-radius: 10px;
   overflow: hidden;
-  background: color-mix(in oklab, currentColor 4%, transparent);
-  box-shadow:
-    0 30px 80px -30px rgba(0, 0, 0, 0.35),
-    0 8px 20px -10px rgba(0, 0, 0, 0.25),
-    0 0 0 1px color-mix(in oklab, currentColor 10%, transparent);
 }
 
 .canvas-screenshot {
