@@ -1283,6 +1283,58 @@
   padding: 0;
 }
 
+/* ──────────────────────────────────────────────────────────────────
+   Screenshot stack — three real product screenshots cross-faded.
+
+   Container locks the 1920:1175 (≈1.634:1) aspect so the canvas
+   reserves the same height across every tab. Stacked images live in
+   the same box and toggle opacity via `data-active`, giving us a
+   pure GPU-accelerated cross-fade with no layout shift.
+   ────────────────────────────────────────────────────────────────── */
+.canvas-showcase--screenshots {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.canvas-screenshot-stack {
+  position: relative;
+  width: 100%;
+  max-width: 1180px;
+  aspect-ratio: 1920 / 1175;
+  border-radius: 18px;
+  overflow: hidden;
+  background: color-mix(in oklab, currentColor 4%, transparent);
+  box-shadow:
+    0 30px 80px -30px rgba(0, 0, 0, 0.35),
+    0 8px 20px -10px rgba(0, 0, 0, 0.25),
+    0 0 0 1px color-mix(in oklab, currentColor 10%, transparent);
+}
+
+.canvas-screenshot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transition: opacity 600ms ease;
+  will-change: opacity;
+  pointer-events: none;
+  user-select: none;
+}
+
+.canvas-screenshot[data-active] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .canvas-screenshot {
+    transition: none;
+  }
+}
+
 @media (max-width: 640px) {
   .canvas-hero {
     padding-top: 4rem;
