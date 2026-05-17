@@ -203,8 +203,8 @@ const css = `
   }
   /* The horizontal sidebar+main row sits below the top shell bar.
      Explicit opaque background so the codex-frame blue underneath
-     the mock can't bleed through (`background: inherit` on the
-     shorthand did not actually re-paint the sam-root fill here). */
+     the mock can't bleed through (background:inherit on the shorthand
+     did not actually re-paint the sam-root fill here). */
   .sam-body-row {
     flex: 1;
     min-height: 0;
