@@ -201,17 +201,21 @@ const css = `
     flex-direction: column;
     position: relative;
   }
-  /* The horizontal sidebar+main row sits below the top shell bar. */
+  /* The horizontal sidebar+main row sits below the top shell bar.
+     Inherit the sam-root surface so changing to a column layout did
+     not introduce a transparent strip behind the chrome. */
   .sam-body-row {
     flex: 1;
     min-height: 0;
     display: flex;
     width: 100%;
     position: relative;
+    background: inherit;
   }
   /* Top shell bar — mirrors the desktop ShellTopBar: macOS traffic
      lights on the left, sidebar/back-forward affordances next to them,
-     and a panel toggle on the right. */
+     and a panel toggle on the right. Uses the same opaque surface as
+     the rest of the mock so it reads as part of the window chrome. */
   .sam-topbar {
     flex-shrink: 0;
     height: 30px;
@@ -220,9 +224,7 @@ const css = `
     gap: 10px;
     padding: 0 12px;
     border-bottom: 1px solid var(--border-base);
-    background: color-mix(in oklch, var(--background) 92%, transparent);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    background: var(--background);
     position: relative;
     z-index: 3;
   }
@@ -2256,27 +2258,19 @@ const css = `
   /* ══════════════════════════════════════════
      PILL OVERLAY (interactive mode)
      ══════════════════════════════════════════ */
-  /* Pills share the codex-frame blue gradient so they read as "click
-     me" affordances rather than glassy floating chrome that blends
-     into the mock. All pills use the same fill regardless of active
-     state — only the ring + inset glow change to signal selection. */
+  /* Pills share the codex-frame blue so they read as "click me"
+     affordances, but the surface stays flat — no inset highlight, no
+     radial sheen, no chunky drop shadow. Active state is a slightly
+     darker fill plus a soft outer ring. */
   .sam-pill {
     position: absolute;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 9px 16px 9px 13px;
+    padding: 8px 14px 8px 12px;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    background:
-      radial-gradient(
-        120% 100% at 8% 6%,
-        rgba(178, 224, 248, 0.95),
-        rgba(104, 180, 232, 0.92) 30%,
-        rgba(45, 132, 224, 0.9) 60%,
-        rgba(20, 86, 180, 0.86) 100%
-      ),
-      linear-gradient(180deg, #62b0e8, #155fb6);
+    border: 1px solid rgba(20, 86, 180, 0.45);
+    background: #2d7fd6;
     font-family: inherit;
     font-size: 13px;
     font-weight: 600;
@@ -2284,25 +2278,20 @@ const css = `
     cursor: pointer;
     user-select: none;
     z-index: 30;
-    box-shadow:
-      0 6px 18px rgba(18, 70, 150, 0.32),
-      0 1px 0 rgba(255, 255, 255, 0.4) inset;
+    box-shadow: 0 1px 2px rgba(18, 70, 150, 0.18);
     animation: samPillIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
     transition:
-      box-shadow 0.2s ease,
-      transform 0.2s ease;
+      background 0.18s ease,
+      box-shadow 0.18s ease,
+      transform 0.18s ease;
   }
   .sam-pill:hover {
+    background: #2070c4;
     transform: translateY(-1px);
-    box-shadow:
-      0 10px 24px rgba(18, 70, 150, 0.38),
-      0 1px 0 rgba(255, 255, 255, 0.5) inset;
   }
   .sam-pill[data-active="true"] {
-    box-shadow:
-      0 8px 22px rgba(18, 70, 150, 0.42),
-      0 0 0 4px rgba(255, 255, 255, 0.32),
-      0 1px 0 rgba(255, 255, 255, 0.55) inset;
+    background: #1a5fb0;
+    box-shadow: 0 0 0 3px rgba(45, 127, 214, 0.22);
   }
   .sam-pill-icon { display: inline-flex; color: rgba(255, 255, 255, 0.92); }
   .sam-pill[data-active="true"] .sam-pill-icon { color: #fff; }
