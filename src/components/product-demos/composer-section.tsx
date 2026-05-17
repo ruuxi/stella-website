@@ -164,7 +164,29 @@ function ComposerMock() {
   const [voiceLevels, setVoiceLevels] = useState<number[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const shellContentRef = useRef<HTMLDivElement | null>(null);
   const addMenuOpen = addMenuAnchor !== null;
+
+  // Smooth shell expansion. Watch the inner content's height and write
+  // it back onto the shell element as an explicit pixel value so the
+  // CSS transition has a target to interpolate to. This is the same
+  // shape as Stella's `useAnimatedComposerShell` hook on the desktop:
+  // chip attaches / textarea grows / dictation row appears → content
+  // height changes → shell springs to the new value instead of
+  // snapping.
+  useEffect(() => {
+    const shell = shellRef.current;
+    const content = shellContentRef.current;
+    if (!shell || !content) return;
+    const sync = () => {
+      shell.style.height = `${content.offsetHeight}px`;
+    };
+    sync();
+    const observer = new ResizeObserver(sync);
+    observer.observe(content);
+    return () => observer.disconnect();
+  }, []);
 
   const toggleAddMenu = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -352,7 +374,12 @@ function ComposerMock() {
       ) : null}
 
       {/* ── The shell ── */}
-      <div className="cmock__shell" data-expanded={expanded || undefined}>
+      <div
+        ref={shellRef}
+        className="cmock__shell"
+        data-expanded={expanded || undefined}
+      >
+        <div ref={shellContentRef} className="cmock__shell-content">
         {attached.length > 0 && (
           <div className="cmock__attached-strip">
             {attached.map((chip) => (
@@ -486,6 +513,7 @@ function ComposerMock() {
             </>
           )}
         </form>
+        </div>
 
       </div>
 
