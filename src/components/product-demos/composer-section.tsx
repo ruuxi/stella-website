@@ -156,12 +156,23 @@ function ComposerMock() {
     chip: SuggestionChip;
     rect: DOMRect;
   } | null>(null);
-  const [addMenuOpen, setAddMenuOpen] = useState(false);
+  // Add menu anchor: when set, the menu portals itself to body and
+  // positions above the anchor button's bounding rect. Null = closed.
+  const [addMenuAnchor, setAddMenuAnchor] = useState<DOMRect | null>(null);
   const [voiceActive, setVoiceActive] = useState(false);
   const [voiceElapsedMs, setVoiceElapsedMs] = useState(0);
   const [voiceLevels, setVoiceLevels] = useState<number[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const addMenuOpen = addMenuAnchor !== null;
+
+  const toggleAddMenu = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      const rect = event.currentTarget.getBoundingClientRect();
+      setAddMenuAnchor((prev) => (prev ? null : rect));
+    },
+    [],
+  );
 
   // Auto-grow the textarea — match the real composer's pill→expanded
   // morph behavior (driven by content rather than a manual toggle).
@@ -172,8 +183,18 @@ function ComposerMock() {
     el.style.height = `${Math.min(200, el.scrollHeight)}px`;
   }, [message]);
 
-  // Voice mode: tick the timer + push a fresh "audio level" sample every
-  // 80ms so the waveform reads as live. Resets on toggle off.
+  // Voice mode: tick the timer + push a fresh "audio level" sample
+  // every 80ms. The mock can't read a real mic, so the levels follow
+  // a synthesised speech-shaped envelope:
+  //
+  //   * a slow "breath" envelope (~0.25 Hz) gives the bar a clear
+  //     phrase rhythm with brief quiet gaps between phrases;
+  //   * a faster "syllable" carrier (~4 Hz) gives within-phrase peaks;
+  //   * a small jitter term breaks up the perfectly regular look.
+  //
+  // The product is shaped so quiet sections still show a visible noise
+  // floor (~0.08) and loud sections spike to ~0.95, matching what real
+  // microphone data tends to look like at this bar count.
   useEffect(() => {
     if (!voiceActive) {
       setVoiceElapsedMs(0);
@@ -182,31 +203,47 @@ function ComposerMock() {
     }
     const start = performance.now();
     const interval = window.setInterval(() => {
-      setVoiceElapsedMs(performance.now() - start);
+      const now = performance.now();
+      const tSec = (now - start) / 1000;
+      setVoiceElapsedMs(now - start);
+      // Slow breath in/out: a phrase + brief quiet gap.
+      const breath = Math.max(0, Math.sin(tSec * 2 * Math.PI * 0.25));
+      const breathShaped = Math.pow(breath, 0.7);
+      // Syllable carrier — roughly the rate of spoken syllables.
+      const syllable = 0.55 + 0.45 * Math.sin(tSec * 2 * Math.PI * 4);
+      // A slower modulator stops the syllable curve from looking
+      // perfectly periodic.
+      const wander = 0.85 + 0.15 * Math.sin(tSec * 2 * Math.PI * 0.7 + 1.3);
+      const noise = (Math.random() - 0.5) * 0.12;
+      const next = Math.max(
+        0.06,
+        Math.min(0.96, breathShaped * syllable * wander + noise),
+      );
       setVoiceLevels((prev) => {
-        // Bias toward mid-range with occasional peaks so it looks like
-        // someone actually speaking, not a uniform noise floor.
-        const next = Math.min(
-          1,
-          Math.max(0.06, Math.pow(Math.random(), 1.5) * 1.05),
-        );
         const updated = [...prev, next];
-        return updated.length > 96 ? updated.slice(updated.length - 96) : updated;
+        return updated.length > 96
+          ? updated.slice(updated.length - 96)
+          : updated;
       });
     }, 80);
     return () => window.clearInterval(interval);
   }, [voiceActive]);
 
-  // Close the add menu on outside click.
+  // Close the add menu on outside click — the menu is portaled to body
+  // so we have to check against both the composer wrap AND the portaled
+  // menu element (looked up by data attribute).
   useEffect(() => {
     if (!addMenuOpen) return;
     const onPointerDown = (event: PointerEvent) => {
       const target = event.target;
-      if (target instanceof Node && wrapRef.current?.contains(target)) return;
-      setAddMenuOpen(false);
+      if (!(target instanceof Node)) return;
+      if (wrapRef.current?.contains(target)) return;
+      const portaledMenu = document.querySelector("[data-cmock-menu='true']");
+      if (portaledMenu?.contains(target)) return;
+      setAddMenuAnchor(null);
     };
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setAddMenuOpen(false);
+      if (event.key === "Escape") setAddMenuAnchor(null);
     };
     window.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("keydown", onKey);
@@ -355,7 +392,7 @@ function ComposerMock() {
               takes over (just like the real composer). */}
           <PlusButton
             className="cmock__add-button"
-            onClick={() => setAddMenuOpen((o) => !o)}
+            onClick={toggleAddMenu}
             isOpen={addMenuOpen}
           />
 
@@ -396,7 +433,7 @@ function ComposerMock() {
                 <div className="cmock__toolbar-left">
                   <PlusButton
                     className="cmock__add-button cmock__add-button--toolbar"
-                    onClick={() => setAddMenuOpen((o) => !o)}
+                    onClick={toggleAddMenu}
                     isOpen={addMenuOpen}
                   />
                 </div>
@@ -450,8 +487,15 @@ function ComposerMock() {
           )}
         </form>
 
-        {addMenuOpen && <AddMenu onClose={() => setAddMenuOpen(false)} />}
       </div>
+
+      {/* Add menu — portaled so the codex-frame can't crop it. */}
+      {addMenuAnchor ? (
+        <AddMenu
+          anchorRect={addMenuAnchor}
+          onClose={() => setAddMenuAnchor(null)}
+        />
+      ) : null}
     </div>
   );
 }
@@ -466,7 +510,7 @@ function PlusButton({
   isOpen,
 }: {
   className?: string;
-  onClick: () => void;
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   isOpen: boolean;
 }) {
   return (
@@ -475,7 +519,7 @@ function PlusButton({
       className={className}
       onClick={(event) => {
         event.stopPropagation();
-        onClick();
+        onClick(event);
       }}
       aria-expanded={isOpen}
       aria-haspopup="menu"
@@ -727,7 +771,23 @@ function DictationBar({
   );
 }
 
-function AddMenu({ onClose }: { onClose: () => void }) {
+const ADD_MENU_WIDTH = 252;
+const ADD_MENU_GAP = 8;
+const ADD_MENU_MARGIN = 12;
+/** Approximate menu height — used to decide whether to open above or
+ *  below the + button. Slightly over-estimated so the flip is reliable
+ *  before the menu has had a chance to measure itself. */
+const ADD_MENU_HEIGHT_GUESS = 268;
+
+function AddMenu({
+  anchorRect,
+  onClose,
+}: {
+  anchorRect: DOMRect;
+  onClose: () => void;
+}) {
+  const [mounted, setMounted] = useState(false);
+  useLayoutEffect(() => setMounted(true), []);
   // Items mirror `ComposerAddMenu.tsx`: Attach files / Capture / Select
   // area / Read aloud, then a "Recent" section with the last few files.
   const items: ReadonlyArray<{
@@ -819,8 +879,41 @@ function AddMenu({ onClose }: { onClose: () => void }) {
     "kickoff-notes.md",
   ];
 
-  return (
-    <div className="cmock__menu" role="menu" onClick={(e) => e.stopPropagation()}>
+  if (!mounted) return null;
+
+  // Place above the + button by default; flip below when the menu
+  // would clip past the top of the viewport. Centered horizontally on
+  // the button, clamped to a 12px viewport margin.
+  const viewportW = window.innerWidth;
+  const viewportH = window.innerHeight;
+  const topAbove = anchorRect.top - ADD_MENU_HEIGHT_GUESS - ADD_MENU_GAP;
+  const topBelow = anchorRect.bottom + ADD_MENU_GAP;
+  const top =
+    topAbove < ADD_MENU_MARGIN ? topBelow : topAbove;
+  const desiredLeft =
+    anchorRect.left + anchorRect.width / 2 - ADD_MENU_WIDTH / 2;
+  const left = Math.max(
+    ADD_MENU_MARGIN,
+    Math.min(viewportW - ADD_MENU_WIDTH - ADD_MENU_MARGIN, desiredLeft),
+  );
+  const clampedTop = Math.max(
+    ADD_MENU_MARGIN,
+    Math.min(viewportH - ADD_MENU_HEIGHT_GUESS - ADD_MENU_MARGIN, top),
+  );
+
+  return createPortal(
+    <div
+      className="cmock__menu"
+      data-cmock-menu="true"
+      role="menu"
+      style={{
+        position: "fixed",
+        top: clampedTop,
+        left,
+        width: ADD_MENU_WIDTH,
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
       {items.map((item) => (
         <button
           key={item.label}
@@ -865,6 +958,7 @@ function AddMenu({ onClose }: { onClose: () => void }) {
           <span className="cmock__menu-label">{name}</span>
         </button>
       ))}
-    </div>
+    </div>,
+    document.body,
   );
 }

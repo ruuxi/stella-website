@@ -553,11 +553,10 @@
 }
 
 /* ─── Add menu popover ───────────────────────────────────────── */
+/* Portaled to <body> with inline `position: fixed` + computed top/left
+   so the codex-frame can't crop it. Everything else (chrome,
+   animation, items) stays here. */
 .cmock__menu {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 6px;
-  min-width: 240px;
   padding: 6px;
   background: white;
   border-radius: 12px;
@@ -565,7 +564,8 @@
   box-shadow:
     0 18px 44px rgba(15, 36, 80, 0.22),
     0 4px 14px rgba(15, 36, 80, 0.12);
-  z-index: 20;
+  z-index: 9999;
+  color: #1a2540;
   animation: cmock-menu-in 140ms ease both;
 }
 
