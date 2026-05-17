@@ -6,13 +6,8 @@ import { useViewportActivity } from "@/components/use-viewport-activity";
 import { CozyCatAvatar, CozyWidget } from "./cozy-cat";
 import { SELF_MOD_STAGES } from "./data";
 import {
-  STELLA_GLYPH,
-  STELLA_ICON_DEVICE,
   STELLA_ICON_HOUSE,
-  STELLA_ICON_LOGIN,
-  STELLA_ICON_PALETTE,
   STELLA_ICON_PLUS,
-  STELLA_ICON_PLUS_SQUARE,
   STELLA_ICON_SEND,
   STELLA_ICON_SETTINGS,
   STELLA_ICON_STORE,
@@ -110,13 +105,10 @@ export function SelfModificationShowcase() {
  *   • high   → cozy tuxedo-cat theme across the whole shell
  * ────────────────────────────────────────────────────────────────────── */
 
+// Current Stella home surfaces ideas as plain-text category pills at
+// the very bottom of the column — no boxy pill chrome, no inline
+// suggestion list. Match that exactly.
 const HOME_CATEGORIES = ["Stella", "Task", "Explore", "Schedule"] as const;
-const HOME_SUGGESTIONS = [
-  "Add a music player to home",
-  "Change my theme to dark",
-  "Build me a budget tracker app",
-  "Make me sound more casual",
-];
 
 const COZY_HOME_CATEGORIES = ["Mochi", "Calm", "Cozy", "Cute"] as const;
 const COZY_HOME_SUGGESTIONS = [
@@ -393,12 +385,18 @@ export function SelfModShell({
         <div className="selfmod-shell__body">
           {/* SIDEBAR ─────────────────────────────────────────── */}
           <aside className="selfmod-shell__sidebar">
-            {/* Default 170px Stella rail */}
+            {/* Default Stella rail — matches the real desktop sidebar:
+                  small logo + italic "Stella" wordmark, Home + Social up
+                  top, Store + Settings + account avatar at the bottom. */}
             <div className="selfmod-shell__sidebar-default">
               <div className="selfmod-shell__sidebar-header" />
               <div className="selfmod-shell__brand">
-                <span className="selfmod-shell__brand-glyph" aria-hidden="true">
-                  {STELLA_GLYPH}
+                <span className="selfmod-shell__brand-logo" aria-hidden="true">
+                  <img
+                    src="/stella-logo.svg"
+                    alt=""
+                    className="selfmod-shell__brand-logo-art"
+                  />
                 </span>
                 <span className="selfmod-shell__brand-text">Stella</span>
               </div>
@@ -415,28 +413,8 @@ export function SelfModShell({
                   </span>
                   <span>Social</span>
                 </div>
-                <div className="selfmod-shell__nav-item">
-                  <span className="selfmod-shell__nav-icon">
-                    {STELLA_ICON_PLUS_SQUARE}
-                  </span>
-                  <span>New App</span>
-                </div>
               </nav>
               <div className="selfmod-shell__sidebar-footer">
-                <div className="selfmod-shell__footer-icons">
-                  <span
-                    className="selfmod-shell__icon-button"
-                    aria-hidden="true"
-                  >
-                    {STELLA_ICON_PALETTE}
-                  </span>
-                  <span
-                    className="selfmod-shell__icon-button"
-                    aria-hidden="true"
-                  >
-                    {STELLA_ICON_SETTINGS}
-                  </span>
-                </div>
                 <div className="selfmod-shell__nav-item">
                   <span className="selfmod-shell__nav-icon">
                     {STELLA_ICON_STORE}
@@ -445,15 +423,18 @@ export function SelfModShell({
                 </div>
                 <div className="selfmod-shell__nav-item">
                   <span className="selfmod-shell__nav-icon">
-                    {STELLA_ICON_DEVICE}
+                    {STELLA_ICON_SETTINGS}
                   </span>
-                  <span>Connect</span>
+                  <span>Settings</span>
                 </div>
-                <div className="selfmod-shell__nav-item">
-                  <span className="selfmod-shell__nav-icon">
-                    {STELLA_ICON_LOGIN}
+                <div className="selfmod-shell__account-row">
+                  <span
+                    className="selfmod-shell__account-avatar"
+                    aria-hidden="true"
+                  >
+                    A
                   </span>
-                  <span>Sign in</span>
+                  <span className="selfmod-shell__account-pill">Upgrade</span>
                 </div>
               </div>
             </div>
@@ -632,23 +613,38 @@ export function SelfModShell({
                 <h1 className="selfmod-shell__home-title">
                   What can I do for you today?
                 </h1>
-                <div className="selfmod-shell__home-categories">
-                  {HOME_CATEGORIES.map((label, index) => (
+
+                {/* Composer sits directly below the title, exactly like
+                    the real desktop home content (not at the bottom of
+                    the main column). */}
+                <div className="selfmod-shell__home-composer">
+                  <span
+                    className="selfmod-shell__composer-add"
+                    aria-hidden="true"
+                  >
+                    {STELLA_ICON_PLUS}
+                  </span>
+                  <span className="selfmod-shell__composer-input">
+                    Ask me anything...
+                  </span>
+                  <span
+                    className="selfmod-shell__composer-submit"
+                    aria-hidden="true"
+                  >
+                    {STELLA_ICON_SEND}
+                  </span>
+                </div>
+
+                {/* Plain-text category pills pinned to the bottom of the
+                    home column — no boxy chrome, hover-only emphasis,
+                    matches `home-ideas-footer` on the desktop. */}
+                <div className="selfmod-shell__home-footer-pills">
+                  {HOME_CATEGORIES.map((label) => (
                     <span
                       key={label}
-                      className={`selfmod-shell__home-category${index === 0 ? " active" : ""}`}
+                      className="selfmod-shell__home-footer-pill"
                     >
                       {label}
-                    </span>
-                  ))}
-                </div>
-                <div className="selfmod-shell__home-suggestions">
-                  {HOME_SUGGESTIONS.map((text) => (
-                    <span
-                      key={text}
-                      className="selfmod-shell__home-suggestion"
-                    >
-                      {text}
                     </span>
                   ))}
                 </div>
