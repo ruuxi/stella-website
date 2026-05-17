@@ -588,45 +588,6 @@
   flex-shrink: 0;
 }
 
-.store-integrations-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.store-integration-card {
-  min-height: 96px;
-}
-
-.store-integration-icon {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background: color-mix(in oklch, var(--foreground) 8%, transparent);
-}
-
-.store-integration-icon-image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  background-position: center;
-  background-size: cover;
-  z-index: 2;
-}
-
-.store-integration-icon .store-card-image-letter {
-  position: relative;
-  color: var(--text-strong);
-  text-shadow: none;
-}
-
-@container store (max-width: 640px) {
-  .store-integrations-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* --- Action Buttons --- */
 
 .store-action-btn {

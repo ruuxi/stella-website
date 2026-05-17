@@ -316,19 +316,7 @@ type DesktopStoreBridge = {
   getEmojiPackState?: () => Promise<{
     activePack: { packId: string; sheetUrls: string[] } | null;
   }>;
-  listComposioConnectors?: () => Promise<ComposioConnectorSummary[]>;
-  enableComposioConnector?: (payload: { toolkit: string }) => Promise<unknown>;
-  disableComposioConnector?: (payload: { toolkit: string }) => Promise<unknown>;
   fashion?: DesktopStoreFashionBridge;
-};
-
-type ComposioConnectorSummary = {
-  slug: string;
-  name: string;
-  id: string;
-  enabled: boolean;
-  authStatus: "connected" | "not_logged_in";
-  description: string;
 };
 
 type PetBridgeState = {
@@ -1594,108 +1582,6 @@ function PackageCard({
           </span>
         </div>
       </div>
-    </div>
-  );
-}
-
-function IntegrationCard({
-  connector,
-  working,
-  onToggle,
-}: {
-  connector: ComposioConnectorSummary;
-  working: boolean;
-  onToggle: () => void;
-}) {
-  const enabled = connector.enabled;
-  const label = working ? "Working..." : enabled ? "Disable" : "Enable";
-  const subtitle = enabled
-    ? connector.authStatus === "connected"
-      ? "Enabled"
-      : "Enabled, needs Composio key"
-    : "Disabled";
-
-  return (
-    <div className="store-card store-integration-card">
-      <div className="store-card-image store-integration-icon">
-        <span
-          className="store-integration-icon-image"
-          style={{
-            backgroundImage: `url(https://logos.composio.dev/api/${connector.slug})`,
-          }}
-        />
-        <span className="store-card-image-letter">
-          {connector.name.charAt(0)}
-        </span>
-      </div>
-      <div className="store-card-body">
-        <div className="store-card-top">
-          <span className="store-card-name">{connector.name}</span>
-          <button
-            className="store-action-btn"
-            data-variant={working ? "working" : enabled ? "remove" : "get"}
-            disabled={working}
-            onClick={onToggle}
-            type="button"
-          >
-            {label}
-          </button>
-        </div>
-        <div className="store-card-desc">{connector.description}</div>
-        <div className="store-card-meta">{subtitle}</div>
-      </div>
-    </div>
-  );
-}
-
-function IntegrationsSection({
-  connectors,
-  loading,
-  query,
-  workingSlug,
-  onToggle,
-}: {
-  connectors: ComposioConnectorSummary[];
-  loading: boolean;
-  query: string;
-  workingSlug: string | null;
-  onToggle: (connector: ComposioConnectorSummary) => void;
-}) {
-  const normalizedQuery = query.trim().toLowerCase();
-  const visibleConnectors = connectors.filter((connector) =>
-    normalizedQuery
-      ? `${connector.name} ${connector.slug}`
-          .toLowerCase()
-          .includes(normalizedQuery)
-      : true,
-  );
-
-  return (
-    <div className="store-section store-integrations-section">
-      <div className="store-section-header">
-        <span className="store-section-title">Integrations</span>
-        <span className="store-section-count">{visibleConnectors.length}</span>
-      </div>
-      {loading && connectors.length === 0 ? (
-        <SkeletonGrid />
-      ) : visibleConnectors.length === 0 ? (
-        <EmptyState
-          icon={<Search size={32} />}
-          title="No integrations found"
-          description="Try a different search."
-        />
-      ) : (
-        <div className="store-grid store-integrations-grid">
-          {visibleConnectors.map((connector) => (
-            <IntegrationCard
-              key={connector.slug}
-              connector={connector}
-              working={workingSlug === connector.slug}
-              onToggle={() => onToggle(connector)}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
@@ -4884,11 +4770,6 @@ function StoreClientInner() {
   const [installingId, setInstallingId] = useState<string | null>(null);
   const [sharePkg, setSharePkg] = useState<StorePackage | null>(null);
   const [installedMods, setInstalledMods] = useState<StoreInstall[]>([]);
-  const [connectors, setConnectors] = useState<ComposioConnectorSummary[]>([]);
-  const [connectorsLoading, setConnectorsLoading] = useState(false);
-  const [workingConnectorSlug, setWorkingConnectorSlug] = useState<string | null>(
-    null,
-  );
   const [urlState, setUrlState] = useState({
     tab: "discover",
     packageId: null as string | null,
@@ -5022,43 +4903,6 @@ function StoreClientInner() {
     });
   }, []);
 
-  const refreshConnectors = useCallback(async () => {
-    const bridge = getDesktopStoreBridge();
-    if (!bridge?.listComposioConnectors) {
-      setConnectors([]);
-      return;
-    }
-    setConnectorsLoading(true);
-    try {
-      setConnectors(await bridge.listComposioConnectors());
-    } finally {
-      setConnectorsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (activeTab !== "discover" || filter !== "integrations") return;
-    void refreshConnectors();
-  }, [activeTab, filter, refreshConnectors]);
-
-  const toggleConnector = async (connector: ComposioConnectorSummary) => {
-    const bridge = getDesktopStoreBridge();
-    if (!bridge?.enableComposioConnector || !bridge.disableComposioConnector) {
-      return;
-    }
-    setWorkingConnectorSlug(connector.slug);
-    try {
-      if (connector.enabled) {
-        await bridge.disableComposioConnector({ toolkit: connector.slug });
-      } else {
-        await bridge.enableComposioConnector({ toolkit: connector.slug });
-      }
-      await refreshConnectors();
-    } finally {
-      setWorkingConnectorSlug(null);
-    }
-  };
-
   if (activeTab !== "discover") {
     return (
       <main className="store-root" data-tab={activeTab}>
@@ -5166,15 +5010,6 @@ function StoreClientInner() {
                 onSelect={setSelectedPackageId}
               />
             ) : null}
-            {filter === "integrations" ? (
-              <IntegrationsSection
-                connectors={connectors}
-                loading={connectorsLoading}
-                query={query}
-                workingSlug={workingConnectorSlug}
-                onToggle={(connector) => void toggleConnector(connector)}
-              />
-            ) : null}
             {showNewSection ? (
               <div className="store-section">
                 <div className="store-section-header">
@@ -5202,7 +5037,7 @@ function StoreClientInner() {
                 </div>
               </div>
             ) : null}
-            {filter === "integrations" ? null : !allPackages ? (
+            {!allPackages ? (
               <SkeletonGrid />
             ) : rest.length === 0 ? (
               <EmptyState
