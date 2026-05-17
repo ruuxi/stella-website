@@ -63,10 +63,16 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  justify-content: flex-end;
   gap: 12px;
   padding: 0 8px;
   font-family: var(--font-sans), "Manrope", system-ui, sans-serif;
   color: var(--cmock-text-base);
+  /* Reserve enough height for the composer's expanded state (attached
+     chip strip + a few lines of textarea + toolbar + optional
+     dictation row) so attaching a chip or typing doesn't grow the
+     surrounding codex-frame and shift the rest of the page. */
+  min-height: 300px;
 }
 
 /* ─── Suggestion chips row (action zero) ─────────────────────── */
