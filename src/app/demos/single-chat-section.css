@@ -1,8 +1,11 @@
 /* ──────────────────────────────────────────────────────────────────
    Single-chat section — text on the left, mini-window mock on the
-   right. Mock uses a "dusk" theme: deep plum surface, warm cream
-   text, rose accent. All tokens scoped to .mini-window so nothing
-   leaks into the surrounding codex-frame.
+   right. The mock includes the Stella sidebar inside the window
+   alongside the chat column. The inline working indicator lives in
+   the context-chip bar above the composer.
+
+   Theme is "dusk" — deep plum surface, warm cream text, rose accent.
+   All tokens scoped to .mini-window so nothing leaks.
    ────────────────────────────────────────────────────────────────── */
 
 /* Hero copy sits next to the codex-frame on the page background, not
@@ -63,9 +66,9 @@
 
 /* ─── Mini window — dusk theme ───────────────────────────────── */
 .mini-window {
-  /* Dusk tokens */
-  --mini-bg: #221a2b;
-  --mini-bg-top: #2a1f33;
+  --mini-bg: #1f1828;
+  --mini-bg-top: #271e30;
+  --mini-sidebar-bg: #1a141f;
   --mini-surface: #2e2438;
   --mini-border: rgba(255, 215, 220, 0.10);
   --mini-border-strong: rgba(255, 215, 220, 0.18);
@@ -79,8 +82,8 @@
   --mini-user-bubble-border: rgba(255, 111, 142, 0.32);
 
   width: 100%;
-  max-width: 420px;
-  height: clamp(520px, 72vh, 620px);
+  max-width: 520px;
+  height: clamp(560px, 74vh, 640px);
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, var(--mini-bg-top) 0%, var(--mini-bg) 100%);
@@ -122,35 +125,142 @@
 .mini-window__traffic span:nth-child(2) { background: #ffbd2e; }
 .mini-window__traffic span:nth-child(3) { background: #28c941; }
 
-.mini-window__rail-toggle {
+.mini-window__title-spacer {
+  flex: 1;
+}
+
+/* ─── Body row: sidebar + main column ────────────────────────── */
+.mini-window__body {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  min-height: 0;
+}
+
+.mini-window__main {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: linear-gradient(180deg, var(--mini-bg-top) 0%, var(--mini-bg) 100%);
+}
+
+/* ─── Sidebar ────────────────────────────────────────────────── */
+.mini-sidebar {
+  display: flex;
+  flex-direction: column;
+  background: var(--mini-sidebar-bg);
+  border-right: 1px solid var(--mini-border);
+  padding: 12px 8px 10px;
+  min-height: 0;
+}
+
+.mini-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 10px;
+}
+
+.mini-sidebar__brand-logo {
+  width: 18px;
+  height: 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: transparent;
-  border: none;
-  color: var(--mini-text-weak);
-  cursor: pointer;
-  transition: color 0.15s ease, background 0.15s ease;
+  opacity: 0.65;
 }
 
-.mini-window__rail-toggle:hover {
-  color: var(--mini-text-base);
-  background: rgba(243, 233, 236, 0.06);
+.mini-sidebar__brand-logo img {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
-.mini-window__title {
+.mini-sidebar__brand-text {
   font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
   font-style: italic;
-  font-size: 16px;
+  font-size: 19px;
+  font-weight: 450;
+  letter-spacing: -0.02em;
   color: var(--mini-text-weak);
-  letter-spacing: -0.01em;
 }
 
-.mini-window__title-spacer {
-  flex: 1;
+.mini-sidebar__nav,
+.mini-sidebar__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mini-sidebar__nav {
+  margin-top: 4px;
+}
+
+.mini-sidebar__footer {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--mini-border);
+}
+
+.mini-sidebar__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  color: var(--mini-text-weak);
+  font-size: 12.5px;
+  font-weight: 500;
+  user-select: none;
+}
+
+.mini-sidebar__item--active {
+  background: rgba(255, 111, 142, 0.10);
+  color: var(--mini-text-strong);
+}
+
+.mini-sidebar__item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.mini-sidebar__item--active .mini-sidebar__item-icon {
+  color: var(--mini-accent);
+}
+
+.mini-sidebar__account {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 2px;
+  margin-top: 6px;
+}
+
+.mini-sidebar__avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(255, 111, 142, 0.28);
+  color: var(--mini-text-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.mini-sidebar__account-pill {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--mini-text-weaker);
+  padding: 2px 8px;
+  border: 1px solid var(--mini-border-strong);
+  border-radius: 999px;
 }
 
 /* ─── Chat body ──────────────────────────────────────────────── */
@@ -158,7 +268,7 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  padding: 16px 14px 12px;
+  padding: 16px 14px 8px;
   scrollbar-width: none;
 }
 
@@ -215,8 +325,7 @@
   max-width: 95%;
 }
 
-/* Just-sent entry animation for user messages — port of the desktop
-   `user-message-enter` keyframes. */
+/* Just-sent entry animation — mirrors `user-message-enter` on desktop. */
 .mini-chat__row--just-sent .mini-chat__bubble--user {
   animation: mini-chat-user-enter 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
   transform-origin: right bottom;
@@ -235,7 +344,6 @@
   }
 }
 
-/* Subtle blinking caret on streaming assistant text. */
 .mini-chat__cursor {
   display: inline-block;
   width: 2px;
@@ -253,41 +361,155 @@
   }
 }
 
-/* ─── Inline working indicator ──────────────────────────────── */
+/* ─── Composer wrap ──────────────────────────────────────────── */
+.mini-window__composer-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 12px 12px;
+}
+
+/* ─── Context-chip bar above the composer ──────────────────── */
+/* Working indicator slot sits on the LEFT, chips on the right. When
+   the indicator is active the chips shift right and collapse their
+   labels — exact behaviour of .composer-context-actions--suggestions
+   on desktop. */
+.mini-context-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 26px;
+  padding: 0 4px;
+  overflow: hidden;
+}
+
+.mini-context-bar__indicator {
+  flex: 0 0 auto;
+  max-width: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    max-width 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 200ms ease;
+}
+
+.mini-context-bar[data-working] .mini-context-bar__indicator {
+  max-width: 320px;
+  opacity: 1;
+}
+
+.mini-context-bar__chips {
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  transform: translateX(0);
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mini-context-bar[data-working] .mini-context-bar__chips {
+  transform: translateX(8px);
+}
+
+/* ─── Suggestion chip ──────────────────────────────────────── */
+.mini-context-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: transparent;
+  border: 1px dashed rgba(243, 233, 236, 0.28);
+  border-radius: 999px;
+  color: var(--mini-text-weak);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    padding 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.mini-context-chip:hover {
+  background: rgba(243, 233, 236, 0.06);
+  color: var(--mini-text-base);
+  border-color: rgba(243, 233, 236, 0.42);
+}
+
+.mini-context-chip__plus {
+  font-size: 11px;
+  line-height: 1;
+  opacity: 0.65;
+}
+
+.mini-context-chip__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.mini-context-chip__label {
+  font-weight: 600;
+}
+
+.mini-context-chip__meta {
+  font-weight: 400;
+  font-size: 10.5px;
+  opacity: 0.7;
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition:
+    max-width 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 200ms ease,
+    margin-left 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mini-context-bar[data-working] .mini-context-chip {
+  padding-inline: 6px;
+}
+
+.mini-context-bar[data-working] .mini-context-chip__label,
+.mini-context-bar[data-working] .mini-context-chip__meta {
+  max-width: 0;
+  opacity: 0;
+  margin-left: 0;
+}
+
+/* ─── Working indicator (no bubble around the orb) ───────────── */
 .mini-working {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 12px 4px 6px;
-  border-radius: 999px;
-  background: rgba(243, 233, 236, 0.04);
-  border: 1px solid rgba(243, 233, 236, 0.06);
+  padding: 0 4px;
   color: var(--mini-text-base);
   font-size: 12.5px;
-  animation: mini-working-enter 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@keyframes mini-working-enter {
-  from {
-    opacity: 0;
-    transform: translateY(4px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
 }
 
 .mini-working__orb {
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
+  width: 20px;
+  height: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   color: var(--mini-accent);
-  background: var(--mini-accent-soft);
+}
+
+.mini-working__orb canvas {
+  display: block !important;
+  width: 20px !important;
+  height: 20px !important;
 }
 
 .mini-working__status {
@@ -296,6 +518,7 @@
   grid-template-areas: "stack";
   align-items: center;
   min-width: 0;
+  max-width: 240px;
 }
 
 .mini-working__status-layer {
@@ -340,32 +563,16 @@
 }
 
 @keyframes mini-working-status-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes mini-working-status-out {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-6px); }
 }
 
-/* ─── Composer ──────────────────────────────────────────────── */
-.mini-window__composer-wrap {
-  padding: 8px 12px 12px;
-}
-
+/* ─── Composer pill ──────────────────────────────────────────── */
 .mini-composer {
   display: flex;
   align-items: center;
@@ -430,13 +637,4 @@
 
 .mini-composer__input::placeholder {
   color: var(--mini-text-weaker);
-}
-
-/* The .mini-window inherits StellaAnimation's container so the orb
-   sizes correctly. The animation itself paints via WebGL/canvas with
-   theme-independent colors. */
-.mini-working__orb canvas {
-  display: block !important;
-  width: 20px !important;
-  height: 20px !important;
 }
