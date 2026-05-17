@@ -202,15 +202,16 @@ const css = `
     position: relative;
   }
   /* The horizontal sidebar+main row sits below the top shell bar.
-     Inherit the sam-root surface so changing to a column layout did
-     not introduce a transparent strip behind the chrome. */
+     Explicit opaque background so the codex-frame blue underneath
+     the mock can't bleed through (`background: inherit` on the
+     shorthand did not actually re-paint the sam-root fill here). */
   .sam-body-row {
     flex: 1;
     min-height: 0;
     display: flex;
     width: 100%;
     position: relative;
-    background: inherit;
+    background: var(--background);
   }
   /* Top shell bar — mirrors the desktop ShellTopBar: macOS traffic
      lights on the left, sidebar/back-forward affordances next to them,
@@ -2269,7 +2270,7 @@ const css = `
     gap: 8px;
     padding: 8px 14px 8px 12px;
     border-radius: 999px;
-    border: 1px solid rgba(20, 86, 180, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.45);
     background: #2d7fd6;
     font-family: inherit;
     font-size: 13px;
@@ -2278,20 +2279,27 @@ const css = `
     cursor: pointer;
     user-select: none;
     z-index: 30;
-    box-shadow: 0 1px 2px rgba(18, 70, 150, 0.18);
+    box-shadow:
+      0 4px 14px rgba(18, 70, 150, 0.22),
+      0 1px 2px rgba(18, 70, 150, 0.16);
     animation: samPillIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
     transition:
       background 0.18s ease,
+      border-color 0.18s ease,
       box-shadow 0.18s ease,
       transform 0.18s ease;
   }
   .sam-pill:hover {
     background: #2070c4;
+    border-color: rgba(255, 255, 255, 0.7);
     transform: translateY(-1px);
   }
   .sam-pill[data-active="true"] {
     background: #1a5fb0;
-    box-shadow: 0 0 0 3px rgba(45, 127, 214, 0.22);
+    border-color: rgba(255, 255, 255, 0.85);
+    box-shadow:
+      0 4px 16px rgba(18, 70, 150, 0.28),
+      0 0 0 3px rgba(45, 127, 214, 0.22);
   }
   .sam-pill-icon { display: inline-flex; color: rgba(255, 255, 255, 0.92); }
   .sam-pill[data-active="true"] .sam-pill-icon { color: #fff; }
