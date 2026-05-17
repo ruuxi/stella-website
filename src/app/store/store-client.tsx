@@ -25,7 +25,6 @@ import {
   Download,
   Layers,
   Package,
-  Plug,
   Plus,
   Search,
   Share2,
@@ -87,29 +86,6 @@ type StoreInstall = {
   displayName?: string;
   releaseNumber?: number;
   installedAt?: number;
-};
-
-type StellaConnectorSummary = {
-  id: string;
-  displayName: string;
-  description?: string;
-  marketplaceKey: string;
-  category?: string;
-  appIds: string[];
-  mcpServers: string[];
-  officialSource?: string;
-  integrationPath?: string;
-  auth?: string;
-  requiresCredential?: boolean;
-  executable?: boolean;
-  configFields?: Array<{
-    key: string;
-    label: string;
-    secret?: boolean;
-    placeholder?: string;
-  }>;
-  status: "local" | "official-mcp" | "official-api" | "implemented";
-  installed: boolean;
 };
 
 type PublicPet = {
@@ -317,12 +293,6 @@ type DesktopStoreBridge = {
   getAuthToken?: () => Promise<string | null>;
   openStorePanel?: () => Promise<unknown>;
   openSignIn?: () => Promise<unknown>;
-  listConnectors?: () => Promise<StellaConnectorSummary[]>;
-  installConnector?: (
-    marketplaceKey: string,
-    credential?: string,
-    config?: Record<string, string>,
-  ) => Promise<unknown>;
   requestPackageInstall?: (payload: {
     packageId: string;
     releaseNumber: number;
@@ -1990,264 +1960,6 @@ function ShareDialog({
         </div>
       ) : null}
     </StoreModal>
-  );
-}
-
-type ConnectorCredentialPayload = {
-  credential?: string;
-  config: Record<string, string>;
-};
-
-function ConnectorCredentialDialog({
-  connector,
-  onSubmit,
-  onCancel,
-}: {
-  connector: StellaConnectorSummary;
-  onSubmit: (payload: ConnectorCredentialPayload) => Promise<void>;
-  onCancel: () => void;
-}) {
-  const [credential, setCredential] = useState("");
-  const [config, setConfig] = useState<Record<string, string>>({});
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const fields = connector.configFields ?? [];
-  const showCredentialField = connector.requiresCredential && fields.length === 0;
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setError(null);
-    const nextConfig: Record<string, string> = {};
-    for (const field of fields) {
-      const value = config[field.key]?.trim() ?? "";
-      if (!value) {
-        setError(`${field.label} is required.`);
-        return;
-      }
-      nextConfig[field.key] = value;
-    }
-    const nextCredential = credential.trim();
-    if (showCredentialField && !nextCredential) {
-      setError("API key is required.");
-      return;
-    }
-    try {
-      setSubmitting(true);
-      await onSubmit({
-        credential: showCredentialField ? nextCredential : undefined,
-        config: nextConfig,
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't add this connector");
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <StoreModal onClose={onCancel}>
-      <form className="credential-modal-content" onSubmit={handleSubmit}>
-        <div className="credential-modal-hero">
-          <div className="credential-modal-icon">
-            <Plug size={20} />
-          </div>
-          <div className="credential-modal-headline">
-            Connect {connector.displayName}
-          </div>
-          <p className="credential-modal-sub">
-            Add the details Stella needs to connect this service.
-          </p>
-        </div>
-        <div className="credential-modal-form">
-          {showCredentialField ? (
-            <label className="credential-modal-field">
-              <span className="credential-modal-label">API key</span>
-              <input
-                type="password"
-                value={credential}
-                onChange={(event) => setCredential(event.target.value)}
-                placeholder="Paste your key"
-                autoFocus
-              />
-            </label>
-          ) : null}
-          {fields.map((field, index) => (
-            <label className="credential-modal-field" key={field.key}>
-              <span className="credential-modal-label">{field.label}</span>
-              <input
-                type={field.secret ? "password" : "text"}
-                value={config[field.key] ?? ""}
-                onChange={(event) =>
-                  setConfig((current) => ({
-                    ...current,
-                    [field.key]: event.target.value,
-                  }))
-                }
-                placeholder={field.placeholder ?? ""}
-                autoFocus={index === 0 && !showCredentialField}
-              />
-            </label>
-          ))}
-          {error ? <div className="credential-modal-error">{error}</div> : null}
-          <div className="credential-modal-actions">
-            <button
-              type="button"
-              className="store-action-btn store-action-btn--lg"
-              data-variant="subtle"
-              onClick={onCancel}
-              disabled={submitting}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="store-action-btn store-action-btn--lg"
-              data-variant="get"
-              disabled={submitting}
-            >
-              {submitting ? "Adding..." : "Add connector"}
-            </button>
-          </div>
-        </div>
-      </form>
-    </StoreModal>
-  );
-}
-
-function ConnectorConfirmDialog({
-  connector,
-  onConfirm,
-  onCancel,
-}: {
-  connector: StellaConnectorSummary;
-  onConfirm: () => void;
-  onCancel: () => void;
-}) {
-  return (
-    <StoreModal onClose={onCancel}>
-      <div className="store-confirm-dialog">
-        <div className="store-confirm-title">Add {connector.displayName}?</div>
-        <p className="store-confirm-description">
-          Stella will add {connector.displayName} to your connected integrations.
-          You can remove it any time.
-        </p>
-        <div className="store-confirm-actions">
-          <button
-            type="button"
-            className="store-action-btn store-action-btn--lg"
-            data-variant="subtle"
-            onClick={onCancel}
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            className="store-action-btn store-action-btn--lg"
-            data-variant="get"
-            onClick={onConfirm}
-          >
-            Add
-          </button>
-        </div>
-      </div>
-    </StoreModal>
-  );
-}
-
-function ConnectTab({
-  connectors,
-  loading,
-  error,
-  onInstall,
-}: {
-  connectors: StellaConnectorSummary[];
-  loading: boolean;
-  error: string | null;
-  onInstall: (marketplaceKey: string) => Promise<void>;
-}) {
-  const [working, setWorking] = useState<string | null>(null);
-
-  const handleInstall = async (marketplaceKey: string) => {
-    setWorking(marketplaceKey);
-    try {
-      await onInstall(marketplaceKey);
-    } finally {
-      setWorking(null);
-    }
-  };
-
-  if (loading) return null;
-  if (error) {
-    return (
-      <div className="store-status" data-variant="error">
-        {error}
-      </div>
-    );
-  }
-  if (connectors.length === 0) return null;
-
-  return (
-    <div className="store-section">
-      <div className="store-section-header">
-        <span className="store-section-title">Integrations</span>
-        <span className="store-section-count">{connectors.length}</span>
-      </div>
-      <div className="store-connector-list">
-        {connectors.map((connector) => {
-          const ready = connector.executable === true;
-          const isWorking = working === connector.marketplaceKey;
-          const description =
-            connector.description ??
-            connector.integrationPath ??
-            "Connect this service to Stella.";
-          const interactive = ready && !connector.installed && !isWorking;
-          const trigger = () => void handleInstall(connector.marketplaceKey);
-          const actionLabel = isWorking
-            ? "Adding..."
-            : connector.installed
-              ? "Connected"
-              : ready
-                ? "Add"
-                : "Soon";
-          const actionVariant = isWorking
-            ? "working"
-            : connector.installed
-              ? "added"
-              : ready
-                ? "subtle"
-                : "added";
-          return (
-            <div
-              key={connector.id}
-              className="store-connector-row"
-              data-clickable={interactive ? "true" : undefined}
-              onClick={interactive ? trigger : undefined}
-            >
-              <PackageArtwork
-                name={connector.displayName}
-                className="store-connector-icon"
-                letterClassName="store-connector-icon-letter"
-              />
-              <div className="store-connector-text">
-                <span className="store-connector-name">{connector.displayName}</span>
-                <span className="store-connector-desc">{description}</span>
-              </div>
-              <button
-                className="store-action-btn"
-                data-variant={actionVariant}
-                disabled={connector.installed || isWorking || !ready}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  trigger();
-                }}
-                type="button"
-              >
-                {actionLabel}
-              </button>
-            </div>
-          );
-        })}
-      </div>
-    </div>
   );
 }
 
@@ -5058,13 +4770,6 @@ function StoreClientInner() {
   const [installingId, setInstallingId] = useState<string | null>(null);
   const [sharePkg, setSharePkg] = useState<StorePackage | null>(null);
   const [installedMods, setInstalledMods] = useState<StoreInstall[]>([]);
-  const [connectors, setConnectors] = useState<StellaConnectorSummary[]>([]);
-  const [connectorsLoading, setConnectorsLoading] = useState(true);
-  const [connectorsError, setConnectorsError] = useState<string | null>(null);
-  const [credentialConnector, setCredentialConnector] =
-    useState<StellaConnectorSummary | null>(null);
-  const [confirmConnector, setConfirmConnector] =
-    useState<StellaConnectorSummary | null>(null);
   const [urlState, setUrlState] = useState({
     tab: "discover",
     packageId: null as string | null,
@@ -5142,80 +4847,6 @@ function StoreClientInner() {
   const showNewSection =
     isForYouSurface && newPackagesFiltered.length >= 3 && allPackages !== undefined;
 
-  const loadConnectors = useCallback(async () => {
-    const bridge = getDesktopStoreBridge();
-    if (!bridge?.listConnectors) {
-      setConnectors([]);
-      setConnectorsError(null);
-      setConnectorsLoading(false);
-      return;
-    }
-    try {
-      const result = await bridge.listConnectors();
-      setConnectors(result);
-      setConnectorsError(null);
-    } catch (error) {
-      setConnectorsError(
-        error instanceof Error ? error.message : "Couldn't load integrations",
-      );
-    } finally {
-      setConnectorsLoading(false);
-    }
-  }, []);
-
-  const requestInstallConnector = useCallback(
-    async (marketplaceKey: string) => {
-      const bridge = getDesktopStoreBridge();
-      if (!bridge?.installConnector) {
-        await redirectToStoreSignIn();
-        return;
-      }
-      if (!(await ensureStoreAuth())) return;
-      const connector = connectors.find(
-        (entry) => entry.marketplaceKey === marketplaceKey,
-      );
-      if (!connector) return;
-      if (connector.requiresCredential || (connector.configFields?.length ?? 0) > 0) {
-        setCredentialConnector(connector);
-        return;
-      }
-      setConfirmConnector(connector);
-    },
-    [connectors],
-  );
-
-  const confirmInstallConnector = useCallback(async () => {
-    const bridge = getDesktopStoreBridge();
-    if (!bridge?.installConnector || !confirmConnector) return;
-    if (!(await ensureStoreAuth())) return;
-    const connector = confirmConnector;
-    setConfirmConnector(null);
-    try {
-      await bridge.installConnector(connector.marketplaceKey);
-      await loadConnectors();
-    } catch (error) {
-      setConnectorsError(
-        error instanceof Error ? error.message : "Couldn't add this integration",
-      );
-    }
-  }, [confirmConnector, loadConnectors]);
-
-  const submitConnectorCredential = useCallback(
-    async ({ credential, config }: ConnectorCredentialPayload) => {
-      const bridge = getDesktopStoreBridge();
-      if (!bridge?.installConnector || !credentialConnector) return;
-      if (!(await ensureStoreAuth())) return;
-      await bridge.installConnector(
-        credentialConnector.marketplaceKey,
-        credential,
-        config,
-      );
-      setCredentialConnector(null);
-      await loadConnectors();
-    },
-    [credentialConnector, loadConnectors],
-  );
-
   const installPackage = async (pkg: StorePackage) => {
     const bridge = getDesktopStoreBridge();
     if (!bridge?.requestPackageInstall) {
@@ -5271,10 +4902,6 @@ function StoreClientInner() {
       setInstalledIds(new Set(mods.map((mod) => mod.packageId)));
     });
   }, []);
-
-  useEffect(() => {
-    void loadConnectors();
-  }, [loadConnectors]);
 
   if (activeTab !== "discover") {
     return (
@@ -5461,34 +5088,11 @@ function StoreClientInner() {
                 </div>
               </div>
             )}
-            {filter === "all" && query.trim() === "" ? (
-              <ConnectTab
-                connectors={connectors}
-                loading={connectorsLoading}
-                error={connectorsError}
-                onInstall={requestInstallConnector}
-              />
-            ) : null}
           </>
         )}
       </div>
       {sharePkg ? (
         <ShareDialog pkg={sharePkg} onClose={() => setSharePkg(null)} />
-      ) : null}
-      {confirmConnector ? (
-        <ConnectorConfirmDialog
-          connector={confirmConnector}
-          onConfirm={() => void confirmInstallConnector()}
-          onCancel={() => setConfirmConnector(null)}
-        />
-      ) : null}
-      {credentialConnector ? (
-        <ConnectorCredentialDialog
-          key={credentialConnector.marketplaceKey}
-          connector={credentialConnector}
-          onSubmit={submitConnectorCredential}
-          onCancel={() => setCredentialConnector(null)}
-        />
       ) : null}
     </main>
   );
