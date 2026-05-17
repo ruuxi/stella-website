@@ -1,0 +1,611 @@
+/* ──────────────────────────────────────────────────────────────────
+   Composer section — interactive replica of the real Stella composer.
+
+   Color tokens are scoped to `.cmock` so the section can sit inside
+   the blue codex-frame without leaking into other demos. Visual
+   styling mirrors `desktop/src/app/chat/full-shell.composer.css` +
+   `composer-primitives.css` + `composer-context.css` + the dictation
+   recording bar — pill shell, expand-on-content, dashed suggestion
+   chips, filled-thumb attached chips, glass add-menu.
+   ────────────────────────────────────────────────────────────────── */
+
+.composer-hero {
+  /* Standard codex-section vertical rhythm — same as other demos. */
+}
+
+.composer-hero__eyebrow {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-style: italic;
+  font-size: 18px;
+  font-weight: 450;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.composer-hero__title {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  color: white;
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin: 0.4rem 0 0.8rem;
+}
+
+.composer-hero__lede {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+  line-height: 1.55;
+  max-width: 38rem;
+}
+
+/* ─── Token scope ─────────────────────────────────────────────── */
+.cmock {
+  /* Light surface — easy to read on top of the blue gradient. */
+  --cmock-bg: rgba(255, 255, 255, 0.96);
+  --cmock-border: rgba(38, 60, 96, 0.18);
+  --cmock-border-strong: rgba(38, 60, 96, 0.28);
+  --cmock-foreground: #1a2540;
+  --cmock-text-strong: #1a2540;
+  --cmock-text-base: rgba(26, 37, 64, 0.85);
+  --cmock-text-weak: rgba(26, 37, 64, 0.62);
+  --cmock-text-weaker: rgba(26, 37, 64, 0.42);
+  --cmock-primary: #2d6cdf;
+  --cmock-primary-foreground: white;
+  --cmock-shell-shadow:
+    0 14px 38px rgba(15, 36, 80, 0.18),
+    0 4px 14px rgba(15, 36, 80, 0.1);
+
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: 0 8px;
+  font-family: var(--font-sans), "Manrope", system-ui, sans-serif;
+  color: var(--cmock-text-base);
+}
+
+/* ─── Suggestion chips row (action zero) ─────────────────────── */
+.cmock__suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 0 6px 2px;
+  min-height: 28px;
+}
+
+.cmock__suggestion {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px 3px 8px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px dashed rgba(255, 255, 255, 0.62);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.92);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease,
+    color 140ms ease;
+}
+
+.cmock__suggestion:hover,
+.cmock__suggestion[data-hovered] {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(255, 255, 255, 0.85);
+  color: #1a2540;
+}
+
+.cmock__suggestion-plus {
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.cmock__suggestion-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.cmock__suggestion-icon img {
+  width: 12px;
+  height: 12px;
+  display: block;
+}
+
+.cmock__suggestion-label {
+  font-weight: 600;
+}
+
+.cmock__suggestion-meta {
+  font-weight: 400;
+  font-size: 11px;
+  color: inherit;
+  opacity: 0.7;
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Hover preview card ─────────────────────────────────────── */
+.cmock__hover-card {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 0;
+  width: 280px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 18px 44px rgba(15, 36, 80, 0.28),
+    0 4px 14px rgba(15, 36, 80, 0.18);
+  border: 1px solid rgba(38, 60, 96, 0.14);
+  color: var(--cmock-text-base);
+  pointer-events: none;
+  z-index: 10;
+  animation: cmock-hover-card-in 140ms ease both;
+}
+
+@keyframes cmock-hover-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cmock__hover-card-image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: #eef2fb;
+  overflow: hidden;
+}
+
+.cmock__hover-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cmock__hover-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+.cmock__hover-card-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cmock__hover-card-icon img {
+  width: 14px;
+  height: 14px;
+}
+
+.cmock__hover-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.cmock__hover-card-text strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cmock-text-strong);
+}
+
+.cmock__hover-card-text span {
+  font-size: 11px;
+  color: var(--cmock-text-weak);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Shell ──────────────────────────────────────────────────── */
+.cmock__shell {
+  position: relative;
+  width: 100%;
+  background: var(--cmock-bg);
+  border: 1px solid var(--cmock-border);
+  border-radius: 999px;
+  box-shadow: var(--cmock-shell-shadow);
+  overflow: visible;
+  transition: border-radius 220ms cubic-bezier(0.4, 0, 0.2, 1),
+    background 220ms ease;
+}
+
+.cmock__shell[data-expanded] {
+  border-radius: 22px;
+}
+
+.cmock__shell:focus-within {
+  box-shadow:
+    var(--cmock-shell-shadow),
+    0 0 0 2px color-mix(in oklch, var(--cmock-primary) 28%, transparent);
+}
+
+/* ─── Attached chip strip ────────────────────────────────────── */
+.cmock__attached-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px 0;
+}
+
+.cmock__attached {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 10px 3px 3px;
+  border-radius: 999px;
+  border: 1px solid var(--cmock-border-strong);
+  background: rgba(45, 108, 223, 0.08);
+  color: var(--cmock-text-strong);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: filter 120ms ease;
+}
+
+.cmock__attached:hover {
+  filter: brightness(0.97);
+}
+
+.cmock__attached-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.cmock__attached-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cmock__attached-text strong {
+  font-weight: 600;
+}
+
+.cmock__attached-text span {
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--cmock-text-weak);
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cmock__attached-remove {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: var(--cmock-text-weak);
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* ─── Form (pill mode) ───────────────────────────────────────── */
+.cmock__form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 7px 8px;
+}
+
+.cmock__add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--cmock-foreground) 6%, transparent);
+  color: var(--cmock-text-weak);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.cmock__add-button:hover,
+.cmock__add-button[aria-expanded="true"] {
+  background: color-mix(in oklch, var(--cmock-foreground) 12%, transparent);
+  color: var(--cmock-text-base);
+}
+
+.cmock__input {
+  flex: 1;
+  resize: none;
+  min-height: 28px;
+  max-height: 200px;
+  padding: 2px 4px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--cmock-text-strong);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.cmock__input::placeholder {
+  color: var(--cmock-text-weaker);
+}
+
+/* In pill mode, the toolbar is `display: contents` so its children sit
+   inline next to the input. */
+.cmock__toolbar,
+.cmock__toolbar-left,
+.cmock__toolbar-right {
+  display: contents;
+}
+
+.cmock__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, opacity 150ms ease;
+}
+
+.cmock__mic {
+  background: transparent;
+  color: var(--cmock-text-base);
+}
+
+.cmock__mic:hover {
+  background: color-mix(in oklch, var(--cmock-foreground) 10%, transparent);
+  color: var(--cmock-text-strong);
+}
+
+.cmock__submit {
+  background: var(--cmock-primary);
+  color: var(--cmock-primary-foreground);
+}
+
+.cmock__submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cmock__submit:not(:disabled):hover {
+  opacity: 0.92;
+}
+
+/* ─── Form (expanded mode) ───────────────────────────────────── */
+.cmock__form--expanded {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+  min-height: auto;
+}
+
+.cmock__form--expanded > .cmock__add-button {
+  display: none;
+}
+
+.cmock__form--expanded .cmock__input {
+  width: 100%;
+  min-height: 36px;
+  padding: 12px 16px 4px;
+  order: -1;
+  font-size: 14px;
+}
+
+.cmock__form--expanded .cmock__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 8px 8px;
+}
+
+.cmock__form--expanded .cmock__toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cmock__form--expanded .cmock__toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cmock__add-button--toolbar {
+  display: none;
+}
+
+.cmock__form--expanded .cmock__add-button--toolbar {
+  display: inline-flex;
+}
+
+/* ─── Dictation bar (voice mode) ─────────────────────────────── */
+.cmock__waveform {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 28px;
+  display: block;
+  color: var(--cmock-text-base);
+}
+
+.cmock__waveform-timer {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--cmock-text-weak);
+  padding: 0 4px;
+  user-select: none;
+}
+
+.cmock__waveform-btn {
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  color: var(--cmock-text-weak);
+}
+
+.cmock__waveform-btn:hover {
+  color: var(--cmock-text-strong);
+}
+
+.cmock__waveform-btn--confirm,
+.cmock__waveform-btn--send {
+  color: var(--cmock-text-strong);
+}
+
+.cmock__waveform-btn--confirm:hover,
+.cmock__waveform-btn--send:hover {
+  color: var(--cmock-primary);
+}
+
+/* ─── Add menu popover ───────────────────────────────────────── */
+.cmock__menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 6px;
+  min-width: 240px;
+  padding: 6px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid rgba(38, 60, 96, 0.12);
+  box-shadow:
+    0 18px 44px rgba(15, 36, 80, 0.22),
+    0 4px 14px rgba(15, 36, 80, 0.12);
+  z-index: 20;
+  animation: cmock-menu-in 140ms ease both;
+}
+
+@keyframes cmock-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cmock__menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  background: transparent;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--cmock-text-strong);
+  cursor: pointer;
+  text-align: left;
+}
+
+.cmock__menu-item:hover {
+  background: color-mix(in oklch, var(--cmock-foreground) 6%, transparent);
+}
+
+.cmock__menu-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cmock-text-weak);
+  flex-shrink: 0;
+}
+
+.cmock__menu-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.cmock__menu-hint {
+  font-size: 11px;
+  color: var(--cmock-text-weaker);
+  letter-spacing: 0.04em;
+}
+
+.cmock__menu-separator {
+  height: 1px;
+  margin: 6px 4px;
+  background: rgba(38, 60, 96, 0.1);
+}
+
+.cmock__menu-section {
+  padding: 4px 10px 2px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cmock-text-weaker);
+}
+
+.cmock__menu-item--recent .cmock__menu-label {
+  font-weight: 400;
+  color: var(--cmock-text-base);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Narrow / mobile collapse ──────────────────────────────── */
+@media (max-width: 640px) {
+  .cmock {
+    padding: 0 4px;
+  }
+  .cmock__suggestions {
+    gap: 4px;
+  }
+  .cmock__suggestion-meta {
+    display: none;
+  }
+  .cmock__hover-card {
+    width: 220px;
+  }
+}

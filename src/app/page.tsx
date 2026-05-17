@@ -1,6 +1,5 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import Link from "next/link";
 import { DownloadButton } from "@/components/download-button";
 import { HeroMorphTitle } from "@/components/hero-morph-title";
 import { HeroStellaOrb } from "@/components/hero-stella-orb-dynamic";
@@ -49,6 +48,11 @@ const VoiceSection = dynamic(
 
 const ExtensionSection = dynamic(
   () => import("@/components/product-demos/onboarding-derived-sections").then((mod) => mod.ExtensionSection),
+  { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
+);
+
+const ComposerSection = dynamic(
+  () => import("@/components/product-demos/composer-section").then((mod) => mod.ComposerSection),
   { loading: () => <div className="demo-panel" style={{ minHeight: "clamp(14rem, 38vw, 26rem)" }} /> },
 );
 
@@ -257,6 +261,8 @@ export default function Home() {
 
         <CanvasSection />
 
+        <ComposerSection />
+
         <ActionsSection />
 
         <VoiceSection />
@@ -344,10 +350,10 @@ export default function Home() {
 
       <footer className="grid-shell site-footer section-deferred-render section-border">
         <div className="footer-brand">
-          <Link className="brand-mark brand-mark--footer" href="/">
+          <a className="brand-mark brand-mark--footer" href="/">
             <Image src="/stella-logo.svg" alt="Stella" width={42} height={42} />
             <span className="brand-text">Stella</span>
-          </Link>
+          </a>
 
           <ul className="legal-links">
             <li>
