@@ -262,19 +262,19 @@ export default function Home() {
           </div>
         </section>
 
-        <RadialDialSection />
-
         <CanvasSection />
 
         <ComposerSection />
 
         <SingleChatSection />
 
+        <RadialDialSection />
+
+        <MobileSection />
+
         <ActionsSection />
 
         <VoiceSection />
-
-        <MobileSection />
 
         <MemorySection />
 
