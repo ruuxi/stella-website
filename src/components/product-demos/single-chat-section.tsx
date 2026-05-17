@@ -133,7 +133,9 @@ export function SingleChatSection() {
           data-reveal-child
           style={{ ["--reveal-index" as string]: 1 }}
         >
-          <MiniWindowMock />
+          <div className="codex-frame single-chat-hero__frame">
+            <MiniWindowMock />
+          </div>
         </div>
       </div>
     </section>

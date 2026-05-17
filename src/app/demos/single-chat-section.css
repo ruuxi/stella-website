@@ -57,6 +57,23 @@
   align-items: center;
 }
 
+/* Codex-frame wrapper around the mini window — matches the blue
+   gradient card used by the other sections. The frame hugs the
+   mini-window with comfortable inner padding, and centers it inside
+   the right column. */
+.single-chat-hero__frame {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: clamp(1rem, 2.4vw, 2rem);
+}
+
+.single-chat-hero__frame .mini-window {
+  box-shadow:
+    0 24px 60px -18px rgba(15, 8, 24, 0.55),
+    0 6px 18px rgba(15, 8, 24, 0.35);
+}
+
 @media (max-width: 880px) {
   .single-chat-stage {
     grid-template-columns: minmax(0, 1fr);
