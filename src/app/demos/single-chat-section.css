@@ -5,13 +5,14 @@
    leaks into the surrounding codex-frame.
    ────────────────────────────────────────────────────────────────── */
 
+/* Hero copy sits next to the codex-frame on the page background, not
+   on top of it — keep the text in the site's default dark color. */
 .single-chat-hero__eyebrow {
   font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
   font-style: italic;
   font-size: 18px;
   font-weight: 450;
   letter-spacing: -0.01em;
-  color: rgba(255, 255, 255, 0.85);
 }
 
 .single-chat-hero__title {
@@ -19,13 +20,11 @@
   font-style: italic;
   font-weight: 400;
   letter-spacing: -0.025em;
-  color: white;
   font-size: clamp(2rem, 4vw, 3rem);
   margin: 0.4rem 0 0.8rem;
 }
 
 .single-chat-hero__lede {
-  color: rgba(255, 255, 255, 0.78);
   font-size: clamp(0.95rem, 1.1vw, 1.05rem);
   line-height: 1.55;
   max-width: 34rem;
@@ -33,33 +32,30 @@
 
 .single-chat-hero__lede--sub {
   margin-top: 1rem;
-  color: rgba(255, 255, 255, 0.66);
+  opacity: 0.78;
 }
 
-/* ─── Side-by-side layout ─────────────────────────────────────── */
-/* Inside the codex-frame, switch the stage into a 2-column layout so
-   copy sits on the left and the mock floats on the right. Stack on
-   small screens. */
-.codex-frame .single-chat-stage {
+/* Side-by-side layout: copy on the left, mock-in-codex-frame on the
+   right. Stacks under 880px. */
+.single-chat-stage {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
   gap: clamp(2rem, 4vw, 3.5rem);
-  padding: 0 clamp(0.5rem, 2vw, 1.5rem);
 }
 
-.codex-frame .single-chat-stage .single-chat-hero__copy {
+.single-chat-stage .single-chat-hero__copy {
   margin: 0;
 }
 
-.codex-frame .single-chat-stage .single-chat-hero__mock {
+.single-chat-stage .single-chat-hero__mock {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 @media (max-width: 880px) {
-  .codex-frame .single-chat-stage {
+  .single-chat-stage {
     grid-template-columns: minmax(0, 1fr);
     gap: 2rem;
   }

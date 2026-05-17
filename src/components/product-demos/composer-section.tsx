@@ -28,10 +28,12 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 
 type SuggestionKind = "app" | "tab";
 
@@ -150,7 +152,10 @@ export function ComposerSection() {
 function ComposerMock() {
   const [message, setMessage] = useState("");
   const [attached, setAttached] = useState<SuggestionChip[]>([]);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<{
+    chip: SuggestionChip;
+    rect: DOMRect;
+  } | null>(null);
   const [addMenuOpen, setAddMenuOpen] = useState(false);
   const [voiceActive, setVoiceActive] = useState(false);
   const [voiceElapsedMs, setVoiceElapsedMs] = useState(0);
@@ -211,11 +216,6 @@ function ComposerMock() {
     };
   }, [addMenuOpen]);
 
-  const hovered = useMemo(
-    () => SUGGESTIONS.find((s) => s.id === hoveredId) ?? null,
-    [hoveredId],
-  );
-
   const attachedIds = useMemo(
     () => new Set(attached.map((c) => c.id)),
     [attached],
@@ -225,7 +225,7 @@ function ComposerMock() {
     setAttached((prev) =>
       prev.some((c) => c.id === chip.id) ? prev : [...prev, chip],
     );
-    setHoveredId(null);
+    setHovered(null);
   }, []);
 
   const handleDetach = useCallback((id: string) => {
@@ -235,11 +235,30 @@ function ComposerMock() {
   const handleSend = useCallback(() => {
     setMessage("");
     setAttached([]);
+    setVoiceActive(false);
   }, []);
 
-  const canSend = message.trim().length > 0 || attached.length > 0;
-  const expanded =
-    message.length > 0 || attached.length > 0 || voiceActive;
+  const handleSuggestionHover = useCallback(
+    (chip: SuggestionChip, event: React.SyntheticEvent<HTMLElement>) => {
+      const rect = event.currentTarget.getBoundingClientRect();
+      setHovered({ chip, rect });
+    },
+    [],
+  );
+
+  // Mirror the real composer's mode selection (Composer.tsx). Voice with
+  // no text replaces the textarea+toolbar inline — keeps the pill the
+  // same size. Voice WITH text leaves the textarea+toolbar in place and
+  // adds the dictation row below; the form is expanded in that mode.
+  const hasText = message.trim().length > 0;
+  const dictationBelow = voiceActive && hasText;
+  const dictationInline = voiceActive && !hasText;
+  const canSend = hasText || attached.length > 0;
+  // The composer expands when the textarea has content, when chips are
+  // attached, or when voice is active with text (so the dictation row
+  // can render below the toolbar). It does NOT expand for voice-only —
+  // that stays pill-shaped like the real desktop app.
+  const expanded = hasText || attached.length > 0 || dictationBelow;
 
   return (
     <div className="cmock" ref={wrapRef}>
@@ -247,7 +266,7 @@ function ComposerMock() {
       <div className="cmock__suggestions" role="list">
         {SUGGESTIONS.map((chip) => {
           if (attachedIds.has(chip.id)) return null;
-          const isHovered = hoveredId === chip.id;
+          const isHovered = hovered?.chip.id === chip.id;
           return (
             <button
               key={chip.id}
@@ -255,13 +274,17 @@ function ComposerMock() {
               role="listitem"
               className="cmock__suggestion"
               data-hovered={isHovered || undefined}
-              onMouseEnter={() => setHoveredId(chip.id)}
+              onMouseEnter={(event) => handleSuggestionHover(chip, event)}
               onMouseLeave={() =>
-                setHoveredId((current) => (current === chip.id ? null : current))
+                setHovered((current) =>
+                  current?.chip.id === chip.id ? null : current,
+                )
               }
-              onFocus={() => setHoveredId(chip.id)}
+              onFocus={(event) => handleSuggestionHover(chip, event)}
               onBlur={() =>
-                setHoveredId((current) => (current === chip.id ? null : current))
+                setHovered((current) =>
+                  current?.chip.id === chip.id ? null : current,
+                )
               }
               onClick={() => handleAttach(chip)}
               title={`Add ${chip.name} as context`}
@@ -280,11 +303,16 @@ function ComposerMock() {
               {chip.detail ? (
                 <span className="cmock__suggestion-meta">{chip.detail}</span>
               ) : null}
-              {isHovered ? <SuggestionHoverCard chip={chip} /> : null}
             </button>
           );
         })}
       </div>
+
+      {/* Hover preview — portaled to body so the codex-frame's clip can't
+          crop it. Positioned via the hovered chip's bounding rect. */}
+      {hovered ? (
+        <SuggestionHoverCardPortal chip={hovered.chip} anchorRect={hovered.rect} />
+      ) : null}
 
       {/* ── The shell ── */}
       <div className="cmock__shell" data-expanded={expanded || undefined}>
@@ -322,24 +350,24 @@ function ComposerMock() {
             if (canSend) handleSend();
           }}
         >
-          {/* Pill-mode add button — sits inline to the left of the input. */}
+          {/* Pill-mode add button — sits inline to the left of the input.
+              In expanded mode this is hidden via CSS and the toolbar one
+              takes over (just like the real composer). */}
           <PlusButton
             className="cmock__add-button"
             onClick={() => setAddMenuOpen((o) => !o)}
             isOpen={addMenuOpen}
           />
 
-          {voiceActive ? (
+          {dictationInline ? (
+            /* Voice ON, no text — the dictation bar REPLACES the
+               textarea + toolbar inline. Form stays in pill shape. */
             <DictationBar
               levels={voiceLevels}
               elapsedMs={voiceElapsedMs}
               onCancel={() => setVoiceActive(false)}
               onConfirm={() => {
-                setMessage((m) =>
-                  m
-                    ? `${m} Let's wrap this up.`
-                    : "Let's wrap this up.",
-                );
+                setMessage("Let's wrap this up.");
                 setVoiceActive(false);
               }}
               onSend={() => {
@@ -375,10 +403,14 @@ function ComposerMock() {
                 <div className="cmock__toolbar-right">
                   <button
                     type="button"
-                    className="cmock__icon-btn cmock__mic"
-                    title="Start dictation"
-                    aria-label="Start dictation"
-                    onClick={() => setVoiceActive(true)}
+                    className={`cmock__icon-btn cmock__mic${
+                      voiceActive ? " cmock__mic--active" : ""
+                    }`}
+                    title={voiceActive ? "Stop dictation" : "Start dictation"}
+                    aria-label={
+                      voiceActive ? "Stop dictation" : "Start dictation"
+                    }
+                    onClick={() => setVoiceActive((v) => !v)}
                   >
                     <MicIcon />
                   </button>
@@ -392,6 +424,28 @@ function ComposerMock() {
                   </button>
                 </div>
               </div>
+
+              {/* Voice WITH text — dictation bar sits BELOW the toolbar
+                  as its own row inside the expanded composer. */}
+              {dictationBelow && (
+                <div className="cmock__dictation-row">
+                  <DictationBar
+                    levels={voiceLevels}
+                    elapsedMs={voiceElapsedMs}
+                    onCancel={() => setVoiceActive(false)}
+                    onConfirm={() => {
+                      setMessage(
+                        (m) => `${m}${m ? " " : ""}Let's wrap this up.`,
+                      );
+                      setVoiceActive(false);
+                    }}
+                    onSend={() => {
+                      setVoiceActive(false);
+                      handleSend();
+                    }}
+                  />
+                </div>
+              )}
             </>
           )}
         </form>
@@ -478,9 +532,60 @@ function SendIcon() {
   );
 }
 
-function SuggestionHoverCard({ chip }: { chip: SuggestionChip }) {
-  return (
-    <div className="cmock__hover-card" role="tooltip">
+/**
+ * Hover preview rendered into a body-level portal so the codex-frame's
+ * clipping can't crop it. The card pins itself just above the hovered
+ * suggestion chip via the anchor's bounding rect.
+ *
+ * Window dimensions are read once on mount and any time the chip rect
+ * changes; the card is then placed with `position: fixed` in viewport
+ * coordinates and clamped to stay within an 8px viewport margin.
+ */
+const HOVER_CARD_WIDTH = 280;
+const HOVER_CARD_HEIGHT = 215;
+const HOVER_CARD_GAP = 12;
+const HOVER_CARD_MARGIN = 12;
+
+function SuggestionHoverCardPortal({
+  chip,
+  anchorRect,
+}: {
+  chip: SuggestionChip;
+  anchorRect: DOMRect;
+}) {
+  const [mounted, setMounted] = useState(false);
+  useLayoutEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
+  const viewportW = window.innerWidth;
+  const viewportH = window.innerHeight;
+  // Default placement: above the chip. If there isn't room, flip below.
+  const desiredTopAbove = anchorRect.top - HOVER_CARD_HEIGHT - HOVER_CARD_GAP;
+  const desiredTopBelow = anchorRect.bottom + HOVER_CARD_GAP;
+  const top =
+    desiredTopAbove < HOVER_CARD_MARGIN ? desiredTopBelow : desiredTopAbove;
+  const centeredLeft =
+    anchorRect.left + anchorRect.width / 2 - HOVER_CARD_WIDTH / 2;
+  const left = Math.max(
+    HOVER_CARD_MARGIN,
+    Math.min(viewportW - HOVER_CARD_WIDTH - HOVER_CARD_MARGIN, centeredLeft),
+  );
+  const clampedTop = Math.max(
+    HOVER_CARD_MARGIN,
+    Math.min(viewportH - HOVER_CARD_HEIGHT - HOVER_CARD_MARGIN, top),
+  );
+
+  return createPortal(
+    <div
+      className="cmock__hover-card"
+      role="tooltip"
+      style={{
+        position: "fixed",
+        top: clampedTop,
+        left,
+        width: HOVER_CARD_WIDTH,
+      }}
+    >
       <div className="cmock__hover-card-image">
         <img src={chip.previewUrl} alt="" />
       </div>
@@ -496,7 +601,8 @@ function SuggestionHoverCard({ chip }: { chip: SuggestionChip }) {
           {chip.detail ? <span>{chip.detail}</span> : null}
         </span>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
