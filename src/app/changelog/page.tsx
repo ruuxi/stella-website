@@ -66,6 +66,48 @@ type Entry = {
 
 const entries: Entry[] = [
   {
+    date: "May 17, 2026",
+    tags: ["New", "Polish"],
+    features: [
+      "Connectors expansion — Store integrations and Google Workspace now route through Stella Connect, with connector media and delivery targets carried end-to-end through the runtime.",
+      "Radial Add and Capture chips now stack on top of each other instead of replacing the previous window — keep multiple captures in flight.",
+      "Launch splash surfaces rescue buttons if startup stalls for more than 8 seconds, so a hung boot is no longer a dead end.",
+      "Stella-provider calls route through pi-mono adapters at relay base URLs.",
+      "Better Fireworks streaming — Kimi K2P6 deltas arriving before output_item.added now stream, and prior assistant text replays as input_text on the Responses API.",
+    ],
+    fixes: [
+      "Orchestrator nudges its formatting when you switch between desktop and connector contexts.",
+      "Activity row right-side labels stay visible when the display sidebar is narrow.",
+      "Stella-alias Anthropic routing honors adaptive thinking on Opus 4.7.",
+      "Fixed provider error toast search typing.",
+      "Fixed hidden orchestrator follow-up rendering.",
+      "Replaced hand-rolled fetch-on-mount effects with a shared resource cache for fewer redundant requests.",
+      "Reverted the short-lived Composio OAuth integrations experiment — connectors stay on the stella-connect import-mcp path.",
+      "Native connector enable/disable now returns its tool count.",
+    ],
+  },
+  {
+    date: "May 16, 2026",
+    tags: ["New", "Polish"],
+    features: [
+      "Sidebar chat now loads older messages when you scroll to the top.",
+      "Stella browser skill filled in with the missing CLI surface.",
+      "Improved connector OAuth MCP flow.",
+      "Animated SVG illustrations for display sidebar empty states.",
+    ],
+    fixes: [
+      "Dropped the preset connector catalog — Stella keeps the stella-connect import-mcp path.",
+      "Shrunk Media tab mode labels and flipped the submit icon upward.",
+      "Up next copy softened, and display:readFile handles missing files gracefully.",
+      "Retry once when the model returns nothing actionable.",
+      "Connector replies keep flowing for the whole conversation instead of stalling mid-thread.",
+      "Chat surfaces retired the legacy event feed; file history, agent activity, and the chat timeline each got their own dedicated stream (with the grown activity window seeded from the smaller loaded snapshot).",
+      "Dropped the visible-messages window mode and split out a display-message overlay.",
+      "send_input interrupt knob removed — Stella always interrupts.",
+      "Fixed failing vitest suites.",
+    ],
+  },
+  {
     date: "May 15, 2026",
     tags: ["New", "Polish"],
     features: [
@@ -87,6 +129,8 @@ const entries: Entry[] = [
       "Radial dial and mini window now behave on macOS fullscreen Spaces.",
       "Surface Stella provider rate-limit errors faster.",
       "Reduced chat resize work and reused artifact cards for HTML; paused the social empty-state illustration when offscreen and dropped the cursor shadows.",
+      "Chat no longer pins to the absolute bottom during resize bursts.",
+      "Clarified send-input follow-up intent.",
     ],
   },
   {
