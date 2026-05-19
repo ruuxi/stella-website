@@ -66,24 +66,38 @@ type Entry = {
 
 const entries: Entry[] = [
   {
+    date: "May 18, 2026",
+    tags: ["Polish"],
+    features: [
+      "Stella's replies now appear more smoothly as she writes, with less jitter.",
+      "When Stella makes several images at once, they now appear together in one tidy filmstrip.",
+      "Messages that are still being written look cleaner in the chat.",
+    ],
+    fixes: [
+      "Replies after Stella takes an action now show up reliably, even after a reload.",
+      "Follow-up messages now land in the right place instead of being treated like mid-task instructions.",
+      "Chat scrolling is steadier while Stella is working, especially near the bottom of a thread.",
+      "The chat is less likely to lose its place when new messages, buttons, or results appear.",
+    ],
+  },
+  {
     date: "May 17, 2026",
     tags: ["New", "Polish"],
     features: [
-      "Connectors expansion — Store integrations and Google Workspace now route through Stella Connect, with connector media and delivery targets carried end-to-end through the runtime.",
-      "Radial Add and Capture chips now stack on top of each other instead of replacing the previous window — keep multiple captures in flight.",
-      "Launch splash surfaces rescue buttons if startup stalls for more than 8 seconds, so a hung boot is no longer a dead end.",
-      "Stella-provider calls route through pi-mono adapters at relay base URLs.",
-      "Better Fireworks streaming — Kimi K2P6 deltas arriving before output_item.added now stream, and prior assistant text replays as input_text on the Responses API.",
+      "More integrations now connect through Stella Connect, including Store add-ons and Google Workspace.",
+      "When you add multiple things from the radial menu, Stella keeps them stacked instead of replacing the previous one.",
+      "If Stella gets stuck while opening, the splash screen now shows rescue buttons after a short wait.",
+      "Some model responses now start appearing sooner instead of waiting for the whole reply to be ready.",
     ],
     fixes: [
-      "Orchestrator nudges its formatting when you switch between desktop and connector contexts.",
+      "Stella formats replies better when you switch between desktop work and connected apps.",
       "Activity row right-side labels stay visible when the display sidebar is narrow.",
-      "Stella-alias Anthropic routing honors adaptive thinking on Opus 4.7.",
-      "Fixed provider error toast search typing.",
-      "Fixed hidden orchestrator follow-up rendering.",
-      "Replaced hand-rolled fetch-on-mount effects with a shared resource cache for fewer redundant requests.",
-      "Reverted the short-lived Composio OAuth integrations experiment — connectors stay on the stella-connect import-mcp path.",
-      "Native connector enable/disable now returns its tool count.",
+      "Smarter handling for Stella's more advanced thinking models.",
+      "Fixed typing inside the model-error search box.",
+      "Fixed hidden follow-up messages from Stella.",
+      "Fewer duplicate background requests when screens load.",
+      "Connectors stay on Stella's built-in connection flow after removing a short-lived experiment.",
+      "Connector settings now show a more accurate count of available actions.",
     ],
   },
   {
@@ -91,20 +105,20 @@ const entries: Entry[] = [
     tags: ["New", "Polish"],
     features: [
       "Sidebar chat now loads older messages when you scroll to the top.",
-      "Stella browser skill filled in with the missing CLI surface.",
-      "Improved connector OAuth MCP flow.",
+      "Stella's built-in browser controls are more complete.",
+      "Connecting apps is smoother.",
       "Animated SVG illustrations for display sidebar empty states.",
     ],
     fixes: [
-      "Dropped the preset connector catalog — Stella keeps the stella-connect import-mcp path.",
+      "Removed an older connector list so app connections use one clearer flow.",
       "Shrunk Media tab mode labels and flipped the submit icon upward.",
-      "Up next copy softened, and display:readFile handles missing files gracefully.",
-      "Retry once when the model returns nothing actionable.",
+      "Up next copy is softer, and missing files fail gracefully.",
+      "Stella automatically retries once when a reply comes back empty.",
       "Connector replies keep flowing for the whole conversation instead of stalling mid-thread.",
-      "Chat surfaces retired the legacy event feed; file history, agent activity, and the chat timeline each got their own dedicated stream (with the grown activity window seeded from the smaller loaded snapshot).",
-      "Dropped the visible-messages window mode and split out a display-message overlay.",
-      "send_input interrupt knob removed — Stella always interrupts.",
-      "Fixed failing vitest suites.",
+      "Chat history, file history, and live activity are now separated so long conversations stay cleaner.",
+      "Display messages now use their own overlay instead of piggybacking on the chat view.",
+      "Interrupting Stella mid-reply is more predictable.",
+      "Fixed failing automated tests.",
     ],
   },
   {
@@ -113,36 +127,36 @@ const entries: Entry[] = [
     features: [
       "Chat home overview redesigned around an Activity layout, with a paginated, virtualized \"See all\" history dialog.",
       "Inline artifact cards get an Open-with menu and a category · format subtitle that swaps to an Open-preview affordance on hover.",
-      "A \"Reconnecting to Stella\" toast appears while the orchestrator retries, so silent stalls are visible.",
-      "New unresponsive-renderer watchdog — if the chat window hangs for 10 seconds, Stella loads a recovery page instead of staying frozen.",
+      "A \"Reconnecting to Stella\" toast appears when Stella is trying again, so silent stalls are visible.",
+      "If the chat window hangs for 10 seconds, Stella now shows a recovery page instead of staying frozen.",
     ],
     fixes: [
       "Schedule details dialog restyled to match the Connect dialog aesthetic.",
       "Store side panel typography and empty-state copy polished; Canvas and Media empty-state text nudged up; Media tab drops the \"Make something\" hero copy.",
-      "Dictation now routes into the Store composer while its textarea is focused.",
+      "Dictation now goes into the Store text box when you're typing there.",
       "Slowed the task progress summary cadence to 30s (with a 10s kickoff) so it stops chattering.",
       "Tighter chat home overview activity list and hidden scrollbars.",
-      "Chat links open directly instead of through Streamdown's confirmation modal.",
-      "Restored Streamdown GFM and fixed chat markdown rendering for headings and tables.",
-      "Fixed canvas artifact rendering (timing, thumbnails, recent files, background).",
-      "Dictation routing works when Stella isn't the active app.",
+      "Chat links open directly instead of through an extra confirmation dialog.",
+      "Headings and tables render correctly in chat again.",
+      "Fixed canvas previews, thumbnails, recent files, and backgrounds.",
+      "Dictation works better when Stella isn't the active app.",
       "Radial dial and mini window now behave on macOS fullscreen Spaces.",
-      "Surface Stella provider rate-limit errors faster.",
+      "Stella now shows model usage-limit errors faster.",
       "Reduced chat resize work and reused artifact cards for HTML; paused the social empty-state illustration when offscreen and dropped the cursor shadows.",
       "Chat no longer pins to the absolute bottom during resize bursts.",
-      "Clarified send-input follow-up intent.",
+      "Follow-up messages are handled more clearly.",
     ],
   },
   {
     date: "May 14, 2026",
     tags: ["Polish"],
     features: [
-      "Model picker opens instantly, with restricted picks now gated by the backend rather than the client.",
+      "Model picker opens instantly, and unavailable choices are checked reliably.",
     ],
     fixes: [
       "Auth-error toast routes to the sign-in dialog instead of dumping you on billing.",
       "Fixed the composer's shape after sending and dictation overlapping with already-typed text.",
-      "Fixed dropped fast Stella stream chunks.",
+      "Fixed missing pieces in fast Stella replies.",
     ],
   },
   {
@@ -152,15 +166,15 @@ const entries: Entry[] = [
       "Inline undo for self-mod commits, with thread-aware reminders so you can roll back a change Stella just made.",
       "Developer file previews collapse into a single \"Code changes\" tab instead of stacking up per file.",
       "Update pill swaps its spinner for a traveling-border loader.",
-      "Install-update agent now verifies the git merge before bumping the manifest, and reconciles a stale manifest after the restart.",
+      "Stella now double-checks updates before marking them installed, and fixes stale update info after restart.",
     ],
     fixes: [
-      "Transient Stella provider errors retry at the adapter layer.",
+      "Temporary model errors retry automatically.",
       "Home sidebar hint dismisses on the first right-click.",
       "Hard cap on rendered task progress phrases so they stop piling up.",
-      "Lyria prompts and task progress summaries now flow through the BYOK runtime path.",
+      "Music prompts and progress summaries respect your own connected keys.",
       "Chronicle (screen memory) summaries inject on file change instead of every turn.",
-      "Worker callers see live disk through the Vite self-mod overlay.",
+      "Background work now sees Stella's latest files while the app is updating itself.",
     ],
   },
   {
@@ -168,8 +182,8 @@ const entries: Entry[] = [
     tags: ["New", "Polish"],
     features: [
       "Read aloud — Stella can speak her replies, with a play button on each message and a menu toggle for auto-play.",
-      "Multi-provider realtime voice — pick which voice model handles your live sessions.",
-      "OpenRouter models now show up in the Stella picker.",
+      "Realtime voice can use more voice options.",
+      "More models now show up in Stella's picker.",
       "Settings got a global search bar and a layout/typography pass.",
       "Subscription upgrades pop a small celebratory dialog.",
     ],
@@ -184,7 +198,7 @@ const entries: Entry[] = [
     tags: ["New", "Billing"],
     features: [
       "Buy extra usage credit on the billing page when you run low — no need to wait for the monthly reset.",
-      "Connect your own provider keys (OpenAI, Anthropic, OpenRouter, etc.) through a polished provider-connect dialog with branded OAuth callbacks.",
+      "Connect your own AI keys through a polished setup dialog.",
       "Dictation sound controls in settings.",
       "Launcher shows a recovery view when desktop fails to start, plus an option to revert a bad Stella update.",
     ],
@@ -193,9 +207,9 @@ const entries: Entry[] = [
       "Seedance replaces the older video generation models.",
       "Paid media (image, voice, video) is gated to subscribers, with a built-in escape hatch to switch to your own keys from the upsell toast.",
       "Default theme in light mode is now Midnight.",
-      "Install-update agent locked down to a small git-only command allowlist.",
-      "Windows builds: native helpers built per-platform on CI and shipped via R2.",
-      "Tighter free and anonymous tier limits, with all plan limits now configurable from the backend (no more hardcoded defaults).",
+      "The update helper is more tightly locked down.",
+      "Windows builds ship with the right native helpers for each platform.",
+      "Free and anonymous limits are tighter, and plan limits are easier to adjust.",
       "Dropped Teams and Google Chat connector tiles; fixed the Discord install link.",
     ],
   },
@@ -204,11 +218,11 @@ const entries: Entry[] = [
     tags: ["Polish", "Under the hood"],
     fixes: [
       "Store side panel and Publish dialog got a UX pass.",
-      "Self-mod applies now route through Vite's native HMR pipeline — fewer dev restarts, less flash.",
+      "Stella applies self-changes with fewer restarts and less visual flashing.",
       "Dev Stella stops prompting for macOS Keychain access on every restart.",
-      "Sidebar registry and route tree have HMR boundaries, so dev edits hot-reload instead of restarting.",
-      "OpenRouter requests now identify as Stella.",
-      "Effect-TS dependencies and migration plan landed.",
+      "Sidebar and page changes refresh more smoothly while Stella updates herself.",
+      "More model requests identify themselves as Stella.",
+      "Internal reliability groundwork landed.",
     ],
   },
   {
@@ -216,15 +230,15 @@ const entries: Entry[] = [
     tags: ["New", "Billing"],
     features: [
       "Billing moved to a Stripe-hosted Checkout with managed payments, and the screen was redesigned to match the Stella aesthetic.",
-      "Local model providers (Ollama and friends) are now first-class — pick them in settings alongside managed and BYOK options.",
-      "Dedicated voice provider and agent model settings.",
+      "Local models like Ollama are now first-class options in settings.",
+      "Voice and agent model choices are easier to configure separately.",
     ],
     fixes: [
       "Plan tiers now describe usage in plain language (e.g. \"a few hours a day\") instead of opaque dollar allotments.",
-      "Default reasoning effort is now routed automatically per request.",
+      "Stella now chooses the right thinking level automatically for each request.",
       "Mini window: sidebar hidden, traffic-light placement tuned, and embedded web views fade behind a glass mask.",
       "Bulk model actions in settings, refined model picker layout.",
-      "Removed global social chat while moderation matures; managed token-per-minute limits removed.",
+      "Global social chat is hidden while safety controls mature; some managed usage limits were simplified.",
       "Onboarding fog overlay removed.",
     ],
   },
@@ -232,33 +246,33 @@ const entries: Entry[] = [
     date: "May 8, 2026",
     tags: ["New", "Polish"],
     features: [
-      "Canvas tab — the orchestrator can now answer with a richer-than-markdown HTML canvas when a chart, layout, or interactive view fits better than text.",
+      "Canvas tab — Stella can answer with a richer visual view when a chart, layout, or interactive page fits better than plain text.",
       "Composer can pull in the area you have selected on screen as context for your next message.",
-      "Orchestrator can spawn custom agent types, with the subagent roster injected into its context.",
+      "Stella can spin up more specialized helper agents when a task calls for it.",
     ],
     fixes: [
       "Model picker now collapses to a small set of Stella presets and expands on demand.",
       "Image generation defaults to fast/low settings (you can still crank it).",
-      "Desktop updates moved from a Settings row to a top-bar pill, and the install-update agent runs through the same self-mod hot-reload pipeline.",
+      "Desktop updates moved from Settings into a small top-bar pill.",
       "Display sidebar performance and memory tightened; expanded panel hides the rest of the chat instead of bleeding through.",
-      "Tool-result images are now sent back as a follow-up user message so the model actually sees them.",
-      "Local image provider selection and Claude Code runtime across all agents.",
-      "Switched the desktop build to TypeScript 7's native compiler.",
+      "Images created or found during a task are easier for Stella to use in the conversation.",
+      "Local image settings now work across agents.",
+      "Desktop build system upgraded.",
     ],
   },
   {
     date: "May 7, 2026",
     tags: ["New", "Polish"],
     features: [
-      "Connect integrations got a new connector CLI, replacing the old MCP agent surface in chat.",
-      "Cron / scheduled tasks now have three tiers of payload and fire native OS notifications when they're done.",
-      "Stella Computer on Windows is now powered by a native helper instead of the old runtime.",
+      "Connect integrations got a cleaner setup path.",
+      "Scheduled tasks are more flexible and can send native OS notifications when they're done.",
+      "Stella Computer on Windows is more native and reliable.",
       "Realtime voice moved to the GA model, with a British accent option and a refreshed prompt.",
     ],
     fixes: [
-      "Runtime sessions are long-lived, with a hook-driven lifecycle so personality, self-mod, reminders, and memory injection all plug in cleanly.",
+      "Long-running Stella sessions are more reliable, including personality, reminders, and memory.",
       "Smoother chat scroll and working indicator in the suggestion row.",
-      "Vite upgraded to 8.0.11 with full-bundle dev mode.",
+      "Local updates are smoother when Stella changes herself.",
     ],
   },
   {
@@ -269,24 +283,24 @@ const entries: Entry[] = [
     ],
     fixes: [
       "Chat timeline and social chat virtualized with Legend List — long threads stay snappy.",
-      "Electron upgraded to 42.",
-      "Sign-in storage isolated in the main process; protected storage moved into the launcher.",
-      "Native OS selects swapped for the Stella menu styling everywhere.",
-      "Fixes: non-mac onboarding phase skips, local Parakeet dictation startup, display URL protocol restrictions, capture-source restoration on cancel.",
+      "Desktop shell upgraded.",
+      "Sign-in storage is more secure and better isolated.",
+      "Native dropdowns now match Stella's own menu styling.",
+      "Fixes: non-mac onboarding skips, local dictation startup, safer display links, and restoring capture sources after canceling.",
     ],
   },
   {
     date: "May 5, 2026",
     tags: ["New", "Polish"],
     features: [
-      "Silero-gated wake-word listener — far fewer false triggers when you're not saying \"Hey Stella\".",
+      "\"Hey Stella\" voice activation has fewer false starts.",
       "Image generation now runs in the background and shows up in a unified gallery in the display sidebar.",
       "Generated media (images, music, etc.) live in their own sidebar workspace, and previews open in an in-app dialog.",
-      "Queued steering messages render inline in the chat while a turn is in progress.",
-      "Pi-style orchestrator steering for smoother mid-turn course corrections.",
+      "Messages you send while Stella is working now appear inline in the chat.",
+      "Stella handles mid-task course corrections more smoothly.",
     ],
     fixes: [
-      "Provider reasoning is hidden from the chat UI by default; direct model reasoning control still available in settings.",
+      "Behind-the-scenes thinking is hidden by default, with advanced controls still in settings.",
       "Store, Pets, and Emoji dialogs aligned with the Connect dialog aesthetic.",
       "Working indicator fades faster when work is done.",
     ],
@@ -295,7 +309,7 @@ const entries: Entry[] = [
     date: "May 4, 2026",
     tags: ["Polish"],
     features: [
-      "Music generation added to the managed media gateway.",
+      "Music generation added.",
     ],
     fixes: [
       "Working indicator now sits inline below the latest reply instead of in a separate footer.",
@@ -309,8 +323,8 @@ const entries: Entry[] = [
     tags: ["New", "Polish"],
     features: [
       "Wake-word voice activation is back — say \"Hey Stella\" to start a voice session, with a bundled prebuilt listener for macOS and Windows. (Off by default; turn it on in settings.)",
-      "AI-generated emoji packs in the Store, alongside new user-created pet packs (UI + backend + renderer).",
-      "Sidebar Models picker — choose your orchestrator and general agent models without leaving chat. Routing is now done by model ID, no separate provider picker.",
+      "AI-generated emoji packs in the Store, alongside user-created pet packs.",
+      "Sidebar Models picker — choose Stella's main models without leaving chat.",
       "Stella's voice is dynamic now, seeded from your personality.md.",
       "Display canvas is now inline, with refreshed working-indicator copy.",
     ],
@@ -319,9 +333,9 @@ const entries: Entry[] = [
       "Dictation: transcripts always paste straight into the focused app, in-app composer flow polished, OS-wide overlay layout cleaned up, on-device toggle hidden on Intel Macs.",
       "Apple-style elevation polish on dropdowns and popovers; toast and display \"+\" menu match the glass aesthetic.",
       "Pet polish: smoother action arc, click-through outside visible pixels, open preference syncs across windows, default pet renamed to Stella.",
-      "Faster chat-send responsiveness; pre-bundled common packages for self-mod runs.",
-      "Onboarding: smoother discovery transitions, fixed phase navigation restore, fixed creation continue click; city/postal/country now seeded into core-memory.md.",
-      "Live Memory now requires sign-in; Store catalog filters blocked tags and defers asset loading until install.",
+      "Sending chat messages feels faster, and self-updates start with more common helpers ready to go.",
+      "Onboarding is smoother, with better step navigation and more useful location setup.",
+      "Live Memory now requires sign-in, and Store browsing loads faster and more safely.",
     ],
   },
   {
@@ -329,18 +343,18 @@ const entries: Entry[] = [
     tags: ["New"],
     features: [
       "Floating pet companion in its own window — hatch one with the new pet skill. The pet drives voice mode (replacing the old voice creature overlay) and surfaces status updates.",
-      "Pets are now part of the Store catalog with a dedicated backend.",
-      "ChatHomeOverview: time-ordered Activity strip with an UP NEXT schedule peek.",
-      "HomeIdeasFooter: category pills with a drop-up of suggestions.",
+      "Pets are now part of the Store catalog.",
+      "Home now has a time-ordered Activity strip with an Up Next peek.",
+      "Home suggestions are grouped into friendly category pills.",
       "Post-onboarding hints for Connect and Store.",
       "New native dictation_bridge helper for macOS and Windows; push-to-talk dictation refresh.",
     ],
     fixes: [
-      "Schedule agent returns structured tool results and shows an inline receipt chip.",
+      "Scheduling now shows a neat inline receipt after it runs.",
       "Utility actions moved into the sidebar.",
-      "Orchestrator turns now queue without interrupting work-in-progress, with a deferred interrupt for queued turns until tools finish.",
-      "Store releases now ship as behaviour spec + reference diffs.",
-      "File-edit tools are picked per model.",
+      "New requests queue more gracefully while Stella is already working.",
+      "Store releases are easier to review before installing.",
+      "File editing is matched more carefully to the model doing the work.",
       "Removed the experimental Snake sidebar app and route.",
     ],
   },
@@ -349,22 +363,22 @@ const entries: Entry[] = [
     tags: ["New", "Onboarding"],
     features: [
       "Personalized app recommendations during onboarding (with badges prefixed \"Stella may:\").",
-      "Stella localization foundation laid down, with a language picker on the start screen.",
-      "Install-update agent flow — Stella can track and apply upstream desktop releases.",
+      "Stella started laying the groundwork for more languages, with a language picker on the start screen.",
+      "Stella can track and apply desktop updates.",
       "Canvas artifacts show up in chat.",
       "Snake game added to the sidebar (and made bigger and easier to play).",
     ],
     fixes: [
-      "Store agent moved to local runtime; Convex now only validates publishes. Add-on installs require explicit confirmation, and uninstalls fall back to a local agent.",
-      "Reworked Store security review around network egress.",
-      "New skills: create-Stella-app, stella-media (managed gateway media generation), runtime extension and MCP skills.",
-      "Computer-use tools now sit behind MCP and computer-use sessions are pruned daily.",
-      "Smoother streamed chat text, plus optimistic updates for social and fashion.",
-      "Voice now receives screen captures directly, with explicit completion signals; local chat context syncs into voice sessions.",
+      "Store installs now require explicit confirmation, and uninstalls are more reliable.",
+      "Store security review got stricter about network access.",
+      "New skills for creating Stella apps, generating media, and extending Stella.",
+      "Computer-use sessions are cleaned up daily.",
+      "Chat text appears more smoothly, and Social/Fashion updates feel faster.",
+      "Voice sessions understand your screen and chat context better.",
       "Replaced \"Explore ideas\" with skill suggestions; flatter app suggestions dialog rows.",
       "Home hint mouse icon, welcome opens the workspace, badge polish.",
-      "Sharper agent prompts that frame Stella as a personal assistant; general agent prompt streamlined and details deferred to skills.",
-      "Image generation removed from the general agent (now lives in the stella-media skill).",
+      "Stella's instructions now frame her more clearly as your personal assistant.",
+      "Image generation moved into its own media skill.",
       "Settings content centered within the panel.",
     ],
   },
@@ -377,16 +391,16 @@ const entries: Entry[] = [
       "In-app dictation bar gets a send arrow.",
     ],
     fixes: [
-      "Launcher UI polish and an R2 public-URL fix for downloads.",
+      "Launcher UI polish and download fixes.",
       "Store integrations now render as App Store-style rows.",
       "Sent user messages animate into the full chat surface.",
       "Display sidebar drops the heavy blur and preserves the active tab when you reopen the panel.",
-      "Computer-use: webview apps now wake the CEF accessibility broker and accept single x/y clicks.",
+      "Computer-use works better inside web apps and supports simpler clicks.",
       "Stella now prefers a desktop app over the browser for named consumer services (e.g. Spotify, Slack).",
-      "Managed OpenAI and Anthropic models route direct, with normalized Anthropic model IDs.",
-      "Clarified orchestrator/general prompt contract and delegation style.",
-      "Fixes: onboarding completion handoff, store display tab routing, first chat-send home bounce, remote connector desktop routing, and several working-indicator copy/lifecycle bugs.",
-      "Global social chat is disabled while moderation tooling matures.",
+      "Built-in AI models respond more reliably.",
+      "Stella is clearer about when to handle work herself versus delegating.",
+      "Fixes: onboarding completion, Store display behavior, first-message bounce, remote connector behavior, and several working-indicator bugs.",
+      "Global social chat is disabled while safety controls mature.",
     ],
   },
   {
@@ -407,7 +421,7 @@ const entries: Entry[] = [
       "Store tabs are centered over the visible area and no longer lag during resize.",
       "Magic-link polling stays alive after you close the auth dialog, so the link still completes sign-in.",
       "Display font now used for the startup branding.",
-      "Auth-aware Convex queries — pages no longer flash errors during sign-in transitions.",
+      "Pages no longer flash errors during sign-in transitions.",
       "Many launcher fixes (Windows process control & tray icon, Intel macOS install lockfile, dock visibility, uninstall retry, Tauri plugin pinning).",
       "Stella cleanly tears down child processes on quit.",
     ],
@@ -425,7 +439,7 @@ const entries: Entry[] = [
       "Onboarding got a big polish pass — snappier transitions, friendlier copy, clearer steps.",
       "Store: navigation redesign, tighter Fashion agent, and a confirmation step before adding new connectors.",
       "Onboarding now skips the macOS permissions step on Windows and Linux.",
-      "Lots of fixes: radial overlay stays on the active macOS Space, Connect dialog layering, askQuestion routing, and self-mod visuals during agent runs.",
+      "Lots of fixes: radial overlay stays on the active macOS Space, Connect dialog layering, inline questions, and visuals while Stella updates herself.",
     ],
   },
   {
@@ -447,7 +461,7 @@ const entries: Entry[] = [
     date: "April 26, 2026",
     tags: ["New", "Windows"],
     features: [
-      "Stella Connect: connect external services through MCP integrations.",
+      "Stella Connect: connect external services to Stella.",
       "Computer-use comes to Windows — Stella can now click and type on your screen on Windows machines.",
       'New "+" menu in the chat composer to attach files, capture your screen, or grab recents.',
       "Markdown and developer-file previews in the side panel.",
@@ -464,7 +478,7 @@ const entries: Entry[] = [
     tags: ["New"],
     features: [
       "Local Parakeet dictation — fast, private, runs on your device.",
-      "Local OAuth controls for routing to your own LLMs.",
+      "Controls for connecting your own AI accounts.",
       "New Fashion tab redesigned as a full-bleed snap feed.",
       "Top-bar chat sidebar toggle and a unified scroll between sidebar chat and full chat.",
       "Stella notifies you when a long-running agent finishes its work.",
@@ -479,7 +493,7 @@ const entries: Entry[] = [
     tags: ["New", "Polish"],
     features: [
       "File-artifact previews in the display sidebar (Codex-style chrome).",
-      "Stella now detects files created by tools running outside her — they show up automatically.",
+      "Stella now detects files created by outside apps — they show up automatically.",
     ],
     fixes: [
       "Transparent topbar in the desktop shell.",
@@ -517,7 +531,7 @@ const entries: Entry[] = [
       "Big computer-use reliability pass: clicks now actually deliver to backgrounded apps, with overlay continuity fixed.",
       'Show more / show less for long user messages.',
       "Settings and Theme moved to the sidebar title bar.",
-      "Backend now rate-limits every public mutation, action, and HTTP route.",
+      "Backend protections now cover every public entry point.",
     ],
   },
   {
@@ -529,7 +543,7 @@ const entries: Entry[] = [
       'New "Cozy" theme.',
     ],
     fixes: [
-      "Shell migrated to TanStack Router with sidebar app discovery.",
+      "Sidebar app discovery became more reliable.",
       "Onboarding mocks now mirror the real Stella surface.",
     ],
   },
@@ -537,8 +551,8 @@ const entries: Entry[] = [
     date: "April 20, 2026",
     tags: ["Under the hood"],
     fixes: [
-      "Major runtime change: agents now run on an Exec-first runtime, with isolated V8 contexts.",
-      "Orchestrator and general agent prompts restructured for clearer behavior.",
+      "Major internal reliability upgrade for how agents run.",
+      "Stella's instructions were reorganized for clearer behavior.",
       "Launcher reliability: macOS screen-permission build, Windows registry args, fewer first-run dependencies.",
     ],
   },
@@ -584,7 +598,7 @@ const entries: Entry[] = [
   {
     date: "April 15, 2026",
     features: [
-      "Write and Edit tools added to the General agent.",
+      "Stella can write and edit files more directly.",
     ],
     fixes: [
       "Onboarding reveals theme options in steps.",
@@ -596,17 +610,17 @@ const entries: Entry[] = [
     date: "April 14, 2026",
     tags: ["New"],
     features: [
-      "Stella streams reasoning summaries while she thinks, so you can see what she's working on.",
-      "Twitch emote rendering in orchestrator markdown.",
+      "Stella shows short thinking summaries while she works, so you can see what she's doing.",
+      "Twitch emotes render in Stella's messages.",
     ],
     fixes: [
-      "Native Stella runtime streaming and a refactor toward Pi extension model.",
+      "Stella's live replies got internal cleanup.",
     ],
   },
   {
     date: "April 13, 2026",
     fixes: [
-      "Smoother assistant text streaming, especially across resumed and hidden runs.",
+      "Smoother live replies, especially after resuming hidden work.",
       "Exponential backoff retry for OpenAI completions.",
       "Reasoning is preserved across Stella completions.",
     ],
@@ -615,7 +629,7 @@ const entries: Entry[] = [
     date: "April 12, 2026",
     tags: ["New"],
     features: [
-      "New ExecuteTypescript tool — typed code-mode for the General agent.",
+      "New deeper coding mode for technical tasks.",
     ],
     fixes: [
       "Wake-word pipeline removed (Stella moved away from always-listening).",
@@ -641,7 +655,7 @@ const entries: Entry[] = [
     features: [
       "ChatGPT-style turn-anchored scrolling in chat.",
       "macOS screen and microphone permission onboarding screen.",
-      "Subagent ticker and streaming events show up in chat.",
+      "Helper-agent progress now shows up in chat.",
       "In-app permission recovery flows.",
     ],
     fixes: [
@@ -661,13 +675,13 @@ const entries: Entry[] = [
     date: "April 8, 2026",
     tags: ["New"],
     features: [
-      "Cloud backups (R2-backed) with settings integration.",
+      "Cloud backups, with settings integration.",
       "Self-mod history is now auto-tracked.",
     ],
     fixes: [
-      "Faster SQLite via node:sqlite.",
+      "Faster local data storage.",
       "Refreshed Stella brand assets across desktop, launcher, and mobile.",
-      "iOS privacy manifest for the mobile app.",
+      "Mobile privacy paperwork added for iOS.",
     ],
   },
   {
@@ -675,11 +689,11 @@ const entries: Entry[] = [
     tags: ["New", "Mobile"],
     features: [
       "Mobile app: dark mode, 17 themes, haptics, voice input, and push notifications.",
-      'Voice "look at screen" tool — Stella can highlight things in real time.',
-      "Vision screenshots, screen-guide overlay, and capture IPC.",
+      'Voice "look at screen" — Stella can highlight things in real time.',
+      "Voice screen viewing and guidance overlays improved.",
       "Compact mode replaces the overlay mini shell.",
       "Suggestion chips in chat with shared screenshot preview.",
-      "New Claude Code orchestrator option.",
+      "New Claude Code option for coding work.",
     ],
     fixes: [
       "One-time welcome dialog after onboarding.",
@@ -716,7 +730,7 @@ const entries: Entry[] = [
     tags: ["Polish"],
     fixes: [
       "Onboarding UX polish: better button visibility, top-down layout, gradient settings fixes.",
-      "Live task status in the thinking footer while streaming.",
+      "Live task status while Stella is thinking.",
       "Faster chat transcript persistence (append-only JSONL).",
       "Restored the blob gradient theme and frosted shell chrome.",
       "Overlay stays on the active macOS Space.",
@@ -741,10 +755,10 @@ const entries: Entry[] = [
     features: [
       "Custom DMG installer with a mesh-gradient background and icon layout.",
       "Stella requests all macOS permissions upfront, with start/stop launcher controls.",
-      "Single General agent with dynamic tool loading and reactive HMR.",
+      "A simpler main-agent setup that can load extra abilities as needed.",
     ],
     fixes: [
-      "Stella branding for Electron app icons.",
+      "Stella branding for desktop app icons.",
     ],
   },
   {
@@ -763,7 +777,7 @@ const entries: Entry[] = [
     ],
     fixes: [
       "Daily cron to purge stale anonymous user data.",
-      "MCP removed from the desktop app (replaced by Connect integrations).",
+      "Older connection plumbing removed from the desktop app and replaced by Connect integrations.",
     ],
   },
   {
@@ -787,7 +801,7 @@ const entries: Entry[] = [
     ],
     fixes: [
       "Polling-based magic-link auth, deep-link protocol fix, and migration to cloud.stella.sh.",
-      "Smoother chat streaming with a deferred WebGL init on the first message.",
+      "Smoother first-message replies.",
       "Region capture fixes.",
       'Message timestamps reformatted as system reminders, with timezone correctness and 10-min dedup.',
     ],
@@ -796,7 +810,7 @@ const entries: Entry[] = [
     date: "March 25, 2026",
     tags: ["New"],
     features: [
-      "Music generation switched to Lyria 3 (proxied through the backend).",
+      "Music generation upgraded.",
       "Home Canvas: LLM generation pipeline, selectable guide, music bar.",
     ],
     fixes: [
@@ -823,7 +837,7 @@ const entries: Entry[] = [
       "New Media Studio app.",
       "Personalized Home Canvas replaces the home dashboard.",
       "Notification panel on the floating orb.",
-      "Display Overlay for the agent Display tool.",
+      "New display overlay for showing generated files and results.",
     ],
     fixes: [
       "Dark-mode gradient banding fixed (oklch interpolation + dithering).",
@@ -847,14 +861,14 @@ const entries: Entry[] = [
     date: "March 21, 2026",
     tags: ["Under the hood"],
     fixes: [
-      "Sidecar runtime architecture — the agent runtime now runs in its own process.",
+      "Stella's agent work now runs in a separate process for better stability.",
       "Chat UI: thinking row, shimmer, message typography refresh.",
     ],
   },
   {
     date: "March 20, 2026",
     features: [
-      "Devtool initial release (hard reset clears storage, simplified UI).",
+      "First version of Stella's developer tools.",
     ],
     fixes: [
       "Backend migrated off the AI SDK.",
@@ -865,7 +879,7 @@ const entries: Entry[] = [
     date: "March 19, 2026",
     fixes: [
       "Switched to Manrope as the default font.",
-      "Mobile bridge backend wired up.",
+      "Mobile bridge wired up.",
     ],
   },
   {
@@ -883,7 +897,7 @@ const entries: Entry[] = [
     date: "March 17, 2026",
     tags: ["Under the hood"],
     features: [
-      "Initial monorepo — desktop, mobile, backend, and launcher merged into one repo.",
+      "Desktop, mobile, cloud, and launcher code were brought together into one project.",
       "Ultra tier added to billing.",
     ],
     fixes: [
@@ -894,7 +908,7 @@ const entries: Entry[] = [
     date: "March 16, 2026",
     tags: ["New"],
     features: [
-      "Tier-aware managed model routing.",
+      "Plans now get the right managed models automatically.",
       "Realtime transcription.",
       'Friend v1 — first cut of the social layer.',
     ],
@@ -908,7 +922,7 @@ const entries: Entry[] = [
       "Launcher's first commit.",
     ],
     fixes: [
-      "Big runtime composition refactor — clearer routing seams.",
+      "Large internal cleanup for how Stella routes work.",
       "Self-mod morph is now readiness-driven (less flash).",
     ],
   },
@@ -917,7 +931,7 @@ const entries: Entry[] = [
     tags: ["New"],
     features: [
       "Multiplayer skill (game).",
-      "Schedule tool.",
+      "Scheduling support.",
     ],
     fixes: [
       "Bundled Stella defaults moved into resources.",
@@ -952,7 +966,7 @@ const entries: Entry[] = [
     tags: ["New"],
     features: [
       "New wake-word model (fp16) and voice handoff.",
-      "First-class Stella provider endpoints — desktop runtime now uses Stella provider models by default.",
+      "Stella's own model endpoints became the desktop default.",
     ],
     fixes: [
       'Clearer "connected account" vs "logged in" semantics.',
@@ -981,7 +995,7 @@ const entries: Entry[] = [
     date: "March 8, 2026",
     tags: ["New"],
     features: [
-      "Extension system: auto-discoverable tools, hooks, providers, and prompts.",
+      "Extension system: Stella can discover new abilities, model options, and prompts.",
       'Native text selection inside Stella.',
       'New "auto" radial dial feature.',
       "Search canvas (and the news side trimmed down).",
@@ -1005,28 +1019,28 @@ const entries: Entry[] = [
   {
     date: "March 6, 2026",
     fixes: [
-      "Edit tool fix and orchestrator local scheduling improvements.",
+      "Editing fixes and local scheduling improvements.",
       "Home view and music adjustments.",
     ],
   },
   {
     date: "March 1–5, 2026",
     fixes: [
-      "Ongoing polish and refactors: cleaner runtime composition, fewer barrels, sharper IPC.",
-      "Search canvas iteration, animation polish on streaming pills, dashboard fixes.",
+      "Ongoing polish and internal cleanup.",
+      "Search canvas iteration, animation polish on live reply pills, dashboard fixes.",
     ],
   },
   {
     date: "February 2026",
     tags: ["Foundation"],
     features: [
-      'Stella renamed and reorganized — new agent / subagent / tools / skills layout.',
+      'Stella renamed and reorganized around agents, helper agents, actions, and skills.',
       "Discovery rewrite: selectable categories, signal collection, and seeded ephemeral memories.",
       "App Store / blueprints groundwork — first cut of how Stella publishes apps.",
       'Connect dialog initial setup; opens links in your browser instead of a tiny Electron window.',
       "Slack, Teams, Signal, Telegram, and Discord channel work.",
       "Multi-monitor and Windows native window-title detection.",
-      "Cron tool, heartbeat handling, and improved interrupt / queue control in the UI.",
+      "Scheduled-task support, health checks, and better interrupt / queue controls.",
     ],
     fixes: [
       "Better Auth integration and hardened secrets handling.",
@@ -1038,10 +1052,10 @@ const entries: Entry[] = [
     tags: ["Genesis"],
     features: [
       "First commits — shadcn UI scaffolding and the floating Stella surface.",
-      "Initial agent / subagent / tools / skills wiring with markdown-driven plugins.",
-      "Working indicator, streaming responses, conversation history, and reasoning components.",
+      "Initial agent, helper-agent, actions, and skills setup.",
+      "Working indicator, live replies, conversation history, and thinking UI.",
       "Markdown colors, grain/noise/blur theming, and the original radial menu theme.",
-      "Embeddings and retrieval initial pass; Convex schema + validators.",
+      "First pass at memory search and cloud data structure.",
       "Wake-up of the discovery + onboarding flow.",
     ],
   },
