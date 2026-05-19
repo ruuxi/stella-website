@@ -81,6 +81,34 @@ type StoreRelease = {
   createdAt: number;
 };
 
+type NativeIntegration = {
+  id: string;
+  name: string;
+  category: string;
+  auth: string[];
+  catalogToolCount: number;
+  availability?: "ready";
+  provider?: "google-workspace" | "oauth-catalog";
+  sourceUrl?: string;
+  iconUrl?: string;
+  description: string;
+  connectable?: boolean;
+  oauthSetupStatus?:
+    | "ready"
+    | "missing_oauth_app"
+    | "missing_backend_exchange"
+    | "missing_callback_bridge";
+  oauthSetupMessage?: string;
+  oauthSetupGroup?: {
+    id: string;
+    name: string;
+  };
+  oauthProviderTemplate?: boolean;
+  enabled?: boolean;
+  toolCount?: number;
+  actionCount?: number;
+};
+
 type StoreInstall = {
   packageId: string;
   displayName?: string;
@@ -293,6 +321,13 @@ type DesktopStoreBridge = {
   getAuthToken?: () => Promise<string | null>;
   openStorePanel?: () => Promise<unknown>;
   openSignIn?: () => Promise<unknown>;
+  listNativeIntegrations?: () => Promise<NativeIntegration[]>;
+  connectNativeIntegration?: (payload: {
+    id: string;
+  }) => Promise<NativeIntegration>;
+  disconnectNativeIntegration?: (payload: {
+    id: string;
+  }) => Promise<NativeIntegration>;
   requestPackageInstall?: (payload: {
     packageId: string;
     releaseNumber: number;
@@ -349,6 +384,12 @@ const listNewPublicPackages = makeFunctionReference<
   { limit?: number },
   StorePackage[]
 >("data/store_packages:listNewPublicPackages");
+
+const listStoreIntegrations = makeFunctionReference<
+  "query",
+  {},
+  NativeIntegration[]
+>("data/integrations:listStoreIntegrations");
 
 const searchPublicPackages = makeFunctionReference<
   "query",
@@ -619,6 +660,19 @@ const normalizeHostedStoreTab = (value: string | null): HostedStoreTab =>
 
 const getDesktopStoreBridge = (): DesktopStoreBridge | undefined =>
   typeof window === "undefined" ? undefined : window.stellaDesktopStore;
+
+const mergeNativeIntegrationUpdate = (
+  previous: NativeIntegration[],
+  next: NativeIntegration,
+): NativeIntegration[] => {
+  let matched = false;
+  const updated = previous.map((entry) => {
+    if (entry.id !== next.id) return entry;
+    matched = true;
+    return next;
+  });
+  return matched ? updated : [next, ...updated];
+};
 
 const redirectToStoreSignIn = async () => {
   const bridge = getDesktopStoreBridge();
@@ -1579,6 +1633,117 @@ function PackageCard({
           <span className="store-card-installs">
             {formatInstallCount(pkg.installCount)}
           </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NativeIntegrationCard({
+  integration,
+  busy,
+  onConnect,
+  onDisconnect,
+}: {
+  integration: NativeIntegration;
+  busy: boolean;
+  onConnect: () => void;
+  onDisconnect: () => void;
+}) {
+  const enabled = integration.enabled === true;
+  const connectable = integration.connectable !== false;
+  const statusLabel = enabled
+    ? "Added"
+    : connectable
+      ? "Ready"
+      : integration.oauthSetupGroup
+        ? `${integration.oauthSetupGroup.name} setup`
+        : integration.oauthProviderTemplate
+          ? "App setup"
+          : "Needs setup";
+  const actionLabel = !connectable
+    ? integration.oauthSetupGroup
+      ? `${integration.oauthSetupGroup.name} setup`
+      : integration.oauthProviderTemplate
+        ? "App setup"
+        : integration.oauthSetupStatus === "missing_backend_exchange"
+          ? "Server setup"
+          : integration.oauthSetupStatus === "missing_callback_bridge"
+            ? "Callback setup"
+            : "OAuth setup"
+    : busy
+      ? enabled
+        ? "Removing..."
+        : "Adding..."
+      : enabled
+        ? "Added"
+        : "Add";
+  const actionVariant = busy ? "working" : enabled ? "added" : "get";
+  const handleAction = () => {
+    if (!connectable || busy) return;
+    if (enabled) onDisconnect();
+    else onConnect();
+  };
+  const actionCount =
+    integration.actionCount ??
+    integration.catalogToolCount ??
+    integration.toolCount ??
+    0;
+  return (
+    <div
+      className="store-card"
+      data-clickable={connectable ? "true" : "false"}
+      onClick={handleAction}
+      onKeyDown={(event) => {
+        if (!connectable || busy) return;
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handleAction();
+        }
+      }}
+      role={connectable ? "button" : undefined}
+      tabIndex={connectable ? 0 : undefined}
+    >
+      <PackageArtwork
+        iconUrl={integration.iconUrl}
+        name={integration.name}
+        className="store-card-image"
+        letterClassName="store-card-image-letter"
+      />
+      <div className="store-card-body">
+        <div className="store-card-top">
+          <span className="store-card-name">{integration.name}</span>
+          <div className="store-card-actions">
+            <button
+              className="store-action-btn"
+              data-variant={actionVariant}
+              disabled={busy || !connectable}
+              onClick={(event) => {
+                event.stopPropagation();
+                handleAction();
+              }}
+              type="button"
+            >
+              {actionLabel}
+            </button>
+          </div>
+        </div>
+        <div className="store-card-desc">
+          {connectable
+            ? integration.description
+            : integration.oauthSetupMessage || integration.description}
+        </div>
+        <div className="store-card-footer">
+          <AuthorChip username="Stella" badge="verified" />
+          <div className="store-card-meta-group">
+            <span
+              className="store-card-status-chip"
+              data-state={enabled ? "added" : connectable ? "ready" : "setup"}
+            >
+              {statusLabel}
+            </span>
+            <span className="store-card-installs">{`${actionCount} actions`}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -4767,8 +4932,17 @@ function StoreClientInner() {
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null);
   const [installedIds, setInstalledIds] = useState<Set<string>>(new Set());
   const [installingId, setInstallingId] = useState<string | null>(null);
+  const [connectingIntegrationId, setConnectingIntegrationId] = useState<
+    string | null
+  >(null);
+  const [nativeIntegrationError, setNativeIntegrationError] = useState<
+    string | null
+  >(null);
   const [sharePkg, setSharePkg] = useState<StorePackage | null>(null);
   const [installedMods, setInstalledMods] = useState<StoreInstall[]>([]);
+  const [localNativeIntegrations, setLocalNativeIntegrations] = useState<
+    NativeIntegration[]
+  >([]);
   const [urlState, setUrlState] = useState({
     tab: "discover",
     packageId: null as string | null,
@@ -4796,6 +4970,7 @@ function StoreClientInner() {
     paginationOpts: { numItems: 80, cursor: null },
   });
   const newPackages = useQuery(listNewPublicPackages, { limit: 12 });
+  const storeIntegrations = useQuery(listStoreIntegrations, {});
   const search = useQuery(
     searchPublicPackages,
     query.trim() ? { query: query.trim(), category: selectedCategory } : "skip",
@@ -4845,6 +5020,38 @@ function StoreClientInner() {
   });
   const showNewSection =
     isForYouSurface && newPackagesFiltered.length >= 3 && allPackages !== undefined;
+  const nativeIntegrations = useMemo(() => {
+    if (localNativeIntegrations.length > 0) return localNativeIntegrations;
+    return storeIntegrations ?? [];
+  }, [localNativeIntegrations, storeIntegrations]);
+  const visibleNativeIntegrations = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (filter !== "all" && filter !== "integrations") return [];
+    return nativeIntegrations
+      .filter((integration) => {
+        if (!q) return true;
+        return [
+          integration.name,
+          integration.category,
+          integration.description,
+          integration.oauthSetupMessage,
+          integration.oauthSetupGroup?.name,
+          integration.oauthSetupStatus,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(q);
+      })
+      .sort((left, right) => {
+        const rank = (integration: NativeIntegration) => {
+          if (integration.enabled) return 0;
+          if (integration.connectable !== false) return 1;
+          return 2;
+        };
+        return rank(left) - rank(right) || left.name.localeCompare(right.name);
+      });
+  }, [filter, nativeIntegrations, query]);
   const installPackage = async (pkg: StorePackage) => {
     const bridge = getDesktopStoreBridge();
     if (!bridge?.requestPackageInstall) {
@@ -4894,10 +5101,69 @@ function StoreClientInner() {
     }
   };
 
+  const connectNativeIntegration = async (integration: NativeIntegration) => {
+    const bridge = getDesktopStoreBridge();
+    if (!bridge?.connectNativeIntegration) {
+      setNativeIntegrationError("Open Stella to add this integration.");
+      return;
+    }
+    setNativeIntegrationError(null);
+    setConnectingIntegrationId(integration.id);
+    try {
+      const next = await bridge.connectNativeIntegration({ id: integration.id });
+      setLocalNativeIntegrations((previous) =>
+        mergeNativeIntegrationUpdate(
+          previous.length > 0 ? previous : (storeIntegrations ?? []),
+          next,
+        ),
+      );
+    } catch (error) {
+      setNativeIntegrationError(
+        error instanceof Error
+          ? error.message
+          : `Couldn't add ${integration.name}.`,
+      );
+    } finally {
+      setConnectingIntegrationId(null);
+    }
+  };
+
+  const disconnectNativeIntegration = async (integration: NativeIntegration) => {
+    const bridge = getDesktopStoreBridge();
+    if (!bridge?.disconnectNativeIntegration) {
+      setNativeIntegrationError("Open Stella to remove this integration.");
+      return;
+    }
+    setNativeIntegrationError(null);
+    setConnectingIntegrationId(integration.id);
+    try {
+      const next = await bridge.disconnectNativeIntegration({
+        id: integration.id,
+      });
+      setLocalNativeIntegrations((previous) =>
+        mergeNativeIntegrationUpdate(
+          previous.length > 0 ? previous : (storeIntegrations ?? []),
+          next,
+        ),
+      );
+    } catch (error) {
+      setNativeIntegrationError(
+        error instanceof Error
+          ? error.message
+          : `Couldn't remove ${integration.name}.`,
+      );
+    } finally {
+      setConnectingIntegrationId(null);
+    }
+  };
+
   useEffect(() => {
     void window.stellaDesktopStore?.listInstalledMods().then((mods) => {
       setInstalledMods(mods);
       setInstalledIds(new Set(mods.map((mod) => mod.packageId)));
+    });
+    void window.stellaDesktopStore?.listNativeIntegrations?.().then((items) => {
+      setLocalNativeIntegrations(items);
     });
   }, []);
 
@@ -5007,6 +5273,36 @@ function StoreClientInner() {
                 packages={allPackages ?? []}
                 onSelect={setSelectedPackageId}
               />
+            ) : null}
+            {visibleNativeIntegrations.length > 0 ? (
+              <div className="store-section">
+                <div className="store-section-header">
+                  <span className="store-section-title">Integrations</span>
+                  <span className="store-section-count">
+                    {visibleNativeIntegrations.length}
+                  </span>
+                </div>
+                {nativeIntegrationError ? (
+                  <div className="store-status" data-variant="error">
+                    {nativeIntegrationError}
+                  </div>
+                ) : null}
+                <div className="store-grid">
+                  {visibleNativeIntegrations.map((integration) => (
+                    <NativeIntegrationCard
+                      key={integration.id}
+                      integration={integration}
+                      busy={connectingIntegrationId === integration.id}
+                      onConnect={() =>
+                        void connectNativeIntegration(integration)
+                      }
+                      onDisconnect={() =>
+                        void disconnectNativeIntegration(integration)
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
             ) : null}
             {showNewSection ? (
               <div className="store-section">

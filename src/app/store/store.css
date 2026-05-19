@@ -588,6 +588,46 @@
   flex-shrink: 0;
 }
 
+.store-card-meta-group {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.store-card-status-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+  border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
+  color: var(--text-weaker);
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
+}
+
+.store-card-status-chip[data-state="ready"] {
+  color: color-mix(in oklch, var(--interactive, var(--primary)) 80%, var(--text-base));
+  border-color: color-mix(in oklch, var(--interactive, var(--primary)) 22%, transparent);
+  background: color-mix(in oklch, var(--interactive, var(--primary)) 9%, transparent);
+}
+
+.store-card-status-chip[data-state="added"] {
+  color: oklch(0.48 0.13 145);
+  border-color: color-mix(in oklch, oklch(0.65 0.18 145) 20%, transparent);
+  background: color-mix(in oklch, oklch(0.65 0.18 145) 8%, transparent);
+}
+
+:root[data-theme="dark"] .store-card-status-chip[data-state="added"] {
+  color: oklch(0.78 0.12 145);
+}
+
 /* --- Action Buttons --- */
 
 .store-action-btn {
