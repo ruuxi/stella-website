@@ -293,9 +293,6 @@ type DesktopStoreBridge = {
   getAuthToken?: () => Promise<string | null>;
   openStorePanel?: () => Promise<unknown>;
   openSignIn?: () => Promise<unknown>;
-  listNativeIntegrations?: () => Promise<NativeIntegration[]>;
-  connectNativeIntegration?: (payload: { id: string }) => Promise<NativeIntegration>;
-  disconnectNativeIntegration?: (payload: { id: string }) => Promise<NativeIntegration>;
   requestPackageInstall?: (payload: {
     packageId: string;
     releaseNumber: number;
@@ -320,18 +317,6 @@ type DesktopStoreBridge = {
     activePack: { packId: string; sheetUrls: string[] } | null;
   }>;
   fashion?: DesktopStoreFashionBridge;
-};
-
-type NativeIntegration = {
-  id: string;
-  name: string;
-  category: string;
-  auth: string[];
-  catalogToolCount: number;
-  availability: "ready" | "planned";
-  description: string;
-  enabled: boolean;
-  toolCount: number;
 };
 
 type PetBridgeState = {
@@ -602,7 +587,6 @@ const DISCOVER_FILTERS: Array<{ id: StoreCategory | "all"; label: string }> = [
   { id: "productivity", label: "Productivity" },
   { id: "customization", label: "Customization" },
   { id: "skills-agents", label: "Skills & agents" },
-  { id: "integrations", label: "Integrations" },
   { id: "other", label: "Other" },
 ];
 
@@ -1594,66 +1578,6 @@ function PackageCard({
           />
           <span className="store-card-installs">
             {formatInstallCount(pkg.installCount)}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function NativeIntegrationCard({
-  integration,
-  busy,
-  onConnect,
-  onDisconnect,
-}: {
-  integration: NativeIntegration;
-  busy: boolean;
-  onConnect: () => void;
-  onDisconnect: () => void;
-}) {
-  const ready = integration.availability === "ready";
-  const actionLabel = busy
-    ? integration.enabled
-      ? "Removing..."
-      : "Adding..."
-    : integration.enabled
-      ? "Added"
-      : ready
-        ? "Add"
-        : "Soon";
-  const actionVariant = busy ? "working" : integration.enabled ? "added" : "get";
-  return (
-    <div className="store-card" data-clickable={ready ? "true" : undefined}>
-      <PackageArtwork
-        name={integration.name}
-        className="store-card-image"
-        letterClassName="store-card-image-letter"
-      />
-      <div className="store-card-body">
-        <div className="store-card-top">
-          <span className="store-card-name">{integration.name}</span>
-          <div className="store-card-actions">
-            <button
-              className="store-action-btn"
-              data-variant={actionVariant}
-              disabled={busy || (!ready && !integration.enabled)}
-              onClick={(event) => {
-                event.stopPropagation();
-                if (integration.enabled) onDisconnect();
-                else onConnect();
-              }}
-              type="button"
-            >
-              {actionLabel}
-            </button>
-          </div>
-        </div>
-        <div className="store-card-desc">{integration.description}</div>
-        <div className="store-card-footer">
-          <AuthorChip username="Stella" badge="verified" />
-          <span className="store-card-installs">
-            {ready ? `${integration.toolCount} actions` : "Planned"}
           </span>
         </div>
       </div>
@@ -4843,10 +4767,8 @@ function StoreClientInner() {
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null);
   const [installedIds, setInstalledIds] = useState<Set<string>>(new Set());
   const [installingId, setInstallingId] = useState<string | null>(null);
-  const [connectingIntegrationId, setConnectingIntegrationId] = useState<string | null>(null);
   const [sharePkg, setSharePkg] = useState<StorePackage | null>(null);
   const [installedMods, setInstalledMods] = useState<StoreInstall[]>([]);
-  const [nativeIntegrations, setNativeIntegrations] = useState<NativeIntegration[]>([]);
   const [urlState, setUrlState] = useState({
     tab: "discover",
     packageId: null as string | null,
@@ -4923,26 +4845,6 @@ function StoreClientInner() {
   });
   const showNewSection =
     isForYouSurface && newPackagesFiltered.length >= 3 && allPackages !== undefined;
-  const visibleNativeIntegrations = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (filter !== "all" && filter !== "integrations") return [];
-    return nativeIntegrations
-      .filter((integration) => {
-        if (!q) return true;
-        return (
-          integration.name.toLowerCase().includes(q) ||
-          integration.category.toLowerCase().includes(q)
-        );
-      })
-      .sort((left, right) => {
-        const availabilityRank = { ready: 0, planned: 1 } as const;
-        const rankDelta =
-          availabilityRank[left.availability] - availabilityRank[right.availability];
-        if (rankDelta !== 0) return rankDelta;
-        return left.name.localeCompare(right.name);
-      });
-  }, [filter, nativeIntegrations, query]);
-
   const installPackage = async (pkg: StorePackage) => {
     const bridge = getDesktopStoreBridge();
     if (!bridge?.requestPackageInstall) {
@@ -4992,41 +4894,10 @@ function StoreClientInner() {
     }
   };
 
-  const connectNativeIntegration = async (integration: NativeIntegration) => {
-    const bridge = getDesktopStoreBridge();
-    if (!bridge?.connectNativeIntegration) return;
-    setConnectingIntegrationId(integration.id);
-    try {
-      const next = await bridge.connectNativeIntegration({ id: integration.id });
-      setNativeIntegrations((previous) =>
-        previous.map((entry) => (entry.id === next.id ? next : entry)),
-      );
-    } finally {
-      setConnectingIntegrationId(null);
-    }
-  };
-
-  const disconnectNativeIntegration = async (integration: NativeIntegration) => {
-    const bridge = getDesktopStoreBridge();
-    if (!bridge?.disconnectNativeIntegration) return;
-    setConnectingIntegrationId(integration.id);
-    try {
-      const next = await bridge.disconnectNativeIntegration({ id: integration.id });
-      setNativeIntegrations((previous) =>
-        previous.map((entry) => (entry.id === next.id ? next : entry)),
-      );
-    } finally {
-      setConnectingIntegrationId(null);
-    }
-  };
-
   useEffect(() => {
     void window.stellaDesktopStore?.listInstalledMods().then((mods) => {
       setInstalledMods(mods);
       setInstalledIds(new Set(mods.map((mod) => mod.packageId)));
-    });
-    void window.stellaDesktopStore?.listNativeIntegrations?.().then((items) => {
-      setNativeIntegrations(items);
     });
   }, []);
 
@@ -5136,29 +5007,6 @@ function StoreClientInner() {
                 packages={allPackages ?? []}
                 onSelect={setSelectedPackageId}
               />
-            ) : null}
-            {visibleNativeIntegrations.length > 0 ? (
-              <div className="store-section">
-                <div className="store-section-header">
-                  <span className="store-section-title">Integrations</span>
-                  <span className="store-section-count">
-                    {visibleNativeIntegrations.length}
-                  </span>
-                </div>
-                <div className="store-grid">
-                  {visibleNativeIntegrations.map((integration) => (
-                    <NativeIntegrationCard
-                      key={integration.id}
-                      integration={integration}
-                      busy={connectingIntegrationId === integration.id}
-                      onConnect={() => void connectNativeIntegration(integration)}
-                      onDisconnect={() =>
-                        void disconnectNativeIntegration(integration)
-                      }
-                    />
-                  ))}
-                </div>
-              </div>
             ) : null}
             {showNewSection ? (
               <div className="store-section">
