@@ -51,7 +51,7 @@ export type NativeIntegration = {
   auth: string[];
   catalogToolCount: number;
   availability?: "ready";
-  provider?: "google-workspace" | "oauth-catalog";
+  provider?: "google-workspace" | "oauth-catalog" | "backend-composio";
   sourceUrl?: string;
   iconUrl?: string;
   description: string;

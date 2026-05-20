@@ -119,7 +119,10 @@ export function StoreClientInner() {
   const rest = isForYouSurface ? sortPackagesForYou(restRaw) : restRaw;
   const nativeIntegrations = useMemo(() => {
     if (localNativeIntegrations.length > 0) return localNativeIntegrations;
-    return storeIntegrations ?? [];
+    return (storeIntegrations ?? []).map((integration) => ({
+      ...integration,
+      enabled: false,
+    }));
   }, [localNativeIntegrations, storeIntegrations]);
   const visibleNativeIntegrations = useMemo(() => {
     const q = query.trim().toLowerCase();
