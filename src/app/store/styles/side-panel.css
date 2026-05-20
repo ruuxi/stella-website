@@ -1,0 +1,536 @@
+/* ============================================
+   Store side panel (new — Phase 3 rewrite)
+   ============================================ */
+
+.store-side-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: 0;
+}
+
+.display-sidebar__rich--store > * {
+  flex: 0 0 auto;
+  min-height: initial;
+}
+
+.display-sidebar__rich--store > .store-side-panel-list,
+.display-sidebar__rich--store > .store-side-panel-empty {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.store-side-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.store-side-panel-refresh {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.store-side-panel-refresh:hover { color: var(--text-strong); }
+.store-side-panel-refresh:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.store-side-panel-empty {
+  margin: auto 16px;
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.store-side-panel-list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 4px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scrollbar-width: thin;
+}
+.store-side-panel-list::-webkit-scrollbar { width: 6px; }
+.store-side-panel-list::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 3px;
+}
+
+/*
+ * Recent-changes row. The label sits on the left; explicit `Add` and
+ * `Publish` action pills sit on the right. The whole row is a div, not
+ * a button — clicking individual actions is the affordance.
+ */
+.store-side-panel-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.store-side-panel-row:hover {
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
+}
+.store-side-panel-row[data-selected] {
+  background: color-mix(
+    in oklch,
+    var(--interactive, var(--primary, oklch(0.62 0.18 250))) 6%,
+    transparent
+  );
+  border-color: color-mix(
+    in oklch,
+    var(--interactive, var(--primary, oklch(0.62 0.18 250))) 28%,
+    transparent
+  );
+}
+
+.store-side-panel-row-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.store-side-panel-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Apple-style tinted action pill (Add / Publish on a recent change). */
+.store-side-panel-pill {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 620;
+  letter-spacing: -0.005em;
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  border: 1px solid color-mix(in oklch, var(--foreground) 14%, transparent);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.2s ease,
+    border-color 0.2s ease;
+  background: color-mix(in oklch, var(--foreground) 8%, transparent);
+  color: var(--text-base);
+}
+.store-side-panel-pill:hover {
+  opacity: 0.88;
+  transform: scale(1.03);
+}
+.store-side-panel-pill:active {
+  transform: scale(0.96);
+}
+.store-side-panel-pill[data-variant="primary"] {
+  background: color-mix(
+    in oklch,
+    var(--interactive, var(--primary, oklch(0.62 0.18 250))) 12%,
+    transparent
+  );
+  color: var(--interactive, var(--primary, oklch(0.62 0.18 250)));
+  border-color: color-mix(
+    in oklch,
+    var(--interactive, var(--primary, oklch(0.62 0.18 250))) 28%,
+    transparent
+  );
+}
+.store-side-panel-pill[data-active] {
+  background: color-mix(
+    in oklch,
+    var(--interactive, var(--primary, oklch(0.62 0.18 250))) 14%,
+    transparent
+  );
+  color: var(--text-strong);
+}
+
+.store-side-panel-row-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.store-side-panel-row-meta {
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: baseline;
+}
+/* ============================================
+   Store side panel — chat surface
+   Renders messages through the same MessageRow components as the full
+   chat / chat sidebar (`UserMessageRow` / `AssistantMessageRow` inside
+   `.chat-conversation-surface--sidebar`), so user / assistant bubbles
+   look identical across surfaces.
+   ============================================ */
+
+.store-side-panel-thread {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 10px 4px;
+  border-top: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
+  scrollbar-width: thin;
+}
+
+.store-side-panel-thread .chat-conversation-surface {
+  /* Top-down flow inside the side panel rather than the full-chat
+   * "stick to bottom" flex-end. */
+  justify-content: flex-start;
+  min-height: 0;
+}
+
+.store-side-panel-thread-empty {
+  margin: 24px 12px;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px dashed color-mix(in oklch, var(--foreground) 8%, transparent);
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-weaker);
+  line-height: 1.55;
+}
+
+/* User-message feature chip strip (renders above the user bubble). */
+.store-side-panel-user-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 12px 4px;
+  justify-content: flex-end;
+}
+.store-side-panel-user-chip {
+  font-size: 10.5px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: color-mix(
+    in oklch,
+    var(--interactive, var(--primary, oklch(0.62 0.18 250))) 10%,
+    transparent
+  );
+  color: var(--text-strong);
+  border: 1px solid
+    color-mix(
+      in oklch,
+      var(--interactive, var(--primary, oklch(0.62 0.18 250))) 22%,
+      transparent
+    );
+}
+
+/*
+ * Drafting indicator. Replaces the in-thread "Working…" line with a
+ * larger, calmer message — primary text in `text-strong` plus a
+ * subtitle hinting at duration. No status dot.
+ */
+.store-side-panel-drafting {
+  margin: 12px 12px 4px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: var(--text-strong);
+}
+.store-side-panel-drafting-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-weak);
+}
+
+/*
+ * Blueprint draft pill — same artifact-card shape as `.end-resource-card`
+ * with a name on the second line and a right-aligned, transparent-with-
+ * border state badge ("Review required" / "Published" / "Denied").
+ */
+.store-side-panel-blueprint-card {
+  /* inherits from .end-resource-card */
+}
+.store-side-panel-blueprint-card[data-denied] {
+  opacity: 0.55;
+  text-decoration: line-through;
+  text-decoration-color: var(--text-weaker);
+}
+.store-side-panel-blueprint-card .end-resource-card__action {
+  font-weight: 500;
+  color: var(--text-base);
+}
+
+.store-side-panel-blueprint-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: 1px solid var(--border-base, var(--border));
+  color: var(--text-strong);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.store-side-panel-blueprint-badge[data-tier="denied"] {
+  border-color: color-mix(in oklch, var(--destructive, oklch(0.6 0.2 25)) 50%, transparent);
+  color: var(--destructive, oklch(0.6 0.2 25));
+}
+.store-side-panel-blueprint-badge[data-tier="published"] {
+  border-color: color-mix(in oklch, oklch(0.65 0.18 145) 55%, transparent);
+  color: oklch(0.45 0.14 145);
+}
+:root[data-theme="dark"] .store-side-panel-blueprint-badge[data-tier="published"] {
+  color: oklch(0.78 0.12 145);
+}
+
+/* Editing-blueprint chip rendered in the composer's attached strip. */
+.store-side-panel-edit-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklch, var(--foreground) 5%, transparent);
+  border: 1px dashed color-mix(in oklch, var(--foreground) 14%, transparent);
+  font-family: inherit;
+  font-size: 11.5px;
+  color: var(--text-base);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.store-side-panel-edit-chip:hover {
+  background: color-mix(in oklch, var(--foreground) 9%, transparent);
+}
+
+/*
+ * Composer override: the panel composer is the chat-sidebar shell
+ * verbatim (`.chat-sidebar-composer` / `.chat-sidebar-shell` /
+ * `.chat-sidebar-form` / `.chat-sidebar-input`) so the visual language
+ * is identical to the chat surfaces. We only adjust the outer padding
+ * to sit flush against the side-panel chrome.
+ */
+.store-side-panel > .chat-sidebar-composer {
+  padding: 6px 12px 10px;
+}
+
+/*
+ * Blueprint review + Publish dialogs.
+ *
+ * Both use the shared Radix `Dialog` shell (`@/ui/dialog`) and adopt the
+ * glass aesthetic from `ConnectDialog`: backdrop-filter on the content
+ * card, soft border, header/body separators. The markdown viewer
+ * deliberately uses a *solid* surface (`--background`) so glass-on-glass
+ * doesn't reduce readability of long blueprint copy.
+ */
+[data-slot="dialog-content"].store-blueprint-dialog,
+[data-slot="dialog-content"].store-publish-dialog {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  background-clip: padding-box;
+  border: 1px solid var(--border-weak);
+  padding: 0;
+}
+
+.store-blueprint-dialog [data-slot="dialog-header"],
+.store-publish-dialog [data-slot="dialog-header"] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-weak);
+}
+
+.store-blueprint-dialog [data-slot="dialog-title"],
+.store-publish-dialog [data-slot="dialog-title"] {
+  font-size: 15px;
+  font-weight: 620;
+  color: var(--text-strong);
+  letter-spacing: -0.01em;
+}
+
+.store-blueprint-dialog [data-slot="dialog-close-button"],
+.store-publish-dialog [data-slot="dialog-close-button"] {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md, 8px);
+  border: none;
+  background: transparent;
+  color: var(--text-weak);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.store-blueprint-dialog [data-slot="dialog-close-button"]:hover,
+.store-publish-dialog [data-slot="dialog-close-button"]:hover {
+  background: color-mix(in oklch, var(--foreground) 6%, transparent);
+  color: var(--text-strong);
+}
+
+.store-blueprint-dialog [data-slot="dialog-body"],
+.store-publish-dialog [data-slot="dialog-body"] {
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+[data-component="dialog"][data-fit]:has([data-slot="dialog-content"].store-blueprint-dialog)
+  [data-slot="dialog-container"] {
+  --dialog-width: 720px;
+  height: min(calc(100vh - 32px), 720px);
+  min-height: min(calc(100vh - 32px), 560px);
+}
+
+[data-component="dialog"][data-fit]:has([data-slot="dialog-content"].store-publish-dialog)
+  [data-slot="dialog-container"] {
+  --dialog-width: 460px;
+}
+
+/* Solid (non-glass) markdown surface inside the glass dialog. */
+.store-blueprint-dialog-viewer {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 16px;
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid var(--border-weak);
+  background: var(--background);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text-strong);
+}
+
+.store-blueprint-dialog-actions,
+.store-publish-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.store-publish-dialog-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-base);
+}
+
+.store-publish-dialog-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.store-publish-dialog-field-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-weaker);
+}
+
+.store-publish-dialog-field input,
+.store-publish-dialog-field textarea,
+.store-publish-dialog-field select {
+  font-family: inherit;
+  font-size: 13.5px;
+  padding: 9px 11px;
+  border-radius: var(--radius-md, 10px);
+  background: color-mix(in srgb, var(--background) 60%, transparent);
+  border: 1px solid var(--border-weak);
+  color: var(--text-strong);
+}
+.store-publish-dialog-field input:focus,
+.store-publish-dialog-field textarea:focus,
+.store-publish-dialog-field select:focus {
+  outline: none;
+  border-color: var(--border-base);
+  background: color-mix(in srgb, var(--background) 80%, transparent);
+}
+
+.store-install-confirm-copy {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-weak);
+}
+
+/*
+ * Re-skin the shared `.pill-btn` inside our dialogs so every action is
+ * a real, bordered, tinted pill at rest (the base `.pill-btn` is
+ * transparent except for the `--primary` variant). Same Apple-style
+ * tint language used elsewhere in the redesign.
+ */
+.store-blueprint-dialog .pill-btn,
+.store-publish-dialog .pill-btn {
+  background: color-mix(in oklch, var(--foreground) 7%, transparent);
+  border: 1px solid color-mix(in oklch, var(--foreground) 14%, transparent);
+  color: var(--text-strong);
+  padding: 7px 16px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.store-blueprint-dialog .pill-btn:hover:not(:disabled),
+.store-publish-dialog .pill-btn:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--foreground) 12%, transparent);
+  color: var(--text-strong);
+}
+.store-blueprint-dialog .pill-btn--danger,
+.store-publish-dialog .pill-btn--danger {
+  background: color-mix(in oklch, var(--destructive, oklch(0.6 0.2 25)) 14%, transparent);
+  color: var(--destructive, oklch(0.6 0.2 25));
+  border-color: color-mix(in oklch, var(--destructive, oklch(0.6 0.2 25)) 32%, transparent);
+}
+.store-blueprint-dialog .pill-btn--danger:hover:not(:disabled),
+.store-publish-dialog .pill-btn--danger:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--destructive, oklch(0.6 0.2 25)) 22%, transparent);
+}
+.store-blueprint-dialog .pill-btn--primary,
+.store-publish-dialog .pill-btn--primary {
+  background: color-mix(
+    in oklch,
+    var(--interactive, var(--primary, oklch(0.62 0.18 250))) 14%,
+    transparent
+  );
+  border-color: color-mix(
+    in oklch,
+    var(--interactive, var(--primary, oklch(0.62 0.18 250))) 32%,
+    transparent
+  );
+  color: var(--interactive, var(--primary, oklch(0.62 0.18 250)));
+}
+.store-blueprint-dialog .pill-btn--primary:hover:not(:disabled),
+.store-publish-dialog .pill-btn--primary:hover:not(:disabled) {
+  background: color-mix(
+    in oklch,
+    var(--interactive, var(--primary, oklch(0.62 0.18 250))) 20%,
+    transparent
+  );
+  opacity: 1;
+}
+

@@ -1,0 +1,541 @@
+/* === Your pets section === */
+
+.pets-your-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pets-your-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.pets-your-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-weak);
+}
+
+.pets-your-count {
+  font-size: 11px;
+  color: var(--text-weak);
+  font-variant-numeric: tabular-nums;
+}
+
+.pets-card-name-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.pets-card-visibility-badge {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--button-secondary-base);
+  color: var(--text-base);
+  border: 1px solid var(--border-base);
+}
+
+.pets-card-visibility-badge[data-tier="private"] {
+  color: var(--text-weak);
+}
+
+.pets-card-menu-btn {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-base);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 120ms ease,
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+.pets-card-wrapper:hover .pets-card-menu-btn,
+.pets-card-menu-btn[data-state="open"],
+.pets-card-menu-btn:focus-visible {
+  opacity: 1;
+  background: var(--surface-raised);
+  border-color: var(--border-base);
+}
+
+/* === Pet detail dialog ===
+   Mirrors Connect dialog aesthetic — glass surface, headered top
+   section with hairline divider, generous internal padding so the
+   content never crowds the dialog edges. */
+
+[data-slot="dialog-content"].pet-detail-dialog {
+  --pet-dialog-pad-x: 28px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  background-clip: padding-box;
+  border: 1px solid var(--border-weak);
+  min-height: 0;
+  flex: 1 1 auto;
+  align-self: stretch;
+  max-height: 100%;
+}
+
+.store-web-dialog > .pet-detail-dialog {
+  --pet-dialog-pad-x: 28px;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+[data-component="dialog"][data-fit]:has([data-slot="dialog-content"].pet-detail-dialog)
+  [data-slot="dialog-container"] {
+  --dialog-width: 540px;
+  height: min(calc(100vh - 16px), 720px);
+  min-height: min(calc(100vh - 16px), 640px);
+}
+
+.pet-detail-header,
+.pet-detail-dialog [data-slot="dialog-header"] {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  text-align: center;
+  padding: 22px var(--pet-dialog-pad-x) 18px;
+  border-bottom: 1px solid var(--border-weak);
+}
+
+.pet-detail-title {
+  margin: 0;
+  font-family: var(--font-family-display, "Cormorant Garamond", Georgia, serif);
+  font-size: 1.7rem;
+  font-weight: 450;
+  font-style: italic;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--text-strong);
+}
+
+.pet-detail-caption {
+  margin: 0;
+  font-family: var(--font-family-sans, "Manrope", sans-serif);
+  font-size: 12.5px;
+  color: var(--text-weak);
+  letter-spacing: -0.005em;
+}
+
+.store-web-dialog .pet-detail-body,
+.pet-detail-dialog [data-slot="dialog-body"] {
+  flex: 1;
+  min-height: 0;
+  padding: 24px var(--pet-dialog-pad-x) 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.pet-detail-body {
+  width: 100%;
+}
+
+.pet-detail-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 260px;
+  padding: 12px 0;
+}
+
+.pet-detail-blurb {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-family-sans, "Manrope", sans-serif);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text-base);
+  max-width: 360px;
+}
+
+.pet-detail-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.pet-detail-states-section {
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-weak);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.pet-detail-states-label {
+  font-family: var(--font-family-sans, "Manrope", sans-serif);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-weaker);
+  opacity: 0.85;
+}
+
+.pet-detail-states {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.pet-detail-state-thumb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-base);
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+.pet-detail-state-thumb:hover {
+  background: color-mix(in oklch, var(--foreground) 6%, transparent);
+}
+
+.pet-detail-state-thumb[data-active] {
+  border-color: var(--border-base);
+  background: color-mix(in oklch, var(--foreground) 8%, transparent);
+}
+
+.pet-detail-state-thumb:focus-visible {
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 24%, transparent);
+}
+
+/* === Create pet dialog ===
+   Connect-dialog aesthetic: glass surface, headered top section,
+   generous padding, single-column layout. */
+
+[data-slot="dialog-content"].user-pet-create-dialog {
+  --pet-create-pad-x: 28px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  background-clip: padding-box;
+  border: 1px solid var(--border-weak);
+  min-height: 0;
+  flex: 1 1 auto;
+  align-self: stretch;
+  max-height: 100%;
+}
+
+.store-web-dialog:has(.user-pet-create-dialog) {
+  display: flex;
+  width: min(540px, 100%);
+  height: min(calc(100vh - 16px), 720px);
+  min-height: min(calc(100vh - 16px), 640px);
+  overflow: hidden;
+  padding: 0;
+}
+
+.store-web-dialog > .user-pet-create-dialog {
+  --pet-create-pad-x: 28px;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+[data-component="dialog"][data-fit]:has([data-slot="dialog-content"].user-pet-create-dialog)
+  [data-slot="dialog-container"] {
+  --dialog-width: 540px;
+  height: min(calc(100vh - 16px), 720px);
+  min-height: min(calc(100vh - 16px), 640px);
+}
+
+.user-pet-create-header,
+.user-pet-create-dialog [data-slot="dialog-header"] {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  text-align: center;
+  padding: 22px var(--pet-create-pad-x) 18px;
+  border-bottom: 1px solid var(--border-weak);
+}
+
+.user-pet-create-title {
+  margin: 0;
+  font-family: var(--font-family-display, "Cormorant Garamond", Georgia, serif);
+  font-size: 1.7rem;
+  font-weight: 450;
+  font-style: italic;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--text-strong);
+}
+
+.user-pet-create-caption {
+  margin: 0;
+  font-family: var(--font-family-sans, "Manrope", sans-serif);
+  font-size: 12.5px;
+  color: var(--text-weak);
+  letter-spacing: -0.005em;
+  max-width: 420px;
+}
+
+.store-web-dialog .user-pet-create-body,
+.user-pet-create-dialog [data-slot="dialog-body"] {
+  flex: 1;
+  min-height: 0;
+  padding: 20px var(--pet-create-pad-x) 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.user-pet-create-body {
+  width: 100%;
+}
+
+.user-pet-create-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 220px;
+  position: relative;
+  overflow: hidden;
+}
+
+.user-pet-create-stage[data-state="busy"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--primary) 12%, transparent),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: user-pet-create-shimmer 1.4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes user-pet-create-shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+.user-pet-create-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-weak);
+  text-align: center;
+  padding: 0 24px;
+}
+
+.user-pet-create-empty-text {
+  font-family: var(--font-family-sans, "Manrope", sans-serif);
+  font-size: 12.5px;
+  color: var(--text-weak);
+}
+
+.user-pet-create-state-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: -6px;
+}
+
+.user-pet-create-state-pill {
+  border: 1px solid var(--border-base);
+  background: var(--surface-raised);
+  color: var(--text-base);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  cursor: pointer;
+  text-transform: capitalize;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+.user-pet-create-state-pill[data-active] {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface-raised));
+  color: var(--text-strong);
+}
+
+.user-pet-create-warning {
+  font-size: 11.5px;
+  color: var(--text-weak);
+  text-align: center;
+}
+
+.user-pet-create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.user-pet-create-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.user-pet-create-field-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-weak);
+}
+
+.user-pet-create-field-hint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 10.5px;
+  margin-left: 6px;
+  color: var(--text-weak);
+}
+
+.user-pet-create-textarea {
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-base);
+  background: var(--surface-raised);
+  color: var(--text-strong);
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+  outline: none;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    background-color 120ms ease;
+}
+
+.user-pet-create-textarea:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 25%, transparent);
+}
+
+.user-pet-create-visibility {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.user-pet-create-visibility-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-base);
+  background: var(--surface-raised);
+  color: var(--text-base);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+.user-pet-create-visibility-pill:hover {
+  background: var(--button-secondary-hover);
+}
+
+.user-pet-create-visibility-pill[data-active] {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface-raised));
+}
+
+.user-pet-create-visibility-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.user-pet-create-visibility-sub {
+  font-size: 11px;
+  color: var(--text-weak);
+}
+
+.user-pet-create-actions {
+  position: sticky;
+  bottom: -24px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 8px -28px -24px;
+  padding: 14px 28px;
+  border-top: 1px solid var(--border-weak);
+  z-index: 2;
+}
+
+.user-pet-create-discard {
+  margin-right: auto;
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-weak);
+}
+
+.user-pet-create-discard:hover:not(:disabled) {
+  color: var(--danger, #d04444);
+  background: color-mix(in oklch, var(--danger, #d04444) 8%, transparent);
+}

@@ -1,0 +1,1428 @@
+/* ============================================
+   Store View — Refined App-Store Aesthetic
+   ============================================ */
+
+.store-root {
+  --shell-topbar-height: 0px;
+  --background: #f2f4f8;
+  --foreground: #161616;
+  --surface-1: rgba(255, 255, 255, 0.76);
+  --surface-2: rgba(255, 255, 255, 0.58);
+  --surface-3: rgba(255, 255, 255, 0.42);
+  --surface-raised: color-mix(in srgb, #ffffff 65%, transparent);
+  --surface-raised-hover: color-mix(in srgb, #ffffff 80%, transparent);
+  --text-strong: color-mix(in srgb, var(--foreground) 95%, transparent);
+  --text: color-mix(in srgb, var(--foreground) 80%, transparent);
+  --text-base: color-mix(in srgb, var(--foreground) 75%, transparent);
+  --text-muted: color-mix(in srgb, var(--foreground) 60%, transparent);
+  --text-weak: color-mix(in srgb, var(--foreground) 50%, transparent);
+  --text-weaker: color-mix(in srgb, var(--foreground) 35%, transparent);
+  --border: rgba(22, 22, 22, 0.12);
+  --border-strong: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --border-base: color-mix(in srgb, var(--foreground) 8%, transparent);
+  --border-weak: color-mix(in srgb, var(--foreground) 5%, transparent);
+  --accent: #0f62fe;
+  --accent-strong: #0043ce;
+  --accent-foreground: #ffffff;
+  --interactive: var(--foreground);
+  --primary: #0f62fe;
+  --primary-foreground: #ffffff;
+  --ring: #0f62fe;
+  --glass-bg: color-mix(in srgb, var(--background) 40%, transparent);
+  --glass-blur: blur(40px) saturate(180%);
+  --button-secondary-base: color-mix(in srgb, rgba(105, 112, 119, 0.16) 40%, var(--background));
+  --button-secondary-hover: rgba(105, 112, 119, 0.16);
+  --destructive: #d84040;
+  --danger: #d84040;
+  --radius-full: 999px;
+  --font-family-sans: var(--font-sans), sans-serif;
+  --font-family-display: var(--font-display, "Cormorant Garamond", Georgia), serif;
+  --store-solid-fg: var(--background);
+  min-height: 100vh;
+}
+
+/* Store keeps its own internal palette tokens (cards, surfaces) but does not
+ * override the global body background, so marketing pages and the Store
+ * share the radial-gradient backdrop defined in `globals.css`. */
+
+@keyframes store-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes store-scale-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes store-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes store-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+
+/* --- Root --- */
+
+.store-root {
+  /* The shell topbar overlays the workspace area — subtract it so the
+     scroll/flex math doesn't push surfaces (esp. the Publish composer)
+     below the visible viewport. */
+  position: relative;
+  height: calc(100vh - var(--shell-topbar-height, 38px));
+  max-height: calc(100vh - var(--shell-topbar-height, 38px));
+  overflow-y: auto;
+  scrollbar-width: none;
+  container-type: inline-size;
+  container-name: store;
+}
+
+.store-root::-webkit-scrollbar { display: none; }
+
+.store-web-tabs {
+  position: sticky;
+  top: 10px;
+  z-index: 20;
+  display: flex;
+  width: fit-content;
+  max-width: calc(100% - 32px);
+  align-items: center;
+  gap: 4px;
+  margin: 10px auto 0;
+  padding: 5px;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklch, var(--foreground) 5%, var(--background));
+  border: 1px solid color-mix(in oklch, var(--foreground) 9%, transparent);
+  box-shadow: 0 8px 24px color-mix(in oklch, var(--foreground) 5%, transparent);
+}
+
+.store-web-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 14px;
+  border-radius: var(--radius-full);
+  color: var(--text-weak);
+  font-size: 12px;
+  font-weight: 620;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.store-web-tab:hover,
+.store-web-tab[data-active="true"] {
+  color: var(--text-strong);
+  background: var(--background);
+}
+
+.store-web-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.34);
+}
+
+.store-web-dialog {
+  position: relative;
+  width: min(920px, 100%);
+  max-height: min(760px, calc(100vh - 48px));
+  overflow: auto;
+  border-radius: 18px;
+  background: var(--background);
+  border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+  padding: 26px;
+}
+
+.store-web-dialog:has(.pet-detail-dialog) {
+  display: flex;
+  width: min(540px, 100%);
+  height: min(calc(100vh - 16px), 720px);
+  min-height: min(calc(100vh - 16px), 640px);
+  max-height: min(calc(100vh - 16px), 720px);
+  overflow: hidden;
+  padding: 0;
+}
+
+.store-web-dialog:has(.store-confirm-dialog) {
+  width: min(460px, 100%);
+  padding: 0;
+  overflow: hidden;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  background-clip: padding-box;
+  border: 1px solid var(--border-weak);
+}
+
+.store-web-dialog-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
+  color: var(--text-strong);
+}
+
+.store-upload-btn {
+  position: sticky;
+  top: 52px;
+  float: right;
+  z-index: 8;
+  margin: 14px 20px 0 0;
+}
+
+/* Hosted install-confirm dialog. The desktop dialog uses Radix
+   `[data-slot="dialog-content"]` selectors that we don't have here;
+   we add the missing inline header / markdown body so the dialog
+   reads the same as the desktop one through `StoreModal`. */
+.store-web-dialog .store-blueprint-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-weak, color-mix(in oklch, var(--foreground) 8%, transparent));
+}
+
+.store-blueprint-dialog-title {
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--text-strong);
+  letter-spacing: -0.01em;
+}
+
+.store-blueprint-dialog-loading {
+  font-size: 13px;
+  color: var(--text-weak);
+  text-align: center;
+  padding: 28px 0;
+}
+
+.store-blueprint-dialog-markdown {
+  margin: 0;
+  font-family: var(--font-mono, ui-monospace);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-strong);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.store-web-dialog:has(.store-blueprint-dialog-viewer) {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: min(720px, calc(100vh - 48px));
+}
+.store-web-dialog .store-blueprint-dialog-viewer {
+  flex: 1;
+  min-height: 320px;
+}
+
+.store-share-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 6px 6px;
+}
+
+.store-share-dialog-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-strong);
+  letter-spacing: -0.01em;
+}
+
+.store-share-dialog-caption {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-weak);
+  line-height: 1.5;
+}
+
+.store-share-dialog-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.store-share-dialog-input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
+  background: color-mix(in oklch, var(--foreground) 3%, transparent);
+  color: var(--text-strong);
+  font-family: inherit;
+  font-size: 12.5px;
+}
+
+.store-share-dialog-input:focus {
+  outline: none;
+  border-color: color-mix(in oklch, var(--interactive) 35%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--interactive) 12%, transparent);
+}
+
+.store-scroll {
+  padding: 28px 32px 48px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Fashion tab takes over the full surface — no width cap, no padding,
+   and it owns the scroll snap. The store header still floats above it. */
+.store-root[data-tab="fashion"] {
+  overflow: hidden;
+}
+.store-root[data-tab="fashion"] .store-scroll {
+  padding: 0;
+  max-width: none;
+  margin: 0;
+  height: calc(100vh - var(--shell-topbar-height, 38px));
+}
+
+/* The Store nav now lives in the page-sidebar (see StoreView), so the
+   in-page header / pill row that used to sit at the top of `.store-root`
+   is gone. Tab content begins flush with the workspace top edge. */
+
+/* --- Section --- */
+
+.store-section {
+  margin-bottom: 36px;
+}
+
+.store-section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.store-section-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-strong);
+  letter-spacing: -0.015em;
+}
+
+.store-section-count {
+  font-size: 13px;
+  color: var(--text-weaker);
+  font-weight: 500;
+}
+
+/* --- Featured Hero Card --- */
+
+.store-featured {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 36px;
+  cursor: default;
+  animation: store-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 2px 12px color-mix(in oklch, var(--foreground) 4%, transparent);
+}
+
+.store-featured:hover {
+  border-color: color-mix(in oklch, var(--foreground) 12%, transparent);
+}
+
+.store-featured-bg {
+  width: 100%;
+  min-height: 176px;
+}
+
+.store-featured-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.52) 0%,
+    rgba(0, 0, 0, 0.24) 58%,
+    rgba(0, 0, 0, 0.08) 100%
+  );
+}
+
+.store-featured-content {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 26px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.store-featured-icon {
+  width: 92px;
+  height: 92px;
+  border-radius: 22px;
+  flex-shrink: 0;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.22),
+    0 0 0 0.5px rgba(255, 255, 255, 0.28);
+}
+
+.store-featured-icon-letter {
+  font-size: 36px;
+  font-weight: 750;
+  color: white;
+  opacity: 0.92;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.store-featured-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.store-featured-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 8px;
+}
+
+.store-featured-name {
+  font-size: 26px;
+  font-weight: 750;
+  color: white;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+}
+
+.store-featured-desc {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+  max-width: 440px;
+}
+
+/* --- Grid --- */
+
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+@container store (max-width: 780px) {
+  .store-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@container store (max-width: 480px) {
+  .store-grid { grid-template-columns: 1fr; }
+  .store-scroll { padding: 22px 18px 36px; }
+  .store-featured-content { padding: 22px 20px; }
+  .store-featured-icon {
+    width: 74px;
+    height: 74px;
+    border-radius: 18px;
+  }
+  .store-featured-name { font-size: 22px; }
+}
+
+/* --- Card --- */
+
+.store-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 10px;
+  border-radius: 14px;
+  overflow: hidden;
+  padding: 12px;
+  background: color-mix(in oklch, var(--foreground) 2.5%, transparent);
+  border: 1px solid color-mix(in oklch, var(--foreground) 5%, transparent);
+  cursor: default;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.store-card-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.store-card:hover {
+  border-color: color-mix(in oklch, var(--foreground) 9%, transparent);
+}
+
+.store-card[data-clickable="true"] {
+  cursor: pointer;
+}
+
+/* --- Card Image --- */
+
+.store-card-image {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  flex: 0 0 auto;
+  box-shadow:
+    0 4px 14px color-mix(in oklch, var(--foreground) 8%, transparent),
+    0 0 0 0.5px color-mix(in oklch, var(--foreground) 6%, transparent);
+}
+
+.store-card-image-letter {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  opacity: 0.9;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  user-select: none;
+}
+
+/* Decorative glow behind letter — removed; read as generic AI chrome */
+
+/* --- Card Body --- */
+
+.store-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.store-card-name {
+  font-size: 14px;
+  font-weight: 620;
+  color: var(--text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.store-card-desc {
+  font-size: 12px;
+  color: var(--text-weak);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.store-card-meta {
+  font-size: 11px;
+  color: var(--text-weaker);
+  margin-top: 2px;
+}
+
+.store-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+  min-width: 0;
+}
+
+.store-card-footer-start {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.store-card-installs {
+  font-size: 11px;
+  color: var(--text-weaker);
+  font-weight: 550;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.store-card-meta-group {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.store-card-status-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+  border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
+  color: var(--text-weaker);
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
+}
+
+.store-card-status-chip[data-state="ready"] {
+  color: color-mix(in oklch, var(--interactive, var(--primary)) 80%, var(--text-base));
+  border-color: color-mix(in oklch, var(--interactive, var(--primary)) 22%, transparent);
+  background: color-mix(in oklch, var(--interactive, var(--primary)) 9%, transparent);
+}
+
+.store-card-status-chip[data-state="added"] {
+  color: oklch(0.48 0.13 145);
+  border-color: color-mix(in oklch, oklch(0.65 0.18 145) 20%, transparent);
+  background: color-mix(in oklch, oklch(0.65 0.18 145) 8%, transparent);
+}
+
+:root[data-theme="dark"] .store-card-status-chip[data-state="added"] {
+  color: oklch(0.78 0.12 145);
+}
+
+/* --- Action Buttons --- */
+
+.store-action-btn {
+  padding: 5px 16px;
+  border-radius: var(--radius-full);
+  border: none;
+  font-size: 13px;
+  font-weight: 650;
+  font-family: inherit;
+  cursor: default;
+  transition:
+    opacity 0.15s,
+    transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.2s,
+    box-shadow 0.2s;
+  flex-shrink: 0;
+  line-height: 1.3;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.store-action-btn:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.store-action-btn:active:not(:disabled) {
+  opacity: 0.85;
+}
+
+.store-action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Primary action: solid fill at rest, outline on hover (matches hosted upload CTA). */
+.store-action-btn[data-variant="get"] {
+  background: var(--foreground);
+  color: var(--store-solid-fg, var(--background));
+  border: 1px solid var(--foreground);
+  box-shadow: none;
+}
+
+.store-action-btn[data-variant="get"]:hover:not(:disabled) {
+  background: var(--foreground);
+  color: var(--store-solid-fg, var(--background));
+  border-color: var(--interactive, var(--primary, var(--foreground)));
+  opacity: 1;
+  box-shadow:
+    0 0 0 2px var(--store-solid-fg, var(--background)),
+    0 0 0 4px var(--interactive, var(--primary, var(--foreground)));
+}
+
+.store-action-btn[data-variant="added"] {
+  background: color-mix(in oklch, var(--foreground) 7%, transparent);
+  color: var(--text-base);
+  border: 1px solid color-mix(in oklch, var(--foreground) 14%, transparent);
+  cursor: default;
+}
+
+.store-action-btn[data-variant="share"] {
+  background: color-mix(
+    in oklch,
+    var(--interactive, var(--primary, oklch(0.62 0.18 250))) 10%,
+    transparent
+  );
+  color: var(--interactive, var(--primary, oklch(0.62 0.18 250)));
+  border: 1px solid
+    color-mix(
+      in oklch,
+      var(--interactive, var(--primary, oklch(0.62 0.18 250))) 22%,
+      transparent
+    );
+}
+
+.store-action-btn[data-variant="shared"] {
+  background: color-mix(in oklch, var(--foreground) 5%, transparent);
+  color: var(--text-weaker);
+  border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+  cursor: default;
+}
+
+.store-action-btn[data-variant="remove"] {
+  background: color-mix(in oklch, var(--destructive, oklch(0.6 0.2 25)) 10%, transparent);
+  color: var(--destructive, oklch(0.6 0.2 25));
+  border: 1px solid color-mix(in oklch, var(--destructive, oklch(0.6 0.2 25)) 28%, transparent);
+}
+
+.store-action-btn[data-variant="subtle"] {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-weak);
+}
+
+.store-action-btn[data-variant="subtle"]:hover:not(:disabled) {
+  color: var(--text-base);
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
+}
+
+.store-action-btn[data-variant="working"] {
+  background: color-mix(in oklch, var(--foreground) 5%, transparent);
+  color: var(--text-weak);
+  border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+  cursor: wait;
+  animation: store-pulse 1.5s ease-in-out infinite;
+}
+
+/* Large action button (detail view) */
+.store-action-btn--lg {
+  padding: 10px 30px;
+  font-size: 15px;
+}
+
+/* --- Detail View --- */
+
+.store-detail {
+  animation: store-scale-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.store-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 0;
+  border: none;
+  background: transparent;
+  color: var(--interactive);
+  font-size: 14px;
+  font-weight: 550;
+  font-family: inherit;
+  cursor: default;
+  transition: opacity 0.15s;
+  margin-bottom: 20px;
+}
+
+.store-detail-back:hover {
+  opacity: 0.7;
+}
+
+.store-detail-hero {
+  display: flex;
+  gap: 26px;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.store-detail-image {
+  width: 128px;
+  height: 128px;
+  border-radius: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow:
+    0 4px 14px color-mix(in oklch, var(--foreground) 8%, transparent),
+    0 0 0 0.5px color-mix(in oklch, var(--foreground) 6%, transparent);
+}
+
+.store-detail-image-letter {
+  font-size: 52px;
+  font-weight: 700;
+  color: white;
+  opacity: 0.9;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+
+.store-detail-info {
+  flex: 1;
+  min-width: 0;
+  padding-top: 4px;
+}
+
+.store-detail-name {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-strong);
+  letter-spacing: -0.025em;
+  margin-bottom: 8px;
+  line-height: 1.15;
+}
+
+.store-detail-desc {
+  font-size: 14px;
+  color: var(--text-weak);
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.store-detail-meta {
+  display: flex;
+  gap: 20px;
+  font-size: 12px;
+  color: var(--text-weaker);
+}
+
+.store-detail-meta--spaced {
+  margin-top: 12px;
+}
+
+.store-detail-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.store-detail-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+@container store (max-width: 560px) {
+  .store-detail-hero {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .store-detail-meta {
+    justify-content: center;
+  }
+  .store-detail-actions {
+    justify-content: center;
+  }
+}
+
+/* --- Detail Section --- */
+
+.store-detail-section {
+  margin-top: 28px;
+}
+
+.store-detail-section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-strong);
+  margin-bottom: 14px;
+  letter-spacing: -0.01em;
+}
+
+.store-detail-divider {
+  border: none;
+  border-top: 1px solid color-mix(in oklch, var(--foreground) 5%, transparent);
+  margin: 28px 0;
+}
+
+/* --- Version List --- */
+
+.store-version-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.store-version-item {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: color-mix(in oklch, var(--foreground) 2%, transparent);
+  border: 1px solid color-mix(in oklch, var(--foreground) 4%, transparent);
+  transition: background 0.2s;
+}
+
+.store-version-item:hover {
+  background: color-mix(in oklch, var(--foreground) 3.5%, transparent);
+}
+
+.store-version-label {
+  font-size: 14px;
+  font-weight: 620;
+  color: var(--text-base);
+  margin-bottom: 4px;
+}
+
+.store-version-notes {
+  font-size: 13px;
+  color: var(--text-weak);
+  line-height: 1.5;
+}
+
+.store-version-date {
+  font-size: 11px;
+  color: var(--text-weaker);
+  margin-top: 6px;
+}
+
+/* --- Empty State --- */
+
+.store-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 520px;
+  padding: 64px 24px;
+  text-align: center;
+  animation: store-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.store-empty-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: var(--text-weaker);
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
+  border: 1px solid color-mix(in oklch, var(--foreground) 3%, transparent);
+}
+
+.store-empty-title {
+  font-size: 17px;
+  font-weight: 650;
+  color: var(--text-base);
+  margin-bottom: 6px;
+}
+
+.store-empty-desc {
+  font-size: 13px;
+  color: var(--text-weak);
+  line-height: 1.6;
+  max-width: 300px;
+}
+
+/* --- Skeleton Loading --- */
+
+.store-skeleton-card {
+  border-radius: 14px;
+  overflow: hidden;
+  background: color-mix(in oklch, var(--foreground) 2%, transparent);
+  border: 1px solid color-mix(in oklch, var(--foreground) 4%, transparent);
+}
+
+.store-skeleton-image {
+  aspect-ratio: 16 / 10;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklch, var(--foreground) 3%, transparent) 25%,
+    color-mix(in oklch, var(--foreground) 6%, transparent) 50%,
+    color-mix(in oklch, var(--foreground) 3%, transparent) 75%
+  );
+  background-size: 200% 100%;
+  animation: store-shimmer 2s ease-in-out infinite;
+}
+
+.store-skeleton-body {
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.store-skeleton-line {
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklch, var(--foreground) 4%, transparent) 25%,
+    color-mix(in oklch, var(--foreground) 7%, transparent) 50%,
+    color-mix(in oklch, var(--foreground) 4%, transparent) 75%
+  );
+  background-size: 200% 100%;
+  animation: store-shimmer 2s ease-in-out infinite;
+}
+
+.store-skeleton-line--short {
+  width: 60%;
+}
+
+/* --- Status Messages --- */
+
+.store-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 550;
+  animation: store-fade-up 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.store-status[data-variant="success"] {
+  background: color-mix(in oklch, oklch(0.65 0.18 145) 8%, transparent);
+  color: oklch(0.45 0.14 145);
+  border: 1px solid color-mix(in oklch, oklch(0.65 0.18 145) 12%, transparent);
+}
+
+:root[data-theme="dark"] .store-status[data-variant="success"] {
+  color: oklch(0.78 0.12 145);
+}
+
+.store-status[data-variant="error"] {
+  background: color-mix(in oklch, var(--destructive) 6%, transparent);
+  color: var(--destructive);
+  border: 1px solid color-mix(in oklch, var(--destructive) 10%, transparent);
+}
+
+/* --- Added-to-Stella horizontal scroll row --- */
+
+.store-added-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+
+.store-added-row::-webkit-scrollbar {
+  display: none;
+}
+
+.store-added-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 8px 8px;
+  border-radius: 12px;
+  background: color-mix(in oklch, var(--foreground) 3%, transparent);
+  border: 1px solid color-mix(in oklch, var(--foreground) 5%, transparent);
+  cursor: default;
+  flex-shrink: 0;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.store-added-chip:hover {
+  background: color-mix(in oklch, var(--foreground) 5%, transparent);
+  border-color: color-mix(in oklch, var(--foreground) 8%, transparent);
+  box-shadow: 0 2px 8px color-mix(in oklch, var(--foreground) 4%, transparent);
+}
+
+.store-added-chip-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.store-added-chip-letter {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  opacity: 0.9;
+}
+
+.store-added-chip-name {
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--text-base);
+  white-space: nowrap;
+}
+
+.store-added-chip-badge {
+  padding: 3px 7px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--primary, oklch(0.58 0.16 260)) 28%, transparent);
+  background: color-mix(in oklch, var(--primary, oklch(0.58 0.16 260)) 8%, transparent);
+  color: color-mix(in oklch, var(--primary, oklch(0.58 0.16 260)) 82%, var(--foreground));
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1;
+}
+
+.store-publish-review {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
+  background: color-mix(in oklch, var(--foreground) 3%, transparent);
+}
+
+.store-publish-review-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.store-publish-review-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.store-publish-review-title {
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--text-strong);
+}
+
+.store-publish-review-sub {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.store-publish-change-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 140px;
+  overflow: auto;
+}
+
+.store-publish-change {
+  padding: 7px 9px;
+  border-radius: 7px;
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
+  color: var(--text-base);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+/* --- Real Artwork (icon image with gradient fallback) --- */
+
+.store-artwork {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.store-artwork-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Generated store icons include intentional canvas padding — zoom inside the frame. */
+.store-artwork--zoom > .store-artwork-img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 175%;
+  height: 175%;
+  max-width: none;
+  max-height: none;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+}
+
+/* --- Discover toolbar (search + category filter) --- */
+
+.store-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.store-search {
+  flex: 0 1 420px;
+  min-width: 220px;
+  max-width: 420px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.store-search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-weaker);
+  pointer-events: none;
+}
+
+.store-search-input {
+  width: 100%;
+  padding: 8px 14px 8px 34px;
+  border-radius: var(--radius-full);
+  border: 1px solid color-mix(in oklch, var(--foreground) 7%, transparent);
+  background: color-mix(in oklch, var(--foreground) 3%, transparent);
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text-strong);
+  transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+}
+
+.store-search-input::placeholder {
+  color: var(--text-weaker);
+}
+
+.store-search-input:focus {
+  outline: none;
+  border-color: color-mix(in oklch, var(--interactive) 35%, transparent);
+  background: var(--background);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--interactive) 12%, transparent);
+}
+
+.store-filter {
+  display: flex;
+  gap: 1px;
+  padding: 3px;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklch, var(--foreground) 5%, transparent);
+}
+
+.store-filter-pill {
+  padding: 4px 14px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 550;
+  font-family: inherit;
+  color: var(--text-weak);
+  cursor: default;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  user-select: none;
+}
+
+.store-filter-pill:hover {
+  color: var(--text-base);
+}
+
+.store-filter-pill[data-active] {
+  background: var(--background);
+  color: var(--text-strong);
+  box-shadow:
+    0 0.5px 2px color-mix(in oklch, var(--foreground) 8%, transparent),
+    0 0 0 0.5px color-mix(in oklch, var(--foreground) 6%, transparent);
+}
+
+:root[data-theme="dark"] .store-filter-pill[data-active] {
+  background: color-mix(in oklch, var(--foreground) 10%, transparent);
+}
+
+/* --- Featured: author + tagline polish --- */
+
+.store-featured-author {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 550;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.store-featured-author-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* --- Card author chip (small, below description) --- */
+
+.store-card-author {
+  font-size: 11px;
+  color: var(--text-weaker);
+  display: inline-flex;
+  min-width: 0;
+  overflow: hidden;
+  align-items: center;
+  gap: 5px;
+}
+
+.store-card-footer-start .store-card-author {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.store-card-author-avatar {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--foreground) 12%, transparent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-weak);
+}
+
+/* --- Author verification / partner badge --- */
+
+.store-badge-mark {
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.store-badge-mark--verified {
+  /* Subtle Twitter-blue style; uses the canonical link/accent token
+     so it adapts to the embedded WebContentsView theme. */
+  color: oklch(0.65 0.18 245);
+}
+
+.store-badge-mark--partner {
+  /* Warmer gold to read as a distinct higher tier vs. verified.
+     Stays legible against both light and dark backgrounds. */
+  color: oklch(0.72 0.16 75);
+}
+
+/* --- Detail: author row + What's New section --- */
+
+.store-detail-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-weak);
+}
+
+.store-detail-author-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--foreground) 10%, transparent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-base);
+}
+
+.store-whats-new {
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: color-mix(in oklch, var(--foreground) 2.5%, transparent);
+  border: 1px solid color-mix(in oklch, var(--foreground) 5%, transparent);
+  margin-bottom: 22px;
+}
+
+.store-whats-new-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-weaker);
+  margin-bottom: 6px;
+}
+
+.store-whats-new-version {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--text-strong);
+  margin-bottom: 6px;
+}
+
+.store-whats-new-body {
+  font-size: 13px;
+  color: var(--text-base);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+/* --- Connector confirm dialog --- */
+[data-slot="dialog-content"].store-confirm-dialog {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  background-clip: padding-box;
+  border: 1px solid var(--border-weak);
+  padding: 24px 28px 20px;
+}
+
+.store-web-dialog .store-confirm-dialog {
+  padding: 24px 28px 20px;
+}
+
+.store-confirm-title {
+  font-size: 16px;
+  font-weight: 620;
+  color: var(--text-strong);
+  margin: 0 0 6px;
+}
+
+.store-confirm-description {
+  margin: 0;
+  color: var(--text-base);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.store-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* The Store tab strip lives in the shell's top bar
+   (`ShellTopBarStoreTabs`) — see `shell/full-shell.layout.css`. */
+
+.store-root[data-tab="fashion"] {
+  display: flex;
+  flex-direction: column;
+}
+
