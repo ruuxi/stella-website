@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type CSSProperties } from "react";
 import Link from "next/link";
-import { Package, X } from "lucide-react";
+import { X } from "lucide-react";
 import type { StoreBadge } from "../lib/types";
 import { getGradient, getInitial } from "../lib/artwork";
 import { storeTabs, type HostedStoreTab } from "../lib/constants";

@@ -6,6 +6,7 @@ export const DISCOVER_FILTERS: Array<{ id: StoreCategory | "all"; label: string 
   { id: "productivity", label: "Productivity" },
   { id: "customization", label: "Customization" },
   { id: "skills-agents", label: "Skills & agents" },
+  { id: "integrations", label: "Integrations" },
   { id: "other", label: "Other" },
 ];
 
