@@ -674,6 +674,25 @@ const mergeNativeIntegrationUpdate = (
   return matched ? updated : [next, ...updated];
 };
 
+const isNativeIntegrationUserCancel = (error: unknown): boolean => {
+  const message = error instanceof Error ? error.message : String(error);
+  return /could not connect\b[\s\S]*:\s*cancelled\b/i.test(message);
+};
+
+const getNativeIntegrationErrorMessage = (
+  error: unknown,
+  integration: NativeIntegration,
+): string => {
+  const message = error instanceof Error ? error.message : String(error);
+  if (/client_secret is missing/i.test(message)) {
+    return `${integration.name} is not ready to connect yet. Stella needs to finish the secure Google connection setup.`;
+  }
+  if (/not trusted|unverified|access blocked/i.test(message)) {
+    return `${integration.name} is not ready to connect yet. Google has not approved this connection screen.`;
+  }
+  return message || `Couldn't add ${integration.name}.`;
+};
+
 const redirectToStoreSignIn = async () => {
   const bridge = getDesktopStoreBridge();
   if (bridge?.openSignIn) {
@@ -5118,10 +5137,9 @@ function StoreClientInner() {
         ),
       );
     } catch (error) {
+      if (isNativeIntegrationUserCancel(error)) return;
       setNativeIntegrationError(
-        error instanceof Error
-          ? error.message
-          : `Couldn't add ${integration.name}.`,
+        getNativeIntegrationErrorMessage(error, integration),
       );
     } finally {
       setConnectingIntegrationId(null);
