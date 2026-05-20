@@ -1,3 +1,5 @@
+@import "./markdown.css";
+
 /* ============================================
    Store View — Refined App-Store Aesthetic
    ============================================ */
@@ -154,6 +156,95 @@
   border: 1px solid var(--border-weak);
 }
 
+.store-web-dialog:has(.store-install-dialog) {
+  width: min(760px, 100%);
+  max-height: min(calc(100vh - 48px), 760px);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.store-install-dialog {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+.store-install-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 26px 18px;
+  border-bottom: 1px solid color-mix(in oklch, var(--foreground) 6%, transparent);
+}
+
+.store-install-dialog-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  flex: 0 0 auto;
+  box-shadow:
+    0 4px 14px color-mix(in oklch, var(--foreground) 8%, transparent),
+    0 0 0 0.5px color-mix(in oklch, var(--foreground) 6%, transparent);
+}
+
+.store-install-dialog-icon-letter {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  opacity: 0.9;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.store-install-dialog-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.store-install-dialog-title {
+  font-size: 18px;
+  font-weight: 650;
+  color: var(--text-strong);
+  letter-spacing: -0.01em;
+}
+
+.store-install-dialog-sub {
+  font-size: 12.5px;
+  color: var(--text-weak);
+  line-height: 1.45;
+}
+
+.store-install-dialog-viewer {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 26px;
+}
+
+.store-install-dialog-viewer .markdown {
+  font-size: 13.5px;
+}
+
+.store-install-dialog-loading {
+  font-size: 13px;
+  color: var(--text-weak);
+  padding: 20px 0;
+  text-align: center;
+}
+
+.store-install-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 26px 20px;
+  border-top: 1px solid color-mix(in oklch, var(--foreground) 6%, transparent);
+  background: color-mix(in oklch, var(--foreground) 1.5%, transparent);
+}
+
 .store-web-dialog-close {
   position: absolute;
   top: 14px;
@@ -170,12 +261,56 @@
   color: var(--text-strong);
 }
 
-.store-upload-btn {
-  position: sticky;
-  top: 52px;
-  float: right;
-  z-index: 8;
-  margin: 14px 20px 0 0;
+/* Base layout for the consolidated Store header (tabs · search · Upload).
+ * Both the hosted marketing site and the embedded desktop view render the
+ * same `StoreWebHeader` component; the hosted site overrides this with the
+ * page-aware palette and a bottom border. */
+.store-web-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px;
+}
+
+/* Reset the standalone-tabs treatment when tabs live inside the header
+ * row (they were originally a sticky, auto-centered pill bar). */
+.store-web-header .store-web-tabs {
+  position: static;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.store-web-header-search {
+  flex: 1 1 280px;
+  min-width: 0;
+  max-width: 380px;
+}
+
+.store-web-header-search .store-search {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
+}
+
+.store-web-upload-cta {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  padding: 7px 14px;
+  border: 1px solid color-mix(in oklch, var(--foreground) 14%, transparent);
+  border-radius: var(--radius-md, 8px);
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
+  color: var(--text-strong);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.store-web-upload-cta:hover {
+  background: color-mix(in oklch, var(--foreground) 8%, transparent);
+  border-color: color-mix(in oklch, var(--foreground) 22%, transparent);
 }
 
 /* Hosted install-confirm dialog. The desktop dialog uses Radix
@@ -413,12 +548,36 @@
   align-items: stretch;
 }
 
+/* Mosaic variant: magazine-style layout with occasional wide tiles.
+   12-col fine grid + dense flow. Cycle of 8 cards renders as
+   [wide, wide] / [4 4 4] / [4 4 4] so each row stays balanced. */
+.store-grid--mosaic {
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-flow: dense;
+}
+
+.store-grid--mosaic > * {
+  grid-column: span 4;
+}
+
+.store-grid--mosaic > :nth-child(8n + 1),
+.store-grid--mosaic > :nth-child(8n + 2) {
+  grid-column: span 6;
+}
+
 @container store (max-width: 780px) {
   .store-grid { grid-template-columns: repeat(2, 1fr); }
+  .store-grid--mosaic { grid-template-columns: repeat(2, 1fr); }
+  .store-grid--mosaic > *,
+  .store-grid--mosaic > :nth-child(8n + 1),
+  .store-grid--mosaic > :nth-child(8n + 2) {
+    grid-column: auto;
+  }
 }
 
 @container store (max-width: 480px) {
   .store-grid { grid-template-columns: 1fr; }
+  .store-grid--mosaic { grid-template-columns: 1fr; }
   .store-scroll { padding: 22px 18px 36px; }
   .store-featured-content { padding: 22px 20px; }
   .store-featured-icon {
@@ -1169,19 +1328,6 @@
   -webkit-user-drag: none;
 }
 
-/* Generated store icons include intentional canvas padding — zoom inside the frame. */
-.store-artwork--zoom > .store-artwork-img {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 175%;
-  height: 175%;
-  max-width: none;
-  max-height: none;
-  transform: translate(-50%, -50%);
-  object-fit: cover;
-}
-
 /* --- Discover toolbar (search + category filter) --- */
 
 .store-toolbar {
@@ -1296,6 +1442,34 @@
 
 /* --- Card author chip (small, below description) --- */
 
+.store-card-author-handle {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text-weaker);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.store-card-author-handle-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.store-card-author-handle--featured {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.store-card-author-handle--detail {
+  margin-top: 6px;
+}
+
 .store-card-author {
   font-size: 11px;
   color: var(--text-weaker);
@@ -1366,6 +1540,30 @@
   font-size: 11px;
   font-weight: 700;
   color: var(--text-base);
+}
+
+.store-detail-blueprint {
+  margin-top: 0;
+  margin-bottom: 22px;
+}
+
+.store-detail-blueprint-body {
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: color-mix(in oklch, var(--foreground) 2.5%, transparent);
+  border: 1px solid color-mix(in oklch, var(--foreground) 5%, transparent);
+  overflow-x: auto;
+}
+
+.store-detail-blueprint-body .markdown {
+  font-size: 13.5px;
+}
+
+.store-detail-blueprint-body--loading {
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-weak);
 }
 
 .store-whats-new {

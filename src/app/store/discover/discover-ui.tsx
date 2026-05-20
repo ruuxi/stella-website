@@ -18,7 +18,8 @@ import type {
 } from "../lib/types";
 import { getGradient } from "../lib/artwork";
 import { nativeIntegrationActionLabel } from "../lib/integration-ui";
-import { AuthorChip, PackageArtwork } from "../components/shared";
+import { PackageArtwork, StoreAuthorHandle } from "../components/shared";
+import { StoreMarkdown } from "../components/store-markdown";
 
 function activateOnEnterOrSpace(
   event: KeyboardEvent,
@@ -77,7 +78,6 @@ export function PackageCard({
           name={pkg.displayName}
           className="store-card-image"
           letterClassName="store-card-image-letter"
-          zoomArtwork
         />
         <div className="store-card-body">
           <span className="store-card-name">{pkg.displayName}</span>
@@ -86,7 +86,7 @@ export function PackageCard({
       </div>
       <div className="store-card-footer">
         <div className="store-card-footer-start">
-          <AuthorChip
+          <StoreAuthorHandle
             username={pkg.authorUsername}
             badge={pkg.authorBadge}
           />
@@ -131,11 +131,6 @@ export function NativeIntegrationCard({
     if (enabled) onDisconnect();
     else onConnect();
   };
-  const actionCount =
-    integration.actionCount ??
-    integration.catalogToolCount ??
-    integration.toolCount ??
-    0;
   return (
     <div
       className="store-card"
@@ -157,7 +152,6 @@ export function NativeIntegrationCard({
           name={integration.name}
           className="store-card-image"
           letterClassName="store-card-image-letter"
-          zoomArtwork
         />
         <div className="store-card-body">
           <span className="store-card-name">{integration.name}</span>
@@ -170,8 +164,7 @@ export function NativeIntegrationCard({
       </div>
       <div className="store-card-footer">
         <div className="store-card-footer-start">
-          <AuthorChip username="Stella" badge="verified" />
-          <span className="store-card-installs">{`${actionCount} actions`}</span>
+          <StoreAuthorHandle username="Stella" badge="verified" />
         </div>
         <button
           className="store-action-btn"
@@ -240,13 +233,12 @@ export function FeaturedCard({
           name={pkg.displayName}
           className="store-featured-icon"
           letterClassName="store-featured-icon-letter"
-          zoomArtwork
         />
         <div className="store-featured-text">
           <div className="store-featured-label">Featured</div>
           <div className="store-featured-name">{pkg.displayName}</div>
           <div className="store-featured-desc">{pkg.description}</div>
-          <AuthorChip
+          <StoreAuthorHandle
             username={pkg.authorUsername}
             badge={pkg.authorBadge}
             variant="featured"
@@ -269,65 +261,10 @@ export function FeaturedCard({
   );
 }
 
-export function AddedRow({
-  installed,
-  packages,
-  onSelect,
-}: {
-  installed: StoreInstall[];
-  packages: StorePackage[];
-  onSelect: (packageId: string) => void;
-}) {
-  const pkgMap = useMemo(() => {
-    const map = new Map<string, StorePackage>();
-    for (const pkg of packages) map.set(pkg.packageId, pkg);
-    return map;
-  }, [packages]);
-
-  if (installed.length === 0) return null;
-
-  return (
-    <div className="store-section">
-      <div className="store-section-header">
-        <span className="store-section-title">Added to Stella</span>
-        <span className="store-section-count">{installed.length}</span>
-      </div>
-      <div className="store-added-row">
-        {installed.map((mod) => {
-          const pkg = pkgMap.get(mod.packageId);
-          const name = pkg?.displayName ?? mod.displayName ?? "Add-on";
-          const updateAvailable = pkg ? isStoreUpdateAvailable(pkg, mod) : false;
-          return (
-            <div
-              key={mod.packageId}
-              className="store-added-chip"
-              role="button"
-              tabIndex={0}
-              onClick={() => onSelect(mod.packageId)}
-              onKeyDown={(event) =>
-                activateOnEnterOrSpace(event, () => onSelect(mod.packageId))
-              }
-            >
-              <PackageArtwork
-                iconUrl={pkg?.iconUrl}
-                name={name}
-                className="store-added-chip-icon"
-                letterClassName="store-added-chip-letter"
-              />
-              <span className="store-added-chip-name">{name}</span>
-              {updateAvailable ? (
-                <span className="store-added-chip-badge">Update</span>
-              ) : null}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 export function Detail({
   pkg,
   releases,
+  releasesLoading = false,
   installedRecord,
   installing,
   onBack,
@@ -336,6 +273,7 @@ export function Detail({
 }: {
   pkg: StorePackage;
   releases: StoreRelease[];
+  releasesLoading?: boolean;
   installedRecord?: StoreInstall;
   installing: boolean;
   onBack: () => void;
@@ -343,6 +281,7 @@ export function Detail({
   onRemove: () => void;
 }) {
   const latestRelease = releases[0];
+  const latestBlueprint = latestRelease?.blueprintMarkdown?.trim();
   const latestNotes = latestRelease ? getReleaseNotes(latestRelease) : undefined;
   const installed = Boolean(installedRecord);
   const updateAvailable = isStoreUpdateAvailable(pkg, installedRecord);
@@ -363,7 +302,7 @@ export function Detail({
         <div className="store-detail-info">
           <div className="store-detail-name">{pkg.displayName}</div>
           <div className="store-detail-desc">{pkg.description}</div>
-          <AuthorChip
+          <StoreAuthorHandle
             username={pkg.authorUsername}
             badge={pkg.authorBadge}
             variant="detail"
@@ -419,6 +358,25 @@ export function Detail({
           </div>
         </div>
       </div>
+
+      {releasesLoading ? (
+        <div className="store-detail-section store-detail-blueprint">
+          <div className="store-detail-section-title">Blueprint</div>
+          <div
+            className="store-detail-blueprint-body store-detail-blueprint-body--loading"
+            aria-busy="true"
+          >
+            Loading blueprint…
+          </div>
+        </div>
+      ) : latestBlueprint ? (
+        <div className="store-detail-section store-detail-blueprint">
+          <div className="store-detail-section-title">Blueprint</div>
+          <div className="store-detail-blueprint-body">
+            <StoreMarkdown text={latestBlueprint} />
+          </div>
+        </div>
+      ) : null}
 
       {latestNotes ? (
         <div className="store-whats-new">

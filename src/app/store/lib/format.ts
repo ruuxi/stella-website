@@ -1,4 +1,4 @@
-import type { StoreInstall, StorePackage, StoreRelease } from "./types";
+import type { StoreBadge, StoreInstall, StorePackage, StoreRelease } from "./types";
 
 export function formatDate(ms: number): string {
   return new Date(ms).toLocaleDateString(undefined, {
@@ -48,4 +48,17 @@ export function isStoreUpdateAvailable(
   return typeof installed?.releaseNumber === "number"
     ? installed.releaseNumber < pkg.latestReleaseNumber
     : false;
+}
+
+/** Normalize author line for cards — strip leading @, default Stella → verified. */
+export function resolveStoreAuthorDisplay(
+  username?: string,
+  badge?: StoreBadge,
+): { username?: string; badge?: StoreBadge } {
+  if (!username?.trim()) return {};
+  const normalized = username.trim().replace(/^@+/, "");
+  if (!normalized) return {};
+  const resolvedBadge =
+    badge ?? (normalized.toLowerCase() === "stella" ? "verified" : undefined);
+  return { username: normalized, badge: resolvedBadge };
 }

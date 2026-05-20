@@ -46,7 +46,7 @@ html:not([data-embedded="true"]) .store-scroll {
 /* Pets / Emojis tabs render their own <main> directly into .store-root
  * (no .store-scroll wrapper), so re-apply the same 1040px centering
  * and gutter on hosted so they line up with Discover and the tab strip. */
-html:not([data-embedded="true"]) :is(.pets-page, .emoji-page) {
+html:not([data-embedded="true"]) :is(.pets-page, .emoji-page, .library-page) {
   max-width: 1040px;
   margin: 0 auto;
   padding-left: var(--page-margin);
@@ -54,10 +54,11 @@ html:not([data-embedded="true"]) :is(.pets-page, .emoji-page) {
   padding-bottom: clamp(4rem, 8vw, 6rem);
 }
 
-/* Pets / Emojis page titles use the same Cormorant display treatment as
- * `.store-web-title` so the three tabs share one visual voice. */
+/* Pets / Emojis page titles use the Cormorant display treatment so all
+ * three tabs share one visual voice (Discover no longer carries its own
+ * page-title h1 — the tab strip is the title). */
 html:not([data-embedded="true"])
-  :is(.pets-page-title, .emoji-page-title) {
+  :is(.pets-page-title, .emoji-page-title, .library-page-title) {
   font-family: var(--font-display, "Cormorant Garamond", Georgia), serif;
   font-size: clamp(2rem, 3.4vw, 2.6rem);
   font-weight: 300;
@@ -68,7 +69,7 @@ html:not([data-embedded="true"])
 
 /* Match the Discover hero's count/eyebrow voice. */
 html:not([data-embedded="true"])
-  :is(.pets-page-count, .emoji-page-active) {
+  :is(.pets-page-count, .emoji-page-active, .library-page-count) {
   font-family: var(--font-mono), monospace;
   font-size: 10.5px;
   font-weight: 500;
@@ -83,16 +84,39 @@ html:not([data-embedded="true"]) .store-web-shell {
   padding: clamp(1.25rem, 2.5vw, 2rem) var(--page-margin) 0;
 }
 
-html:not([data-embedded="true"]) .store-web-tabs {
+/* Single-row page header: tabs on the left, search grows in the
+ * middle, Upload pins to the right. Replaces the old eyebrow + h1 +
+ * lead + separate tab row + separate search/filter row stack. */
+html:not([data-embedded="true"]) .store-web-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+html:not([data-embedded="true"]) .store-web-header .store-web-tabs {
   position: static;
-  width: fit-content;
-  max-width: 100%;
-  margin: 0 0 28px;
-  padding: 4px;
+  margin: 0;
+  padding: 3px;
   border-radius: var(--radius-full);
   background: color-mix(in oklch, var(--page-foreground) 5%, var(--page-background));
   border: 1px solid var(--page-border);
   box-shadow: none;
+  flex-shrink: 0;
+}
+
+html:not([data-embedded="true"]) .store-web-header-search {
+  flex: 1 1 320px;
+  min-width: 0;
+  max-width: 440px;
+  display: flex;
+  align-items: center;
+}
+
+html:not([data-embedded="true"]) .store-web-header-search .store-search {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
 }
 
 html:not([data-embedded="true"]) .store-web-tab[data-active="true"],
@@ -100,60 +124,10 @@ html:not([data-embedded="true"]) .store-web-tab:hover {
   background: var(--page-panel-strong);
 }
 
-html:not([data-embedded="true"]) .store-web-hero {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 32px;
-}
-
-html:not([data-embedded="true"]) .store-web-hero-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px 24px;
-  flex-wrap: wrap;
-}
-
-html:not([data-embedded="true"]) .store-web-eyebrow {
-  margin: 0;
-  font-family: var(--font-mono), monospace;
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--page-muted);
-}
-
-html:not([data-embedded="true"]) .store-web-title {
-  margin: 0;
-  flex: 1 1 auto;
-  min-width: 0;
-  font-family: var(--font-display, "Cormorant Garamond", Georgia), serif;
-  font-size: clamp(2.2rem, 4vw, 3rem);
-  font-weight: 300;
-  letter-spacing: -0.04em;
-  line-height: 1.05;
-  color: var(--page-foreground);
-}
-
 html:not([data-embedded="true"]) .store-web-upload-cta {
-  flex-shrink: 0;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  padding: 10px 16px;
   border: 1px solid var(--page-foreground);
-  border-radius: 6px;
   background: var(--page-foreground);
   color: var(--page-background);
-  cursor: pointer;
-  transition:
-    background 0.15s ease,
-    color 0.15s ease,
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
 }
 
 html:not([data-embedded="true"]) .store-web-upload-cta:hover {
@@ -165,38 +139,20 @@ html:not([data-embedded="true"]) .store-web-upload-cta:hover {
     0 0 0 4px var(--page-accent);
 }
 
-html:not([data-embedded="true"]) .store-action-btn[data-variant="get"]:hover:not(:disabled) {
-  background: var(--page-foreground);
-  color: var(--page-background);
-  border-color: var(--page-accent);
-  box-shadow:
-    0 0 0 2px var(--page-background),
-    0 0 0 4px var(--page-accent);
-}
+@media (max-width: 720px) {
+  html:not([data-embedded="true"]) .store-web-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
 
-html:not([data-embedded="true"]) .store-web-lead {
-  margin: 0;
-  font-size: 14.5px;
-  line-height: 1.55;
-  color: var(--page-muted);
-  letter-spacing: -0.01em;
-  max-width: 52ch;
-}
-
-html:not([data-embedded="true"]) .store-upload-btn {
-  position: static;
-  float: none;
-  margin: 0;
-}
-
-@media (max-width: 640px) {
-  html:not([data-embedded="true"]) .store-web-hero-title-row {
-    align-items: flex-start;
-    flex-direction: column;
+  html:not([data-embedded="true"]) .store-web-header-search {
+    flex-basis: 100%;
+    max-width: none;
+    order: 3;
   }
 
   html:not([data-embedded="true"]) .store-web-upload-cta {
-    width: 100%;
+    margin-left: auto;
   }
 }
 
@@ -264,12 +220,7 @@ html:not([data-embedded="true"]) .store-featured-desc {
   max-width: 52ch;
 }
 
-html:not([data-embedded="true"]) .store-featured-author {
-  color: var(--page-muted);
-}
-
-html:not([data-embedded="true"]) .store-featured-author-avatar {
-  background: color-mix(in oklch, var(--page-foreground) 8%, transparent);
+html:not([data-embedded="true"]) .store-card-author-handle--featured {
   color: var(--page-muted);
 }
 
@@ -291,19 +242,47 @@ html:not([data-embedded="true"]) .store-card-status-chip {
   display: none;
 }
 
-html:not([data-embedded="true"]) .store-search-input,
-html:not([data-embedded="true"]) .store-filter {
+html:not([data-embedded="true"]) .store-search-input {
   background: color-mix(in oklch, var(--page-foreground) 4%, var(--page-background));
   border-color: var(--page-border);
 }
 
-html:not([data-embedded="true"]) .store-filter-pill[data-active] {
-  background: var(--page-panel-strong);
-  box-shadow: none;
-}
-
 html:not([data-embedded="true"]) .store-search-input:focus {
   background: var(--page-panel-strong);
+}
+
+/* Filter row reads as filters, not as a second tab strip: flat
+ * underline-chip style instead of pill-on-tray. */
+html:not([data-embedded="true"]) .store-toolbar {
+  gap: 4px;
+  padding: 0 0 2px;
+  background: transparent;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+}
+
+html:not([data-embedded="true"]) .store-toolbar .store-filter-pill {
+  padding: 8px 12px;
+  border-radius: 0;
+  background: transparent;
+  color: var(--page-muted);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  box-shadow: none;
+  position: relative;
+  cursor: pointer;
+}
+
+html:not([data-embedded="true"]) .store-toolbar .store-filter-pill:hover {
+  color: var(--page-foreground);
+}
+
+html:not([data-embedded="true"]) .store-toolbar .store-filter-pill[data-active] {
+  background: transparent;
+  color: var(--page-foreground);
+  box-shadow: inset 0 -2px 0 0 var(--page-foreground);
 }
 
 html:not([data-embedded="true"]) .store-web-dialog.store-web-dialog--solid,

@@ -14,23 +14,16 @@ export default function StoreLoading() {
       <SiteHeader />
       <main className="store-root" data-tab="discover" aria-busy="true">
         <div className="store-web-shell">
-          <nav className="store-web-tabs" aria-label="Store sections">
-            <span className="store-web-tab" data-active="true">Discover</span>
-            <span className="store-web-tab">Pets</span>
-            <span className="store-web-tab">Emojis</span>
-          </nav>
-          <header className="store-web-hero">
-            <p className="store-web-eyebrow">Store</p>
-            <div className="store-web-hero-title-row">
-              <h1 className="store-web-title">Add-ons for Stella</h1>
-            </div>
+          <header className="store-web-header">
+            <nav className="store-web-tabs" aria-label="Store sections">
+              <span className="store-web-tab" data-active="true">Discover</span>
+              <span className="store-web-tab">Pets</span>
+              <span className="store-web-tab">Emojis</span>
+            </nav>
           </header>
         </div>
         <div className="store-scroll">
           <div className="store-section">
-            <div className="store-section-header">
-              <span className="store-section-title">For You</span>
-            </div>
             <SkeletonGrid count={6} />
           </div>
         </div>

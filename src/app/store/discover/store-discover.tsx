@@ -28,20 +28,20 @@ import type { NativeIntegration, StoreCategory, StoreInstall, StorePackage } fro
 import {
   EmptyState,
   SkeletonGrid,
-  StoreWebHero,
-  StoreWebTabs,
+  StoreWebHeader,
   useIsEmbeddedWebsite,
 } from "../components/shared";
 import { pickFeaturedPackage, sortPackagesForYou } from "../lib/discover-ranking";
 import {
-  AddedRow,
   Detail,
   FeaturedCard,
   NativeIntegrationCard,
   PackageCard,
 } from "./discover-ui";
+import { InstallConfirmDialog } from "./install-confirm-dialog";
 import { PetsTab } from "../pets/pets-tab";
 import { EmojisTab } from "../emojis/emojis-tab";
+import { LibraryTab } from "../library/library-tab";
 
 export function StoreClientInner() {
   const isEmbedded = useIsEmbeddedWebsite();
@@ -57,6 +57,9 @@ export function StoreClientInner() {
     string | null
   >(null);
   const [installedMods, setInstalledMods] = useState<StoreInstall[]>([]);
+  const [pendingInstall, setPendingInstall] = useState<StorePackage | null>(
+    null,
+  );
   const [localNativeIntegrations, setLocalNativeIntegrations] = useState<
     NativeIntegration[]
   >([]);
@@ -152,6 +155,13 @@ export function StoreClientInner() {
         return rank(left) - rank(right) || left.name.localeCompare(right.name);
       });
   }, [filter, nativeIntegrations, query]);
+  /**
+   * Surfaces the in-app blueprint confirmation dialog. The actual
+   * install call only fires after the user clicks Install in
+   * `InstallConfirmDialog` → `confirmInstall` below. We still gate on
+   * the desktop bridge / auth here so non-desktop visitors get
+   * redirected to sign-in like before.
+   */
   const installPackage = async (pkg: StorePackage) => {
     const bridge = getDesktopStoreBridge();
     if (!bridge?.requestPackageInstall) {
@@ -159,6 +169,12 @@ export function StoreClientInner() {
       return;
     }
     if (!(await ensureStoreAuth())) return;
+    setPendingInstall(pkg);
+  };
+
+  const confirmInstall = async (pkg: StorePackage) => {
+    const bridge = getDesktopStoreBridge();
+    if (!bridge?.requestPackageInstall) return;
     setInstallingId(pkg.packageId);
     try {
       const installRecord = await bridge.requestPackageInstall({
@@ -177,6 +193,7 @@ export function StoreClientInner() {
           installedAt: Date.now(),
         },
       ]);
+      setPendingInstall(null);
     } finally {
       setInstallingId(null);
     }
@@ -287,30 +304,31 @@ export function StoreClientInner() {
     });
   }, [activeTab]);
 
+  const showHeaderSearch = activeTab === "discover" && !selectedPackage;
+  const searchSlot = showHeaderSearch ? (
+    <div className="store-search">
+      <Search size={14} className="store-search-icon" />
+      <input
+        className="store-search-input"
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder="Search the Store"
+        value={query}
+        spellCheck={false}
+        autoComplete="off"
+      />
+    </div>
+  ) : null;
+
   return (
     <main className="store-root" data-tab={activeTab}>
-      {isEmbedded ? (
-        <>
-          <StoreWebTabs activeTab={activeTab} />
-          {activeTab === "discover" && !selectedPackage ? (
-            <button
-              className="store-action-btn store-action-btn--lg store-upload-btn"
-              data-variant="get"
-              type="button"
-              onClick={handleUploadToStore}
-            >
-              Upload to Store
-            </button>
-          ) : null}
-        </>
-      ) : (
-        <div className="store-web-shell">
-          <StoreWebTabs activeTab={activeTab} />
-          {activeTab === "discover" && !selectedPackage ? (
-            <StoreWebHero onUpload={handleUploadToStore} />
-          ) : null}
-        </div>
-      )}
+      <div className="store-web-shell" data-embedded={isEmbedded || undefined}>
+        <StoreWebHeader
+          activeTab={activeTab}
+          showUpload={activeTab === "discover" && !selectedPackage}
+          onUpload={handleUploadToStore}
+          searchSlot={searchSlot}
+        />
+      </div>
       {mountedTabs.has("pets") ? (
         <div hidden={activeTab !== "pets"}>
           <PetsTab />
@@ -321,11 +339,23 @@ export function StoreClientInner() {
           <EmojisTab />
         </div>
       ) : null}
+      {mountedTabs.has("library") ? (
+        <div hidden={activeTab !== "library"}>
+          <LibraryTab
+            installedMods={installedMods}
+            browsePackages={browse?.page}
+            installingId={installingId}
+            onSelectPackage={setSelectedPackageId}
+            onInstallPackage={(pkg) => void installPackage(pkg)}
+          />
+        </div>
+      ) : null}
       <div className="store-scroll" hidden={activeTab !== "discover"}>
         {selectedPackage ? (
           <Detail
             pkg={selectedPackage}
             releases={selectedReleases ?? []}
+            releasesLoading={selectedReleases === undefined}
             installedRecord={installedMap.get(selectedPackage.packageId)}
             installing={installingId === selectedPackage.packageId}
             onBack={() => {
@@ -341,31 +371,20 @@ export function StoreClientInner() {
           />
         ) : (
           <>
-            <div className="store-toolbar">
-              <div className="store-search">
-                <Search size={14} className="store-search-icon" />
-                <input
-                  className="store-search-input"
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search the Store"
-                  value={query}
-                  spellCheck={false}
-                  autoComplete="off"
-                />
-              </div>
-              <div className="store-filter">
-                {DISCOVER_FILTERS.map((entry) => (
-                  <button
-                    key={entry.id}
-                    className="store-filter-pill"
-                    data-active={filter === entry.id || undefined}
-                    onClick={() => setFilter(entry.id)}
-                    type="button"
-                  >
-                    {entry.label}
-                  </button>
-                ))}
-              </div>
+            <div className="store-toolbar" role="tablist" aria-label="Filter">
+              {DISCOVER_FILTERS.map((entry) => (
+                <button
+                  key={entry.id}
+                  className="store-filter-pill"
+                  data-active={filter === entry.id || undefined}
+                  onClick={() => setFilter(entry.id)}
+                  type="button"
+                  role="tab"
+                  aria-selected={filter === entry.id}
+                >
+                  {entry.label}
+                </button>
+              ))}
             </div>
             {showFeatured && featured ? (
               <FeaturedCard
@@ -380,13 +399,48 @@ export function StoreClientInner() {
                 onClick={() => setSelectedPackageId(featured.packageId)}
               />
             ) : null}
-            {filter === "all" && query.trim() === "" ? (
-              <AddedRow
-                installed={installedMods}
-                packages={allPackages ?? []}
-                onSelect={setSelectedPackageId}
+            {!allPackages ? (
+              <SkeletonGrid />
+            ) : rest.length === 0 ? (
+              <EmptyState
+                icon={
+                  query.trim() !== "" || filter !== "all" ? (
+                    <Search size={32} />
+                  ) : (
+                    <Package size={32} />
+                  )
+                }
+                title={
+                  query.trim() !== "" || filter !== "all"
+                    ? "No matches"
+                    : "Nothing here yet"
+                }
+                description={
+                  query.trim() !== "" || filter !== "all"
+                    ? "Try a different search or category."
+                    : "Add-ons for Stella will appear here as they become available."
+                }
               />
-            ) : null}
+            ) : (
+              <div className="store-section">
+                <div className="store-grid store-grid--mosaic">
+                  {rest.map((pkg) => (
+                    <PackageCard
+                      key={pkg.packageId}
+                      pkg={pkg}
+                      installed={installedIds.has(pkg.packageId)}
+                      updateAvailable={isStoreUpdateAvailable(
+                        pkg,
+                        installedMap.get(pkg.packageId),
+                      )}
+                      installing={installingId === pkg.packageId}
+                      onOpen={() => setSelectedPackageId(pkg.packageId)}
+                      onInstall={() => void installPackage(pkg)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
             {visibleNativeIntegrations.length > 0 ? (
               <div className="store-section">
                 <div className="store-section-header">
@@ -417,59 +471,21 @@ export function StoreClientInner() {
                 </div>
               </div>
             ) : null}
-            {!allPackages ? (
-              <SkeletonGrid />
-            ) : rest.length === 0 ? (
-              <EmptyState
-                icon={
-                  query.trim() !== "" || filter !== "all" ? (
-                    <Search size={32} />
-                  ) : (
-                    <Package size={32} />
-                  )
-                }
-                title={
-                  query.trim() !== "" || filter !== "all"
-                    ? "No matches"
-                    : "Nothing here yet"
-                }
-                description={
-                  query.trim() !== "" || filter !== "all"
-                    ? "Try a different search or category."
-                    : "Add-ons for Stella will appear here as they become available."
-                }
-              />
-            ) : (
-              <div className="store-section">
-                <div className="store-section-header">
-                  <span className="store-section-title">
-                    {query.trim() === "" && filter === "all"
-                      ? "For You"
-                      : "Results"}
-                  </span>
-                  <span className="store-section-count">{rest.length}</span>
-                </div>
-                <div className="store-grid store-grid--enter">
-                  {rest.map((pkg) => (
-                    <PackageCard
-                      key={pkg.packageId}
-                      pkg={pkg}
-                      installed={installedIds.has(pkg.packageId)}
-                      updateAvailable={isStoreUpdateAvailable(
-                        pkg,
-                        installedMap.get(pkg.packageId),
-                      )}
-                      installing={installingId === pkg.packageId}
-                      onOpen={() => setSelectedPackageId(pkg.packageId)}
-                      onInstall={() => void installPackage(pkg)}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
           </>
         )}
       </div>
+      {pendingInstall ? (
+        <InstallConfirmDialog
+          pkg={pendingInstall}
+          isUpdate={isStoreUpdateAvailable(
+            pendingInstall,
+            installedMap.get(pendingInstall.packageId),
+          )}
+          installing={installingId === pendingInstall.packageId}
+          onCancel={() => setPendingInstall(null)}
+          onConfirm={() => void confirmInstall(pendingInstall)}
+        />
+      ) : null}
     </main>
   );
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
+import { resolveStoreAuthorDisplay } from "../lib/format";
 import type { StoreBadge } from "../lib/types";
 import { getGradient, getInitial } from "../lib/artwork";
 import { storeTabs, type HostedStoreTab } from "../lib/constants";
@@ -65,20 +66,17 @@ export function PackageArtwork({
   name,
   className,
   letterClassName,
-  zoomArtwork = false,
 }: {
   iconUrl?: string;
   name: string;
   className: string;
   letterClassName: string;
-  /** Crop in on generated icons that ship with extra canvas padding. */
-  zoomArtwork?: boolean;
 }) {
   const [failed, setFailed] = useState(false);
   const showImage = Boolean(iconUrl) && !failed;
   return (
     <div
-      className={`store-artwork ${className}${zoomArtwork ? " store-artwork--zoom" : ""}`}
+      className={`store-artwork ${className}`}
       style={{ background: getGradient(name) }}
     >
       {showImage ? (
@@ -173,28 +171,33 @@ export function AuthorChip({
   badge?: StoreBadge;
   variant?: "card" | "featured" | "detail";
 }) {
-  if (!username) return null;
-  const displayed = `@${username}`;
-  const initial = getInitial(username);
+  return (
+    <StoreAuthorHandle username={username} badge={badge} variant={variant} />
+  );
+}
+
+export function StoreAuthorHandle({
+  username,
+  badge,
+  variant = "card",
+}: {
+  username?: string;
+  badge?: StoreBadge;
+  variant?: "card" | "featured" | "detail";
+}) {
+  const author = resolveStoreAuthorDisplay(username, badge);
+  if (!author.username) return null;
   const className =
     variant === "featured"
-      ? "store-featured-author"
+      ? "store-card-author-handle store-card-author-handle--featured"
       : variant === "detail"
-        ? "store-detail-author"
-        : "store-card-author";
-  const avatarClassName =
-    variant === "featured"
-      ? "store-featured-author-avatar"
-      : variant === "detail"
-        ? "store-detail-author-avatar"
-        : "store-card-author-avatar";
-  const badgeSize = variant === "card" ? 11 : variant === "featured" ? 13 : 14;
+        ? "store-card-author-handle store-card-author-handle--detail"
+        : "store-card-author-handle";
   return (
-    <div className={className}>
-      <span className={avatarClassName}>{initial}</span>
-      <span>by {displayed}</span>
-      <BadgeMark badge={badge} size={badgeSize} />
-    </div>
+    <span className={className}>
+      {author.badge ? <BadgeMark badge={author.badge} size={18} /> : null}
+      <span className="store-card-author-handle-name">@{author.username}</span>
+    </span>
   );
 }
 
@@ -279,12 +282,33 @@ export function StoreWebTabs({ activeTab }: { activeTab: HostedStoreTab }) {
   );
 }
 
-export function StoreWebHero({ onUpload }: { onUpload: () => void }) {
+/**
+ * Single-row page header for both hosted and embedded views: section
+ * tabs sit on the left, optional search input grows in the middle, and
+ * the Upload CTA pins to the right. The eyebrow, h1 title, lead
+ * paragraph, and separate Upload button that used to stack above the
+ * content are all collapsed into this one row — the route + tab
+ * already tells the user they're in the Store, so the h1 was just
+ * repeating itself.
+ */
+export function StoreWebHeader({
+  activeTab,
+  showUpload,
+  onUpload,
+  searchSlot,
+}: {
+  activeTab: HostedStoreTab;
+  showUpload: boolean;
+  onUpload: () => void;
+  searchSlot?: React.ReactNode;
+}) {
   return (
-    <header className="store-web-hero">
-      <p className="store-web-eyebrow">Store</p>
-      <div className="store-web-hero-title-row">
-        <h1 className="store-web-title">Add-ons for Stella</h1>
+    <header className="store-web-header">
+      <StoreWebTabs activeTab={activeTab} />
+      {searchSlot ? (
+        <div className="store-web-header-search">{searchSlot}</div>
+      ) : null}
+      {showUpload ? (
         <button
           className="store-web-upload-cta"
           type="button"
@@ -292,11 +316,7 @@ export function StoreWebHero({ onUpload }: { onUpload: () => void }) {
         >
           Upload to Store
         </button>
-      </div>
-      <p className="store-web-lead">
-        Browse mods, integrations, pets, and emoji packs. Install them in the
-        desktop app when you are signed in.
-      </p>
+      ) : null}
     </header>
   );
 }
