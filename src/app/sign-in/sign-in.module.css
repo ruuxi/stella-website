@@ -143,6 +143,51 @@
   opacity: 0.65;
 }
 
+.socialAuth {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.socialButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  min-height: 3rem;
+  width: 100%;
+  padding: 0.85rem 1.15rem;
+  border: 1px solid rgba(82, 104, 134, 0.18);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--page-foreground);
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    opacity 150ms ease;
+}
+
+.socialButton:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(82, 104, 134, 0.28);
+}
+
+.socialButton:disabled {
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.65;
+}
+
+.googleIcon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: 0 0 auto;
+}
+
 .statusCard {
   display: grid;
   gap: 0.75rem;
@@ -280,4 +325,23 @@
   height: 1px;
   background: rgba(82, 104, 134, 0.14);
   margin: 0.25rem 0;
+}
+
+.methodDivider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--page-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.methodDivider::before,
+.methodDivider::after {
+  content: "";
+  height: 1px;
+  flex: 1 1 0;
+  background: rgba(82, 104, 134, 0.14);
 }

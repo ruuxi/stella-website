@@ -13,10 +13,15 @@ import {
   type ReactNode,
 } from "react";
 import { ArrowRight, CheckCircle2, MailCheck, X } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import { clearCachedToken } from "@/lib/auth-token";
 import { useMagicLinkAuth } from "@/lib/use-magic-link-auth";
 import { isConvexConfigured } from "@/lib/convex-urls";
 import formStyles from "@/app/sign-in/sign-in.module.css";
+import { GoogleSignInButton } from "./google-sign-in-button";
 import styles from "./sign-in-dialog.module.css";
+
+const AUTH_TOKEN_PATTERN = /^[A-Za-z0-9._~-]{8,2048}$/;
 
 type SignInDialogContextValue = {
   open: () => void;
@@ -46,6 +51,7 @@ export function openSignInDialog() {
 export function SignInDialogProvider({ children }: { children: ReactNode }) {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  useOAuthReturnToken();
 
   const open = useCallback(() => {
     if (!isConvexConfigured()) {
@@ -126,6 +132,44 @@ export function SignInDialogProvider({ children }: { children: ReactNode }) {
   );
 }
 
+function useOAuthReturnToken() {
+  useEffect(() => {
+    if (!isConvexConfigured()) return;
+    const url = new URL(window.location.href);
+    const token = url.searchParams.get("ott");
+    if (!token || !AUTH_TOKEN_PATTERN.test(token)) return;
+
+    url.searchParams.delete("ott");
+    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+
+    let cancelled = false;
+    const verify = async () => {
+      try {
+        await authClient.$fetch("/cross-domain/one-time-token/verify", {
+          method: "POST",
+          body: { token },
+        });
+        if (cancelled) return;
+        clearCachedToken();
+        const store = (
+          authClient as unknown as {
+            $store?: { notify: (signal: string) => void };
+          }
+        ).$store;
+        store?.notify("$sessionSignal");
+      } catch {
+        if (cancelled) return;
+        window.dispatchEvent(new CustomEvent(SIGN_IN_DIALOG_EVENT));
+      }
+    };
+
+    void verify();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+}
+
 export function useSignInDialog(): SignInDialogContextValue {
   const ctx = useContext(SignInDialogContext);
   if (ctx) return ctx;
@@ -172,9 +216,15 @@ function DialogBody({ onClose }: { onClose: () => void }) {
         <>
           <h2 className={formStyles.title}>Sign in to Stella</h2>
           <p className={formStyles.subtitle}>
-            Enter your email and we&apos;ll send you a one-time sign-in link.
-            No password needed.
+            Use Google or enter your email and we&apos;ll send you a one-time
+            sign-in link. No password needed.
           </p>
+
+          <GoogleSignInButton />
+
+          <div className={formStyles.methodDivider}>
+            <span>or use email</span>
+          </div>
 
           <form className={formStyles.form} onSubmit={handleMagicLinkSubmit}>
             <label className={formStyles.field}>

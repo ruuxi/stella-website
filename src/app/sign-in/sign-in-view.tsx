@@ -9,6 +9,7 @@ import { clearCachedToken } from "@/lib/auth-token";
 import { useDesktopBridgeAuthUser } from "@/lib/desktop-bridge-auth";
 import { useMagicLinkAuth } from "@/lib/use-magic-link-auth";
 import { isConvexConfigured } from "@/lib/convex-urls";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import styles from "./sign-in.module.css";
 
 type SessionUser = {
@@ -94,9 +95,15 @@ function MagicLinkPanel() {
           <>
             <h1 className={styles.title}>Sign in to Stella</h1>
             <p className={styles.subtitle}>
-              Enter your email and we&apos;ll send you a one-time sign-in link.
-              No password needed.
+              Use Google or enter your email and we&apos;ll send you a one-time
+              sign-in link. No password needed.
             </p>
+
+            <GoogleSignInButton />
+
+            <div className={styles.methodDivider}>
+              <span>or use email</span>
+            </div>
 
             <form className={styles.form} onSubmit={handleMagicLinkSubmit}>
               <label className={styles.field}>
