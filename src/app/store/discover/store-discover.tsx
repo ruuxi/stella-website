@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import { Package, Search } from "lucide-react";
 import {
@@ -59,21 +60,14 @@ export function StoreClientInner() {
   const [localNativeIntegrations, setLocalNativeIntegrations] = useState<
     NativeIntegration[]
   >([]);
-  const [urlState, setUrlState] = useState({
-    tab: "discover",
-    packageId: null as string | null,
+  const searchParams = useSearchParams();
+  const activeTab = normalizeHostedStoreTab(
+    searchParams.get("tab") ?? "discover",
+  );
+  const [initialPackageId] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return new URLSearchParams(window.location.search).get("package");
   });
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setUrlState({
-      tab: params.get("tab") || "discover",
-      packageId: params.get("package"),
-    });
-  }, []);
-
-  const activeTab = normalizeHostedStoreTab(urlState.tab);
-  const initialPackageId = urlState.packageId;
 
   useEffect(() => {
     if (initialPackageId && !selectedPackageId) {
@@ -275,39 +269,27 @@ export function StoreClientInner() {
     });
   }, []);
 
-  if (activeTab !== "discover") {
-    return (
-      <main className="store-root" data-tab={activeTab}>
-        {isEmbedded ? (
-          <StoreWebTabs activeTab={activeTab} />
-        ) : (
-          <div className="store-web-shell">
-            <StoreWebTabs activeTab={activeTab} />
-          </div>
-        )}
-        {activeTab === "pets" ? (
-          <PetsTab />
-        ) : activeTab === "emojis" ? (
-          <EmojisTab />
-        ) : (
-          <div className="store-scroll">
-            <EmptyState
-              icon={<Package size={32} />}
-              title="Store unavailable"
-              description="Unknown Store tab."
-            />
-          </div>
-        )}
-      </main>
-    );
-  }
+  // Lazy-mount Pets/Emojis on first visit, then keep them mounted so their
+  // Convex subscriptions and scroll state persist across tab switches. Without
+  // this, returning to a tab tears down its queries and re-renders skeletons.
+  const [mountedTabs, setMountedTabs] = useState<Set<string>>(
+    () => new Set([activeTab]),
+  );
+  useEffect(() => {
+    setMountedTabs((previous) => {
+      if (previous.has(activeTab)) return previous;
+      const next = new Set(previous);
+      next.add(activeTab);
+      return next;
+    });
+  }, [activeTab]);
 
   return (
-    <main className="store-root" data-tab="discover">
+    <main className="store-root" data-tab={activeTab}>
       {isEmbedded ? (
         <>
-          <StoreWebTabs activeTab="discover" />
-          {!selectedPackage ? (
+          <StoreWebTabs activeTab={activeTab} />
+          {activeTab === "discover" && !selectedPackage ? (
             <button
               className="store-action-btn store-action-btn--lg store-upload-btn"
               data-variant="get"
@@ -320,13 +302,23 @@ export function StoreClientInner() {
         </>
       ) : (
         <div className="store-web-shell">
-          <StoreWebTabs activeTab="discover" />
-          {!selectedPackage ? (
+          <StoreWebTabs activeTab={activeTab} />
+          {activeTab === "discover" && !selectedPackage ? (
             <StoreWebHero onUpload={handleUploadToStore} />
           ) : null}
         </div>
       )}
-      <div className="store-scroll">
+      {mountedTabs.has("pets") ? (
+        <div hidden={activeTab !== "pets"}>
+          <PetsTab />
+        </div>
+      ) : null}
+      {mountedTabs.has("emojis") ? (
+        <div hidden={activeTab !== "emojis"}>
+          <EmojisTab />
+        </div>
+      ) : null}
+      <div className="store-scroll" hidden={activeTab !== "discover"}>
         {selectedPackage ? (
           <Detail
             pkg={selectedPackage}
@@ -454,7 +446,7 @@ export function StoreClientInner() {
                   </span>
                   <span className="store-section-count">{rest.length}</span>
                 </div>
-                <div className="store-grid">
+                <div className="store-grid store-grid--enter">
                   {rest.map((pkg) => (
                     <PackageCard
                       key={pkg.packageId}
