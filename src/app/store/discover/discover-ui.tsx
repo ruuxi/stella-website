@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type KeyboardEvent } from "react";
 import { ChevronLeft, Clock, Layers } from "lucide-react";
 import {
   formatDate,
@@ -17,7 +17,18 @@ import type {
   StoreRelease,
 } from "../lib/types";
 import { getGradient } from "../lib/artwork";
+import { nativeIntegrationActionLabel } from "../lib/integration-ui";
 import { AuthorChip, PackageArtwork } from "../components/shared";
+
+function activateOnEnterOrSpace(
+  event: KeyboardEvent,
+  action: () => void,
+): void {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    action();
+  }
+}
 
 export function PackageCard({
   pkg,
@@ -55,7 +66,10 @@ export function PackageCard({
     <div
       className="store-card"
       data-clickable="true"
+      role="button"
+      tabIndex={0}
       onClick={onOpen}
+      onKeyDown={(event) => activateOnEnterOrSpace(event, onOpen)}
     >
       <div className="store-card-main">
         <PackageArtwork
@@ -110,23 +124,7 @@ export function NativeIntegrationCard({
 }) {
   const enabled = integration.enabled === true;
   const connectable = integration.connectable !== false;
-  const actionLabel = !connectable
-    ? integration.oauthSetupGroup
-      ? `${integration.oauthSetupGroup.name} setup`
-      : integration.oauthProviderTemplate
-        ? "App setup"
-        : integration.oauthSetupStatus === "missing_backend_exchange"
-          ? "Server setup"
-          : integration.oauthSetupStatus === "missing_callback_bridge"
-            ? "Callback setup"
-            : "OAuth setup"
-    : busy
-      ? enabled
-        ? "Removing..."
-        : "Adding..."
-      : enabled
-        ? "Added"
-        : "Add";
+  const actionLabel = nativeIntegrationActionLabel(integration, { busy });
   const actionVariant = busy ? "working" : enabled ? "added" : "get";
   const handleAction = () => {
     if (!connectable || busy) return;
@@ -224,7 +222,13 @@ export function FeaturedCard({
         ? "added"
         : "get";
   return (
-    <div className="store-featured" onClick={onClick}>
+    <div
+      className="store-featured"
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(event) => activateOnEnterOrSpace(event, onClick)}
+    >
       <div
         className="store-featured-bg"
         style={{ background: getGradient(pkg.displayName) }}
@@ -297,7 +301,12 @@ export function AddedRow({
             <div
               key={mod.packageId}
               className="store-added-chip"
+              role="button"
+              tabIndex={0}
               onClick={() => onSelect(mod.packageId)}
+              onKeyDown={(event) =>
+                activateOnEnterOrSpace(event, () => onSelect(mod.packageId))
+              }
             >
               <PackageArtwork
                 iconUrl={pkg?.iconUrl}

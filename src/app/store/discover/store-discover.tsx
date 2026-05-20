@@ -41,7 +41,6 @@ import {
 } from "./discover-ui";
 import { PetsTab } from "../pets/pets-tab";
 import { EmojisTab } from "../emojis/emojis-tab";
-import { FashionTab } from "../fashion/fashion-tab";
 
 export function StoreClientInner() {
   const isEmbedded = useIsEmbeddedWebsite();
@@ -290,8 +289,6 @@ export function StoreClientInner() {
           <PetsTab />
         ) : activeTab === "emojis" ? (
           <EmojisTab />
-        ) : activeTab === "fashion" ? (
-          <FashionTab />
         ) : (
           <div className="store-scroll">
             <EmptyState
