@@ -27,6 +27,9 @@
 # Cursor local state
 .cursor/
 
+# impeccable critique scratch
+.impeccable/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
