@@ -14,6 +14,7 @@ export const storeTabs = [
   { key: "discover", label: "Discover" },
   { key: "pets", label: "Pets" },
   { key: "emojis", label: "Emojis" },
+  { key: "library", label: "Library" },
 ] as const;
 
 export type HostedStoreTab = (typeof storeTabs)[number]["key"];

@@ -9,7 +9,7 @@ import {
   type DragEvent as ReactDragEvent,
 } from "react";
 import { useAction, useMutation, usePaginatedQuery, useQuery } from "convex/react";
-import { ChevronRight, Compass, Download, Package, Plus, Search, User, X } from "lucide-react";
+import { Download, Package, Plus, Search } from "lucide-react";
 import {
   createUserPet,
   createUserPetUploadUrl,
@@ -562,7 +562,6 @@ export function PetsTab() {
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string>(ALL_TAG);
   const [sort, setSort] = useState<PetSort>("downloads");
-  const [viewMode, setViewMode] = useState<"discover" | "mine">("discover");
   const [createOpen, setCreateOpen] = useState(false);
   const [detailsPet, setDetailsPet] = useState<PublicPet | null>(null);
   const [petState, setPetState] = useState<PetBridgeState>({
@@ -649,13 +648,8 @@ export function PetsTab() {
       }),
     ];
   }, [activeTag, pets, publicUserPetCards]);
-  const myPetCards = useMemo(
-    () => (myUserPets ?? []).map(userPetToPublicPet),
-    [myUserPets],
-  );
-  const visiblePets = viewMode === "mine" ? myPetCards : discoverPets;
-  const visibleCountSuffix =
-    viewMode === "discover" && (canLoadMore || canLoadMoreUserPets) ? "+" : "";
+  const visiblePets = discoverPets;
+  const visibleCountSuffix = canLoadMore || canLoadMoreUserPets ? "+" : "";
 
   useEffect(() => {
     const handle = window.setTimeout(() => {
@@ -857,26 +851,6 @@ export function PetsTab() {
           <button
             type="button"
             className="store-action-btn store-action-btn--lg"
-            data-variant="subtle"
-            onClick={() =>
-              setViewMode((current) => (current === "mine" ? "discover" : "mine"))
-            }
-          >
-            {viewMode === "mine" ? (
-              <>
-                <Compass size={14} aria-hidden />
-                Discover
-              </>
-            ) : (
-              <>
-                <User size={14} aria-hidden />
-                My pets
-              </>
-            )}
-          </button>
-          <button
-            type="button"
-            className="store-action-btn store-action-btn--lg"
             data-variant="get"
             onClick={() => setCreateOpen(true)}
           >
@@ -893,8 +867,7 @@ export function PetsTab() {
           </button>
         </div>
       </div>
-      {viewMode === "discover" ? (
-        <div className="pets-tags" role="tablist" aria-label="Filter by tag">
+      <div className="pets-tags" role="tablist" aria-label="Filter by tag">
           <button
             type="button"
             role="tab"
@@ -919,56 +892,20 @@ export function PetsTab() {
             </button>
           ))}
         </div>
-      ) : null}
       {actionError ? (
         <div className="store-status" data-variant="error">
           {actionError}
         </div>
       ) : null}
-      {viewMode === "discover" && myUserPets && myUserPets.length > 0 ? (
-        <section className="pets-your-section">
-          <div className="pets-your-header">
-            <span className="pets-your-title">Your pets</span>
-            <span className="pets-your-count">{myUserPets.length}</span>
-          </div>
-          <div className="pets-grid">
-            {myPetCards.map((pet) => {
-              const selected = petState.selectedPetId === pet.id;
-              const working = workingPetId === pet.id;
-              return (
-                <PetCard
-                  key={`mine-${pet.id}`}
-                  pet={pet}
-                  installed
-                  selected={selected}
-                  working={working}
-                  onOpen={() => setDetailsPet(pet)}
-                  onGet={() => installPet(pet)}
-                  onSelect={() => selectPet(pet.id)}
-                  onRemove={() => removePet(pet.id)}
-                />
-              );
-            })}
-          </div>
-        </section>
-      ) : null}
-      {isLoadingFirstPage && viewMode === "discover" ? (
+      {isLoadingFirstPage ? (
         <div className="store-grid" aria-busy="true" aria-live="polite">
           {Array.from({ length: 8 }).map((_, index) => (
             <StoreSkeletonCard key={index} index={index} />
           ))}
         </div>
-      ) : viewMode === "mine" && myUserPets === undefined ? (
-        <div className="store-grid" aria-busy="true" aria-live="polite">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <StoreSkeletonCard key={index} index={index} />
-          ))}
-        </div>
       ) : visiblePets.length === 0 ? (
         <div className="pets-empty">
-          {viewMode === "mine"
-            ? "You haven't created any pets yet."
-            : "No pets match that filter. Try a different tag or clear the search."}
+          No pets match that filter. Try a different tag or clear the search.
         </div>
       ) : (
         <>
@@ -992,8 +929,7 @@ export function PetsTab() {
               );
             })}
           </div>
-          {viewMode === "discover" &&
-          (canLoadMore || isLoadingMore || canLoadMoreUserPets || isLoadingMoreUserPets) ? (
+          {canLoadMore || isLoadingMore || canLoadMoreUserPets || isLoadingMoreUserPets ? (
             <div
               ref={sentinelRef}
               className="store-grid pets-grid-sentinel"

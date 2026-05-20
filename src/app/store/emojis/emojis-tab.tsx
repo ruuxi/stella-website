@@ -5,12 +5,9 @@ import { useAction, useMutation, usePaginatedQuery, useQuery } from "convex/reac
 import {
   ChevronLeft,
   ChevronRight,
-  Compass,
   Package,
   Plus,
   Search,
-  User,
-  X,
 } from "lucide-react";
 import {
   generateEmojiPack,
@@ -246,7 +243,6 @@ export function EmojisTab() {
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string>(ALL_TAG);
   const [sort, setSort] = useState<EmojiPackSort>("installs");
-  const [viewMode, setViewMode] = useState<"discover" | "mine">("discover");
   const [createOpen, setCreateOpen] = useState(false);
   const [detailsPack, setDetailsPack] = useState<EmojiPack | null>(null);
   const [previewSheet, setPreviewSheet] = useState(0);
@@ -293,7 +289,7 @@ export function EmojisTab() {
     () => packs.filter((pack) => !ownedPackIds.has(pack.packId)),
     [ownedPackIds, packs],
   );
-  const visiblePacks = viewMode === "mine" ? (myPacks ?? []) : visiblePublicPacks;
+  const visiblePacks = visiblePublicPacks;
 
   useEffect(() => {
     const bridge = getDesktopStoreBridge();
@@ -442,26 +438,6 @@ export function EmojisTab() {
           <button
             type="button"
             className="store-action-btn store-action-btn--lg"
-            data-variant="subtle"
-            onClick={() =>
-              setViewMode((current) => (current === "mine" ? "discover" : "mine"))
-            }
-          >
-            {viewMode === "mine" ? (
-              <>
-                <Compass size={14} aria-hidden />
-                Discover
-              </>
-            ) : (
-              <>
-                <User size={14} aria-hidden />
-                My emojis
-              </>
-            )}
-          </button>
-          <button
-            type="button"
-            className="store-action-btn store-action-btn--lg"
             data-variant="get"
             onClick={() => setCreateOpen(true)}
           >
@@ -470,12 +446,11 @@ export function EmojisTab() {
           </button>
         </div>
       </div>
-      {viewMode === "discover" ? (
-        <div
-          className="emoji-page-tags"
-          role="tablist"
-          aria-label="Filter emoji packs by tag"
-        >
+      <div
+        className="emoji-page-tags"
+        role="tablist"
+        aria-label="Filter emoji packs by tag"
+      >
           <button
             type="button"
             role="tab"
@@ -500,65 +475,28 @@ export function EmojisTab() {
             </button>
           ))}
         </div>
-      ) : null}
       {actionError ? (
         <div className="store-status" data-variant="error">
           {actionError}
         </div>
       ) : null}
-      {viewMode === "discover" && myPacks && myPacks.length > 0 ? (
-        <section className="emoji-page-section">
-          <div className="emoji-page-section-header">
-            <span className="emoji-page-section-title">Your packs</span>
-            <span className="emoji-page-section-count">{myPacks.length}</span>
-          </div>
-          <div className="emoji-pack-grid">
-            {myPacks.map((pack) => {
-              const active = activePackId === pack.packId;
-              return (
-                <EmojiPackCard
-                  key={`mine-${pack.packId}`}
-                  pack={pack}
-                  active={active}
-                  onOpen={() => {
-                    setPreviewSheet(0);
-                    setDetailsPack(pack);
-                  }}
-                />
-              );
-            })}
-          </div>
-        </section>
-      ) : null}
-      {isLoadingFirstPage && viewMode === "discover" ? (
+      {isLoadingFirstPage ? (
         <div className="emoji-pack-grid" aria-busy="true" aria-live="polite">
           {Array.from({ length: 8 }).map((_, index) => (
             <StoreSkeletonCard key={index} index={index} />
           ))}
         </div>
-      ) : viewMode === "mine" && myPacks === undefined ? (
-        <div className="emoji-pack-grid" aria-busy="true" aria-live="polite">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <StoreSkeletonCard key={index} index={index} />
-          ))}
-        </div>
       ) : visiblePacks.length === 0 ? (
         <div className="emoji-page-empty">
-          {viewMode === "mine"
-            ? "You haven't created any emoji packs yet."
-            : trimmedSearch
-              ? "No packs match that search."
-              : "No community packs yet."}
+          {trimmedSearch ? "No packs match that search." : "No community packs yet."}
         </div>
       ) : (
         <section className="emoji-page-section">
           <div className="emoji-page-section-header">
-            <span className="emoji-page-section-title">
-              {viewMode === "mine" ? "My emojis" : "Discover"}
-            </span>
+            <span className="emoji-page-section-title">Discover</span>
             <span className="emoji-page-section-count">
               {visiblePacks.length}
-              {viewMode === "discover" && canLoadMore ? "+" : ""}
+              {canLoadMore ? "+" : ""}
             </span>
           </div>
           <div className="emoji-pack-grid">
@@ -577,7 +515,7 @@ export function EmojisTab() {
               );
             })}
           </div>
-          {viewMode === "discover" && (canLoadMore || isLoadingMore) ? (
+          {canLoadMore || isLoadingMore ? (
             <div
               ref={sentinelRef}
               className="emoji-pack-grid emoji-page-sentinel"
