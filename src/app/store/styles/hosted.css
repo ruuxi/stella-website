@@ -43,6 +43,40 @@ html:not([data-embedded="true"]) .store-scroll {
   padding: 0 var(--page-margin) clamp(4rem, 8vw, 6rem);
 }
 
+/* Pets / Emojis tabs render their own <main> directly into .store-root
+ * (no .store-scroll wrapper), so re-apply the same 1040px centering
+ * and gutter on hosted so they line up with Discover and the tab strip. */
+html:not([data-embedded="true"]) :is(.pets-page, .emoji-page) {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding-left: var(--page-margin);
+  padding-right: var(--page-margin);
+  padding-bottom: clamp(4rem, 8vw, 6rem);
+}
+
+/* Pets / Emojis page titles use the same Cormorant display treatment as
+ * `.store-web-title` so the three tabs share one visual voice. */
+html:not([data-embedded="true"])
+  :is(.pets-page-title, .emoji-page-title) {
+  font-family: var(--font-display, "Cormorant Garamond", Georgia), serif;
+  font-size: clamp(2rem, 3.4vw, 2.6rem);
+  font-weight: 300;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  color: var(--page-foreground);
+}
+
+/* Match the Discover hero's count/eyebrow voice. */
+html:not([data-embedded="true"])
+  :is(.pets-page-count, .emoji-page-active) {
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--page-muted);
+}
+
 html:not([data-embedded="true"]) .store-web-shell {
   max-width: 1040px;
   margin: 0 auto;

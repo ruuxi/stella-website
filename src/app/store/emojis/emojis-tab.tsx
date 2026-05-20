@@ -40,6 +40,7 @@ import {
   EmptyState,
   PackageArtwork,
   StoreModal,
+  StoreSkeletonCard,
 } from "../components/shared";
 
 export function CreateEmojiPackDialog({
@@ -530,13 +531,17 @@ export function EmojisTab() {
         </section>
       ) : null}
       {isLoadingFirstPage && viewMode === "discover" ? (
-        <div className="emoji-pack-grid">
+        <div className="emoji-pack-grid" aria-busy="true" aria-live="polite">
           {Array.from({ length: 8 }).map((_, index) => (
-            <div className="store-skeleton-card" key={index} />
+            <StoreSkeletonCard key={index} index={index} />
           ))}
         </div>
       ) : viewMode === "mine" && myPacks === undefined ? (
-        <div className="emoji-page-empty">Loading...</div>
+        <div className="emoji-pack-grid" aria-busy="true" aria-live="polite">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <StoreSkeletonCard key={index} index={index} />
+          ))}
+        </div>
       ) : visiblePacks.length === 0 ? (
         <div className="emoji-page-empty">
           {viewMode === "mine"
@@ -575,10 +580,16 @@ export function EmojisTab() {
           {viewMode === "discover" && (canLoadMore || isLoadingMore) ? (
             <div
               ref={sentinelRef}
-              className="emoji-page-sentinel"
+              className="emoji-pack-grid emoji-page-sentinel"
               data-loading={isLoadingMore || undefined}
+              aria-hidden="true"
             >
-              {isLoadingMore ? "Loading more..." : ""}
+              {isLoadingMore ? (
+                <>
+                  <StoreSkeletonCard index={0} />
+                  <StoreSkeletonCard index={1} />
+                </>
+              ) : null}
             </div>
           ) : null}
         </section>

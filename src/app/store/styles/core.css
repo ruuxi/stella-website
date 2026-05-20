@@ -55,16 +55,6 @@
   to   { opacity: 1; transform: scale(1); }
 }
 
-@keyframes store-shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes store-pulse {
-  0%, 100% { opacity: 0.5; }
-  50%      { opacity: 1; }
-}
-
 /* --- Root --- */
 
 .store-root {
@@ -701,7 +691,7 @@
   color: var(--text-weak);
   border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
   cursor: wait;
-  animation: store-pulse 1.5s ease-in-out infinite;
+  animation: loading-pulse 1.6s ease-in-out infinite;
 }
 
 /* Large action button (detail view) */
@@ -924,49 +914,87 @@
   max-width: 300px;
 }
 
-/* --- Skeleton Loading --- */
+/* --- Loading placeholders ---
+   Shared primitives (`.loading-text`, `.loading-block`, keyframes)
+   live in `globals.css` so non-store pages can use them. Cards below
+   mirror real `.store-card` geometry so content lands without layout
+   shift. */
 
 .store-skeleton-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  min-height: 116px;
+  padding: 12px;
   border-radius: 14px;
-  overflow: hidden;
   background: color-mix(in oklch, var(--foreground) 2%, transparent);
-  border: 1px solid color-mix(in oklch, var(--foreground) 4%, transparent);
+  border: 1px solid color-mix(in oklch, var(--foreground) 5%, transparent);
+  animation: loading-pulse 1.6s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 80ms);
 }
 
-.store-skeleton-image {
-  aspect-ratio: 16 / 10;
-  background: linear-gradient(
-    90deg,
-    color-mix(in oklch, var(--foreground) 3%, transparent) 25%,
-    color-mix(in oklch, var(--foreground) 6%, transparent) 50%,
-    color-mix(in oklch, var(--foreground) 3%, transparent) 75%
-  );
-  background-size: 200% 100%;
-  animation: store-shimmer 2s ease-in-out infinite;
+.store-skeleton-card-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.store-skeleton-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  flex: 0 0 auto;
+  background: color-mix(in oklch, var(--foreground) 8%, transparent);
 }
 
 .store-skeleton-body {
-  padding: 12px 14px 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding-top: 6px;
 }
 
 .store-skeleton-line {
   height: 10px;
   border-radius: 5px;
-  background: linear-gradient(
-    90deg,
-    color-mix(in oklch, var(--foreground) 4%, transparent) 25%,
-    color-mix(in oklch, var(--foreground) 7%, transparent) 50%,
-    color-mix(in oklch, var(--foreground) 4%, transparent) 75%
-  );
-  background-size: 200% 100%;
-  animation: store-shimmer 2s ease-in-out infinite;
+  background: color-mix(in oklch, var(--foreground) 8%, transparent);
 }
 
-.store-skeleton-line--short {
-  width: 60%;
+.store-skeleton-line--name { width: 55%; height: 12px; }
+.store-skeleton-line--desc { width: 92%; }
+.store-skeleton-line--short { width: 60%; }
+
+.store-skeleton-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.store-skeleton-chip {
+  height: 16px;
+  width: 88px;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--foreground) 6%, transparent);
+}
+
+.store-skeleton-pill {
+  height: 28px;
+  width: 64px;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklch, var(--foreground) 8%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .store-skeleton-card {
+    animation: none;
+    opacity: 0.85;
+  }
 }
 
 /* --- Status Messages --- */

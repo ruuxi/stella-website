@@ -232,11 +232,8 @@
 }
 
 .emoji-page-sentinel {
-  min-height: 48px;
-  text-align: center;
-  color: var(--text-weak);
-  font-size: 12px;
-  padding: 12px 0 24px;
+  margin-top: 12px;
+  padding: 0 0 24px;
   opacity: 0;
   transition: opacity 140ms ease;
 }

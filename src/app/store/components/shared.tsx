@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
+import Link from "next/link";
 import { Package, X } from "lucide-react";
 import type { StoreBadge } from "../lib/types";
 import { getGradient, getInitial } from "../lib/artwork";
@@ -215,17 +216,35 @@ export function EmptyState({
   );
 }
 
-export function SkeletonGrid() {
+/** Skeleton card matching `.store-card` geometry exactly. */
+export function StoreSkeletonCard({ index = 0 }: { index?: number }) {
   return (
-    <div className="store-grid">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="store-skeleton-card">
-          <div className="store-skeleton-image" />
-          <div className="store-skeleton-body">
-            <div className="store-skeleton-line" />
-            <div className="store-skeleton-line store-skeleton-line--short" />
-          </div>
+    <div
+      className="store-skeleton-card"
+      style={{ "--i": index } as CSSProperties}
+      aria-hidden="true"
+    >
+      <div className="store-skeleton-card-main">
+        <div className="store-skeleton-icon" />
+        <div className="store-skeleton-body">
+          <div className="store-skeleton-line store-skeleton-line--name" />
+          <div className="store-skeleton-line store-skeleton-line--desc" />
+          <div className="store-skeleton-line store-skeleton-line--short" />
         </div>
+      </div>
+      <div className="store-skeleton-footer">
+        <div className="store-skeleton-chip" />
+        <div className="store-skeleton-pill" />
+      </div>
+    </div>
+  );
+}
+
+export function SkeletonGrid({ count = 6 }: { count?: number }) {
+  return (
+    <div className="store-grid" aria-busy="true" aria-live="polite">
+      {Array.from({ length: count }).map((_, i) => (
+        <StoreSkeletonCard key={i} index={i} />
       ))}
     </div>
   );
@@ -245,14 +264,16 @@ export function StoreWebTabs({ activeTab }: { activeTab: HostedStoreTab }) {
   return (
     <nav className="store-web-tabs" aria-label="Store sections">
       {storeTabs.map((tab) => (
-        <a
+        <Link
           className="store-web-tab"
           data-active={activeTab === tab.key ? "true" : undefined}
           href={`/store?tab=${tab.key}`}
           key={tab.key}
+          scroll={false}
+          prefetch={false}
         >
           {tab.label}
-        </a>
+        </Link>
       ))}
     </nav>
   );

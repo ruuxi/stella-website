@@ -785,11 +785,8 @@
 }
 
 .pets-grid-sentinel {
-  min-height: 56px;
-  padding: 16px 0 32px;
-  text-align: center;
-  color: var(--text-weak);
-  font-size: 12px;
+  margin-top: 16px;
+  padding: 0 0 32px;
   opacity: 0;
   transition: opacity 140ms ease;
 }

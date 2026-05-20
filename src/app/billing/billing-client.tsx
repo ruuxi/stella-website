@@ -2,7 +2,7 @@
 
 import { useAction, useQuery } from "convex/react";
 import { makeFunctionReference } from "convex/server";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import { openSignInDialog } from "@/components/auth/sign-in-dialog";
 import { isConvexConfigured } from "@/lib/convex-urls";
 
@@ -506,7 +506,15 @@ function BillingInteractive() {
             <div className="billing-account-plan">
               <span className="billing-status-label">Current plan</span>
               <span className="billing-status-value">
-                {isLoadingStatus ? "..." : getPlanDisplay(currentPlan).label}
+                {isLoadingStatus ? (
+                  <span
+                    className="loading-text"
+                    style={{ "--w": "5ch" } as CSSProperties}
+                    aria-label="Loading current plan"
+                  />
+                ) : (
+                  getPlanDisplay(currentPlan).label
+                )}
               </span>
               {isActivePaidSubscriber ? (
                 <span className="billing-account-renewal">{renewalLabel} · {renewalDetail}</span>

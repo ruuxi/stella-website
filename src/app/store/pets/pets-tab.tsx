@@ -61,6 +61,7 @@ import {
   EmptyState,
   PackageArtwork,
   StoreModal,
+  StoreSkeletonCard,
 } from "../components/shared";
 
 export function CreatePetDialog({
@@ -952,13 +953,17 @@ export function PetsTab() {
         </section>
       ) : null}
       {isLoadingFirstPage && viewMode === "discover" ? (
-        <div className="store-grid">
+        <div className="store-grid" aria-busy="true" aria-live="polite">
           {Array.from({ length: 8 }).map((_, index) => (
-            <div className="store-skeleton-card" key={index} />
+            <StoreSkeletonCard key={index} index={index} />
           ))}
         </div>
       ) : viewMode === "mine" && myUserPets === undefined ? (
-        <div className="pets-empty">Loading...</div>
+        <div className="store-grid" aria-busy="true" aria-live="polite">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <StoreSkeletonCard key={index} index={index} />
+          ))}
+        </div>
       ) : visiblePets.length === 0 ? (
         <div className="pets-empty">
           {viewMode === "mine"
@@ -991,13 +996,18 @@ export function PetsTab() {
           (canLoadMore || isLoadingMore || canLoadMoreUserPets || isLoadingMoreUserPets) ? (
             <div
               ref={sentinelRef}
-              className="pets-grid-sentinel"
+              className="store-grid pets-grid-sentinel"
               data-loading={
                 isLoadingMore || isLoadingMoreUserPets ? "true" : "false"
               }
               aria-hidden="true"
             >
-              {isLoadingMore || isLoadingMoreUserPets ? "Loading more..." : ""}
+              {isLoadingMore || isLoadingMoreUserPets ? (
+                <>
+                  <StoreSkeletonCard index={0} />
+                  <StoreSkeletonCard index={1} />
+                </>
+              ) : null}
             </div>
           ) : null}
         </>

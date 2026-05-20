@@ -1184,6 +1184,40 @@ html[data-embedded="true"] .site-header {
   animation-delay: 220ms;
 }
 
+/* Shared loading primitives. Content-shaped placeholders that mirror
+   real layout exactly, with a single calm opacity pulse instead of a
+   gradient shimmer (reads as template UI). Reduced-motion safe. */
+@keyframes loading-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.95; }
+}
+
+.loading-block {
+  display: block;
+  border-radius: 6px;
+  background: color-mix(in oklch, var(--page-foreground) 6%, transparent);
+  animation: loading-pulse 1.6s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 80ms);
+}
+
+.loading-text {
+  display: inline-block;
+  height: 0.85em;
+  width: var(--w, 4ch);
+  vertical-align: -0.08em;
+  border-radius: 4px;
+  background: color-mix(in oklch, var(--page-foreground) 10%, transparent);
+  animation: loading-pulse 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-block,
+  .loading-text {
+    animation: none;
+    opacity: 0.85;
+  }
+}
+
 @keyframes fade-up {
   from {
     opacity: 0;
