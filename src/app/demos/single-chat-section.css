@@ -179,8 +179,8 @@
 }
 
 .mini-sidebar__brand-logo {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -216,7 +216,35 @@
 .mini-sidebar__footer {
   margin-top: auto;
   padding-top: 8px;
-  border-top: 1px solid var(--mini-border);
+}
+
+.mini-sidebar__footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 6px 2px 0;
+}
+
+.mini-sidebar__footer-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.mini-sidebar__footer-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: var(--mini-text-weak);
+}
+
+.mini-sidebar__footer-icon svg {
+  width: 12px;
+  height: 12px;
 }
 
 .mini-sidebar__item {
@@ -249,35 +277,48 @@
   color: var(--mini-accent);
 }
 
-.mini-sidebar__account {
+.mini-sidebar__footer-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 8px 2px;
-  margin-top: 6px;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 6px 2px 0;
+}
+
+.mini-sidebar__footer-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.mini-sidebar__footer-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: var(--mini-text-weak);
+}
+
+.mini-sidebar__footer-icon svg {
+  width: 12px;
+  height: 12px;
 }
 
 .mini-sidebar__avatar {
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
   background: rgba(255, 111, 142, 0.28);
   color: var(--mini-text-strong);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 600;
+  letter-spacing: 0.04em;
   flex-shrink: 0;
-}
-
-.mini-sidebar__account-pill {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--mini-text-weaker);
-  padding: 2px 8px;
-  border: 1px solid var(--mini-border-strong);
-  border-radius: 999px;
 }
 
 /* Narrow viewport: collapse the in-window sidebar to an icon rail,
@@ -300,8 +341,7 @@
   }
 
   .single-chat-hero__frame .mini-sidebar__brand-text,
-  .single-chat-hero__frame .mini-sidebar__item-label,
-  .single-chat-hero__frame .mini-sidebar__account-pill {
+  .single-chat-hero__frame .mini-sidebar__item-label {
     display: none;
   }
 
@@ -318,12 +358,16 @@
     padding: 8px 0;
   }
 
-  .single-chat-hero__frame .mini-sidebar__account {
+  .single-chat-hero__frame .mini-sidebar__footer-row {
     flex-direction: column;
     align-items: center;
     gap: 0;
-    padding: 6px 0 0;
-    margin-top: 4px;
+    padding-top: 4px;
+  }
+
+  .single-chat-hero__frame .mini-sidebar__footer-actions {
+    flex-direction: column;
+    gap: 0;
   }
 }
 

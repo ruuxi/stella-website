@@ -495,12 +495,16 @@ html[data-embedded="true"] .site-header {
   background: rgba(255, 255, 255, 0.92);
 }
 
+/* pi.dev-style centered hero: large orb on top, two-line italic
+   headline, soft subtitle, single CTA. Everything stacks centered
+   on a single grid cell. */
 .hero-section {
   position: relative;
-  align-items: start;
+  align-items: center;
+  justify-items: center;
   min-height: calc(100svh - 4rem);
-  padding-top: clamp(4rem, 12vw, 14rem);
-  padding-bottom: clamp(4rem, 8vw, 8rem);
+  padding-top: clamp(3rem, 6vw, 6rem);
+  padding-bottom: clamp(3rem, 6vw, 6rem);
 }
 
 .hero-section > * {
@@ -508,90 +512,138 @@ html[data-embedded="true"] .site-header {
   z-index: 1;
 }
 
-.hero-title h1 {
+.hero-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: clamp(1.4rem, 2.6vw, 2.2rem);
+  width: 100%;
+  max-width: 56rem;
+  margin-inline: auto;
+}
+
+.hero-stack__orb {
+  position: relative;
+  width: clamp(200px, 22vw, 320px);
+  height: clamp(200px, 22vw, 320px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-stack__title {
+  width: 100%;
+}
+
+.hero-stack__sub {
+  max-width: 36rem;
+}
+
+.hero-stack__sub p {
+  margin: 0;
+  font-size: clamp(1rem, 1.3vw, 1.25rem);
+  line-height: 1.45;
+  letter-spacing: -0.015em;
+  color: var(--page-foreground);
+}
+
+.hero-stack__cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* pi.dev-style hero pitch — long sentence headline. Sits inside
+   `.hero-stack__title` which centers it; the `<br/>` controls line
+   breaks at desktop widths and `text-wrap: balance` keeps narrow
+   viewports readable. */
+.hero-stack__title h1.hero-pitch {
+  /* Word-reveal timing knobs — overridable per-viewport if needed. */
+  --hero-reveal-base: 1.1s;
+  --hero-reveal-step: 90ms;
+  --hero-reveal-dur: 900ms;
+
   margin: 0;
   font-family: var(--font-display), serif;
-  font-size: clamp(3.4rem, 12vw, 8.6rem);
+  font-size: clamp(2.2rem, 5.2vw, 4.4rem);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  min-height: 0;
   font-weight: 300;
-  line-height: 0.88;
-  letter-spacing: -0.07em;
-  /* Two-line headline; reserve height before display font metrics settle */
-  min-height: calc(2 * 0.88 * clamp(3.4rem, 12vw, 8.6rem));
+  white-space: normal;
+  text-wrap: balance;
 }
 
-.hero-title span {
-  font-style: italic;
+/* Each rendered line is a flex row so we can keep words on the same
+   baseline and add a horizontal gap without forcing extra spaces in
+   the markup. The block stacks the two lines vertically. */
+.hero-pitch__line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  column-gap: 0.32em;
+  row-gap: 0.08em;
 }
 
-.hero-title__morph {
-  position: relative;
+.hero-pitch__word {
   display: inline-block;
-  font-style: italic;
-  vertical-align: top;
+  /* Off-screen start: slightly down, blurred, transparent. The
+     transform/filter/opacity get released together by the reveal
+     keyframe so the word "lifts in" like Apple's marketing pages. */
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(8px);
+  animation: hero-pitch-reveal var(--hero-reveal-dur)
+    cubic-bezier(0.22, 1, 0.36, 1)
+    calc(var(--hero-reveal-base) + (var(--i, 0) * var(--hero-reveal-step)))
+    forwards;
+  will-change: opacity, filter, transform;
 }
 
-.hero-title__ghost {
-  visibility: hidden;
-  pointer-events: none;
-  font-style: italic;
+/* The trailing period is part of the same word visually — collapse
+   the leading gap so it hugs the accent word instead of floating. */
+.hero-pitch__word--punct {
+  margin-left: -0.32em;
 }
 
-.hero-title__phrase {
-  position: absolute;
-  inset: 0;
+.hero-pitch__accent {
   font-style: italic;
-  white-space: nowrap;
-  animation: hero-title-morph-in 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  color: var(--page-accent);
 }
 
-@keyframes hero-title-morph-in {
+@keyframes hero-pitch-reveal {
   0% {
     opacity: 0;
-    transform: translateY(0.22em);
-    filter: blur(4px);
+    filter: blur(8px);
+    transform: translateY(8px);
+  }
+  60% {
+    opacity: 1;
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
     filter: blur(0);
+    transform: translateY(0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-title__phrase {
+  .hero-pitch__word {
     animation: none;
+    opacity: 1;
+    filter: none;
+    transform: none;
   }
 }
 
-.hero-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-width: 34rem;
-}
-
-.hero-copy p {
-  margin: 0;
-  font-size: clamp(1rem, 1.4vw, 1.4rem);
-  line-height: 1.45;
-  letter-spacing: -0.02em;
-}
-
-.hero-copy__subtle {
-  color: var(--page-muted);
-  font-size: 0.9rem !important;
-}
-
-.hero-actions {
-  display: flex;
-  justify-content: flex-start;
-}
-
-.hero-actions__cta {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
+@media (max-width: 767px) {
+  .hero-stack__title h1.hero-pitch {
+    font-size: clamp(1.8rem, 7vw, 2.6rem);
+  }
 }
 
 .hero-research-note {
@@ -601,46 +653,15 @@ html[data-embedded="true"] .site-header {
   font-size: 0.95rem;
   font-style: italic;
   letter-spacing: -0.02em;
+  text-align: center;
 }
 
-@media (max-width: 767px) {
-  .hero-actions__cta {
-    align-items: center;
-  }
-
-  .hero-research-note {
-    text-align: center;
-  }
-}
-
-@media (max-width: 767px) {
-  .hero-actions {
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-  }
-
-  .hero-actions .button--primary {
-    display: none;
-  }
-
-  .hero-actions__cta {
-    /* On mobile the download button is hidden; just leave the
-       research-preview note centered under the orb. */
-    gap: 0;
-  }
-}
-
+/* Default orb wrapper sits inside `.hero-stack__orb` and fills it. */
 .hero-orb-wrap {
-  display: none;
-}
-
-@media (max-width: 767px) {
-  .hero-orb-wrap {
-    display: flex;
-    width: clamp(160px, 40vw, 220px);
-    height: clamp(160px, 40vw, 220px);
-  }
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 .stella-animation-container {
@@ -700,8 +721,6 @@ html[data-embedded="true"] .site-header {
 }
 
 .hero-orb-wrap {
-  width: clamp(280px, 25vw, 440px);
-  height: clamp(280px, 25vw, 440px);
   align-items: center;
   justify-content: center;
   pointer-events: none;
@@ -711,8 +730,8 @@ html[data-embedded="true"] .site-header {
   --ring: #7e8fff;
   --spinner-color-2: #66dcff;
   --spinner-color-3: #8ff7db;
-  opacity: 0.88;
-  filter: saturate(1.08);
+  opacity: 0.95;
+  filter: saturate(1.1);
 }
 
 .hero-orb-rings {
@@ -1554,9 +1573,12 @@ html[data-embedded="true"] .site-header {
     grid-column: 2 / 4;
   }
 
-  .hero-title,
-  .hero-copy,
-  .hero-actions,
+  .hero-stack {
+    /* The centered hero stack spans the whole row so it can self-
+       center; everything else lives in the middle column. */
+    grid-column: 1 / -1;
+  }
+
   .section-kicker,
   .product-demos-slot,
   .install-panels,
@@ -1598,31 +1620,8 @@ html[data-embedded="true"] .site-header {
     grid-template-columns: 560fr 560fr 373fr 373fr 373fr;
   }
 
-  .hero-title {
-    grid-column: 2 / 5;
-    margin-left: -8rem;
-  }
-
-  .hero-copy {
-    grid-column: 2 / 4;
-    margin-left: -8rem;
-  }
-
-  .hero-actions {
-    grid-column: 4 / 6;
-    align-self: start;
-    justify-content: center;
-    position: relative;
-  }
-
-  .hero-orb-wrap {
-    display: flex;
-    position: absolute;
-    inset-inline-end: auto;
-    top: auto;
-    bottom: calc(100% + 1.5rem);
-    left: 50%;
-    transform: translateX(-50%);
+  .hero-stack {
+    grid-column: 1 / -1;
   }
 
   .section-kicker {

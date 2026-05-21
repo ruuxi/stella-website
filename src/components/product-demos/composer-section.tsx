@@ -131,7 +131,7 @@ export function ComposerSection() {
    The mock itself
    ────────────────────────────────────────────────────────────────── */
 
-function ComposerMock() {
+export function ComposerMock() {
   const [message, setMessage] = useState("");
   const [attached, setAttached] = useState<SuggestionChip[]>([]);
   const [hovered, setHovered] = useState<{

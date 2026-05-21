@@ -8,7 +8,7 @@
  * the actual conversation animation.
  *
  * The mock includes the full Stella sidebar on the left of the window
- * (logo + Home/Social up top, Store/Settings + account avatar at the
+ * (logo + Home/Social/New App up top, Store + avatar/icon row at the
  * bottom), and the inline working indicator lives in the context-chips
  * bar above the composer — when active it slides the suggestion chips
  * to the right and renders the bare Stella animation orb plus a
@@ -20,7 +20,15 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Cog, Home, Store, Users } from "lucide-react";
+import {
+  STELLA_ICON_DEVICE,
+  STELLA_ICON_HOUSE,
+  STELLA_ICON_PALETTE,
+  STELLA_ICON_PLUS_SQUARE,
+  STELLA_ICON_SETTINGS,
+  STELLA_ICON_STORE,
+  STELLA_ICON_USERS,
+} from "./stella-shell";
 import { StellaAnimation } from "@/components/stella-animation/stella-animation";
 
 type ChatMessage =
@@ -149,7 +157,7 @@ export function SingleChatSection() {
    The mini-window mock
    ────────────────────────────────────────────────────────────────── */
 
-function MiniWindowMock() {
+export function MiniWindowMock() {
   const [stepIndex, setStepIndex] = useState(0);
   const [revealed, setRevealed] = useState<Record<string, number>>({});
   const [working, setWorking] = useState(false);
@@ -374,18 +382,28 @@ function MiniSidebar() {
       </div>
 
       <nav className="mini-sidebar__nav" aria-label="Apps">
-        <MiniSidebarItem icon={<Home size={15} strokeWidth={1.75} />} label="Home" active />
-        <MiniSidebarItem icon={<Users size={15} strokeWidth={1.75} />} label="Social" />
+        <MiniSidebarItem icon={STELLA_ICON_HOUSE} label="Home" active />
+        <MiniSidebarItem icon={STELLA_ICON_USERS} label="Social" />
+        <MiniSidebarItem icon={STELLA_ICON_PLUS_SQUARE} label="New App" />
       </nav>
 
       <div className="mini-sidebar__footer">
-        <MiniSidebarItem icon={<Store size={15} strokeWidth={1.75} />} label="Store" />
-        <MiniSidebarItem icon={<Cog size={15} strokeWidth={1.75} />} label="Settings" />
-        <div className="mini-sidebar__account">
+        <MiniSidebarItem icon={STELLA_ICON_STORE} label="Store" />
+        <div className="mini-sidebar__footer-row">
           <span className="mini-sidebar__avatar" aria-hidden="true">
             J
           </span>
-          <span className="mini-sidebar__account-pill">Pro</span>
+          <div className="mini-sidebar__footer-actions">
+            <span className="mini-sidebar__footer-icon" aria-hidden="true">
+              {STELLA_ICON_PALETTE}
+            </span>
+            <span className="mini-sidebar__footer-icon" aria-hidden="true">
+              {STELLA_ICON_SETTINGS}
+            </span>
+            <span className="mini-sidebar__footer-icon" aria-hidden="true">
+              {STELLA_ICON_DEVICE}
+            </span>
+          </div>
         </div>
       </div>
     </aside>

@@ -6,8 +6,11 @@ import { useViewportActivity } from "@/components/use-viewport-activity";
 import { CozyCatAvatar, CozyWidget } from "./cozy-cat";
 import { SELF_MOD_STAGES } from "./data";
 import {
+  STELLA_ICON_DEVICE,
   STELLA_ICON_HOUSE,
+  STELLA_ICON_PALETTE,
   STELLA_ICON_PLUS,
+  STELLA_ICON_PLUS_SQUARE,
   STELLA_ICON_SEND,
   STELLA_ICON_SETTINGS,
   STELLA_ICON_STORE,
@@ -413,6 +416,12 @@ export function SelfModShell({
                   </span>
                   <span>Social</span>
                 </div>
+                <div className="selfmod-shell__nav-item">
+                  <span className="selfmod-shell__nav-icon">
+                    {STELLA_ICON_PLUS_SQUARE}
+                  </span>
+                  <span>New App</span>
+                </div>
               </nav>
               <div className="selfmod-shell__sidebar-footer">
                 <div className="selfmod-shell__nav-item">
@@ -421,20 +430,24 @@ export function SelfModShell({
                   </span>
                   <span>Store</span>
                 </div>
-                <div className="selfmod-shell__nav-item">
-                  <span className="selfmod-shell__nav-icon">
-                    {STELLA_ICON_SETTINGS}
-                  </span>
-                  <span>Settings</span>
-                </div>
-                <div className="selfmod-shell__account-row">
+                <div className="selfmod-shell__footer-row">
                   <span
                     className="selfmod-shell__account-avatar"
                     aria-hidden="true"
                   >
                     A
                   </span>
-                  <span className="selfmod-shell__account-pill">Upgrade</span>
+                  <div className="selfmod-shell__footer-actions">
+                    <span className="selfmod-shell__footer-icon" aria-hidden="true">
+                      {STELLA_ICON_PALETTE}
+                    </span>
+                    <span className="selfmod-shell__footer-icon" aria-hidden="true">
+                      {STELLA_ICON_SETTINGS}
+                    </span>
+                    <span className="selfmod-shell__footer-icon" aria-hidden="true">
+                      {STELLA_ICON_DEVICE}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

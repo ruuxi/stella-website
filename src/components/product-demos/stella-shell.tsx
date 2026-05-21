@@ -1,8 +1,7 @@
 /**
- * Shared SVG glyphs that mirror the real desktop sidebar icons (matches
- * `desktop/src/global/onboarding/panels/StellaAppMock.tsx`). Kept inline
- * so each demo renders identically without depending on icon libraries
- * for these specific shapes.
+ * Shared SVG glyphs and sidebar markup that mirror the real desktop
+ * sidebar (`desktop/src/shell/sidebar/`). Kept inline so each demo
+ * renders identically without depending on icon libraries.
  */
 
 import type { ReactNode } from "react";
@@ -92,7 +91,7 @@ export const STELLA_ICON_SETTINGS = (
     strokeLinejoin="round"
   >
     <circle cx="12" cy="12" r="3" />
-    <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+    <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 005.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
   </svg>
 );
 
@@ -179,75 +178,67 @@ export const STELLA_ICON_SEND = (
 );
 
 /**
- * Stella brand glyph — the small inline mark that sits at the back of
- * the sidebar brand row. Same drawing as the desktop StellaAppMock.
- */
-export const STELLA_GLYPH = (
-  <svg viewBox="0 0 32 32" width="100%" height="100%" fill="none">
-    <path
-      d="M16 2 L19 13 L30 16 L19 19 L16 30 L13 19 L2 16 L13 13 Z"
-      fill="currentColor"
-      opacity="0.85"
-    />
-  </svg>
-);
-
-/**
- * Renders the canonical 170px Stella sidebar (brand on right, Home /
- * Social / New App nav, footer with Palette+Settings icon row plus
- * Store / Connect / Sign in items). Used by every desktop-style mock
- * on the website so they all read as the same product.
+ * Canonical 170px Stella sidebar — logo + italic wordmark, Home /
+ * Social / New App nav, Store row, avatar + Theme / Settings /
+ * Connect icon buttons in the footer row.
  */
 export function StellaSidebar({
   className = "",
+  rail = false,
 }: {
   className?: string;
+  rail?: boolean;
 }): ReactNode {
   return (
-    <aside className={`stella-sidebar ${className}`.trim()}>
-      <div className="stella-sidebar__header" />
-      <div className="stella-sidebar__brand">
-        <span className="stella-sidebar__brand-glyph" aria-hidden="true">
-          {STELLA_GLYPH}
-        </span>
-        <span className="stella-sidebar__brand-text">Stella</span>
-      </div>
-      <nav className="stella-sidebar__nav">
-        <div className="stella-sidebar__nav-item active">
-          <span className="stella-sidebar__nav-icon">{STELLA_ICON_HOUSE}</span>
-          <span>Home</span>
-        </div>
-        <div className="stella-sidebar__nav-item">
-          <span className="stella-sidebar__nav-icon">{STELLA_ICON_USERS}</span>
-          <span>Social</span>
-        </div>
-        <div className="stella-sidebar__nav-item">
-          <span className="stella-sidebar__nav-icon">
-            {STELLA_ICON_PLUS_SQUARE}
+    <aside
+      className={`stella-sidebar ${className}`.trim()}
+      data-rail={rail || undefined}
+    >
+      <div className="stella-sidebar__stack">
+        <div className="stella-sidebar__titlebar" />
+        <div className="stella-sidebar__brand">
+          <span className="stella-sidebar__brand-logo" aria-hidden="true">
+            <img src="/stella-logo.svg" alt="" />
           </span>
-          <span>New App</span>
+          <span className="stella-sidebar__brand-text">Stella</span>
         </div>
-      </nav>
-      <div className="stella-sidebar__footer">
-        <div className="stella-sidebar__footer-icons">
-          <span className="stella-sidebar__icon-button" aria-hidden="true">
-            {STELLA_ICON_PALETTE}
-          </span>
-          <span className="stella-sidebar__icon-button" aria-hidden="true">
-            {STELLA_ICON_SETTINGS}
-          </span>
-        </div>
-        <div className="stella-sidebar__nav-item">
-          <span className="stella-sidebar__nav-icon">{STELLA_ICON_STORE}</span>
-          <span>Store</span>
-        </div>
-        <div className="stella-sidebar__nav-item">
-          <span className="stella-sidebar__nav-icon">{STELLA_ICON_DEVICE}</span>
-          <span>Connect</span>
-        </div>
-        <div className="stella-sidebar__nav-item">
-          <span className="stella-sidebar__nav-icon">{STELLA_ICON_LOGIN}</span>
-          <span>Sign in</span>
+        <nav className="stella-sidebar__nav">
+          <div className="stella-sidebar__nav-item active">
+            <span className="stella-sidebar__nav-icon">{STELLA_ICON_HOUSE}</span>
+            <span>Home</span>
+          </div>
+          <div className="stella-sidebar__nav-item">
+            <span className="stella-sidebar__nav-icon">{STELLA_ICON_USERS}</span>
+            <span>Social</span>
+          </div>
+          <div className="stella-sidebar__nav-item">
+            <span className="stella-sidebar__nav-icon">
+              {STELLA_ICON_PLUS_SQUARE}
+            </span>
+            <span>New App</span>
+          </div>
+        </nav>
+        <div className="stella-sidebar__footer">
+          <div className="stella-sidebar__nav-item">
+            <span className="stella-sidebar__nav-icon">{STELLA_ICON_STORE}</span>
+            <span>Store</span>
+          </div>
+          <div className="stella-sidebar__footer-row">
+            <span className="stella-sidebar__account-avatar" aria-hidden="true">
+              A
+            </span>
+            <div className="stella-sidebar__footer-actions">
+              <span className="stella-sidebar__footer-icon" aria-hidden="true">
+                {STELLA_ICON_PALETTE}
+              </span>
+              <span className="stella-sidebar__footer-icon" aria-hidden="true">
+                {STELLA_ICON_SETTINGS}
+              </span>
+              <span className="stella-sidebar__footer-icon" aria-hidden="true">
+                {STELLA_ICON_DEVICE}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </aside>

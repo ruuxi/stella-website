@@ -15,8 +15,16 @@
  */
 
 import { useState } from "react";
-import { Cog, Home, Store, Users } from "lucide-react";
 import { type SectionKey } from "./stella-app-mock-types";
+import {
+  STELLA_ICON_DEVICE,
+  STELLA_ICON_HOUSE,
+  STELLA_ICON_PALETTE,
+  STELLA_ICON_PLUS_SQUARE,
+  STELLA_ICON_SETTINGS,
+  STELLA_ICON_STORE,
+  STELLA_ICON_USERS,
+} from "./stella-shell";
 
 type Variant = "default" | "rail" | "tabs" | "dashboard" | "cozy";
 
@@ -135,31 +143,28 @@ function MiniSidebar({ variant }: { variant: Variant }) {
       ) : null}
 
       <nav className="mini-sidebar__nav" aria-label="Apps">
-        <SidebarItem
-          icon={<Home size={15} strokeWidth={1.75} />}
-          label="Home"
-          active
-        />
-        <SidebarItem
-          icon={<Users size={15} strokeWidth={1.75} />}
-          label="Social"
-        />
+        <SidebarItem icon={STELLA_ICON_HOUSE} label="Home" active />
+        <SidebarItem icon={STELLA_ICON_USERS} label="Social" />
+        <SidebarItem icon={STELLA_ICON_PLUS_SQUARE} label="New App" />
       </nav>
 
       <div className="mini-sidebar__footer">
-        <SidebarItem
-          icon={<Store size={15} strokeWidth={1.75} />}
-          label="Store"
-        />
-        <SidebarItem
-          icon={<Cog size={15} strokeWidth={1.75} />}
-          label="Settings"
-        />
-        <div className="mini-sidebar__account">
+        <SidebarItem icon={STELLA_ICON_STORE} label="Store" />
+        <div className="mini-sidebar__footer-row">
           <span className="mini-sidebar__avatar" aria-hidden="true">
             J
           </span>
-          <span className="mini-sidebar__account-pill">Pro</span>
+          <div className="mini-sidebar__footer-actions">
+            <span className="mini-sidebar__footer-icon" aria-hidden="true">
+              {STELLA_ICON_PALETTE}
+            </span>
+            <span className="mini-sidebar__footer-icon" aria-hidden="true">
+              {STELLA_ICON_SETTINGS}
+            </span>
+            <span className="mini-sidebar__footer-icon" aria-hidden="true">
+              {STELLA_ICON_DEVICE}
+            </span>
+          </div>
         </div>
       </div>
     </aside>

@@ -538,7 +538,8 @@
 }
 
 .radial-result-fullshell__sidebar.stella-sidebar .stella-sidebar__brand {
-  min-height: 64px;
+  padding-top: 16px;
+  padding-bottom: 6px;
 }
 
 .radial-result-fullshell__sidebar.stella-sidebar .stella-sidebar__footer {

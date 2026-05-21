@@ -4,7 +4,7 @@
  * Stella App Mock — onboarding preview that mirrors the real desktop app.
  *
  * The default state reproduces the actual Stella surface: a 170px sidebar
- * (brand + Home/Social/New App + footer icons) and a centered home column
+ * (brand + Home/Social/New App + Store + avatar/icon footer) and a centered
  * with the italic Cormorant Garamond title, category pills, and a pill
  * composer — exactly what users see when they finish onboarding.
  *
@@ -302,6 +302,44 @@ const css = `
     overflow: hidden;
     position: relative;
     z-index: 2;
+    transition: width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Icon rail — collapsed sidebar for dashboard surfaces. Labels and
+     account chrome hide; nav icons stay centered in a narrow strip. */
+  .sam-sidebar[data-rail="true"] {
+    width: 52px;
+  }
+  .sam-sidebar[data-rail="true"] .sam-sidebar-brand {
+    justify-content: center;
+    padding: 18px 0 8px;
+  }
+  .sam-sidebar[data-rail="true"] .sam-sidebar-brand-text,
+  .sam-sidebar[data-rail="true"] .sam-nav-item > span:not(.sam-nav-icon),
+  .sam-sidebar[data-rail="true"] .sam-nav-item-tag {
+    display: none;
+  }
+  .sam-sidebar[data-rail="true"] .sam-sidebar-nav {
+    padding: 0 8px 12px;
+  }
+  .sam-sidebar[data-rail="true"] .sam-nav-item {
+    justify-content: center;
+    padding: 10px;
+    border-radius: 8px;
+  }
+  .sam-sidebar[data-rail="true"] .sam-sidebar-footer,
+  .sam-sidebar[data-rail="true"] .sam-sidebar-footer-row {
+    justify-content: center;
+    padding-inline: 0;
+  }
+  .sam-sidebar[data-rail="true"] .sam-sidebar-footer-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .sam-sidebar[data-rail="true"] .sam-footer-actions {
+    flex-direction: column;
+    gap: 2px;
   }
 
   .sam-sidebar-default {
@@ -319,22 +357,18 @@ const css = `
   }
 
   .sam-sidebar-brand {
-    position: relative;
     display: flex;
     align-items: center;
     justify-content: flex-start;
     gap: 12px;
-    /* Logo sits in the same column as the nav icons below
-       (nav padding 12px + nav-item padding 14px ≈ 26px), matching
-       the real desktop sidebar. */
-    padding: 24px 16px 10px 26px;
+    padding: 24px 16px 10px 28px;
   }
   .sam-sidebar-brand-logo {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
+    width: 17px;
+    height: 17px;
     flex-shrink: 0;
     opacity: 0.55;
   }
@@ -346,7 +380,7 @@ const css = `
   .sam-sidebar-brand-text {
     color: var(--text-weak);
     font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
-    font-size: 22px;
+    font-size: 19px;
     font-weight: 450;
     font-style: italic;
     letter-spacing: -0.02em;
@@ -354,36 +388,20 @@ const css = `
     text-transform: none;
   }
 
-  /* Account row at the bottom of the sidebar footer — small initials
-     avatar + Upgrade pill, mirrors AccountRow in the real sidebar. */
-  .sam-account-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px 4px;
-    margin-top: 4px;
-  }
-  .sam-avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 999px;
-    background: oklch(0.88 0.06 250);
-    color: oklch(0.32 0.05 250);
+  .sam-account-avatar {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
-    font-weight: 600;
-    border: 1px solid oklch(0.78 0.05 250 / 0.5);
+    width: 32px;
+    height: 32px;
     flex-shrink: 0;
-  }
-  .sam-account-pill {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-weaker);
-    padding: 4px 10px;
-    border: 1px solid var(--border-strong);
-    border-radius: 999px;
+    border-radius: 50%;
+    border: 1px solid var(--border-weak);
+    background: oklch(0.88 0.06 250);
+    color: oklch(0.32 0.05 250);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
   }
 
   .sam-sidebar-nav {
@@ -398,14 +416,14 @@ const css = `
   .sam-nav-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    border-radius: var(--radius-md, 6px);
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: var(--radius-md, 8px);
     background: transparent;
     border: none;
     color: var(--text-base);
     font-family: inherit;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     text-align: left;
     width: 100%;
@@ -468,30 +486,45 @@ const css = `
     color: var(--text-weak);
   }
 
+  .sam-nav-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
   .sam-sidebar-footer {
     display: flex;
     flex-direction: column;
     gap: 4px;
     padding: 12px;
-    border-top: 1px solid var(--border-weak);
   }
-  .sam-footer-icons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 8px;
-    justify-items: center;
-    align-items: center;
-  }
-  .sam-icon-button {
+  .sam-sidebar-footer-row {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 4px 4px 0;
+  }
+  .sam-footer-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .sam-footer-icon {
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: none;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    padding: 0;
+    border-radius: var(--radius-md, 8px);
+    border: 1px solid transparent;
     background: transparent;
     color: var(--text-weak);
-    border-radius: var(--radius-md, 6px);
+  }
+  .sam-footer-icon svg {
+    width: 14px;
+    height: 14px;
   }
 
   /* SIDEBAR — modern: dense workspace with project list & badges. */
@@ -818,15 +851,72 @@ const css = `
     letter-spacing: 0;
   }
 
-  /* BODY — modern: cards-as-tools dashboard */
+  /* BODY — modern: dashboard surface (header row + card grid). */
+  .sam-body[data-modern="true"] {
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 18px 22px 16px;
+  }
   .sam-body[data-modern="true"] .sam-body-default { display: none; }
+  .sam-dashboard {
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    animation: samFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .sam-body[data-modern="true"] .sam-dashboard { display: flex; }
+
+  .sam-dashboard-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 2px 2px 4px;
+  }
+  .sam-dashboard-eyebrow {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-weaker);
+    margin-bottom: 4px;
+  }
+  .sam-dashboard-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text-strong);
+    line-height: 1.15;
+  }
+  .sam-dashboard-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  .sam-dashboard-stat {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-weak);
+    background: color-mix(in oklch, var(--foreground) 4%, transparent);
+    border: 1px solid var(--border-weak);
+    white-space: nowrap;
+  }
+
   .sam-cards {
     display: none;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 10px;
     width: 100%;
-    max-width: 540px;
-    margin: auto 0;
+    max-width: none;
+    margin: 0;
     animation: samFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
   .sam-body[data-modern="true"] .sam-cards { display: grid; }
@@ -835,10 +925,51 @@ const css = `
     position: relative;
     padding: 12px 14px;
     border-radius: var(--radius-lg, 8px);
-    background: var(--glass-bg);
+    background: color-mix(in oklch, var(--background) 82%, transparent);
     backdrop-filter: var(--glass-blur);
     border: 1px solid var(--border-strong);
     overflow: hidden;
+    grid-column: span 2;
+    min-height: 92px;
+  }
+  .sam-card[data-wide="true"] {
+    grid-column: span 6;
+    min-height: 0;
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px 16px;
+    align-items: center;
+  }
+  .sam-card[data-wide="true"] .sam-card-head { grid-column: 1; margin-bottom: 0; }
+  .sam-card[data-wide="true"] .sam-card-title { grid-column: 1; margin-bottom: 0; }
+  .sam-card[data-wide="true"] .sam-card-meta { grid-column: 1; }
+  .sam-card[data-wide="true"] .sam-card-detail { grid-column: 1; margin-top: 0; }
+  .sam-card[data-wide="true"] .sam-card-bar { grid-column: 1; margin-top: 4px; }
+  .sam-card[data-wide="true"] .sam-card-wide-aside {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 4px;
+    padding-left: 12px;
+    border-left: 1px solid var(--border-weak);
+    min-width: 72px;
+  }
+  .sam-card-wide-time {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--text-strong);
+    line-height: 1;
+  }
+  .sam-card-wide-countdown {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--card-accent, var(--primary));
+    white-space: nowrap;
   }
   .sam-card::before {
     content: "";
@@ -876,6 +1007,13 @@ const css = `
   .sam-card-meta {
     font-size: 10.5px;
     color: var(--text-weak);
+    line-height: 1.4;
+  }
+  .sam-card-detail {
+    margin-top: 3px;
+    font-size: 10px;
+    color: var(--text-weaker);
+    line-height: 1.35;
   }
   .sam-card-bar {
     margin-top: 8px;
@@ -2037,27 +2175,16 @@ const HOME_SUGGESTIONS: string[] = [
   "Make me sound more casual",
 ];
 
-/* Cards rendered when `messages` toggle is ON. */
-const CARDS = [
+/* Cards rendered when `messages` toggle is ON — dashboard surface. */
+const DASHBOARD_CARDS = [
   {
-    label: "Inbox",
-    title: "3 unread, 1 needs reply",
-    meta: "Alex \u00b7 design review moved",
+    label: "Next up",
+    title: "Design review with Alex",
+    meta: "Thu 2:00pm · Zoom · 4 attendees",
+    detail: "Deck attached · starts in 22 min",
     accent: "var(--primary)",
-    progress: 0.4,
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 4h16v16H4z" />
-        <path d="M4 4l8 8 8-8" />
-      </svg>
-    ),
-  },
-  {
-    label: "Calendar",
-    title: "Design review \u00b7 Thu 2pm",
-    meta: "in 2 days \u00b7 4 attendees",
-    accent: "oklch(0.65 0.18 200)",
-    progress: 0.7,
+    progress: 0.72,
+    wide: true,
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="5" width="18" height="16" rx="2" />
@@ -2066,11 +2193,28 @@ const CARDS = [
     ),
   },
   {
+    label: "Inbox",
+    title: "3 threads need you",
+    meta: "Alex · Q3 launch scope",
+    detail: "1 flagged urgent",
+    accent: "oklch(0.58 0.19 255)",
+    progress: 0.35,
+    wide: false,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 4h16v16H4z" />
+        <path d="M4 4l8 8 8-8" />
+      </svg>
+    ),
+  },
+  {
     label: "Tasks",
     title: "Ship onboarding rework",
-    meta: "due today \u00b7 67% done",
+    meta: "67% done · due today",
+    detail: "2 blocked on design",
     accent: "oklch(0.65 0.16 150)",
     progress: 0.67,
+    wide: false,
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
         <polyline points="20 6 9 17 4 12" />
@@ -2079,10 +2223,12 @@ const CARDS = [
   },
   {
     label: "Focus",
-    title: "Deep work \u00b7 22:14 left",
-    meta: "session 2 of 4",
+    title: "Deep work · 22:14 left",
+    meta: "Session 2 of 4",
+    detail: "Notifications paused",
     accent: "oklch(0.7 0.18 60)",
     progress: 0.55,
+    wide: false,
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="13" r="8" />
@@ -2137,7 +2283,7 @@ const TAB_ICON = (d: string) => (
     <path d={d} />
   </svg>
 );
-const TABS: { label: string; icon: ReactNode; active?: boolean }[] = [
+const HOME_TABS: { label: string; icon: ReactNode; active?: boolean }[] = [
   {
     label: "Home",
     active: true,
@@ -2171,6 +2317,35 @@ const TABS: { label: string; icon: ReactNode; active?: boolean }[] = [
     ),
   },
 ];
+const DASHBOARD_TABS: { label: string; icon: ReactNode; active?: boolean }[] =
+  [
+    {
+      label: "Chat",
+      icon: TAB_ICON("M21 15a4 4 0 01-4 4H8l-5 3V7a4 4 0 014-4h10a4 4 0 014 4z"),
+    },
+    {
+      label: "Dashboard",
+      active: true,
+      icon: TAB_ICON("M3 3v18h18M7 15l4-5 3 3 5-7"),
+    },
+    {
+      label: "Trip plan",
+      icon: (
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M2 16l20-7-7 13-3-6-10-0z" />
+        </svg>
+      ),
+    },
+    {
+      label: "Budget",
+      icon: (
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 3v18h18" />
+          <path d="M7 15l4-5 3 3 5-7" />
+        </svg>
+      ),
+    },
+  ];
 
 /* ──────────────────────────────────────────────────────────────────────
  * Cozy theme content. When the user clicks the "Cozy mode" pill, the
@@ -2528,7 +2703,7 @@ export function StellaAppMock({
         {/* SIDEBAR ─────────────────────────────────────────────── */}
         <aside
           className="sam-sidebar"
-          data-modern={toggles.sidebar || undefined}
+          data-rail={toggles.messages || undefined}
         >
           <div className="sam-sidebar-default">
             <div className="sam-sidebar-header" />
@@ -2549,6 +2724,10 @@ export function StellaAppMock({
                 <span className="sam-nav-icon">{ICON_USERS}</span>
                 <span>Social</span>
               </button>
+              <button type="button" className="sam-nav-item">
+                <span className="sam-nav-icon">{ICON_PLUS_SQUARE}</span>
+                <span>New App</span>
+              </button>
               <button type="button" className="sam-nav-item sam-nav-item--studio">
                 <span className="sam-nav-icon">{ICON_MUSIC}</span>
                 <span>Music</span>
@@ -2560,13 +2739,19 @@ export function StellaAppMock({
                 <span className="sam-nav-icon">{ICON_STORE}</span>
                 <span>Store</span>
               </button>
-              <button type="button" className="sam-nav-item">
-                <span className="sam-nav-icon">{ICON_SETTINGS}</span>
-                <span>Settings</span>
-              </button>
-              <div className="sam-account-row">
-                <span className="sam-avatar" aria-hidden="true">A</span>
-                <span className="sam-account-pill">Upgrade</span>
+              <div className="sam-sidebar-footer-row">
+                <span className="sam-account-avatar" aria-hidden="true">A</span>
+                <div className="sam-footer-actions">
+                  <button type="button" className="sam-footer-icon" aria-label="Theme">
+                    {ICON_PALETTE}
+                  </button>
+                  <button type="button" className="sam-footer-icon" aria-label="Settings">
+                    {ICON_SETTINGS}
+                  </button>
+                  <button type="button" className="sam-footer-icon" aria-label="Connect">
+                    {ICON_DEVICE}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -2668,7 +2853,7 @@ export function StellaAppMock({
             data-modern={toggles.header || undefined}
           >
             <div className="sam-tabs">
-              {TABS.map((tab) => (
+              {(toggles.messages ? DASHBOARD_TABS : HOME_TABS).map((tab) => (
                 <div
                   key={tab.label}
                   className={`sam-tab${tab.active ? " active" : ""}`}
@@ -2754,27 +2939,51 @@ export function StellaAppMock({
               </div>
             </div>
 
-            <div className="sam-cards">
-              {CARDS.map((card) => (
-                <div
-                  key={card.label}
-                  className="sam-card"
-                  style={{ ["--card-accent" as string]: card.accent }}
-                >
-                  <div className="sam-card-head">
-                    <span className="sam-card-head-icon">{card.icon}</span>
-                    <span className="sam-card-head-label">{card.label}</span>
-                  </div>
-                  <div className="sam-card-title">{card.title}</div>
-                  <div className="sam-card-meta">{card.meta}</div>
-                  <div className="sam-card-bar">
-                    <div
-                      className="sam-card-bar-fill"
-                      style={{ width: `${Math.round(card.progress * 100)}%` }}
-                    />
-                  </div>
+            <div className="sam-dashboard">
+              <div className="sam-dashboard-header">
+                <div>
+                  <span className="sam-dashboard-eyebrow">Thursday, May 21</span>
+                  <h2 className="sam-dashboard-title">Your day</h2>
                 </div>
-              ))}
+                <div className="sam-dashboard-stats">
+                  <span className="sam-dashboard-stat">4 meetings</span>
+                  <span className="sam-dashboard-stat">3 open threads</span>
+                  <span className="sam-dashboard-stat">67% on track</span>
+                </div>
+              </div>
+
+              <div className="sam-cards">
+                {DASHBOARD_CARDS.map((card) => (
+                  <div
+                    key={card.label}
+                    className="sam-card"
+                    data-wide={card.wide || undefined}
+                    style={{ ["--card-accent" as string]: card.accent }}
+                  >
+                    <div className="sam-card-head">
+                      <span className="sam-card-head-icon">{card.icon}</span>
+                      <span className="sam-card-head-label">{card.label}</span>
+                    </div>
+                    <div className="sam-card-title">{card.title}</div>
+                    <div className="sam-card-meta">{card.meta}</div>
+                    {"detail" in card && card.detail ? (
+                      <div className="sam-card-detail">{card.detail}</div>
+                    ) : null}
+                    <div className="sam-card-bar">
+                      <div
+                        className="sam-card-bar-fill"
+                        style={{ width: `${Math.round(card.progress * 100)}%` }}
+                      />
+                    </div>
+                    {card.wide ? (
+                      <div className="sam-card-wide-aside" aria-hidden="true">
+                        <span className="sam-card-wide-time">2:00</span>
+                        <span className="sam-card-wide-countdown">in 22 min</span>
+                      </div>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="sam-body-create" aria-hidden={!toggles.createApp}>

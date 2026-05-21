@@ -95,6 +95,56 @@ function LabeledCursor({
 
 /* ─── Memory ──────────────────────────────────────────────────────── */
 
+/** Just the mock — usable inside the home story grid. */
+export function MemoryMock() {
+  return (
+    <div className="ob-memory__stage">
+      <article className="ob-memory__pane" data-variant="off">
+        <span className="ob-memory__label">Without memory</span>
+        <div className="ob-memory__convo">
+          <Bubble role="user" delay={120}>
+            Book the usual hotel for next Friday.
+          </Bubble>
+          <Bubble role="assistant" delay={900}>
+            I don&apos;t have a record of a previous booking. Which hotel,
+            and which city?
+          </Bubble>
+          <Bubble role="user" delay={1700}>
+            Lisbon. Same one as last trip.
+          </Bubble>
+          <Bubble role="assistant" delay={2400}>
+            Could you share the name of the hotel?
+          </Bubble>
+        </div>
+      </article>
+
+      <article className="ob-memory__pane" data-variant="on">
+        <span className="ob-memory__label">With memory</span>
+        <div className="ob-memory__convo">
+          <Bubble role="user" delay={120}>
+            Book the usual hotel for next Friday.
+          </Bubble>
+          <Bubble role="assistant" delay={900}>
+            Booking Casa do Príncipe in Alfama, Fri 14 → Sun 16. Adding it
+            to your trip notes.
+          </Bubble>
+        </div>
+        <div
+          className="ob-memory__recall"
+          style={{ animationDelay: "1500ms" }}
+        >
+          <span className="ob-memory__recall-label">Remembers</span>
+          <ul>
+            <li>Hotel in Lisbon · Alfama, top-floor room</li>
+            <li>Travel days · Friday out, Sunday back</li>
+            <li>Trip notes · linked from your kitchen board</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  );
+}
+
 export function MemorySection() {
   return (
     <section className="ob-memory codex-section" data-reveal suppressHydrationWarning>
@@ -119,50 +169,7 @@ export function MemorySection() {
         style={{ ["--reveal-index" as string]: 1 }}
       >
         <div className="codex-frame">
-        <div className="ob-memory__stage">
-        <article className="ob-memory__pane" data-variant="off">
-          <span className="ob-memory__label">Without memory</span>
-          <div className="ob-memory__convo">
-            <Bubble role="user" delay={120}>
-              Book the usual hotel for next Friday.
-            </Bubble>
-            <Bubble role="assistant" delay={900}>
-              I don&apos;t have a record of a previous booking. Which hotel,
-              and which city?
-            </Bubble>
-            <Bubble role="user" delay={1700}>
-              Lisbon. Same one as last trip.
-            </Bubble>
-            <Bubble role="assistant" delay={2400}>
-              Could you share the name of the hotel?
-            </Bubble>
-          </div>
-        </article>
-
-        <article className="ob-memory__pane" data-variant="on">
-          <span className="ob-memory__label">With memory</span>
-          <div className="ob-memory__convo">
-            <Bubble role="user" delay={120}>
-              Book the usual hotel for next Friday.
-            </Bubble>
-            <Bubble role="assistant" delay={900}>
-              Booking Casa do Príncipe in Alfama, Fri 14 → Sun 16. Adding it
-              to your trip notes.
-            </Bubble>
-          </div>
-          <div
-            className="ob-memory__recall"
-            style={{ animationDelay: "1500ms" }}
-          >
-            <span className="ob-memory__recall-label">Remembers</span>
-            <ul>
-              <li>Hotel in Lisbon · Alfama, top-floor room</li>
-              <li>Travel days · Friday out, Sunday back</li>
-              <li>Trip notes · linked from your kitchen board</li>
-            </ul>
-          </div>
-        </article>
-        </div>
+          <MemoryMock />
         </div>
       </div>
       </div>
@@ -234,6 +241,51 @@ export function TogetherSection() {
 
 const ACTION_TIME_SLOTS = ["7:00", "7:30", "8:00", "8:30", "9:00"];
 
+export function ActionsMock() {
+  return (
+    <div className="ob-actions__stage">
+      <MacWindow title="opentable.com / luna-cucina">
+        <div className="ob-actions__rest">
+          <div className="ob-actions__rest-name">Luna Cucina</div>
+          <div className="ob-actions__rest-meta">
+            Italian · West Village · 4.8 ★
+          </div>
+
+          <div className="ob-actions__time-row">
+            {ACTION_TIME_SLOTS.map((t) => (
+              <span
+                key={t}
+                className="ob-actions__time"
+                // Cursor lands on 8:30 in the keyframes (translate 11rem
+                // crosses the seam between 8:00 and 8:30 at this font
+                // size). Mark 8:30 as the selected slot so the visual
+                // click and the highlight agree.
+                data-active={t === "8:30" || undefined}
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            className="ob-actions__confirm"
+            style={{ animationDelay: "2100ms" }}
+          >
+            Reserve · Party of 2
+          </button>
+
+          <LabeledCursor
+            label="Stella"
+            color="stella"
+            className="ob-actions__cursor"
+          />
+        </div>
+      </MacWindow>
+    </div>
+  );
+}
+
 export function ActionsSection() {
   return (
     <section className="ob-actions codex-section" data-reveal suppressHydrationWarning>
@@ -258,43 +310,7 @@ export function ActionsSection() {
         style={{ ["--reveal-index" as string]: 1 }}
       >
         <div className="codex-frame">
-        <div className="ob-actions__stage">
-        <MacWindow title="opentable.com / luna-cucina">
-          <div className="ob-actions__rest">
-            <div className="ob-actions__rest-name">Luna Cucina</div>
-            <div className="ob-actions__rest-meta">
-              Italian · West Village · 4.8 ★
-            </div>
-
-            <div className="ob-actions__time-row">
-              {ACTION_TIME_SLOTS.map((t, i) => (
-                <span
-                  key={t}
-                  className="ob-actions__time"
-                  data-active={t === "8:00" || undefined}
-                  style={{ animationDelay: `${1100 + i * 70}ms` }}
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-
-            <button
-              type="button"
-              className="ob-actions__confirm"
-              style={{ animationDelay: "2100ms" }}
-            >
-              Reserve · Party of 2
-            </button>
-
-            <LabeledCursor
-              label="Stella"
-              color="stella"
-              className="ob-actions__cursor"
-            />
-          </div>
-        </MacWindow>
-        </div>
+          <ActionsMock />
         </div>
       </div>
       </div>
@@ -314,6 +330,72 @@ const VOICE_WAVEFORM_BARS = Array.from({ length: 56 }, (_, i) => {
     } as CSSProperties,
   };
 });
+
+export function VoiceMock() {
+  return (
+    <div className="ob-voice__stage">
+      {/* Generic "any app" surface — a Mail draft — to make it clear the
+          dictation overlay floats above whatever the user is in. Mirrors
+          the layout of `OnboardingVoicePhase`'s dictate card, which in
+          turn mirrors `.dictation-overlay` + `DictationRecordingBar`. */}
+      <div className="ob-voice-app" aria-hidden="true">
+        <div className="ob-voice-app__bar">
+          <span />
+          <span />
+          <span />
+          <strong>Mail — New message</strong>
+        </div>
+        <div className="ob-voice-app__body">
+          <div className="ob-voice-app__field">
+            <span className="ob-voice-app__label">To</span>
+            <span className="ob-voice-app__value">alex@team.com</span>
+          </div>
+          <div className="ob-voice-app__field">
+            <span className="ob-voice-app__label">Subject</span>
+            <span className="ob-voice-app__value">Quick update</span>
+          </div>
+          <div className="ob-voice-app__editor">
+            <span className="ob-voice-app__typed">
+              Hey Alex — pushing the launch to next Tuesday so we have
+              time to polish the deck.
+            </span>
+          </div>
+        </div>
+
+        {/* Faithful mock of `.dictation-overlay` + DictationRecordingBar.
+            Static visual replica — no live audio. */}
+        <div className="ob-voice-dictation" role="presentation">
+          <div className="ob-voice-waveform" aria-hidden="true">
+            {VOICE_WAVEFORM_BARS.map((bar) => (
+              <span
+                key={bar.key}
+                className="ob-voice-waveform__bar"
+                style={bar.style}
+              />
+            ))}
+          </div>
+          <span className="ob-voice-dictation__timer">0:04</span>
+          <button
+            type="button"
+            className="ob-voice-dictation__btn"
+            tabIndex={-1}
+            aria-label="Cancel dictation"
+          >
+            <DictateCancelIcon />
+          </button>
+          <button
+            type="button"
+            className="ob-voice-dictation__btn ob-voice-dictation__btn--confirm"
+            tabIndex={-1}
+            aria-label="Stop dictation and transcribe"
+          >
+            <DictateCheckIcon />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function VoiceSection() {
   return (
@@ -339,68 +421,7 @@ export function VoiceSection() {
         style={{ ["--reveal-index" as string]: 1 }}
       >
         <div className="codex-frame">
-        <div className="ob-voice__stage">
-        {/* Generic "any app" surface — a Mail draft — to make it clear the
-            dictation overlay floats above whatever the user is in. Mirrors
-            the layout of `OnboardingVoicePhase`'s dictate card, which in
-            turn mirrors `.dictation-overlay` + `DictationRecordingBar`. */}
-        <div className="ob-voice-app" aria-hidden="true">
-          <div className="ob-voice-app__bar">
-            <span />
-            <span />
-            <span />
-            <strong>Mail — New message</strong>
-          </div>
-          <div className="ob-voice-app__body">
-            <div className="ob-voice-app__field">
-              <span className="ob-voice-app__label">To</span>
-              <span className="ob-voice-app__value">alex@team.com</span>
-            </div>
-            <div className="ob-voice-app__field">
-              <span className="ob-voice-app__label">Subject</span>
-              <span className="ob-voice-app__value">Quick update</span>
-            </div>
-            <div className="ob-voice-app__editor">
-              <span className="ob-voice-app__typed">
-                Hey Alex — pushing the launch to next Tuesday so we have
-                time to polish the deck.
-              </span>
-              <span className="ob-voice-app__caret" />
-            </div>
-          </div>
-
-          {/* Faithful mock of `.dictation-overlay` + DictationRecordingBar.
-              Static visual replica — no live audio. */}
-          <div className="ob-voice-dictation" role="presentation">
-            <div className="ob-voice-waveform" aria-hidden="true">
-              {VOICE_WAVEFORM_BARS.map((bar) => (
-                <span
-                  key={bar.key}
-                  className="ob-voice-waveform__bar"
-                  style={bar.style}
-                />
-              ))}
-            </div>
-            <span className="ob-voice-dictation__timer">0:04</span>
-            <button
-              type="button"
-              className="ob-voice-dictation__btn"
-              tabIndex={-1}
-              aria-label="Cancel dictation"
-            >
-              <DictateCancelIcon />
-            </button>
-            <button
-              type="button"
-              className="ob-voice-dictation__btn ob-voice-dictation__btn--confirm"
-              tabIndex={-1}
-              aria-label="Stop dictation and transcribe"
-            >
-              <DictateCheckIcon />
-            </button>
-          </div>
-        </div>
-        </div>
+          <VoiceMock />
         </div>
       </div>
       </div>
