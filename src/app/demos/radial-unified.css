@@ -1347,7 +1347,7 @@
 /* ──────────────────────────────────────────────────────────────────
    Screenshot stack — three real product screenshots cross-faded.
 
-   Container locks the 1920:1175 (≈1.634:1) aspect so the canvas
+   Container locks the 2560:1566 (≈1.634:1) aspect so the canvas
    reserves the same height across every tab. Stacked images live in
    the same box and toggle opacity via `data-active`, giving us a
    pure GPU-accelerated cross-fade with no layout shift.
@@ -1361,7 +1361,7 @@
 .canvas-screenshot-stack {
   position: relative;
   width: 100%;
-  aspect-ratio: 1920 / 1175;
+  aspect-ratio: 2560 / 1566;
   border-radius: 10px;
   overflow: hidden;
 }

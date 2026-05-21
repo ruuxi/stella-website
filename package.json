@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "optimize-canvas-demos": "bun scripts/optimize-canvas-screenshots.mjs"
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.12.2",
