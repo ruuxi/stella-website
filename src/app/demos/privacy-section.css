@@ -13,13 +13,12 @@
   flex-direction: column;
   align-items: center;
   gap: clamp(2.5rem, 5vw, 4rem);
-  padding: clamp(4.5rem, 9vw, 7rem) 0 clamp(4.5rem, 9vw, 7rem);
+  padding: clamp(4.5rem, 9vw, 7rem) clamp(1.25rem, 4vw, 2.5rem);
   isolation: isolate;
 }
 
 .privacy-hero__copy {
   width: min(100%, 52rem);
-  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -55,8 +54,9 @@
 
 .privacy-hero__grid {
   position: relative;
-  width: min(100%, 64rem);
-  margin: 0 clamp(1.25rem, 4vw, 2.5rem);
+  width: 100%;
+  max-width: 64rem;
+  margin-inline: auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0;
@@ -167,6 +167,12 @@
   color: rgba(255, 255, 255, 0.82);
   font-size: 0.98rem;
   line-height: 1.55;
+}
+
+@media (max-width: 640px) {
+  .privacy-hero {
+    padding-inline: 1rem;
+  }
 }
 
 @media (max-width: 900px) {
