@@ -791,6 +791,11 @@
   transition: opacity 140ms ease;
 }
 
+.store-grid-sentinel {
+  height: 1px;
+  margin-top: 16px;
+}
+
 .pets-grid-sentinel[data-loading="true"] {
   opacity: 1;
 }

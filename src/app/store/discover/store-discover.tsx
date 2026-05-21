@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { Package, Search } from "lucide-react";
 import {
@@ -11,7 +11,7 @@ import {
   recordPackageInstall,
   searchPublicPackages,
 } from "../lib/convex";
-import { DISCOVER_FILTERS } from "../lib/constants";
+import { DISCOVER_FILTERS, PAGE_SIZE } from "../lib/constants";
 import type { HostedStoreTab } from "../lib/constants";
 import {
   getDesktopStoreBridge,
@@ -172,6 +172,39 @@ export function StoreClientInner() {
         return rank(left) - rank(right) || left.name.localeCompare(right.name);
       });
   }, [filter, nativeIntegrations, query]);
+
+  // Progressive reveal for integrations. The Convex query returns the full
+  // list eagerly, but rendering ~130 cards in one paint pushes the document
+  // height up suddenly after the rest of the page has settled, which makes
+  // the body gradient visibly re-scale. Slicing the array and growing
+  // `integrationsLimit` via an IntersectionObserver matches the pets/emojis
+  // pattern and keeps initial layout stable.
+  const [integrationsLimit, setIntegrationsLimit] = useState(PAGE_SIZE);
+  const integrationsSentinelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    setIntegrationsLimit(PAGE_SIZE);
+  }, [filter, query]);
+  const totalIntegrations = visibleNativeIntegrations.length;
+  const pagedIntegrations = useMemo(
+    () => visibleNativeIntegrations.slice(0, integrationsLimit),
+    [visibleNativeIntegrations, integrationsLimit],
+  );
+  const canLoadMoreIntegrations = pagedIntegrations.length < totalIntegrations;
+  useEffect(() => {
+    if (!canLoadMoreIntegrations) return;
+    const node = integrationsSentinelRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setIntegrationsLimit((current) => current + PAGE_SIZE);
+        }
+      },
+      { rootMargin: "600px 0px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [canLoadMoreIntegrations]);
   /**
    * Surfaces the in-app blueprint confirmation dialog. The actual
    * install call only fires after the user clicks Install in
@@ -459,12 +492,12 @@ export function StoreClientInner() {
                 </div>
               </div>
             )}
-            {visibleNativeIntegrations.length > 0 ? (
+            {totalIntegrations > 0 ? (
               <div className="store-section">
                 <div className="store-section-header">
                   <span className="store-section-title">Integrations</span>
                   <span className="store-section-count">
-                    {visibleNativeIntegrations.length}
+                    {totalIntegrations}
                   </span>
                 </div>
                 {nativeIntegrationError ? (
@@ -473,7 +506,7 @@ export function StoreClientInner() {
                   </div>
                 ) : null}
                 <div className="store-grid">
-                  {visibleNativeIntegrations.map((integration) => (
+                  {pagedIntegrations.map((integration) => (
                     <NativeIntegrationCard
                       key={integration.id}
                       integration={integration}
@@ -487,6 +520,13 @@ export function StoreClientInner() {
                     />
                   ))}
                 </div>
+                {canLoadMoreIntegrations ? (
+                  <div
+                    ref={integrationsSentinelRef}
+                    className="store-grid-sentinel"
+                    aria-hidden="true"
+                  />
+                ) : null}
               </div>
             ) : null}
           </>
