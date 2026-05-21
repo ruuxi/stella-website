@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
-import Link from "next/link";
+import { useState, type CSSProperties } from "react";
 import { X } from "lucide-react";
 import { resolveStoreAuthorDisplay } from "../lib/format";
 import type { StoreBadge } from "../lib/types";
@@ -254,29 +253,32 @@ export function SkeletonGrid({ count = 6 }: { count?: number }) {
 }
 
 export function useIsEmbeddedWebsite() {
-  const [embedded, setEmbedded] = useState(false);
-  useEffect(() => {
-    setEmbedded(
-      document.documentElement.getAttribute("data-embedded") === "true",
-    );
-  }, []);
+  const [embedded] = useState(() => {
+    if (typeof document === "undefined") return false;
+    return document.documentElement.getAttribute("data-embedded") === "true";
+  });
   return embedded;
 }
 
-export function StoreWebTabs({ activeTab }: { activeTab: HostedStoreTab }) {
+export function StoreWebTabs({
+  activeTab,
+  onSelectTab,
+}: {
+  activeTab: HostedStoreTab;
+  onSelectTab: (tab: HostedStoreTab) => void;
+}) {
   return (
     <nav className="store-web-tabs" aria-label="Store sections">
       {storeTabs.map((tab) => (
-        <Link
+        <button
           className="store-web-tab"
           data-active={activeTab === tab.key ? "true" : undefined}
-          href={`/store?tab=${tab.key}`}
           key={tab.key}
-          scroll={false}
-          prefetch={false}
+          onClick={() => onSelectTab(tab.key)}
+          type="button"
         >
           {tab.label}
-        </Link>
+        </button>
       ))}
     </nav>
   );
@@ -293,18 +295,20 @@ export function StoreWebTabs({ activeTab }: { activeTab: HostedStoreTab }) {
  */
 export function StoreWebHeader({
   activeTab,
+  onSelectTab,
   showUpload,
   onUpload,
   searchSlot,
 }: {
   activeTab: HostedStoreTab;
+  onSelectTab: (tab: HostedStoreTab) => void;
   showUpload: boolean;
   onUpload: () => void;
   searchSlot?: React.ReactNode;
 }) {
   return (
     <header className="store-web-header">
-      <StoreWebTabs activeTab={activeTab} />
+      <StoreWebTabs activeTab={activeTab} onSelectTab={onSelectTab} />
       {searchSlot ? (
         <div className="store-web-header-search">{searchSlot}</div>
       ) : null}

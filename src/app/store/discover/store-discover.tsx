@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import { Package, Search } from "lucide-react";
 import {
@@ -13,6 +12,7 @@ import {
   searchPublicPackages,
 } from "../lib/convex";
 import { DISCOVER_FILTERS } from "../lib/constants";
+import type { HostedStoreTab } from "../lib/constants";
 import {
   getDesktopStoreBridge,
   mergeNativeIntegrationUpdate,
@@ -63,9 +63,8 @@ export function StoreClientInner() {
   const [localNativeIntegrations, setLocalNativeIntegrations] = useState<
     NativeIntegration[]
   >([]);
-  const searchParams = useSearchParams();
-  const activeTab = normalizeHostedStoreTab(
-    searchParams.get("tab") ?? "discover",
+  const [activeTab, setActiveTab] = useState<HostedStoreTab>(() =>
+    getCurrentStoreTab(),
   );
   const [initialPackageId] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
@@ -77,6 +76,24 @@ export function StoreClientInner() {
       setSelectedPackageId(initialPackageId);
     }
   }, [initialPackageId, selectedPackageId]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setActiveTab(getCurrentStoreTab());
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  const selectStoreTab = useCallback((tab: HostedStoreTab) => {
+    setActiveTab((current) => {
+      if (current === tab) return current;
+      const next = new URL(window.location.href);
+      next.searchParams.set("tab", tab);
+      window.history.pushState({}, "", next.toString());
+      return tab;
+    });
+  }, []);
 
   const selectedCategory = filter === "all" ? undefined : filter;
   const browse = useQuery(listPublicPackages, {
@@ -324,6 +341,7 @@ export function StoreClientInner() {
       <div className="store-web-shell" data-embedded={isEmbedded || undefined}>
         <StoreWebHeader
           activeTab={activeTab}
+          onSelectTab={selectStoreTab}
           showUpload={activeTab === "discover" && !selectedPackage}
           onUpload={handleUploadToStore}
           searchSlot={searchSlot}
@@ -487,5 +505,12 @@ export function StoreClientInner() {
         />
       ) : null}
     </main>
+  );
+}
+
+function getCurrentStoreTab(): HostedStoreTab {
+  if (typeof window === "undefined") return "discover";
+  return normalizeHostedStoreTab(
+    new URLSearchParams(window.location.search).get("tab") ?? "discover",
   );
 }
