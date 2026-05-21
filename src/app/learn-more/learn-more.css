@@ -1,17 +1,23 @@
 /* Learn More docs layout */
 
-.learn-page {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.46), rgba(237, 243, 251, 0.3)),
-    var(--page-background);
-}
-
 .learn-shell {
   width: min(100%, var(--page-max-width));
   padding-inline: var(--page-margin);
   display: grid;
   grid-template-columns: 1fr;
   gap: clamp(1.4rem, 3vw, 3rem);
+}
+
+.learn-hero--compact {
+  padding-block: clamp(0.5rem, 1.5vw, 1.25rem) clamp(2rem, 5vw, 3.5rem);
+}
+
+.learn-hero--compact .learn-hero__copy h1 {
+  font-size: clamp(2.4rem, 7vw, 4.6rem);
+}
+
+.learn-section__link {
+  margin-top: 0.25rem;
 }
 
 .learn-sidebar {
@@ -30,13 +36,13 @@
   font-weight: 650;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(15, 23, 40, 0.44);
+  color: color-mix(in oklch, var(--page-foreground) 55%, transparent);
 }
 
 .learn-sidebar a {
   display: block;
   padding: 0.48rem 0;
-  color: rgba(15, 23, 40, 0.58);
+  color: color-mix(in oklch, var(--page-foreground) 75%, transparent);
   font-size: 0.84rem;
   font-weight: 650;
   letter-spacing: -0.02em;
@@ -48,6 +54,11 @@
 .learn-sidebar a:hover {
   color: var(--page-foreground);
   transform: translateX(2px);
+}
+
+.learn-sidebar .learn-sidebar__active {
+  color: var(--page-foreground);
+  font-weight: 700;
 }
 
 .learn-content {
@@ -73,10 +84,14 @@
 .learn-hero__copy h1 {
   margin: 0 0 1rem;
   font-family: var(--font-display), serif;
-  font-size: clamp(3.2rem, 11vw, 7rem);
+  font-size: clamp(2.8rem, 9vw, 6.2rem);
   font-weight: 300;
-  line-height: 0.88;
-  letter-spacing: -0.07em;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+}
+
+.learn-hero__accent {
+  font-style: italic;
 }
 
 .learn-hero__copy p,
@@ -106,7 +121,7 @@
 
 .learn-eyebrow {
   display: block;
-  color: rgba(18, 18, 15, 0.42);
+  color: color-mix(in oklch, var(--page-foreground) 62%, transparent);
   font-family: var(--font-display), serif;
   font-size: 0.86rem;
   font-style: italic;
@@ -145,13 +160,12 @@
 .learn-grid {
   display: grid;
   gap: 1px;
-  border: 1px solid rgba(82, 104, 134, 0.14);
-  background: rgba(82, 104, 134, 0.08);
+  border: 1px solid var(--page-border);
+  background: var(--page-border);
 }
 
 .learn-tile,
-.learn-storage,
-.learn-news {
+.learn-storage {
   min-width: 0;
   padding: clamp(1.05rem, 2vw, 1.45rem);
   background:
@@ -159,10 +173,15 @@
     var(--page-panel);
 }
 
+/* Span a trailing odd tile so the 2-col grid never shows a half-empty row. */
+.learn-grid--two > :last-child:nth-child(odd),
+.learn-grid--storage > :last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
 .learn-tile h3,
 .learn-row h3,
-.learn-storage h4,
-.learn-news h3 {
+.learn-storage h4 {
   margin: 0;
   font-family: var(--font-display), serif;
   color: var(--page-foreground);
@@ -171,8 +190,7 @@
   letter-spacing: -0.04em;
 }
 
-.learn-tile h3,
-.learn-news h3 {
+.learn-tile h3 {
   font-size: clamp(1.12rem, 1.8vw, 1.32rem);
 }
 
@@ -182,8 +200,7 @@
 
 .learn-tile p,
 .learn-row p,
-.learn-storage p,
-.learn-news p {
+.learn-storage p {
   margin: 0.55rem 0 0;
   color: var(--page-muted);
   font-size: 0.9rem;
@@ -193,7 +210,7 @@
 
 .learn-list {
   display: grid;
-  border-top: 1px solid rgba(82, 104, 134, 0.14);
+  border-top: 1px solid var(--page-border);
 }
 
 .learn-row {
@@ -201,18 +218,7 @@
   grid-template-columns: 1fr;
   gap: 0.4rem;
   padding: 1.15rem 0;
-  border-bottom: 1px solid rgba(82, 104, 134, 0.14);
-}
-
-.learn-row span {
-  display: block;
-  margin-bottom: 0.32rem;
-  color: var(--page-accent);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.64rem;
-  font-weight: 650;
-  letter-spacing: 0.035em;
-  text-transform: uppercase;
+  border-bottom: 1px solid var(--page-border);
 }
 
 .learn-row h3 {
@@ -222,8 +228,8 @@
 .learn-callout {
   margin-bottom: clamp(1.8rem, 3vw, 2.6rem);
   padding: clamp(1.15rem, 2.4vw, 1.7rem);
-  border: 1px solid rgba(82, 104, 134, 0.17);
-  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--page-border);
+  background: var(--page-panel-strong);
 }
 
 .learn-subheading {
@@ -255,51 +261,150 @@
   content: "";
   position: absolute;
   left: 0;
-  top: 0.62rem;
-  width: 0.48rem;
-  height: 0.48rem;
-  border-radius: 50%;
-  background: var(--page-accent);
-  box-shadow: 0 0 0 4px rgba(29, 120, 242, 0.1);
+  top: 0.85rem;
+  width: 0.6rem;
+  height: 1px;
+  background: color-mix(in oklch, var(--page-foreground) 38%, transparent);
 }
 
 .learn-prose code {
   padding: 0.1rem 0.28rem;
-  border: 1px solid rgba(82, 104, 134, 0.14);
-  background: rgba(255, 255, 255, 0.72);
-  color: rgba(15, 23, 40, 0.8);
+  border: 1px solid var(--page-border);
+  background: var(--page-panel-strong);
+  color: color-mix(in oklch, var(--page-foreground) 88%, transparent);
   font-family: var(--font-mono), monospace;
   font-size: 0.84em;
 }
 
-.learn-section--dark {
-  max-width: none;
-  margin-block: clamp(2.5rem, 5vw, 4.5rem);
-  padding: clamp(1.6rem, 4vw, 3.2rem);
-  background:
-    radial-gradient(circle at 12% 0%, rgba(112, 195, 255, 0.28), transparent 34%),
-    linear-gradient(145deg, #172f5f 0%, #0d1d3f 54%, #08162d 100%);
-  color: var(--page-dark-foreground);
+/* ── Changelog log ─────────────────────────────────
+ * Long-form chronological list embedded inside learn-more.
+ * Two-column editorial layout: sticky-feeling date rail on the
+ * left, grouped New / Fixes & polish entries on the right. */
+
+.learn-section--log {
+  max-width: 60rem;
 }
 
-.learn-section--dark .learn-eyebrow,
-.learn-section--dark .learn-section__lede p,
-.learn-section--dark .learn-news p {
-  color: rgba(237, 246, 255, 0.68);
+.learn-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.learn-section--dark .learn-section__header h2,
-.learn-section--dark .learn-news h3 {
-  color: var(--page-dark-foreground);
+.learn-log__entry {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+  padding: 1.85rem 0;
+  border-top: 1px solid var(--page-border);
 }
 
-.learn-section--dark .learn-grid {
-  border-color: rgba(237, 246, 255, 0.14);
-  background: rgba(237, 246, 255, 0.12);
+.learn-log__entry:first-child {
+  border-top: none;
+  padding-top: 0.25rem;
 }
 
-.learn-section--dark .learn-news {
-  background: rgba(237, 246, 255, 0.08);
+.learn-log__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.55rem 0.85rem;
+}
+
+.learn-log__date {
+  font-family: var(--font-display), serif;
+  font-size: clamp(1.25rem, 2vw, 1.55rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  color: var(--page-foreground);
+}
+
+.learn-log__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.learn-log__tag {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--page-foreground) 62%, transparent);
+  border: 1px solid var(--page-border);
+  border-radius: 999px;
+  padding: 0.18rem 0.5rem;
+  background: var(--page-panel);
+}
+
+.learn-log__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  min-width: 0;
+}
+
+.learn-log__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.learn-log__group-label {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--page-foreground);
+}
+
+.learn-log__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.learn-log__items li {
+  position: relative;
+  padding-left: 1.1rem;
+  margin: 0;
+  color: var(--page-foreground);
+  font-size: 0.94rem;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+}
+
+.learn-log__items li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.78rem;
+  width: 0.55rem;
+  height: 1px;
+  background: color-mix(in oklch, var(--page-foreground) 38%, transparent);
+}
+
+@media (min-width: 760px) {
+  .learn-log__entry {
+    grid-template-columns: 11rem 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .learn-log__meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding-top: 0.15rem;
+  }
 }
 
 .learn-cta {
@@ -350,8 +455,8 @@
     max-width: 50rem;
   }
 
-  .learn-section--dark {
-    max-width: 58rem;
+  .learn-section--log {
+    max-width: 62rem;
   }
 }
 

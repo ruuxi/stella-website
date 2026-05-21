@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowRight, Github } from "lucide-react";
 import { DownloadButton } from "@/components/download-button";
-import { FooterLegalLinks } from "@/components/footer-legal-links";
-import { SiteHeader } from "@/components/site-header";
-import "./learn-more.css";
+import { LearnSidebar } from "./learn-sidebar";
 
 export const metadata: Metadata = {
   title: "Learn More",
@@ -14,18 +11,6 @@ export const metadata: Metadata = {
     "Learn what Stella is, how the desktop app works, what stays local, what the backend stores, and what changed recently.",
   alternates: { canonical: "/learn-more" },
 };
-
-const navSections = [
-  { label: "Overview", href: "#overview" },
-  { label: "What Stella is", href: "#what-stella-is" },
-  { label: "One chat", href: "#one-chat" },
-  { label: "Capabilities", href: "#capabilities" },
-  { label: "Access", href: "#access" },
-  { label: "Privacy", href: "#privacy" },
-  { label: "Models", href: "#models" },
-  { label: "Technical notes", href: "#technical" },
-  { label: "What's new", href: "#whats-new" },
-];
 
 const capabilities = [
   {
@@ -129,69 +114,6 @@ const notStoredItems = [
   "BYOK model traffic when the model call goes directly from your device to your provider.",
 ];
 
-const whatsNew = [
-  {
-    title: "The desktop app feels more like one continuous workspace",
-    body: "Recent updates cleaned up chat, activity history, display, canvas previews, model controls, settings, Store, and embedded web views.",
-  },
-  {
-    title: "Stella can reach more places",
-    body: "Mobile pairing, push updates, messaging connectors, Google sign-in, Google Workspace, native integrations, and Store-backed integrations have all expanded.",
-  },
-  {
-    title: "Voice, dictation, and media got stronger",
-    body: "Read-aloud, realtime voice options, OS-wide dictation polish, generated image galleries, music generation, video/model updates, and better media previews landed.",
-  },
-  {
-    title: "The app can change itself with less disruption",
-    body: "Self-mod updates, HMR handling, morph transitions, update checks, launcher recovery, and undo paths have been tightened.",
-  },
-  {
-    title: "Privacy and billing moved into clearer boundaries",
-    body: "Backend work tightened anonymous limits, plan checks, paid media gates, BYOK escape hatches, connector storage, mobile delivery cleanup, and cloud backup gating.",
-  },
-  {
-    title: "Model choice got more practical",
-    body: "Stella now has a simpler composer picker, more detailed advanced settings, managed defaults, BYO provider options, local model support, OpenRouter-style inventory where supported, and Claude Code as an engine option.",
-  },
-];
-
-const footerGroups: {
-  title: string;
-  items: { label: string; href: string; external?: boolean }[];
-}[] = [
-  {
-    title: "Product",
-    items: [
-      { label: "Learn More", href: "/learn-more" },
-      { label: "Store", href: "/store" },
-      { label: "Pricing", href: "/pricing" },
-      { label: "Sign In", href: "/sign-in" },
-    ],
-  },
-  {
-    title: "Resources",
-    items: [
-      { label: "What's New", href: "/learn-more#whats-new" },
-      {
-        label: "GitHub",
-        href: "https://github.com/ruuxi/stella",
-        external: true,
-      },
-    ],
-  },
-  {
-    title: "Community",
-    items: [
-      {
-        label: "Discord",
-        href: "https://discord.gg/HXVCCeE542",
-        external: true,
-      },
-    ],
-  },
-];
-
 function SectionHeader({
   eyebrow,
   title,
@@ -212,20 +134,8 @@ function SectionHeader({
 
 export default function LearnMore() {
   return (
-    <div className="stella-page learn-page">
-      <SiteHeader />
-
-      <main className="learn-shell">
-        <aside className="learn-sidebar" aria-label="Learn More sections">
-          <nav>
-            <p>Learn More</p>
-            {navSections.map((item) => (
-              <a key={item.href} href={item.href}>
-                {item.label}
-              </a>
-            ))}
-          </nav>
-        </aside>
+    <main className="learn-shell">
+      <LearnSidebar current="learn-more" />
 
         <article className="learn-content">
           <section id="overview" className="learn-hero section-border">
@@ -434,21 +344,21 @@ export default function LearnMore() {
             </div>
           </section>
 
-          <section id="whats-new" className="learn-section learn-section--dark">
-            <SectionHeader eyebrow="What's new" title="Recent preview changes">
+          <section id="whats-new-link" className="learn-section section-border">
+            <SectionHeader eyebrow="What's new" title="A running changelog">
               <p>
-                The old changelog was too commit-shaped. This is the practical
-                version: what changed recently, grouped by what users can feel.
+                Stella ships preview updates almost daily. The full log,
+                grouped by date with new features and fixes, lives on its own
+                page so you can scroll the history without leaving Learn More.
               </p>
             </SectionHeader>
-            <div className="learn-grid learn-grid--two">
-              {whatsNew.map((item) => (
-                <section key={item.title} className="learn-news">
-                  <h3>{item.title}</h3>
-                  <p>{item.body}</p>
-                </section>
-              ))}
-            </div>
+            <Link
+              className="button button--ghost learn-section__link"
+              href="/learn-more/whats-new"
+            >
+              Read the changelog
+              <ArrowRight size={16} />
+            </Link>
           </section>
 
           <section className="learn-cta">
@@ -462,47 +372,7 @@ export default function LearnMore() {
               <ArrowRight size={16} />
             </Link>
           </section>
-        </article>
-      </main>
-
-      <footer className="grid-shell site-footer section-border">
-        <div className="footer-brand">
-          <Link className="brand-mark brand-mark--footer" href="/">
-            <Image
-              src="/stella-logo.svg"
-              alt="Stella"
-              width={42}
-              height={42}
-            />
-            <span className="brand-text">Stella</span>
-          </Link>
-          <FooterLegalLinks />
-        </div>
-        <div className="footer-columns">
-          {footerGroups.map((group) => (
-            <div key={group.title} className="footer-column">
-              <h3>{group.title}</h3>
-              <ul>
-                {group.items.map((item) => (
-                  <li key={item.label}>
-                    {item.external ? (
-                      <a
-                        href={item.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {item.label}
-                      </a>
-                    ) : (
-                      <a href={item.href}>{item.label}</a>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </footer>
-    </div>
+      </article>
+    </main>
   );
 }
