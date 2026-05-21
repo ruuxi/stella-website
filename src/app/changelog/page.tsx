@@ -66,18 +66,59 @@ type Entry = {
 
 const entries: Entry[] = [
   {
+    date: "May 20, 2026",
+    tags: ["New", "Polish"],
+    features: [
+      "Settings → Models and the composer model picker got a cleaner redesign, with the real model name shown on every Stella tier row.",
+      "Fashion is back as a first-class Store tab.",
+      "Display tabs now remember their history, so reopening the panel feels less like starting over.",
+      "Canvas previews use compact tab-style chips instead of bulky rail thumbnails.",
+    ],
+    fixes: [
+      "Stella shuts down and updates more reliably.",
+      "Chat text reveals more smoothly word by word, and extra trailing divider lines no longer appear in assistant messages.",
+      "The Chat-tab Activity panel is quieter and holds its layout better in narrow sidebars.",
+      "Agent activity text is clearer when Stella updates you on progress.",
+      "Claude Code replies now persist correctly.",
+      "Developer sign-in links and local launch metadata got cleanup.",
+    ],
+  },
+  {
+    date: "May 19, 2026",
+    tags: ["New", "Polish"],
+    features: [
+      "Sign in with Google is now available in the desktop app.",
+      "Native integrations are now backed by Stella's server catalog, with restored integration icons.",
+      "Mobile can receive push updates for Stella's activity, and remote mobile chats now cancel correctly.",
+      "Stella can open browser tabs in your existing Chrome windows instead of always making a new window.",
+      "When you're scrolled away, Stella can show a small peek of the latest reply above the composer.",
+      "Memory and screen context now load on demand, so Stella only pulls that context when it actually helps.",
+    ],
+    fixes: [
+      "Model controls moved into Settings and the composer menu, and the model picker is faster.",
+      "Sidebar footer actions were redesigned with larger, easier-to-hit buttons.",
+      "Queued composer messages are smaller and sit more naturally in the composer.",
+      "Store packages no longer show an extra OS install confirmation.",
+      "Top-bar web controls and the sidebar theme picker were cleaned up.",
+      "Desktop chat scrolling is steadier while Stella is replying.",
+      "Mobile WebView and bridge behavior is more reliable.",
+    ],
+  },
+  {
     date: "May 18, 2026",
     tags: ["Polish"],
     features: [
       "Stella's replies now appear more smoothly as she writes, with less jitter.",
       "When Stella makes several images at once, they now appear together in one tidy filmstrip.",
       "Messages that are still being written look cleaner in the chat.",
+      "Phone pairing and connected-app setup are smoother.",
     ],
     fixes: [
       "Replies after Stella takes an action now show up reliably, even after a reload.",
       "Follow-up messages now land in the right place instead of being treated like mid-task instructions.",
       "Chat scrolling is steadier while Stella is working, especially near the bottom of a thread.",
       "The chat is less likely to lose its place when new messages, buttons, or results appear.",
+      "Mobile sign-in and chat history work more reliably.",
     ],
   },
   {
