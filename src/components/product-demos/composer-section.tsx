@@ -53,30 +53,9 @@ type SuggestionChip = {
   previewUrl: string;
 };
 
-/* The five suggestion chips. Logos come from simpleicons (no API key, no
- * download) and the larger preview images are stable Unsplash URLs that
- * read as the right kind of UI for each app. */
+/* Three suggestion chips — familiar apps only (no niche dev/design tools).
+ * Logos come from simpleicons; preview images are stable Unsplash URLs. */
 const SUGGESTIONS: ReadonlyArray<SuggestionChip> = [
-  {
-    id: "linear",
-    kind: "app",
-    name: "Linear",
-    detail: "STE-241 · composer overhaul",
-    iconUrl: "https://cdn.simpleicons.org/linear/5E6AD2",
-    iconTint: "#eef0ff",
-    previewUrl:
-      "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=900&q=80&auto=format&fit=crop",
-  },
-  {
-    id: "figma",
-    kind: "app",
-    name: "Figma",
-    detail: "Composer states · v3",
-    iconUrl: "https://cdn.simpleicons.org/figma/F24E1E",
-    iconTint: "#fff1ec",
-    previewUrl:
-      "https://images.unsplash.com/photo-1545235617-9465d2a55698?w=900&q=80&auto=format&fit=crop",
-  },
   {
     id: "github",
     kind: "tab",
@@ -109,6 +88,9 @@ const SUGGESTIONS: ReadonlyArray<SuggestionChip> = [
   },
 ];
 
+/** Shown in the suggestion row at ≤640px; Slack stays desktop-only. */
+const MOBILE_SUGGESTION_IDS = new Set(["github", "notion"]);
+
 export function ComposerSection() {
   return (
     <section
@@ -125,9 +107,9 @@ export function ComposerSection() {
           <span className="composer-hero__eyebrow">Compose</span>
           <h2 className="composer-hero__title">One place to start anything.</h2>
           <p className="composer-hero__lede">
-            Type, talk, attach a file, or grab whatever&apos;s on your screen
-            — Stella picks up the apps and tabs you&apos;re in so you never
-            re-explain context. Try the composer below; everything is real.
+            Type, talk, attach a file, or grab whatever&apos;s on your screen.
+            Quickly bring in recent apps and tabs so Stella has the context
+            you want to share.
           </p>
         </header>
 
@@ -332,6 +314,9 @@ function ComposerMock() {
               type="button"
               role="listitem"
               className="cmock__suggestion"
+              data-show-on-mobile={
+                MOBILE_SUGGESTION_IDS.has(chip.id) || undefined
+              }
               data-hovered={isHovered || undefined}
               onMouseEnter={(event) => handleSuggestionHover(chip, event)}
               onMouseLeave={() =>

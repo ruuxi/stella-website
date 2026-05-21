@@ -889,9 +889,9 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1.5px solid var(--selfmod-text);
-  background: color-mix(in srgb, var(--selfmod-foreground) 6%, transparent);
-  color: var(--selfmod-foreground);
+  border: 1px solid color-mix(in srgb, var(--selfmod-text) 28%, transparent);
+  background: color-mix(in srgb, var(--selfmod-foreground) 4%, transparent);
+  color: color-mix(in srgb, var(--selfmod-foreground) 75%, transparent);
   display: inline-flex;
   align-items: center;
   justify-content: center;
