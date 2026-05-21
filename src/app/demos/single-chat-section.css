@@ -280,6 +280,53 @@
   border-radius: 999px;
 }
 
+/* Narrow viewport: collapse the in-window sidebar to an icon rail,
+   matching the desktop app's mobile persistent rail. Scoped to the
+   single-chat mock so it doesn't fight `.mini-window__body--solo`. */
+@media (max-width: 640px) {
+  .single-chat-hero__frame .mini-window__body {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+  .single-chat-hero__frame .mini-sidebar {
+    padding: 10px 4px 8px;
+    align-items: center;
+  }
+
+  .single-chat-hero__frame .mini-sidebar__brand {
+    justify-content: center;
+    gap: 0;
+    padding: 4px 0 8px;
+  }
+
+  .single-chat-hero__frame .mini-sidebar__brand-text,
+  .single-chat-hero__frame .mini-sidebar__item-label,
+  .single-chat-hero__frame .mini-sidebar__account-pill {
+    display: none;
+  }
+
+  .single-chat-hero__frame .mini-sidebar__nav,
+  .single-chat-hero__frame .mini-sidebar__footer {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .single-chat-hero__frame .mini-sidebar__item {
+    justify-content: center;
+    gap: 0;
+    padding: 8px 0;
+  }
+
+  .single-chat-hero__frame .mini-sidebar__account {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 6px 0 0;
+    margin-top: 4px;
+  }
+}
+
 /* ─── Chat body ──────────────────────────────────────────────── */
 .mini-window__chat {
   flex: 1 1 auto;

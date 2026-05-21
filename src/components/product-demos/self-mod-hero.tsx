@@ -68,7 +68,9 @@ export function SelfModHero() {
         style={{ ["--reveal-index" as string]: 1 }}
       >
         {isNarrow ? (
-          <MobileSelfModMock />
+          <div className="codex-frame self-mod-hero__frame">
+            <MobileSelfModMock />
+          </div>
         ) : (
           <div className="codex-frame self-mod-hero__frame">
             <div className="self-mod-hero__stage-inner">

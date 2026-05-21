@@ -117,8 +117,8 @@
   --radius-lg: 8px;
 }
 
-/* Floating pills use `position: absolute; z-index: 30` — keep them
-   above the main column and Mochi overlay, and don’t clip at the root. */
+/* Floating pills use position: absolute; z-index: 30 — keep them
+   above the main column and Mochi overlay, and don't clip at the root. */
 .self-mod-hero__stage-inner .sam-root[data-interactive="true"] {
   overflow: visible;
 }
@@ -185,6 +185,9 @@
 .self-mod-hero__frame {
   width: min(100%, 1240px);
   margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  padding: clamp(1rem, 2.4vw, 2rem);
 }
 
 @media (max-width: 640px) {
@@ -199,13 +202,13 @@
 }
 
 /* ──────────────────────────────────────────────────────────────────────
-   Mobile mock — purpose-built for narrow viewports.
-   See `self-mod-hero-mobile.tsx`.
+   Mobile mock — mini-window shell (light theme, no sidebar).
+   See self-mod-hero-mobile.tsx.
    ────────────────────────────────────────────────────────────────────── */
 
 .smhm {
   width: 100%;
-  max-width: 22rem;
+  max-width: 520px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -213,435 +216,462 @@
   gap: 1.1rem;
 }
 
-.smhm__phone {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 32rem;
-  border-radius: 1.7rem;
-  overflow: hidden;
-  background: linear-gradient(180deg, #fbfbfd 0%, #f1f3f7 100%);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+/* Light theme — mirrors the real Stella desktop surface. */
+.mini-window--self-mod[data-theme="light"] {
+  --mini-bg: #f6f7fa;
+  --mini-bg-top: #fbfbfd;
+  --mini-sidebar-bg: #f1f2f5;
+  --mini-surface: #ffffff;
+  --mini-border: rgba(22, 22, 22, 0.08);
+  --mini-border-strong: rgba(22, 22, 22, 0.12);
+  --mini-text-strong: rgba(22, 22, 22, 0.95);
+  --mini-text-base: rgba(22, 22, 22, 0.75);
+  --mini-text-weak: rgba(22, 22, 22, 0.5);
+  --mini-text-weaker: rgba(22, 22, 22, 0.35);
+  --mini-accent: #161616;
+  --mini-accent-soft: rgba(22, 22, 22, 0.06);
+  --mini-user-bubble: rgba(22, 22, 22, 0.05);
+  --mini-user-bubble-border: rgba(22, 22, 22, 0.1);
+
+  height: clamp(480px, 68vh, 580px);
+  background: linear-gradient(180deg, var(--mini-bg-top) 0%, var(--mini-bg) 100%);
+  color: var(--mini-text-base);
+  border-color: var(--mini-border);
   box-shadow:
-    0 28px 60px -28px rgba(15, 23, 42, 0.32),
-    0 8px 24px -16px rgba(15, 23, 42, 0.18);
-  color: rgba(15, 23, 40, 0.92);
+    0 24px 60px -18px rgba(15, 23, 42, 0.22),
+    0 6px 18px rgba(15, 23, 42, 0.12);
   transition:
     background 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    color 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.smhm__phone[data-variant="cozy"] {
-  background: linear-gradient(180deg, #f7ead2 0%, #e8d3a7 100%);
-  color: #43321b;
+/* Collapse the sidebar to icon-only rail — this mock is mobile-only. */
+.mini-window--self-mod .mini-window__body {
+  grid-template-columns: 48px minmax(0, 1fr);
 }
-
-/* ── Status bar ──────────────────────────────────────────────────── */
-
-.smhm__status {
-  display: flex;
+.mini-window--self-mod .mini-sidebar {
+  padding: 10px 4px 8px;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.6rem 1rem 0.2rem;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: inherit;
-  opacity: 0.78;
 }
-
-.smhm__status-right {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.smhm__signal {
-  width: 14px;
-  height: 8px;
-  background:
-    linear-gradient(currentColor, currentColor) left bottom / 2px 3px no-repeat,
-    linear-gradient(currentColor, currentColor) 4px bottom / 2px 5px no-repeat,
-    linear-gradient(currentColor, currentColor) 8px bottom / 2px 7px no-repeat,
-    linear-gradient(currentColor, currentColor) 12px bottom / 2px 8px no-repeat;
-}
-
-.smhm__battery {
-  width: 18px;
-  height: 9px;
-  border: 1px solid currentColor;
-  border-radius: 2px;
-  position: relative;
-  background: linear-gradient(currentColor, currentColor) left center / 70% 100% no-repeat;
-}
-
-.smhm__battery::after {
-  content: "";
-  position: absolute;
-  right: -3px;
-  top: 2px;
-  width: 2px;
-  height: 3px;
-  background: currentColor;
-  border-radius: 0 1px 1px 0;
-}
-
-/* ── Header ──────────────────────────────────────────────────────── */
-
-.smhm__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.55rem 1rem 0.7rem;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
-}
-
-.smhm__phone[data-variant="cozy"] .smhm__header {
-  border-bottom-color: rgba(67, 50, 27, 0.1);
-}
-
-.smhm__brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.smhm__brand-orb {
-  width: 0.9rem;
-  height: 0.9rem;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 35% 32%, rgba(255, 255, 255, 0.95), transparent 42%),
-    radial-gradient(circle, rgba(102, 220, 255, 0.92), rgba(31, 100, 221, 0.82));
-  box-shadow: 0 0 6px rgba(31, 100, 221, 0.25);
-}
-
-.smhm__phone[data-variant="cozy"] .smhm__brand-orb {
-  background: radial-gradient(circle at 35% 32%, #fff8e8 5%, #d6a45a 70%);
-  box-shadow: 0 0 6px rgba(214, 164, 90, 0.4);
-}
-
-.smhm__brand-name {
-  font-family: var(--font-display, Georgia), serif;
-  font-style: italic;
-  font-size: 1.05rem;
-  font-weight: 500;
-  letter-spacing: -0.03em;
-}
-
-.smhm__rail {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.25rem 0.55rem;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.05);
-}
-
-.smhm__rail-dot {
-  width: 0.45rem;
-  height: 0.45rem;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.25);
-}
-
-.smhm__rail-dot--active {
-  background: var(--page-accent, #1f64dd);
-  box-shadow: 0 0 0 3px rgba(31, 100, 221, 0.15);
-}
-
-.smhm__header-action {
-  display: inline-flex;
-  align-items: center;
+.mini-window--self-mod .mini-sidebar__brand {
   justify-content: center;
-  width: 1.7rem;
-  height: 1.7rem;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.05);
-  color: inherit;
-  opacity: 0.7;
+  gap: 0;
+  padding: 4px 0 8px;
+}
+.mini-window--self-mod .mini-sidebar__brand-text,
+.mini-window--self-mod .mini-sidebar__item-label,
+.mini-window--self-mod .mini-sidebar__account-pill {
+  display: none;
+}
+.mini-window--self-mod .mini-sidebar__nav,
+.mini-window--self-mod .mini-sidebar__footer {
+  width: 100%;
+}
+.mini-window--self-mod .mini-sidebar__item {
+  justify-content: center;
+  gap: 0;
+  padding: 8px 0;
+}
+.mini-window--self-mod .mini-sidebar__account {
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 6px 0 0;
+  margin-top: 4px;
 }
 
-/* ── Tab bar (variant: tabs) ─────────────────────────────────────── */
+/* Light-theme overrides for the sidebar so the active item + avatar
+   read in grayscale instead of the dusk theme's pink. */
+.mini-window--self-mod[data-theme="light"] .mini-sidebar__item--active {
+  background: var(--mini-accent-soft);
+  color: var(--mini-text-strong);
+}
+.mini-window--self-mod[data-theme="light"] .mini-sidebar__item--active .mini-sidebar__item-icon {
+  color: var(--mini-text-strong);
+}
+.mini-window--self-mod[data-theme="light"] .mini-sidebar__avatar {
+  background: rgba(22, 22, 22, 0.08);
+  color: var(--mini-text-strong);
+}
 
-.smhm__tabs {
+/* Workspaces section — shown only in the "rail" variant. Small dots
+   stacked between the brand and the nav, like the desktop workspace
+   rail collapsed to icons. */
+.mini-sidebar__workspaces {
   display: flex;
-  gap: 0.3rem;
-  padding: 0.55rem 0.85rem 0.4rem;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0 8px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--mini-border);
+  width: 100%;
+}
+.mini-sidebar__workspace {
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  background: var(--mini-accent-soft);
+  border: 1px solid var(--mini-border);
+}
+.mini-sidebar__workspace--active {
+  background: var(--mini-text-strong);
+  border-color: var(--mini-text-strong);
 }
 
-.smhm__tab {
+/* Tabs strip — appears above the chat in the "tabs" variant. */
+.smhm-tabs-strip {
+  display: flex;
+  gap: 4px;
+  padding: 10px 14px 6px;
+  border-bottom: 1px solid var(--mini-border);
+}
+
+/* Cozy variant — full-window takeover. The sidebar is hidden and
+   the main column gets the dark rainy-window background. */
+.mini-window--self-mod[data-variant="cozy"] .mini-window__body {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.mini-window--self-mod[data-theme="light"] .mini-window__main {
+  background: linear-gradient(180deg, var(--mini-bg-top) 0%, var(--mini-bg) 100%);
+}
+
+.mini-window--self-mod[data-theme="light"][data-variant="cozy"],
+.mini-window--self-mod[data-variant="cozy"] {
+  background:
+    radial-gradient(95% 70% at 78% 105%, rgba(255, 255, 255, 0.08), transparent 60%),
+    radial-gradient(70% 60% at 12% -10%, rgba(255, 255, 255, 0.05), transparent 65%),
+    linear-gradient(168deg, #2a2c33 0%, #1b1d22 55%, #0c0d10 100%);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.mini-window--self-mod[data-variant="cozy"] .mini-window__main {
+  background: transparent;
+}
+
+.mini-window--self-mod[data-variant="cozy"] .mini-window__titlebar {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.mini-window--self-mod[data-theme="light"] .mini-composer {
+  background: var(--mini-surface);
+  border-color: var(--mini-border-strong);
+}
+
+.mini-window--self-mod[data-theme="light"] .mini-composer__btn {
+  background: rgba(22, 22, 22, 0.05);
+  color: var(--mini-text-weak);
+}
+
+.mini-window--self-mod[data-theme="light"] .mini-composer__send {
+  background: var(--mini-accent);
+  color: #fff;
+}
+
+.mini-window--self-mod[data-theme="light"] .mini-composer__mic {
+  background: transparent;
+}
+
+.mini-window--self-mod[data-theme="light"] .mini-composer__placeholder {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--mini-text-weaker);
+  padding: 2px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Tabs strip ──────────────────────────────────────────────────── */
+
+.smhm-tab {
   appearance: none;
   border: 0;
   background: transparent;
   font: inherit;
-  font-size: 0.72rem;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: -0.02em;
-  padding: 0.35rem 0.7rem;
+  padding: 5px 11px;
   border-radius: 999px;
-  color: rgba(15, 23, 40, 0.55);
+  color: var(--mini-text-weak);
   cursor: pointer;
 }
 
-.smhm__tab[data-active] {
-  background: rgba(15, 23, 42, 0.92);
+.smhm-tab[data-active] {
+  background: var(--mini-accent);
   color: #fff;
 }
 
-/* ── Body ────────────────────────────────────────────────────────── */
+/* (Removed: the old `.smhm-home*` default-body styles — chip rows,
+   thread cards, and blue-gradient orbs — lived here. The mock now
+   uses the real `.mini-chat` from the single-chat mini-window.) */
 
-.smhm__body {
-  flex: 1;
-  min-height: 0;
-  padding: 1rem 1rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
+/* ── Dashboard variant — clean surface cards, no decorative gradients ── */
 
-/* Default + tabs + rail share this layout */
-
-.smhm__home {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  flex: 1;
-  min-height: 0;
-}
-
-.smhm__greeting {
-  margin: 0;
-  font-family: var(--font-display, Georgia), serif;
-  font-weight: 300;
-  font-size: 1.65rem;
-  letter-spacing: -0.04em;
-  line-height: 1.05;
-  color: rgba(15, 23, 40, 0.85);
-}
-
-.smhm__greeting em {
-  font-style: italic;
-}
-
-.smhm__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-
-.smhm__chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.35rem 0.7rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: rgba(15, 23, 40, 0.78);
-}
-
-.smhm__threads {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  margin-top: 0.1rem;
-  overflow: hidden;
-}
-
-.smhm__thread {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.55rem 0.7rem;
-  border-radius: 0.7rem;
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(15, 23, 42, 0.06);
-}
-
-.smhm__thread-orb {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 999px;
-  flex-shrink: 0;
-  background:
-    radial-gradient(circle at 35% 32%, rgba(255, 255, 255, 0.9), transparent 42%),
-    radial-gradient(circle, rgba(102, 220, 255, 0.9), rgba(31, 100, 221, 0.82));
-}
-
-.smhm__thread-text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.smhm__thread-title {
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: rgba(15, 23, 40, 0.85);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.smhm__thread-detail {
-  font-size: 0.68rem;
-  color: rgba(15, 23, 40, 0.5);
-}
-
-/* Dashboard variant */
-
-.smhm__dash {
+.smhm-dash {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  flex: 1;
-  min-height: 0;
+  gap: 8px;
+  padding: 4px 0 8px;
 }
 
-.smhm__dash-card {
+.smhm-dash__card {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  padding: 0.7rem 0.75rem;
-  border-radius: 0.8rem;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(15, 23, 42, 0.07);
+  gap: 4px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  background: var(--mini-surface);
+  border: 1px solid var(--mini-border);
 }
 
-.smhm__dash-card--tall {
+.smhm-dash__card--tall {
   grid-row: span 2;
-  background: linear-gradient(160deg, rgba(31, 100, 221, 0.92), rgba(102, 220, 255, 0.85));
-  color: #fff;
-  border-color: transparent;
+  justify-content: space-between;
 }
 
-.smhm__dash-card--wide {
+.smhm-dash__card--wide {
   grid-column: span 2;
 }
 
-.smhm__dash-eyebrow {
-  font-size: 0.6rem;
+.smhm-dash__eyebrow {
+  font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  opacity: 0.7;
+  color: var(--mini-text-weak);
 }
 
-.smhm__dash-figure {
+.smhm-dash__figure {
   font-family: var(--font-display, Georgia), serif;
+  font-style: italic;
   font-weight: 400;
   font-size: 1.7rem;
   letter-spacing: -0.04em;
   line-height: 1;
+  color: var(--mini-text-strong);
 }
 
-.smhm__dash-card--tall .smhm__dash-figure {
+.smhm-dash__card--tall .smhm-dash__figure {
   font-size: 2.4rem;
-  margin-top: 0.4rem;
 }
 
-.smhm__dash-detail {
-  font-size: 0.68rem;
+.smhm-dash__detail {
+  font-size: 11.5px;
   letter-spacing: -0.01em;
-  opacity: 0.78;
-  line-height: 1.35;
+  color: var(--mini-text-base);
+  line-height: 1.4;
 }
 
-/* Cozy variant */
+/* ── Cozy variant — rainy-window takeover (mirrors desktop mock) ──── */
 
-.smhm__cozy {
+.smhm-cozy {
+  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  text-align: center;
-  color: #43321b;
+  min-height: 0;
+  overflow: hidden;
+  color: #f5f6f9;
 }
 
-.smhm__cozy-cat {
-  width: 70%;
-  max-width: 14rem;
-  height: auto;
+/* Cool silver pool of moonlight behind the cat. */
+.smhm-cozy__lamp {
+  position: absolute;
+  right: -22%;
+  bottom: -28%;
+  width: 96%;
+  aspect-ratio: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    rgba(240, 244, 252, 0.22) 0%,
+    rgba(200, 210, 225, 0.1) 32%,
+    transparent 60%
+  );
+  filter: blur(2px);
 }
 
-.smhm__cozy-text {
+/* Slow cool rain streaks down the window. */
+.smhm-cozy__rain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.45;
+}
+.smhm-cozy__drop {
+  position: absolute;
+  top: -20%;
+  left: calc(8% + var(--drop-i) * 9%);
+  width: 1px;
+  height: 22px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(232, 238, 248, 0.6)
+  );
+  border-radius: 1px;
+  animation: smhmCozyRain 5.4s linear infinite;
+  animation-delay: calc(var(--drop-i) * -0.31s);
+}
+
+@keyframes smhmCozyRain {
+  0%   { transform: translateY(0); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateY(220%); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smhm-cozy__drop {
+    animation: none;
+  }
+}
+
+/* Header — minimalist brand left, text nav top-right (no chrome). */
+.smhm-cozy__header {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px 8px;
+  z-index: 2;
 }
 
-.smhm__cozy-name {
+.smhm-cozy__brand {
   font-family: var(--font-display, Georgia), serif;
   font-style: italic;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #f5f6f9;
+}
+
+.smhm-cozy__nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.smhm-cozy__nav-item {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: rgba(245, 246, 249, 0.55);
+}
+
+.smhm-cozy__nav-item.is-active {
+  color: #f5f6f9;
+  font-weight: 600;
+}
+
+/* Cat — sits in the silver pool, between header and headline. */
+.smhm-cozy__cat {
+  position: relative;
+  width: 64%;
+  max-width: 11rem;
+  height: auto;
+  margin: 6px auto 0;
+  z-index: 1;
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.5));
+}
+
+.smhm-cozy__text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 8px 16px 0;
+  z-index: 1;
+}
+
+.smhm-cozy__headline {
+  font-family: var(--font-display, Georgia), serif;
+  font-style: italic;
+  font-weight: 300;
   font-size: 1.4rem;
+  line-height: 1;
   letter-spacing: -0.03em;
+  color: #f5f6f9;
 }
 
-.smhm__cozy-detail {
-  font-size: 0.78rem;
-  opacity: 0.7;
+.smhm-cozy__headline-em {
+  font-family: var(--font-display, Georgia), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 1.4rem;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: rgba(245, 246, 249, 0.62);
 }
 
-/* ── Composer ────────────────────────────────────────────────────── */
-
-.smhm__composer {
+/* Dark glass composer, anchored to the bottom of the takeover. */
+.smhm-cozy__compose {
+  position: relative;
+  margin: auto 12px 12px;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin: 0.5rem 0.75rem 0.85rem;
-  padding: 0.55rem 0.75rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 6px 18px -14px rgba(50, 84, 128, 0.25);
+  gap: 6px;
+  padding: 6px 6px 6px 10px;
+  border-radius: 22px;
+  background: rgba(28, 30, 36, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 8px 24px -14px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(14px) saturate(140%);
+  z-index: 2;
 }
 
-.smhm__composer[data-cozy] {
-  background: rgba(255, 248, 232, 0.9);
-  border-color: rgba(67, 50, 27, 0.15);
-  color: #43321b;
-}
-
-.smhm__composer-plus {
-  width: 1.2rem;
-  height: 1.2rem;
+.smhm-cozy__compose-attach,
+.smhm-cozy__compose-send {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.06);
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: rgba(15, 23, 40, 0.6);
+  cursor: default;
 }
 
-.smhm__composer-placeholder {
+.smhm-cozy__compose-attach {
+  background: transparent;
+  color: rgba(245, 246, 249, 0.7);
+}
+
+.smhm-cozy__compose-send {
+  background: #f5f6f9;
+  color: #0a0a0a;
+  box-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.6);
+}
+
+.smhm-cozy__compose-send:disabled {
+  opacity: 0.85;
+}
+
+.smhm-cozy__compose-input {
   flex: 1;
-  font-size: 0.78rem;
-  letter-spacing: -0.01em;
-  color: rgba(15, 23, 40, 0.45);
+  min-width: 0;
+  padding: 4px 6px;
+  font-size: 12.5px;
+  color: #f5f6f9;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.smhm__composer[data-cozy] .smhm__composer-placeholder {
-  color: rgba(67, 50, 27, 0.55);
+.smhm-cozy__compose-placeholder {
+  color: rgba(245, 246, 249, 0.45);
 }
 
-.smhm__composer-mic {
-  display: inline-flex;
-  color: rgba(15, 23, 40, 0.55);
-}
-
-/* ── Pill toggle (below the phone) ──────────────────────────────── */
+/* ── Pill toggle (below the window) ─────────────────────────────── */
 
 .smhm__pills {
   display: grid;
