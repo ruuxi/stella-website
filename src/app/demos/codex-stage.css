@@ -269,6 +269,16 @@
   max-width: 18rem;
 }
 
+@media (max-width: 1300px) {
+  .codex-frame .mobile-hero__stage {
+    grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+  }
+
+  .codex-frame .mobile-hero__mock .mobile-phone-col {
+    max-width: none;
+  }
+}
+
 .codex-frame .mobile-hero__mock .mobile-phone-label {
   color: rgba(255, 255, 255, 0.86);
 }

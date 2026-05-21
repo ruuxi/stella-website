@@ -440,6 +440,62 @@
   white-space: nowrap;
 }
 
+/* Tighter viewports: icon-only channel row (no "Message Stella from" label). */
+@media (max-width: 1300px) {
+  .mobile-channels {
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .mobile-channels__label {
+    display: none;
+  }
+
+  .mobile-channels__list {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+    width: fit-content;
+  }
+
+  .mobile-channel {
+    width: auto;
+    gap: 0;
+    padding: 0.55rem;
+    flex: 0 0 auto;
+    justify-content: center;
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+  }
+
+  .mobile-channel__name {
+    display: none;
+  }
+}
+
+@media (max-width: 800px) {
+  .mobile-channels {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1300px) {
+  .mobile-showcase {
+    grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+  }
+
+  .mobile-showcase__phone-wrap {
+    justify-content: stretch;
+    min-width: 0;
+  }
+
+  .mobile-showcase__phone-wrap .mobile-phone,
+  .mobile-showcase .mobile-phone {
+    width: 100%;
+    max-width: none;
+  }
+}
+
 /* ── Stella app variant ──────────────────────────────────── */
 
 .mobile-phone--stella-app {
@@ -1604,13 +1660,13 @@
 .mobile-phone-single .mobile-phone-swap {
   width: 100%;
   /* Fixed height prevents layout shift when platform cycles */
-  height: 26rem;
+  height: min(46rem, 86svh);
   overflow: hidden;
 }
 
 .mobile-phone-single .mobile-phone-visual .mobile-phone {
-  height: 26rem;
-  max-height: none;
+  height: min(46rem, 86svh);
+  max-height: 86svh;
 }
 
 /* Compact phone internals on mobile */
@@ -1682,5 +1738,17 @@
 
   .mobile-phone {
     width: 320px;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1300px) {
+  .mobile-showcase {
+    grid-template-columns: minmax(0, max-content) minmax(380px, 1fr);
+  }
+
+  .mobile-showcase__phone-wrap .mobile-phone,
+  .mobile-showcase .mobile-phone {
+    width: 100%;
+    max-width: none;
   }
 }

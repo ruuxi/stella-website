@@ -1461,6 +1461,53 @@
   gap: clamp(1.5rem, 3vw, 3rem);
 }
 
+@media (max-width: 1300px) {
+  .mobile-hero__stage {
+    grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+  }
+
+  .mobile-hero__mock .mobile-phone-col {
+    max-width: none;
+  }
+}
+
+@media (max-width: 1150px) {
+  .mobile-hero__mock .mobile-phone-single {
+    width: 100%;
+    max-width: min(26rem, 100%);
+  }
+
+  /* Single layout reuses .mobile-phone-single, which defaults to a short
+     26rem phone for narrow phones — use the same tall mock as two-up. */
+  .mobile-hero__mock .mobile-phone-single .mobile-phone-swap {
+    height: 46rem;
+  }
+
+  .mobile-hero__mock .mobile-phone-single .mobile-phone-swap,
+  .mobile-hero__mock .mobile-phone-single .mobile-phone-visual .mobile-phone {
+    width: 100%;
+  }
+
+  .mobile-hero__mock .mobile-phone-single .mobile-phone-visual .mobile-phone {
+    height: 46rem;
+    max-height: none;
+  }
+}
+
+@media (max-width: 800px) {
+  .mobile-hero__channels {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .mobile-hero__mock .mobile-phone-single .mobile-phone-swap,
+  .mobile-hero__mock .mobile-phone-single .mobile-phone-visual .mobile-phone {
+    height: min(46rem, 86svh);
+    max-height: 86svh;
+  }
+}
+
 @media (max-width: 900px) {
   .mobile-hero__stage {
     grid-template-columns: 1fr;

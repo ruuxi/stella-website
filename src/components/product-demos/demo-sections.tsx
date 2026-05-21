@@ -257,6 +257,8 @@ const PLATFORM_LABELS: Record<Platform, string> = {
   teams: "Teams",
 };
 const CYCLE_MS = 4000;
+/** Viewports at or below this width show one cycling phone mock (not two-up). */
+const MOBILE_HERO_SINGLE_PHONE_MAX_PX = 1150;
 
 function useIsMobile(breakpoint = 768) {
   const query = `(max-width: ${breakpoint - 1}px)`;
@@ -307,8 +309,8 @@ function usePlatformCycle(isMobile: boolean) {
 }
 
 export function MobileSection() {
-  const isMobile = useIsMobile();
-  const { slots, cycle, activePlatform } = usePlatformCycle(isMobile);
+  const useSinglePhoneLayout = useIsMobile(MOBILE_HERO_SINGLE_PHONE_MAX_PX + 1);
+  const { slots, cycle, activePlatform } = usePlatformCycle(useSinglePhoneLayout);
   const { ref, isActive } = useViewportActivity<HTMLDivElement>({
     rootMargin: "360px 0px",
   });
@@ -350,7 +352,7 @@ export function MobileSection() {
 
               <div ref={ref} className="mobile-hero__mock">
                 <DeferInView fallback={<DemoChunkPlaceholder />}>
-                  {isMobile ? (
+                  {useSinglePhoneLayout ? (
                     <div className="mobile-phone-single">
                       <div className="mobile-phone-swap">
                         <MobilePhoneVisual
