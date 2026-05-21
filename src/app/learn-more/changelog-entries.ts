@@ -15,6 +15,8 @@ export const changelogEntries: ChangelogEntry[] = [
       "Fashion is back as a first-class Store tab.",
       "Display tabs now remember their history, so reopening the panel feels less like starting over.",
       "Canvas previews use compact tab-style chips instead of bulky rail thumbnails.",
+      "The chat surface is getting a workspace strip, so conversation-specific work can stay easier to find.",
+      "Workspace section toggles now live in the Open card header, closer to the work they control.",
     ],
     fixes: [
       "Stella shuts down and updates more reliably.",
@@ -23,6 +25,13 @@ export const changelogEntries: ChangelogEntry[] = [
       "Agent activity text is clearer when Stella updates you on progress.",
       "Claude Code replies now persist correctly.",
       "Developer sign-in links and local launch metadata got cleanup.",
+      "Settings and model picker polish: no more double-selected Stella tiers, and picking a model no longer makes the submenu flash.",
+      "General settings and connected-provider controls got a cleaner layout.",
+      "Shell and display-sidebar resizing feel smoother, with a cleaner divider.",
+      "The Store side panel layout was fixed.",
+      "Streaming chat messages no longer re-fade after they finish.",
+      "Media tab errors now show as toasts instead of awkward inline text.",
+      "The sidebar footer is cleaner, without the extra divider or sticky selected state on the toggle.",
     ],
   },
   {
