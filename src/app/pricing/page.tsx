@@ -83,7 +83,7 @@ const footerGroups: {
   {
     title: "Product",
     items: [
-      { label: "How It Works", href: "/how-it-works" },
+      { label: "Learn More", href: "/learn-more" },
       { label: "Store", href: "/store" },
       { label: "Pricing", href: "/pricing" },
       { label: "Sign In", href: "/sign-in" },
@@ -91,7 +91,7 @@ const footerGroups: {
   },
   {
     title: "Resources",
-    items: [{ label: "What's New", href: "/changelog" }],
+    items: [{ label: "What's New", href: "/learn-more#whats-new" }],
   },
   {
     title: "Community",

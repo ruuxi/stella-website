@@ -13,11 +13,31 @@ export function SiteHeader() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
+    // Pages like /store wrap their content in an internal scroll
+    // container (e.g. `.store-root` with `overflow-y: auto`), so the
+    // window itself never scrolls. Listen on whichever element is
+    // actually scrolling and use the max progress across sources.
+    const sources: Array<Window | Element> = [window];
+    const page = el.closest(".stella-page");
+    if (page) {
+      for (const child of Array.from(page.children) as Element[]) {
+        if (child === el) continue;
+        const style = window.getComputedStyle(child);
+        const oy = style.overflowY;
+        if (oy === "auto" || oy === "scroll") sources.push(child);
+      }
+    }
+
+    const getY = (s: Window | Element) =>
+      s === window ? window.scrollY : (s as Element).scrollTop;
+
     let raf = 0;
     const update = () => {
       raf = 0;
-      const y = Math.max(0, window.scrollY);
-      const p = Math.min(1, y / SCROLL_RANGE);
+      let y = 0;
+      for (const s of sources) y = Math.max(y, getY(s));
+      const p = Math.min(1, Math.max(0, y) / SCROLL_RANGE);
       el.style.setProperty("--scroll-progress", p.toFixed(4));
     };
     const onScroll = () => {
@@ -25,9 +45,11 @@ export function SiteHeader() {
       raf = window.requestAnimationFrame(update);
     };
     update();
-    window.addEventListener("scroll", onScroll, { passive: true });
+    for (const s of sources) {
+      s.addEventListener("scroll", onScroll, { passive: true });
+    }
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      for (const s of sources) s.removeEventListener("scroll", onScroll);
       if (raf) window.cancelAnimationFrame(raf);
     };
   }, []);

@@ -27,7 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: new URL("/how-it-works", base).href,
+      url: new URL("/learn-more", base).href,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.8,
@@ -37,12 +37,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.8,
-    },
-    {
-      url: new URL("/changelog", base).href,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.6,
     },
     {
       url: new URL("/privacy", base).href,

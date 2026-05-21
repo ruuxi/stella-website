@@ -8,10 +8,9 @@ import { SiteHeaderAccount } from "@/components/auth/site-header-account";
 type NavItem = { label: string; href: string; external?: boolean };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "How It Works", href: "/how-it-works" },
+  { label: "Learn More", href: "/learn-more" },
   { label: "Store", href: "/store" },
   { label: "Pricing", href: "/pricing" },
-  { label: "What's New", href: "/changelog" },
   { label: "Community", href: "https://discord.gg/HXVCCeE542", external: true },
 ];
 
