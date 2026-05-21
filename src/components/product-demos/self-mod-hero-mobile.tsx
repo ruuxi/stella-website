@@ -27,10 +27,10 @@ import {
 type Variant = "default" | "rail" | "tabs" | "dashboard" | "cozy";
 
 const PILLS: { key: SectionKey; label: string; variant: Variant }[] = [
-  { key: "sidebar", label: "Workspace rail", variant: "rail" },
-  { key: "header", label: "Tabs", variant: "tabs" },
-  { key: "messages", label: "Dashboard", variant: "dashboard" },
-  { key: "composer", label: "Cozy mode", variant: "cozy" },
+  { key: "sidebar", label: "Add a workspace rail", variant: "rail" },
+  { key: "header", label: "Give me tabs", variant: "tabs" },
+  { key: "messages", label: "Make it a dashboard", variant: "dashboard" },
+  { key: "composer", label: "Make it cozy", variant: "cozy" },
 ];
 
 const KEY_TO_VARIANT: Partial<Record<SectionKey, Variant>> = {

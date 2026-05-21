@@ -68,6 +68,9 @@ type Step =
   | { kind: "stella"; id: string; text: string; delay: number; reveal: number }
   | { kind: "working"; delay: number };
 
+/** Pause on the finished state (all messages + working indicator) before replay. */
+const REPLAY_HOLD_MS = 5000;
+
 const SCRIPT: Step[] = [
   {
     kind: "user",
@@ -162,14 +165,16 @@ function MiniWindowMock() {
       const restart = window.setTimeout(() => {
         setRevealed({});
         setWorking(false);
+        setTaskIndex(0);
         setStepIndex(0);
-      }, 3000);
+      }, REPLAY_HOLD_MS);
       return () => window.clearTimeout(restart);
     }
     const step = SCRIPT[stepIndex]!;
     const t = window.setTimeout(() => {
       if (step.kind === "working") {
         setWorking(true);
+        setStepIndex((i) => i + 1);
       } else if (step.kind === "stella") {
         let pos = 0;
         const tickMs = step.reveal;
