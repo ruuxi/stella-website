@@ -33,8 +33,6 @@ export function HeroStellaOrb() {
 
   return (
     <div ref={ref} className="hero-orb-wrap" aria-hidden="true">
-      <div className="hero-orb-rings-outer" />
-      <div className="hero-orb-rings" />
       <div className="hero-stella-orb">
         <StellaAnimation
           ref={animationRef}

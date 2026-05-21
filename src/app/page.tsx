@@ -126,16 +126,14 @@ export default function Home() {
             <div className="hero-stack__title reveal">
               <HeroMorphTitle />
             </div>
-            <div className="hero-stack__sub reveal reveal-delay-1">
-              <p>Private. Open source. Lives on your computer.</p>
-            </div>
             <div className="hero-stack__cta reveal reveal-delay-2">
               <DownloadButton />
               <p className="hero-research-note">
-                Stella is in research preview
+                Private. Open source.
               </p>
             </div>
           </div>
+          <p className="hero-preview-badge reveal">Stella is in research preview</p>
         </section>
 
         <HomeStoryGrid />

@@ -1137,9 +1137,18 @@
 }
 
 /* ── Narrow viewport collapse ─────────────────────────────────── */
+/* Below 1024px the sticky stage hides and every section renders its
+   own mock inline above the copy. The copy column is also redefined
+   here to align-items: stretch (instead of flex-end) and the section
+   sets width:100% so both copy and mock fill the viewport — the
+   default `width: var(--story-text-w)` would otherwise lock both to
+   ~256px regardless of viewport. */
 @media (max-width: 1023px) {
   .home-story {
-    grid-template-columns: 1fr;
+    /* `minmax(0, 1fr)` instead of bare `1fr` so intrinsic min-content
+       from nested mocks (sam-root, mini-window, etc.) can't force the
+       column wider than the viewport. */
+    grid-template-columns: minmax(0, 1fr);
     gap: 0;
     padding-top: clamp(2.5rem, 6vw, 4rem);
     padding-bottom: clamp(3rem, 7vw, 5rem);
@@ -1150,27 +1159,52 @@
   }
 
   .home-story__copy {
-    gap: clamp(3rem, 8vw, 5rem);
+    align-items: stretch;
+    gap: clamp(2.5rem, 6vw, 4rem);
+    min-width: 0;
   }
 
   .story-section {
     min-height: 0;
     opacity: 1;
     transform: none;
-    max-width: none;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     gap: 0.9rem;
+  }
+
+  .story-section__inline-mock {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .story-mock,
+  .story-mock--app .sam-root {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .story-section__title {
+    font-size: clamp(1.65rem, 6.5vw, 2.4rem);
+    line-height: 1.08;
+  }
+
+  .story-section__body {
+    font-size: clamp(0.95rem, 3.6vw, 1.05rem);
+    line-height: 1.5;
   }
 
   .story-section__inline-mock {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0.4rem 0 0.4rem;
+    margin: 0.2rem 0 0.6rem;
     width: 100%;
-    height: clamp(380px, 64vw, 520px);
+    height: clamp(360px, 78vw, 540px);
     border-radius: 0;
     overflow: hidden;
-    padding: clamp(1rem, 4vw, 2rem);
+    padding: clamp(0.6rem, 3vw, 1.4rem);
     background:
       radial-gradient(
         120% 100% at 8% 6%,
@@ -1183,5 +1217,187 @@
     box-shadow:
       0 18px 36px rgba(15, 30, 60, 0.1),
       0 4px 10px rgba(15, 30, 60, 0.05);
+  }
+
+  /* Memory: two cramped panes side-by-side don't read on a phone.
+     Stack vertically so each conversation gets full width. */
+  .story-mock--memory-panes {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+  .story-section__inline-mock:has(.story-mock--memory-panes) {
+    height: clamp(560px, 130vw, 760px);
+  }
+
+  /* Models: parent + submenu side-by-side overflows. Stack them
+     vertically and let each take full width up to the cap. */
+  .model-picker-mock__menus {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  .model-picker-parent,
+  .model-picker-mock {
+    width: 100%;
+    max-width: 100%;
+  }
+  .story-mock--models {
+    gap: 16px;
+    padding: 12px 0;
+  }
+  .model-providers {
+    padding: 6px 0 0;
+    gap: 10px;
+  }
+
+  /* Phone is naturally narrow — let it use the inline-mock's vertical
+     room more aggressively so the device chrome isn't dwarfed. */
+  .story-section__inline-mock:has(.story-mock--phone) {
+    height: clamp(440px, 110vw, 600px);
+    padding: 18px 0;
+  }
+  .story-mock--phone .mobile-phone-single {
+    max-width: 240px;
+  }
+
+  /* Settings cards (Models / Private): drop the card's heavy padding
+     and big drop shadow at narrow widths so they don't crowd the
+     gradient frame. */
+  .story-mock--settings .settings-mock {
+    padding: 18px 18px 20px;
+    gap: 14px;
+    box-shadow:
+      0 12px 28px rgba(15, 30, 60, 0.1),
+      0 3px 8px rgba(15, 30, 60, 0.04);
+  }
+  .settings-mock__title { font-size: 15px; }
+  .settings-mock__desc { font-size: 12px; }
+}
+
+/* Phone-only: tighten further. The desktop-style StellaAppMock and
+   mini-window need rail-collapsed sidebars at this width or there's
+   no room for the main column. */
+@media (max-width: 640px) {
+  .home-story {
+    padding-left: clamp(1rem, 4vw, 1.5rem);
+    padding-right: clamp(1rem, 4vw, 1.5rem);
+  }
+
+  /* StellaAppMock: 170px sidebar + ~200px main column at this scale
+     reads as broken. Collapse the sidebar to an icon rail so the
+     home column has room to breathe. The rail mode is the same one
+     the dashboard step already uses, just always-on for mobile. */
+  .story-section__inline-mock .sam-sidebar {
+    width: 48px;
+  }
+  .story-section__inline-mock .sam-sidebar-brand {
+    justify-content: center;
+    padding: 16px 0 8px;
+  }
+  .story-section__inline-mock .sam-sidebar-brand-text,
+  .story-section__inline-mock .sam-nav-item > span:not(.sam-nav-icon),
+  .story-section__inline-mock .sam-nav-item-tag {
+    display: none;
+  }
+  .story-section__inline-mock .sam-sidebar-nav {
+    padding: 0 6px 12px;
+  }
+  .story-section__inline-mock .sam-nav-item {
+    justify-content: center;
+    padding: 9px 0;
+    gap: 0;
+  }
+  .story-section__inline-mock .sam-sidebar-footer {
+    padding: 8px 6px;
+  }
+  .story-section__inline-mock .sam-sidebar-footer-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding-inline: 0;
+  }
+  .story-section__inline-mock .sam-footer-actions {
+    display: none;
+  }
+  /* Cozy sidebar uses a parallel class set; collapse it too. */
+  .story-section__inline-mock .sam-sidebar-cozy {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+  .story-section__inline-mock .sam-cozy-rail-nav > * > span:last-child,
+  .story-section__inline-mock .sam-cozy-rail-name,
+  .story-section__inline-mock .sam-cozy-rail-meta {
+    display: none;
+  }
+
+  /* Mini-window (One chat / Memory panes) — collapse the in-window
+     sidebar to its rail variant so the chat fills the pane. The
+     `single-chat-section.css` rules already gate this on
+     `.single-chat-hero__frame`; mirror the same behavior for any
+     mini-window rendered inside the story stage on phone. */
+  .story-section__inline-mock .mini-window__body {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+  .story-section__inline-mock .mini-sidebar {
+    padding: 8px 4px 6px;
+    align-items: center;
+  }
+  .story-section__inline-mock .mini-sidebar__brand {
+    justify-content: center;
+    gap: 0;
+    padding: 4px 0 6px;
+  }
+  .story-section__inline-mock .mini-sidebar__brand-text,
+  .story-section__inline-mock .mini-sidebar__item-label {
+    display: none;
+  }
+  .story-section__inline-mock .mini-sidebar__item {
+    justify-content: center;
+    gap: 0;
+    padding: 7px 0;
+  }
+  .story-section__inline-mock .mini-sidebar__footer-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding-top: 4px;
+  }
+  .story-section__inline-mock .mini-sidebar__footer-actions {
+    display: none;
+  }
+
+  /* Tighter type inside the customize mocks at this scale. */
+  .story-section__inline-mock .sam-home-title {
+    font-size: 18px;
+  }
+  .story-section__inline-mock .sam-home-context,
+  .story-section__inline-mock .sam-home-footer-pills {
+    display: none;
+  }
+
+  /* Dashboard cards: 6-column grid is too dense; let each card take
+     a whole row at phone widths. */
+  .story-section__inline-mock .sam-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+  .story-section__inline-mock .sam-card {
+    grid-column: span 1;
+  }
+  .story-section__inline-mock .sam-card[data-wide="true"] {
+    grid-column: span 2;
+  }
+  .story-section__inline-mock .sam-dashboard-stats {
+    display: none;
+  }
+
+  /* Actions / Voice mocks shrink their interior typography so they
+     don't overflow the narrower frame. */
+  .story-mock--actions .ob-actions__stage,
+  .story-mock--voice .ob-voice__stage {
+    transform: scale(0.82);
+    transform-origin: center center;
   }
 }

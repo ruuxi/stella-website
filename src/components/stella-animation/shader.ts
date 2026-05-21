@@ -130,51 +130,6 @@ export const getFragmentShader = (): string => {
                    * step(abs(uv.y - eyeOrigin.y), eyeHalf.y);
     float eyeMask = max(leftEye, rightEye) * smoothstep(0.3, 0.6, u_birth);
     gl_FragColor = mix(gl_FragColor, vec4(u_colors[4], 1.0), eyeMask);
-
-    vec2 mouthPos = vec2(eyeOrigin.x, eyeOrigin.y + 3.5 / u_gridSize.y);
-
-    float mouthSlot = floor(u_time / 2.5);
-    float mouthHash = fract(sin(mouthSlot * 47.3) * 31718.9);
-    float shapeHash = fract(sin(mouthSlot * 113.1) * 18734.3);
-    float mouthLocal = fract(u_time / 2.5);
-
-    float doOpen = step(0.70, mouthHash);
-
-    float isO =     (1.0 - step(0.2, shapeHash));
-    float isSmile = step(0.2, shapeHash) * (1.0 - step(0.4, shapeHash));
-    float isFrown = step(0.4, shapeHash) * (1.0 - step(0.6, shapeHash));
-    float isSideV = step(0.6, shapeHash) * (1.0 - step(0.8, shapeHash));
-    float isDash =  step(0.8, shapeHash);
-
-    float openUp = smoothstep(0.0, 0.08, mouthLocal);
-    float closeDown = 1.0 - smoothstep(0.6, 0.8, mouthLocal);
-    float mouthAnim = openUp * closeDown * doOpen;
-
-    vec2 md = (uv - mouthPos) * u_gridSize;
-    float lineW = 0.5;
-
-    float mouthShape = 0.0;
-    if (isO > 0.5) {
-      vec2 mdO = md;
-      mdO.y /= max(mouthAnim, 0.15);
-      float oDist = length(mdO);
-      mouthShape = smoothstep(1.8, 1.5, oDist) * smoothstep(0.5, 0.8, oDist);
-    } else if (isSmile > 0.5) {
-      float smileDist = abs(md.y - 0.6 + 0.7 * abs(md.x));
-      mouthShape = (1.0 - smoothstep(lineW * 0.5, lineW, smileDist)) * step(abs(md.x), 1.8);
-    } else if (isFrown > 0.5) {
-      float frownDist = abs(md.y + 0.6 - 0.7 * abs(md.x));
-      mouthShape = (1.0 - smoothstep(lineW * 0.5, lineW, frownDist)) * step(abs(md.x), 1.8);
-    } else if (isSideV > 0.5) {
-      float sideDist = abs(md.x - 0.8 + 0.6 * abs(md.y));
-      mouthShape = (1.0 - smoothstep(lineW * 0.5, lineW, sideDist)) * step(abs(md.y), 1.2);
-    } else if (isDash > 0.5) {
-      mouthShape = (1.0 - smoothstep(lineW * 0.3, lineW * 0.7, abs(md.y))) * step(abs(md.x), 1.5);
-    }
-    mouthShape *= smoothstep(0.05, 0.2, mouthAnim);
-
-    float mouthMask = mouthShape * smoothstep(0.3, 0.6, u_birth);
-    gl_FragColor = mix(gl_FragColor, vec4(u_colors[4], 1.0), mouthMask);
   `;
 
   const phaseFunction = `

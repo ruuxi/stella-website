@@ -158,20 +158,18 @@ export const STORY_SECTIONS: ReadonlyArray<StorySection> = [
       },
       {
         id: "createApp",
-        eyebrow: "\u201cSpin up a little app for my cat\u201d",
+        eyebrow: "\u201cBuild me a music app\u201d",
         title: <>And when she runs out of room, she builds new apps.</>,
         body: (
           <p>
             Ask for something Stella doesn&apos;t already have, and she
-            builds it — a focused little app with its own name, theme,
-            and home. You keep it. Or throw it out. Either way it lived
-            in your computer, not in a tab.
+            builds it — a focused app with its own name, theme, and home.
           </p>
         ),
       },
       {
         id: "cozy",
-        eyebrow: "\u201cMake it feel cozy\u201d",
+        eyebrow: "\u201cMake a cozy home for my cat\u201d",
         title: <>Or a whole new mood.</>,
         body: (
           <p>
