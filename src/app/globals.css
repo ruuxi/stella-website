@@ -3,7 +3,7 @@
 :root {
   --page-background: #edf3fb;
   --page-foreground: #0f1728;
-  --page-muted: #5f7186;
+  --page-muted: #44546c;
   --page-border: rgba(82, 104, 134, 0.18);
   --page-border-strong: rgba(82, 104, 134, 0.28);
   --page-accent: #1d78f2;
@@ -44,9 +44,19 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* The site background lives entirely on `body` (+ `body::before` for the
+ * fixed top highlight). Body persists across App Router navigations, so
+ * the gradient stack is painted once at first load and never re-painted
+ * when the user moves between routes.
+ *
+ * Per-page wrappers (`.stella-page`, `.legal-doc-page`, etc.) are
+ * intentionally transparent — they show body through. The only override
+ * is embedded mode below, which clears body so the desktop webview's
+ * canvas shows through instead. */
 body {
   margin: 0;
   min-width: 320px;
+  min-height: 100vh;
   background:
     radial-gradient(circle at top left, var(--page-glow-cyan), transparent 28%),
     radial-gradient(circle at 82% 10%, var(--page-glow-blue), transparent 26%),
@@ -57,6 +67,20 @@ body {
   font-family: var(--font-sans), sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Top highlight + soft top-down vignette, locked to the viewport so it
+ * keeps reading as "ambient light from above" no matter how far the
+ * user scrolls. Persists across navigations because `body` does. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.45), transparent 35%),
+    linear-gradient(180deg, rgba(12, 22, 38, 0.035), rgba(12, 22, 38, 0));
+  pointer-events: none;
 }
 
 a {
@@ -83,17 +107,6 @@ select {
   overflow-x: clip;
 }
 
-.stella-page::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.45), transparent 35%),
-    linear-gradient(180deg, rgba(12, 22, 38, 0.035), rgba(12, 22, 38, 0));
-  pointer-events: none;
-}
-
 /* ── Embedded mode ──
  * When the website is loaded inside Stella's desktop `WebContentsView`
  * (Store, Billing, etc.), the body becomes transparent so the desktop's
@@ -110,7 +123,7 @@ html[data-embedded="true"] body {
   color: var(--embedded-fg, var(--page-foreground));
 }
 
-html[data-embedded="true"] .stella-page::before {
+html[data-embedded="true"] body::before {
   display: none;
 }
 
@@ -159,10 +172,6 @@ html[data-embedded="true"] .site-header {
   border-bottom: 1px solid transparent;
   border-bottom-color: rgba(82, 104, 134, calc(var(--scroll-progress) * 0.18));
   box-shadow: 0 6px 24px -18px rgba(12, 22, 38, calc(var(--scroll-progress) * 0.4));
-  backdrop-filter: blur(calc(var(--scroll-progress) * 18px))
-    saturate(calc(100% + var(--scroll-progress) * 40%));
-  -webkit-backdrop-filter: blur(calc(var(--scroll-progress) * 18px))
-    saturate(calc(100% + var(--scroll-progress) * 40%));
 }
 
 .site-header::before {
@@ -171,11 +180,7 @@ html[data-embedded="true"] .site-header {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.62),
-    rgba(255, 255, 255, 0.38)
-  );
+  background: var(--page-background);
   opacity: var(--scroll-progress);
 }
 
@@ -477,13 +482,17 @@ html[data-embedded="true"] .site-header {
 }
 
 .button--ghost {
-  border-color: rgba(82, 104, 134, 0.16);
-  background: rgba(255, 255, 255, 0.58);
+  align-self: flex-start;
+  padding: 0.95rem 1.3rem;
+  font-size: 1rem;
+  border-color: var(--page-border);
+  background: var(--page-panel-strong);
+  color: var(--page-foreground);
 }
 
 .button--ghost:hover {
-  border-color: rgba(82, 104, 134, 0.24);
-  background: rgba(255, 255, 255, 0.78);
+  border-color: var(--page-border-strong);
+  background: rgba(255, 255, 255, 0.92);
 }
 
 .hero-section {

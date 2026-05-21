@@ -14,7 +14,8 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="legal-doc-page">
+    <div className="stella-page">
+      <div className="legal-doc-page">
       <div className="legal-doc-page__bar">
         <Link className="legal-doc-page__back" href="/">
           ← Back to Stella
@@ -24,6 +25,7 @@ export default function TermsPage() {
         <h1 className="legal-doc-page__title">{LEGAL_TITLES.terms}</h1>
         <pre className="legal-doc-page__text">{TERMS_OF_SERVICE}</pre>
       </main>
+      </div>
     </div>
   );
 }

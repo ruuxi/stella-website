@@ -13,8 +13,10 @@ export const metadata: Metadata = {
 
 export default function AuthCallbackPage() {
   return (
-    <Suspense fallback={null}>
-      <AuthCallbackView />
-    </Suspense>
+    <div className="stella-page">
+      <Suspense fallback={null}>
+        <AuthCallbackView />
+      </Suspense>
+    </div>
   );
 }

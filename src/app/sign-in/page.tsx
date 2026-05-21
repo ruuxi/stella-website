@@ -13,5 +13,9 @@ export const metadata: Metadata = {
 };
 
 export default function SignInPage() {
-  return <SignInView />;
+  return (
+    <div className="stella-page">
+      <SignInView />
+    </div>
+  );
 }

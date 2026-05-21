@@ -6,6 +6,7 @@
  * same off-white so cards still read as a "raised" surface against the
  * desktop's transparent backdrop. */
 html[data-embedded="true"] .store-root {
+  background: transparent;
   --foreground: var(--embedded-fg, #161616);
   --text-muted: color-mix(
     in srgb,
