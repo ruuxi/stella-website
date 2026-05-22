@@ -44,6 +44,10 @@ type ScrollTarget = {
   eyebrow: string;
   title: ReactNode;
   body: ReactNode;
+  /** Optional 3–6 word phrase rendered above the mock inside the
+   *  stage frame. Only set on per-step targets for sections that opt
+   *  into `sharedCopy`. */
+  mockTitle?: string;
 };
 
 function buildScrollTargets(
@@ -61,6 +65,7 @@ function buildScrollTargets(
           eyebrow: step.eyebrow,
           title: step.title,
           body: step.body,
+          mockTitle: step.mockTitle,
         });
       });
     } else {
@@ -131,48 +136,140 @@ export function HomeStoryGrid() {
 
       {/* ── Scrolling copy column ─────────────────────────────────── */}
       <div className="home-story__copy">
-        {targets.map((target, index) => {
-          const isActive = target.key === activeKey;
-          return (
-            <section
-              key={target.key}
-              ref={setTargetRef.write(target.key)}
-              className="story-section"
-              data-id={target.sectionId}
-              data-key={target.key}
-              data-step={target.stepIndex}
-              data-active={isActive || undefined}
-              data-index={index}
-            >
-              <span className="story-section__eyebrow">{target.eyebrow}</span>
-              <h2 className="story-section__title">{target.title}</h2>
-              <div className="story-section__body">{target.body}</div>
-
-              {/* Inline mock — only shows on narrow viewports via CSS. */}
-              <div
-                className="story-section__inline-mock"
-                data-section={target.sectionId}
-                data-revealed=""
-                aria-hidden="true"
-              >
-                <MockSlot
-                  section={target.section}
-                  isActive={isActive}
-                  step={target.stepIndex}
-                />
-              </div>
-
-              {target.section.footnote ? (
-                <p className="story-section__footnote">
-                  {target.section.footnote}
-                </p>
-              ) : null}
-            </section>
-          );
+        {renderCopyColumn({
+          sections,
+          targets,
+          activeKey,
+          setTargetRef,
         })}
       </div>
     </div>
   );
+}
+
+/* ── Copy column rendering ─────────────────────────────────────── */
+
+/**
+ * Render the right-side copy column. Most sections render one
+ * `<section>` per scroll target. Sections that opt into `sharedCopy`
+ * collapse all their step targets into a single visible copy block
+ * (sticky inside the section group) followed by lightweight scroll
+ * anchors — one per step — that the IntersectionObserver still picks
+ * up to drive the stage's `step` prop. The right-side text stays put
+ * while the user scrolls; only the mock and its in-frame title change.
+ */
+function renderCopyColumn({
+  sections,
+  targets,
+  activeKey,
+  setTargetRef,
+}: {
+  sections: ReadonlyArray<StorySection>;
+  targets: ReadonlyArray<ScrollTarget>;
+  activeKey: string;
+  setTargetRef: { write: (key: string) => (el: HTMLElement | null) => void };
+}): ReactNode {
+  const nodes: ReactNode[] = [];
+
+  for (const section of sections) {
+    const sectionTargets = targets.filter((t) => t.sectionId === section.id);
+    if (sectionTargets.length === 0) continue;
+
+    if (section.sharedCopy && section.steps && section.steps.length > 0) {
+      const anyActive = sectionTargets.some((t) => t.key === activeKey);
+      nodes.push(
+        <div
+          key={section.id}
+          className="story-section-group"
+          data-id={section.id}
+          data-active={anyActive || undefined}
+        >
+          <div className="story-section-group__copy story-section">
+            <span className="story-section__eyebrow">{section.eyebrow}</span>
+            <h2 className="story-section__title">{section.title}</h2>
+            <div className="story-section__body">{section.body}</div>
+            {section.footnote ? (
+              <p className="story-section__footnote">{section.footnote}</p>
+            ) : null}
+          </div>
+
+          <div className="story-section-group__anchors" aria-hidden="true">
+            {sectionTargets.map((target, index) => {
+              const isActive = target.key === activeKey;
+              return (
+                <div
+                  key={target.key}
+                  ref={setTargetRef.write(target.key)}
+                  className="story-section-group__anchor"
+                  data-id={target.sectionId}
+                  data-key={target.key}
+                  data-step={target.stepIndex}
+                  data-active={isActive || undefined}
+                  data-index={index}
+                >
+                  {/* Inline mock — only shows on narrow viewports via CSS. */}
+                  <div
+                    className="story-section__inline-mock"
+                    data-section={target.sectionId}
+                    data-revealed=""
+                  >
+                    <MockSlot
+                      section={target.section}
+                      isActive={isActive}
+                      step={target.stepIndex}
+                      mockTitle={target.mockTitle}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>,
+      );
+      continue;
+    }
+
+    for (const target of sectionTargets) {
+      const isActive = target.key === activeKey;
+      nodes.push(
+        <section
+          key={target.key}
+          ref={setTargetRef.write(target.key)}
+          className="story-section"
+          data-id={target.sectionId}
+          data-key={target.key}
+          data-step={target.stepIndex}
+          data-active={isActive || undefined}
+        >
+          <span className="story-section__eyebrow">{target.eyebrow}</span>
+          <h2 className="story-section__title">{target.title}</h2>
+          <div className="story-section__body">{target.body}</div>
+
+          {/* Inline mock — only shows on narrow viewports via CSS. */}
+          <div
+            className="story-section__inline-mock"
+            data-section={target.sectionId}
+            data-revealed=""
+            aria-hidden="true"
+          >
+            <MockSlot
+              section={target.section}
+              isActive={isActive}
+              step={target.stepIndex}
+            />
+          </div>
+
+          {target.section.footnote ? (
+            <p className="story-section__footnote">
+              {target.section.footnote}
+            </p>
+          ) : null}
+        </section>,
+      );
+    }
+  }
+
+  return nodes;
 }
 
 /* ── Mock rendering ────────────────────────────────────────────── */
@@ -181,12 +278,30 @@ function MockSlot({
   section,
   isActive,
   step,
+  mockTitle,
 }: {
   section: StorySection;
   isActive: boolean;
   step: number;
+  mockTitle?: string;
 }): ReactNode {
   const Mock = section.Mock;
+  const resolvedTitle =
+    mockTitle ?? section.steps?.[step]?.mockTitle ?? undefined;
+
+  if (resolvedTitle) {
+    return (
+      <div className="story-mock-stack">
+        <div className="story-mock-stack__title" aria-hidden="true">
+          {resolvedTitle}
+        </div>
+        <div className="story-mock-stack__body">
+          <Mock isActive={isActive} step={step} />
+        </div>
+      </div>
+    );
+  }
+
   return <Mock isActive={isActive} step={step} />;
 }
 

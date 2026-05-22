@@ -93,6 +93,11 @@ export type StoryStep = {
   eyebrow: string;
   title: ReactNode;
   body: ReactNode;
+  /** 3–6 word phrase shown above the mock inside the stage frame for
+   *  this step. Used when the section's copy is `sharedCopy: true` so
+   *  the per-step request still surfaces — just above the mock instead
+   *  of in the copy column. */
+  mockTitle?: string;
 };
 
 export type StorySection = {
@@ -107,6 +112,11 @@ export type StorySection = {
    *  scroll target in the copy column; the stage shows one shared slot
    *  for the whole section and `step` is passed to the Mock. */
   steps?: ReadonlyArray<StoryStep>;
+  /** When true and `steps` is set, the copy column renders the
+   *  section's own `eyebrow/title/body` once and pins it (sticky)
+   *  while the user scrolls through the step anchors. Each step still
+   *  drives the stage via its `mockTitle` and the Mock's `step` prop. */
+  sharedCopy?: boolean;
 };
 
 export const STORY_SECTIONS: ReadonlyArray<StorySection> = [
@@ -119,65 +129,56 @@ export const STORY_SECTIONS: ReadonlyArray<StorySection> = [
      * itself to match. */
     id: "customize",
     Mock: MockCustomize,
+    /* The intro copy stays put on the right while the user scrolls
+     * through every transformation on the left. Each step contributes
+     * a 3–6 word `mockTitle` that surfaces above the mock inside the
+     * blue gradient card — that's where the per-step user prompt
+     * lives now. */
+    sharedCopy: true,
+    eyebrow: "Yours",
+    title: <>An app that becomes you.</>,
+    body: (
+      <p>
+        Stella isn&apos;t a fixed app. Tell her what you want and she
+        rearranges herself — the layout, even brand-new tools — live, in
+        place, no rebuild.
+      </p>
+    ),
     steps: [
       {
         id: "intro",
         eyebrow: "Yours",
         title: <>An app that becomes you.</>,
-        body: (
-          <p>
-            Stella isn&apos;t a fixed app. Tell her what you want and she
-            rearranges herself — the layout, even brand-new tools — live,
-            in place, no rebuild.
-          </p>
-        ),
+        body: null,
+        mockTitle: "Show me what you can do",
       },
       {
         id: "header",
         eyebrow: "\u201cGive me tabs at the top\u201d",
         title: <>Reshape the chrome.</>,
-        body: (
-          <p>
-            Tabs, segmented switches, a pinned toolbar. She redraws the
-            top of the window without losing your place in the chat
-            underneath.
-          </p>
-        ),
+        body: null,
+        mockTitle: "Give me tabs at the top",
       },
       {
         id: "messages",
         eyebrow: "\u201cShow me my dashboard\u201d",
         title: <>Turn chat into surfaces.</>,
-        body: (
-          <p>
-            Promote the conversation into a real dashboard — cards,
-            schedules, dense readouts. The chat stays one click away, the
-            new view is just another way to look at the same data.
-          </p>
-        ),
+        body: null,
+        mockTitle: "Make me a dashboard",
       },
       {
         id: "createApp",
         eyebrow: "\u201cBuild me a music app\u201d",
         title: <>And when she runs out of room, she builds new apps.</>,
-        body: (
-          <p>
-            Ask for something Stella doesn&apos;t already have, and she
-            builds it — a focused app with its own name, theme, and home.
-          </p>
-        ),
+        body: null,
+        mockTitle: "Build me a music app",
       },
       {
         id: "cozy",
         eyebrow: "\u201cMake a cozy home for my cat\u201d",
         title: <>Or a whole new mood.</>,
-        body: (
-          <p>
-            Warm surface, hand-drawn details, a quiet companion in the
-            corner. Theme, typography, the entire feel of the app — yours
-            to ask for, hers to draw.
-          </p>
-        ),
+        body: null,
+        mockTitle: "Make a cozy home for my cat",
       },
     ],
   },

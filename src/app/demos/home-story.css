@@ -27,7 +27,7 @@
      real Stella surfaces. Caps at ~960px so the inner app shell
      stays under "absurd" widths on very wide displays. */
   --story-stage-w: clamp(720px, 64vw, 960px);
-  --story-stage-h: clamp(600px, 80svh, 800px);
+  --story-stage-h: clamp(560px, 74svh, 740px);
   --story-gap: clamp(2rem, 4vw, 5rem);
   --story-section-min: 84svh;
   --story-text-w: clamp(16rem, 22vw, 28rem);
@@ -205,6 +205,96 @@
 
 .story-section__inline-mock {
   display: none;
+}
+
+/* ── Shared-copy section group ───────────────────────────────────
+   Sections that opt into `sharedCopy` keep one visible copy block on
+   the right while the user scrolls through several mock-only steps
+   on the left. The copy stays put (sticky) and only the in-frame
+   mock + its title change. Each step still owns a full-height scroll
+   anchor inside the group so the IntersectionObserver can pick the
+   active step the same way it does for normal sections. */
+.story-section-group {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: var(--story-text-w);
+  max-width: 100%;
+}
+
+.story-section-group__copy {
+  position: sticky;
+  /* Sit roughly in the same vertical band where the regular
+     `.story-section` copy lands — slightly above the viewport
+     midpoint so the line of sight matches the centered stage on
+     the left. */
+  top: clamp(28svh, 34svh, 40svh);
+  z-index: 2;
+  min-height: 0;
+  /* Override `.story-section`'s scroll-driven dim — shared copy is
+     always considered active for the whole group. */
+  opacity: 1;
+  transform: none;
+}
+
+.story-section-group__anchors {
+  display: flex;
+  flex-direction: column;
+}
+
+.story-section-group__anchor {
+  min-height: var(--story-section-min);
+}
+
+/* ── In-frame stack: title above the mock ───────────────────────
+   When a step ships a `mockTitle`, the stage slot stops being a
+   single centered mock and becomes a column: a small label up top
+   (the user's request, e.g. "Build me a music app"), then the mock
+   filling the remaining room. The body wrapper shrinks the mock's
+   available height — by design — so it reads as the user's prompt
+   driving the change, not the whole stage. */
+.story-mock-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: clamp(0.8rem, 1.6vw, 1.4rem);
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.story-mock-stack__title {
+  flex-shrink: 0;
+  text-align: center;
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-style: italic;
+  font-weight: 450;
+  font-size: clamp(1.75rem, 3vw, 2.4rem);
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow: 0 1px 2px rgba(15, 30, 60, 0.18);
+  text-wrap: balance;
+}
+
+.story-mock-stack__title::before {
+  content: "\201C";
+  margin-right: 0.06em;
+}
+
+.story-mock-stack__title::after {
+  content: "\201D";
+  margin-left: 0.06em;
+}
+
+.story-mock-stack__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ── Per-mock sizing inside the slot ─────────────────────────────
@@ -1172,6 +1262,35 @@
     max-width: 100%;
     min-width: 0;
     gap: 0.9rem;
+  }
+
+  /* Shared-copy group collapses to a normal flow: one copy block at
+     the top, then one inline-mock card per step underneath. No
+     sticky behavior — every mock card is its own scroll moment. */
+  .story-section-group {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    gap: clamp(2rem, 5vw, 3rem);
+  }
+
+  .story-section-group__copy {
+    position: static;
+    top: auto;
+    gap: 0.9rem;
+  }
+
+  .story-section-group__anchors {
+    gap: clamp(2rem, 5vw, 3rem);
+  }
+
+  .story-section-group__anchor {
+    min-height: 0;
+    width: 100%;
+  }
+
+  .story-mock-stack__title {
+    font-size: clamp(1.4rem, 5.5vw, 1.9rem);
   }
 
   .story-section__inline-mock {
