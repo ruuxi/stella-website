@@ -4,7 +4,7 @@ export function FooterLegalLinks() {
   const year = new Date().getFullYear();
   return (
     <>
-      <p className="footer-operator">&copy; {year} FromYou LLC</p>
+      <p className="footer-operator">&copy; {year} FromYou, LLC</p>
       <ul className="legal-links">
         <li>
           <a href="/privacy">Privacy Policy</a>

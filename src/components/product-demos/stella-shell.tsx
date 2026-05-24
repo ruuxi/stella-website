@@ -154,11 +154,11 @@ export const STELLA_ICON_PLUS = (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth={1.5}
+    strokeWidth={2.25}
     strokeLinecap="round"
   >
-    <line x1="12" y1="5" x2="12" y2="19" />
-    <line x1="5" y1="12" x2="19" y2="12" />
+    <line x1="12" y1="6" x2="12" y2="18" />
+    <line x1="6" y1="12" x2="18" y2="12" />
   </svg>
 );
 
@@ -178,9 +178,8 @@ export const STELLA_ICON_SEND = (
 );
 
 /**
- * Canonical 170px Stella sidebar — logo + italic wordmark, Home /
- * Social / New App nav, Store row, avatar + Theme / Settings /
- * Connect icon buttons in the footer row.
+ * Canonical 180px Stella sidebar — logo + italic wordmark, Home /
+ * Store / Social nav, and a full-width account row in the footer.
  */
 export function StellaSidebar({
   className = "",
@@ -203,41 +202,25 @@ export function StellaSidebar({
           <span className="stella-sidebar__brand-text">Stella</span>
         </div>
         <nav className="stella-sidebar__nav">
-          <div className="stella-sidebar__nav-item active">
+          <div className="stella-sidebar__nav-item">
             <span className="stella-sidebar__nav-icon">{STELLA_ICON_HOUSE}</span>
             <span>Home</span>
+          </div>
+          <div className="stella-sidebar__nav-item">
+            <span className="stella-sidebar__nav-icon">{STELLA_ICON_STORE}</span>
+            <span>Store</span>
           </div>
           <div className="stella-sidebar__nav-item">
             <span className="stella-sidebar__nav-icon">{STELLA_ICON_USERS}</span>
             <span>Social</span>
           </div>
-          <div className="stella-sidebar__nav-item">
-            <span className="stella-sidebar__nav-icon">
-              {STELLA_ICON_PLUS_SQUARE}
-            </span>
-            <span>New App</span>
-          </div>
         </nav>
         <div className="stella-sidebar__footer">
-          <div className="stella-sidebar__nav-item">
-            <span className="stella-sidebar__nav-icon">{STELLA_ICON_STORE}</span>
-            <span>Store</span>
-          </div>
-          <div className="stella-sidebar__footer-row">
+          <div className="stella-sidebar__account-trigger">
             <span className="stella-sidebar__account-avatar" aria-hidden="true">
               A
             </span>
-            <div className="stella-sidebar__footer-actions">
-              <span className="stella-sidebar__footer-icon" aria-hidden="true">
-                {STELLA_ICON_PALETTE}
-              </span>
-              <span className="stella-sidebar__footer-icon" aria-hidden="true">
-                {STELLA_ICON_SETTINGS}
-              </span>
-              <span className="stella-sidebar__footer-icon" aria-hidden="true">
-                {STELLA_ICON_DEVICE}
-              </span>
-            </div>
+            <span className="stella-sidebar__account-label">Alex</span>
           </div>
         </div>
       </div>

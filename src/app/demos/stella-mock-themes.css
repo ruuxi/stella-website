@@ -1,0 +1,96 @@
+/* ──────────────────────────────────────────────────────────────────────
+   Stella mock theme chrome — tokens are injected via inline style from
+   `stella-mock-theme-tokens.ts` (light palettes + soft/flat gradient).
+   Cozy keeps its own hard-coded palette.
+   ────────────────────────────────────────────────────────────────────── */
+
+.sam-root[data-theme] {
+  transition:
+    background-color 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sam-root[data-theme] .sam-window,
+.sam-root[data-theme] .sam-body-row {
+  transition:
+    background-color 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    background-image 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Mobile mini-window — themed shell (tokens from inline style). */
+.mini-window--self-mod[data-theme] {
+  height: clamp(480px, 68vh, 580px);
+  background:
+    var(--mock-window-gradient, none),
+    linear-gradient(180deg, var(--mini-bg-top) 0%, var(--mini-bg) 100%);
+  color: var(--mini-text-base);
+  border-color: var(--mini-border);
+  box-shadow:
+    0 24px 60px -18px rgba(15, 23, 42, 0.22),
+    0 6px 18px rgba(15, 23, 42, 0.12);
+  transition:
+    background 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mini-window--self-mod[data-theme] .mini-window__main {
+  background:
+    var(--mock-window-gradient, none),
+    linear-gradient(180deg, var(--mini-bg-top) 0%, var(--mini-bg) 100%);
+}
+
+.mini-window--self-mod[data-theme] .mini-composer {
+  background: var(--mini-surface);
+  border: 1px solid var(--mini-border-strong);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 color-mix(in oklch, white 42%, transparent);
+}
+
+.mini-window--self-mod[data-theme][data-color-mode="dark"] {
+  box-shadow:
+    0 24px 60px -18px rgba(0, 0, 0, 0.55),
+    0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.mini-window--self-mod[data-theme][data-color-mode="dark"] .mini-composer {
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 color-mix(in oklch, white 10%, transparent);
+}
+
+.mini-window--self-mod[data-theme] .mini-composer__btn {
+  background: var(--mini-accent-soft);
+  color: var(--mini-text-weak);
+}
+
+.mini-window--self-mod[data-theme] .mini-composer__send {
+  background: var(--mini-accent);
+  color: #fff;
+}
+
+.mini-window--self-mod[data-theme] .mini-sidebar__item--active {
+  background: var(--mini-accent-soft);
+  color: var(--mini-text-strong);
+}
+
+.mini-window--self-mod[data-theme] .mini-sidebar__item--active .mini-sidebar__item-icon {
+  color: var(--mini-text-strong);
+}
+
+.mini-window--self-mod[data-theme] .mini-sidebar__avatar {
+  background: var(--mini-accent-soft);
+  color: var(--mini-text-strong);
+}
+
+.mini-window--self-mod[data-theme] .mini-composer__placeholder {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--mini-text-weaker);
+  padding: 2px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

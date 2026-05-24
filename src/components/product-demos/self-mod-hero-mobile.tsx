@@ -14,14 +14,12 @@
  *   - cozy          → the whole window becomes the Mochi takeover
  */
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { type SectionKey } from "./stella-app-mock-types";
+import { resolveMobileSelfModThemeConfig } from "./stella-mock-theme";
+import { themeConfigToMiniWindowStyle } from "./stella-mock-theme-tokens";
 import {
-  STELLA_ICON_DEVICE,
   STELLA_ICON_HOUSE,
-  STELLA_ICON_PALETTE,
-  STELLA_ICON_PLUS_SQUARE,
-  STELLA_ICON_SETTINGS,
   STELLA_ICON_STORE,
   STELLA_ICON_USERS,
 } from "./stella-shell";
@@ -45,12 +43,21 @@ const KEY_TO_VARIANT: Partial<Record<SectionKey, Variant>> = {
 export function MobileSelfModMock() {
   const [active, setActive] = useState<SectionKey | null>(null);
   const variant: Variant = (active && KEY_TO_VARIANT[active]) || "default";
+  const mockThemeConfig = resolveMobileSelfModThemeConfig(variant);
+  const mockThemeStyle = useMemo(
+    () =>
+      mockThemeConfig ? themeConfigToMiniWindowStyle(mockThemeConfig) : undefined,
+    [mockThemeConfig],
+  );
 
   return (
     <div className="smhm">
       <div
         className="mini-window mini-window--self-mod"
-        data-theme="light"
+        style={mockThemeStyle}
+        data-theme={mockThemeConfig?.id}
+        data-color-mode={mockThemeConfig?.colorMode}
+        data-gradient-mode={mockThemeConfig?.gradientMode}
         data-variant={variant}
       >
         <div className="mini-window__titlebar">
@@ -143,28 +150,17 @@ function MiniSidebar({ variant }: { variant: Variant }) {
       ) : null}
 
       <nav className="mini-sidebar__nav" aria-label="Apps">
-        <SidebarItem icon={STELLA_ICON_HOUSE} label="Home" active />
+        <SidebarItem icon={STELLA_ICON_HOUSE} label="Home" />
+        <SidebarItem icon={STELLA_ICON_STORE} label="Store" />
         <SidebarItem icon={STELLA_ICON_USERS} label="Social" />
-        <SidebarItem icon={STELLA_ICON_PLUS_SQUARE} label="New App" />
       </nav>
 
       <div className="mini-sidebar__footer">
-        <SidebarItem icon={STELLA_ICON_STORE} label="Store" />
-        <div className="mini-sidebar__footer-row">
+        <div className="mini-sidebar__account-trigger">
           <span className="mini-sidebar__avatar" aria-hidden="true">
             J
           </span>
-          <div className="mini-sidebar__footer-actions">
-            <span className="mini-sidebar__footer-icon" aria-hidden="true">
-              {STELLA_ICON_PALETTE}
-            </span>
-            <span className="mini-sidebar__footer-icon" aria-hidden="true">
-              {STELLA_ICON_SETTINGS}
-            </span>
-            <span className="mini-sidebar__footer-icon" aria-hidden="true">
-              {STELLA_ICON_DEVICE}
-            </span>
-          </div>
+          <span className="mini-sidebar__account-label">Jordan</span>
         </div>
       </div>
     </aside>

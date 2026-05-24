@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
+import { FooterLegalLinks } from "@/components/footer-legal-links";
 import { SiteHeader } from "@/components/site-header";
 import "./pricing.css";
 
@@ -91,7 +92,7 @@ const footerGroups: {
   },
   {
     title: "Resources",
-    items: [{ label: "What's New", href: "/learn-more#whats-new" }],
+    items: [{ label: "What's New", href: "/learn-more/whats-new" }],
   },
   {
     title: "Community",
@@ -228,14 +229,7 @@ export default function Pricing() {
             />
             <span className="brand-text">Stella</span>
           </Link>
-          <ul className="legal-links">
-            <li>
-              <a href="/privacy">Privacy Policy</a>
-            </li>
-            <li>
-              <a href="/terms">Terms of Service</a>
-            </li>
-          </ul>
+          <FooterLegalLinks />
         </div>
         <div className="footer-columns">
           {footerGroups.map((group) => (

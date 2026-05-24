@@ -96,16 +96,17 @@ export function HomeStoryGrid() {
     targets.find((t) => t.key === activeKey) ?? targets[0];
   const activeSectionId = activeTarget.sectionId;
 
-  /** For each top-level section, what step is in view right now? Used
-   *  to drive multi-step mocks via the `step` prop. */
-  const activeStepBySection = useMemo(() => {
-    const map = new Map<StorySectionId, number>();
-    for (const section of sections) {
-      map.set(section.id, 0);
-    }
-    map.set(activeTarget.sectionId, activeTarget.stepIndex);
-    return map;
-  }, [sections, activeTarget]);
+  /** For each top-level section, what step is in view (or was last
+   *  in view)? Used to drive multi-step mocks via the `step` prop.
+   *  We persist the last step per section across renders so that when
+   *  the user scrolls *past* a multi-step section, that section's
+   *  mock keeps rendering its final step during the cross-fade — no
+   *  flash back to step 0 mid-transition. */
+  const lastStepBySectionRef = useRef<Map<StorySectionId, number>>(
+    new Map(sections.map((s) => [s.id, 0])),
+  );
+  lastStepBySectionRef.current.set(activeTarget.sectionId, activeTarget.stepIndex);
+  const activeStepBySection = lastStepBySectionRef.current;
 
   return (
     <div className="home-story" data-active-section={activeSectionId}>
@@ -241,9 +242,20 @@ function renderCopyColumn({
           data-step={target.stepIndex}
           data-active={isActive || undefined}
         >
-          <span className="story-section__eyebrow">{target.eyebrow}</span>
-          <h2 className="story-section__title">{target.title}</h2>
-          <div className="story-section__body">{target.body}</div>
+          {/* The copy is sticky-pinned within the section's scroll
+              runway so it stays in place while the user scrolls, then
+              swaps to the next section's copy at the end. See
+              `.story-section__copy` in `home-story.css`. */}
+          <div className="story-section__copy">
+            <span className="story-section__eyebrow">{target.eyebrow}</span>
+            <h2 className="story-section__title">{target.title}</h2>
+            <div className="story-section__body">{target.body}</div>
+            {target.section.footnote ? (
+              <p className="story-section__footnote">
+                {target.section.footnote}
+              </p>
+            ) : null}
+          </div>
 
           {/* Inline mock — only shows on narrow viewports via CSS. */}
           <div
@@ -258,12 +270,6 @@ function renderCopyColumn({
               step={target.stepIndex}
             />
           </div>
-
-          {target.section.footnote ? (
-            <p className="story-section__footnote">
-              {target.section.footnote}
-            </p>
-          ) : null}
         </section>,
       );
     }

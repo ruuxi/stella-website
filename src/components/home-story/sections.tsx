@@ -129,55 +129,73 @@ export const STORY_SECTIONS: ReadonlyArray<StorySection> = [
      * itself to match. */
     id: "customize",
     Mock: MockCustomize,
-    /* The intro copy stays put on the right while the user scrolls
-     * through every transformation on the left. Each step contributes
-     * a 3–6 word `mockTitle` that surfaces above the mock inside the
-     * blue gradient card — that's where the per-step user prompt
-     * lives now. */
-    sharedCopy: true,
+    /* Each step is its own scrolling section — the right-side copy
+     * changes alongside the mock so scrolling actually moves text,
+     * not just the active step indicator. The user prompt for the
+     * step still surfaces above the mock via `mockTitle`. */
     eyebrow: "Yours",
     title: <>An app that becomes you.</>,
-    body: (
-      <p>
-        Stella isn&apos;t a fixed app. Tell her what you want and she
-        rearranges herself — the layout, even brand-new tools — live, in
-        place, no rebuild.
-      </p>
-    ),
+    body: null,
     steps: [
       {
         id: "intro",
         eyebrow: "Yours",
         title: <>An app that becomes you.</>,
-        body: null,
+        body: (
+          <p>
+            Make Stella look how you want. Tabs, a dashboard, a whole
+            new app — just ask, and she becomes it.
+          </p>
+        ),
         mockTitle: "Show me what you can do",
       },
       {
         id: "header",
-        eyebrow: "\u201cGive me tabs at the top\u201d",
+        eyebrow: "Layout",
         title: <>Reshape the chrome.</>,
-        body: null,
+        body: (
+          <p>
+            Ask for tabs and they show up. Stella rearranges the window
+            to match the way you work.
+          </p>
+        ),
         mockTitle: "Give me tabs at the top",
       },
       {
         id: "messages",
-        eyebrow: "\u201cShow me my dashboard\u201d",
-        title: <>Turn chat into surfaces.</>,
-        body: null,
+        eyebrow: "Surfaces",
+        title: <>Turn chat into a dashboard.</>,
+        body: (
+          <p>
+            When a conversation outgrows the chat, Stella turns it into
+            a workspace — your day, laid out at a glance.
+          </p>
+        ),
         mockTitle: "Make me a dashboard",
       },
       {
         id: "createApp",
-        eyebrow: "\u201cBuild me a music app\u201d",
+        eyebrow: "New tools",
         title: <>And when she runs out of room, she builds new apps.</>,
-        body: null,
+        body: (
+          <p>
+            Need a music studio? A journal? A timer? Stella writes a
+            small custom app inside herself, ready to use immediately.
+          </p>
+        ),
         mockTitle: "Build me a music app",
       },
       {
         id: "cozy",
-        eyebrow: "\u201cMake a cozy home for my cat\u201d",
+        eyebrow: "Mood",
         title: <>Or a whole new mood.</>,
-        body: null,
+        body: (
+          <p>
+            Stella isn&apos;t just an interface — she&apos;s an
+            atmosphere. Ask for cozy, calm, or playful, and she becomes
+            it from background to font.
+          </p>
+        ),
         mockTitle: "Make a cozy home for my cat",
       },
     ],

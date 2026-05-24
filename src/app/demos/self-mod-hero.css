@@ -85,33 +85,14 @@
     0 30px 80px -32px rgba(15, 23, 42, 0.28),
     0 12px 36px -20px rgba(15, 23, 42, 0.14);
 
-  /* Stella theme tokens — scoped so the mock renders exactly like the
-     real desktop app without leaking into the rest of the marketing
-     site's design tokens. */
+  /* Typography + shared chrome — color tokens live on `.sam-root[data-theme]`
+     in `stella-mock-themes.css` so each transformation reads as a real
+     Stella desktop theme. Cozy keeps its own palette via `[data-cozy]`. */
   --font-family-sans: var(--font-sans), system-ui, sans-serif;
   --font-family-display: var(--font-display), Georgia, serif;
   --font-family-mono: var(--font-mono), ui-monospace, monospace;
 
-  --background: #f6f7fa;
-  --foreground: #161616;
-
-  --primary: #0f62fe;
-  --primary-foreground: #ffffff;
-  --accent: #0f62fe;
-
-  --text-strong: color-mix(in srgb, var(--foreground) 95%, transparent);
-  --text-base: color-mix(in srgb, var(--foreground) 75%, transparent);
-  --text-weak: color-mix(in srgb, var(--foreground) 50%, transparent);
-  --text-weaker: color-mix(in srgb, var(--foreground) 35%, transparent);
-
-  --border-strong: color-mix(in srgb, var(--foreground) 12%, transparent);
-  --border-base: color-mix(in srgb, var(--foreground) 8%, transparent);
-  --border-weak: color-mix(in srgb, var(--foreground) 5%, transparent);
-
-  --glass-bg: color-mix(in srgb, var(--background) 40%, transparent);
   --glass-blur: blur(40px) saturate(180%);
-
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
 
   --radius-md: 6px;
   --radius-lg: 8px;
@@ -156,19 +137,6 @@
 .self-mod-hero__stage-inner .sam-cozy {
   animation-duration: 0.55s !important;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
-}
-
-@media (prefers-color-scheme: dark) {
-  .self-mod-hero__stage-inner {
-    --background: #1a1a1d;
-    --foreground: #f2f4f8;
-    --primary: #78a9ff;
-    --primary-foreground: #161616;
-    --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.45);
-    box-shadow:
-      0 40px 120px -40px rgba(0, 0, 0, 0.7),
-      0 14px 50px -22px rgba(0, 0, 0, 0.5);
-  }
 }
 
 @media (max-width: 900px) {
@@ -216,36 +184,6 @@
   gap: 1.1rem;
 }
 
-/* Light theme — mirrors the real Stella desktop surface. */
-.mini-window--self-mod[data-theme="light"] {
-  --mini-bg: #f6f7fa;
-  --mini-bg-top: #fbfbfd;
-  --mini-sidebar-bg: #f1f2f5;
-  --mini-surface: #ffffff;
-  --mini-border: rgba(22, 22, 22, 0.08);
-  --mini-border-strong: rgba(22, 22, 22, 0.12);
-  --mini-text-strong: rgba(22, 22, 22, 0.95);
-  --mini-text-base: rgba(22, 22, 22, 0.75);
-  --mini-text-weak: rgba(22, 22, 22, 0.5);
-  --mini-text-weaker: rgba(22, 22, 22, 0.35);
-  --mini-accent: #161616;
-  --mini-accent-soft: rgba(22, 22, 22, 0.06);
-  --mini-user-bubble: rgba(22, 22, 22, 0.05);
-  --mini-user-bubble-border: rgba(22, 22, 22, 0.1);
-
-  height: clamp(480px, 68vh, 580px);
-  background: linear-gradient(180deg, var(--mini-bg-top) 0%, var(--mini-bg) 100%);
-  color: var(--mini-text-base);
-  border-color: var(--mini-border);
-  box-shadow:
-    0 24px 60px -18px rgba(15, 23, 42, 0.22),
-    0 6px 18px rgba(15, 23, 42, 0.12);
-  transition:
-    background 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
 /* Collapse the sidebar to icon-only rail — this mock is mobile-only. */
 .mini-window--self-mod .mini-window__body {
   grid-template-columns: 48px minmax(0, 1fr);
@@ -272,29 +210,14 @@
   gap: 0;
   padding: 8px 0;
 }
-.mini-window--self-mod .mini-sidebar__footer-row {
+.mini-window--self-mod .mini-sidebar__account-trigger {
   flex-direction: column;
   align-items: center;
   gap: 0;
-  padding-top: 4px;
+  padding: 4px 0;
 }
-.mini-window--self-mod .mini-sidebar__footer-actions {
-  flex-direction: column;
-  gap: 0;
-}
-
-/* Light-theme overrides for the sidebar so the active item + avatar
-   read in grayscale instead of the dusk theme's pink. */
-.mini-window--self-mod[data-theme="light"] .mini-sidebar__item--active {
-  background: var(--mini-accent-soft);
-  color: var(--mini-text-strong);
-}
-.mini-window--self-mod[data-theme="light"] .mini-sidebar__item--active .mini-sidebar__item-icon {
-  color: var(--mini-text-strong);
-}
-.mini-window--self-mod[data-theme="light"] .mini-sidebar__avatar {
-  background: rgba(22, 22, 22, 0.08);
-  color: var(--mini-text-strong);
+.mini-window--self-mod .mini-sidebar__account-label {
+  display: none;
 }
 
 /* Workspaces section — shown only in the "rail" variant. Small dots
@@ -336,11 +259,7 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-.mini-window--self-mod[data-theme="light"] .mini-window__main {
-  background: linear-gradient(180deg, var(--mini-bg-top) 0%, var(--mini-bg) 100%);
-}
-
-.mini-window--self-mod[data-theme="light"][data-variant="cozy"],
+.mini-window--self-mod[data-variant="cozy"],
 .mini-window--self-mod[data-variant="cozy"] {
   background:
     radial-gradient(95% 70% at 78% 105%, rgba(255, 255, 255, 0.08), transparent 60%),
@@ -357,34 +276,8 @@
   border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
-.mini-window--self-mod[data-theme="light"] .mini-composer {
-  background: var(--mini-surface);
-  border-color: var(--mini-border-strong);
-}
-
-.mini-window--self-mod[data-theme="light"] .mini-composer__btn {
-  background: rgba(22, 22, 22, 0.05);
-  color: var(--mini-text-weak);
-}
-
-.mini-window--self-mod[data-theme="light"] .mini-composer__send {
-  background: var(--mini-accent);
-  color: #fff;
-}
-
-.mini-window--self-mod[data-theme="light"] .mini-composer__mic {
+.mini-window--self-mod[data-theme] .mini-composer__mic {
   background: transparent;
-}
-
-.mini-window--self-mod[data-theme="light"] .mini-composer__placeholder {
-  flex: 1;
-  min-width: 0;
-  font-size: 13px;
-  color: var(--mini-text-weaker);
-  padding: 2px 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* ── Tabs strip ──────────────────────────────────────────────────── */

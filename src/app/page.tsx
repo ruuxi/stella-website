@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { DownloadButton } from "@/components/download-button";
+import { FooterLegalLinks } from "@/components/footer-legal-links";
 import { HeroMorphTitle } from "@/components/hero-morph-title";
 import { HeroStellaOrb } from "@/components/hero-stella-orb-dynamic";
 import { SiteHeader } from "@/components/site-header";
@@ -58,6 +59,10 @@ const features = [
     blurb: "Stella rides along in Chrome, ready to read or act on the page you're on.",
   },
   {
+    title: "Use your computer",
+    blurb: "Open apps, click, type, and get things done on your computer.",
+  },
+  {
     title: "Collaborate with friends",
     blurb: "Invite people in, create together, and share what you make.",
   },
@@ -98,7 +103,7 @@ const footerGroups: {
   },
   {
     title: "Resources",
-    items: [{ label: "What's New", href: "/learn-more#whats-new" }],
+    items: [{ label: "What's New", href: "/learn-more/whats-new" }],
   },
   {
     title: "Community",
@@ -233,14 +238,7 @@ export default function Home() {
             <span className="brand-text">Stella</span>
           </a>
 
-          <ul className="legal-links">
-            <li>
-              <a href="/privacy">Privacy Policy</a>
-            </li>
-            <li>
-              <a href="/terms">Terms of Service</a>
-            </li>
-          </ul>
+          <FooterLegalLinks />
         </div>
 
         <div className="footer-columns">

@@ -121,7 +121,6 @@ export function MobileShowcase() {
         {/* Right column: phone mockup (full height) */}
         <div className="mobile-showcase__phone-wrap">
           <div className="mobile-phone">
-            <div className="mobile-phone__notch" />
             <div className="mobile-phone__status-bar">
               <span className="mobile-phone__time">9:41</span>
               <div className="mobile-phone__status-icons">
@@ -135,10 +134,6 @@ export function MobileShowcase() {
               </div>
               <div className="mobile-phone__contact">
                 <span className="mobile-phone__name">Stella</span>
-                <span className="mobile-phone__status-text">
-                  <span className="mobile-phone__dot" />
-                  Connected to your PC
-                </span>
               </div>
             </div>
             <div className="mobile-phone__chat">
@@ -192,19 +187,11 @@ export function MobilePhoneVisual({
     return (
       <div className="mobile-phone-visual">
         <div className="mobile-phone mobile-phone--stella-app">
-          <div className="mobile-phone__notch" />
           <div className="mobile-phone__status-bar">
             <span className="mobile-phone__time">9:41</span>
             <div className="mobile-phone__status-icons">
               <Wifi size={11} />
               <span className="mobile-phone__battery" />
-            </div>
-          </div>
-          <div className="stella-app-header">
-            <div className="stella-app-header__nav">
-              <span className="stella-app-header__tab stella-app-header__tab--active">Chat</span>
-              <span className="stella-app-header__tab">Desktop</span>
-              <span className="stella-app-header__tab">Account</span>
             </div>
           </div>
           <div className="stella-app-chat">
@@ -242,7 +229,6 @@ export function MobilePhoneVisual({
     return (
       <div className="mobile-phone-visual">
         <div className="mobile-phone mobile-phone--discord">
-          <div className="mobile-phone__notch" />
           <div className="mobile-phone__status-bar">
             <span className="mobile-phone__time">9:41</span>
             <div className="mobile-phone__status-icons">
@@ -339,7 +325,6 @@ export function MobilePhoneVisual({
     return (
       <div className="mobile-phone-visual">
         <div className="mobile-phone mobile-phone--slack">
-          <div className="mobile-phone__notch" />
           <div className="mobile-phone__status-bar">
             <span className="mobile-phone__time">9:41</span>
             <div className="mobile-phone__status-icons">
@@ -428,7 +413,6 @@ export function MobilePhoneVisual({
     return (
       <div className="mobile-phone-visual">
         <div className="mobile-phone mobile-phone--telegram">
-          <div className="mobile-phone__notch" />
           <div className="mobile-phone__status-bar">
             <span className="mobile-phone__time">9:41</span>
             <div className="mobile-phone__status-icons">
@@ -497,7 +481,6 @@ export function MobilePhoneVisual({
     return (
       <div className="mobile-phone-visual">
         <div className="mobile-phone mobile-phone--teams">
-          <div className="mobile-phone__notch" />
           <div className="mobile-phone__status-bar">
             <span className="mobile-phone__time">9:41</span>
             <div className="mobile-phone__status-icons">
@@ -574,7 +557,6 @@ export function MobilePhoneVisual({
   return (
     <div className="mobile-phone-visual">
       <div className="mobile-phone mobile-phone--imessage">
-        <div className="mobile-phone__notch" />
         <div className="mobile-phone__status-bar">
           <span className="mobile-phone__time">9:41</span>
           <div className="mobile-phone__status-icons">
@@ -588,10 +570,6 @@ export function MobilePhoneVisual({
           </div>
           <div className="mobile-phone__contact">
             <span className="mobile-phone__name">Stella</span>
-            <span className="mobile-phone__status-text">
-              <span className="mobile-phone__dot" />
-              Connected to your PC
-            </span>
           </div>
         </div>
         <div className="mobile-phone__chat">

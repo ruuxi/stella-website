@@ -4,7 +4,7 @@
  * Mirrors `desktop/src/global/onboarding/panels/StellaAppMock.tsx` so the
  * website "Stella can transform itself" demo reads as the same product
  * users see in onboarding. The shell has a 170px brand-on-right sidebar
- * (Home / Social / New App + footer), an italic Cormorant home title
+ * (Home / Store / Social + account footer), an italic Cormorant home title
  * with category pills, and a pill composer at the bottom.
  *
  * Stages map to the desktop "transformation pills":
@@ -233,49 +233,42 @@
 .selfmod-shell__sidebar-footer {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 12px;
+  padding: 0 12px 8px;
+  margin-top: auto;
 }
 
-.selfmod-shell__footer-row {
+.selfmod-shell__account-trigger {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  padding: 4px 4px 0;
+  gap: 11px;
+  width: 100%;
+  min-width: 0;
+  padding: 8px 9px;
+  border-radius: 8px;
+  color: var(--selfmod-text);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
 }
 
-.selfmod-shell__footer-actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.selfmod-shell__footer-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
-  color: var(--selfmod-text-weak);
-}
-
-.selfmod-shell__footer-icon svg {
-  width: 14px;
-  height: 14px;
+.selfmod-shell__account-label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .selfmod-shell__account-avatar {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: oklch(0.88 0.06 250);
   color: oklch(0.32 0.05 250);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
   border: 1px solid oklch(0.78 0.05 250 / 0.5);
@@ -886,9 +879,9 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1px solid color-mix(in srgb, var(--selfmod-text) 28%, transparent);
-  background: color-mix(in srgb, var(--selfmod-foreground) 4%, transparent);
-  color: color-mix(in srgb, var(--selfmod-foreground) 75%, transparent);
+  border: none;
+  background: color-mix(in srgb, var(--selfmod-foreground) 6%, transparent);
+  color: color-mix(in srgb, var(--selfmod-foreground) 50%, transparent);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -897,7 +890,7 @@
 .selfmod-shell__composer-input {
   flex: 1;
   padding: 4px;
-  font-size: 13.5px;
+  font-size: 12.5px;
   color: var(--selfmod-text-weaker);
   opacity: 0.85;
 }
@@ -1123,11 +1116,32 @@ button.selfmod-shell__stage-chip:focus-visible {
   max-width: 14rem;
 }
 
-/* ── Stage-specific accent overrides ────────────────────────────── */
+/* ── Stage-specific theme overrides (light Stella desktop palettes) ─ */
+
+.selfmod-shell[data-stage="low"] {
+  --selfmod-accent: #4876d6;
+  --selfmod-accent-soft: rgba(72, 118, 214, 0.14);
+  --selfmod-foreground: rgba(64, 63, 83, 0.95);
+  --selfmod-text: rgba(64, 63, 83, 0.88);
+  --selfmod-text-weak: rgba(113, 111, 138, 0.78);
+  --selfmod-text-weaker: rgba(113, 111, 138, 0.52);
+  --selfmod-glass-bg: rgba(242, 248, 253, 0.72);
+  --selfmod-border-weak: rgba(64, 63, 83, 0.08);
+  --selfmod-border-strong: rgba(64, 63, 83, 0.12);
+  --selfmod-bg: rgba(231, 241, 251, 0.92);
+}
 
 .selfmod-shell[data-stage="medium"] {
-  --selfmod-accent: #1aa5ff;
-  --selfmod-accent-soft: rgba(26, 165, 255, 0.18);
+  --selfmod-accent: #8fbf8a;
+  --selfmod-accent-soft: rgba(143, 191, 138, 0.18);
+  --selfmod-foreground: rgba(219, 229, 212, 0.95);
+  --selfmod-text: rgba(219, 229, 212, 0.88);
+  --selfmod-text-weak: rgba(138, 160, 133, 0.82);
+  --selfmod-text-weaker: rgba(138, 160, 133, 0.58);
+  --selfmod-glass-bg: rgba(26, 34, 26, 0.72);
+  --selfmod-border-weak: rgba(219, 229, 212, 0.08);
+  --selfmod-border-strong: rgba(219, 229, 212, 0.14);
+  --selfmod-bg: rgba(16, 24, 15, 0.92);
 }
 
 .selfmod-shell[data-stage="high"] {

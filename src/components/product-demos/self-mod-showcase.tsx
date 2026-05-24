@@ -6,13 +6,9 @@ import { useViewportActivity } from "@/components/use-viewport-activity";
 import { CozyCatAvatar, CozyWidget } from "./cozy-cat";
 import { SELF_MOD_STAGES } from "./data";
 import {
-  STELLA_ICON_DEVICE,
   STELLA_ICON_HOUSE,
-  STELLA_ICON_PALETTE,
   STELLA_ICON_PLUS,
-  STELLA_ICON_PLUS_SQUARE,
   STELLA_ICON_SEND,
-  STELLA_ICON_SETTINGS,
   STELLA_ICON_STORE,
   STELLA_ICON_USERS,
 } from "./stella-shell";
@@ -95,7 +91,7 @@ export function SelfModificationShowcase() {
 
 /* ──────────────────────────────────────────────────────────────────────
  * Mock of the real Stella desktop shell — same 170px brand-on-right
- * sidebar, Home/Social/New App nav, italic Cormorant home title with
+ * sidebar, Home/Store/Social nav, italic Cormorant home title with
  * category pills + suggestions, and a pill composer at the bottom.
  *
  * Stages (low / medium / high) are the same three creation examples as
@@ -404,7 +400,7 @@ export function SelfModShell({
                 <span className="selfmod-shell__brand-text">Stella</span>
               </div>
               <nav className="selfmod-shell__nav">
-                <div className="selfmod-shell__nav-item active">
+                <div className="selfmod-shell__nav-item">
                   <span className="selfmod-shell__nav-icon">
                     {STELLA_ICON_HOUSE}
                   </span>
@@ -412,42 +408,26 @@ export function SelfModShell({
                 </div>
                 <div className="selfmod-shell__nav-item">
                   <span className="selfmod-shell__nav-icon">
-                    {STELLA_ICON_USERS}
-                  </span>
-                  <span>Social</span>
-                </div>
-                <div className="selfmod-shell__nav-item">
-                  <span className="selfmod-shell__nav-icon">
-                    {STELLA_ICON_PLUS_SQUARE}
-                  </span>
-                  <span>New App</span>
-                </div>
-              </nav>
-              <div className="selfmod-shell__sidebar-footer">
-                <div className="selfmod-shell__nav-item">
-                  <span className="selfmod-shell__nav-icon">
                     {STELLA_ICON_STORE}
                   </span>
                   <span>Store</span>
                 </div>
-                <div className="selfmod-shell__footer-row">
+                <div className="selfmod-shell__nav-item">
+                  <span className="selfmod-shell__nav-icon">
+                    {STELLA_ICON_USERS}
+                  </span>
+                  <span>Social</span>
+                </div>
+              </nav>
+              <div className="selfmod-shell__sidebar-footer">
+                <div className="selfmod-shell__account-trigger">
                   <span
                     className="selfmod-shell__account-avatar"
                     aria-hidden="true"
                   >
                     A
                   </span>
-                  <div className="selfmod-shell__footer-actions">
-                    <span className="selfmod-shell__footer-icon" aria-hidden="true">
-                      {STELLA_ICON_PALETTE}
-                    </span>
-                    <span className="selfmod-shell__footer-icon" aria-hidden="true">
-                      {STELLA_ICON_SETTINGS}
-                    </span>
-                    <span className="selfmod-shell__footer-icon" aria-hidden="true">
-                      {STELLA_ICON_DEVICE}
-                    </span>
-                  </div>
+                  <span className="selfmod-shell__account-label">Alex</span>
                 </div>
               </div>
             </div>

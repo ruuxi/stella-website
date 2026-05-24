@@ -414,7 +414,7 @@
   background: transparent;
   color: var(--cmock-text-strong);
   font-family: inherit;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.5;
 }
 
@@ -484,7 +484,7 @@
   min-height: 36px;
   padding: 12px 16px 4px;
   order: -1;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .cmock__form--expanded .cmock__toolbar {

@@ -68,9 +68,8 @@ export function MockCustomize({ step }: MockProps) {
   const active = CUSTOMIZE_STEP_TOGGLES[stepIndex] ?? null;
   const toggles: SectionToggles = {
     ...EMPTY_SECTION_TOGGLES,
-    /* Dashboard is a full surface: tabs up top, icon rail on the left,
-     * dense cards in the body. Header + messages fire together for
-     * that step so the mock reads as one coherent transformation. */
+    /* Dashboard is a full surface: tabs up top, no sidebar, dense cards
+     * in the body. Header + messages fire together for that step. */
     ...(active === "messages"
       ? { header: true, messages: true }
       : active

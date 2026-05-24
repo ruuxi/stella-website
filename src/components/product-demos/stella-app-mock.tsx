@@ -3,8 +3,8 @@
 /**
  * Stella App Mock — onboarding preview that mirrors the real desktop app.
  *
- * The default state reproduces the actual Stella surface: a 170px sidebar
- * (brand + Home/Social/New App + Store + avatar/icon footer) and a centered
+ * The default state reproduces the actual Stella surface: a 180px sidebar
+ * (brand + Home/Store/Social nav + account footer row) and a centered
  * with the italic Cormorant Garamond title, category pills, and a pill
  * composer — exactly what users see when they finish onboarding.
  *
@@ -14,12 +14,16 @@
  * completely Stella can remake itself.
  */
 
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import {
   EMPTY_SECTION_TOGGLES,
   type SectionKey,
   type SectionToggles,
 } from "./stella-app-mock-types";
+import {
+  resolveStellaMockThemeConfig,
+  themeConfigToSamRootStyle,
+} from "./stella-mock-theme-tokens";
 
 type SectionPill = {
   key: SectionKey;
@@ -182,8 +186,8 @@ const ICON_SEND = (
   </svg>
 );
 const ICON_PLUS = (
-  <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
-    <line x1="12" y1="5" x2="12" y2="19" />
+  <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.25} strokeLinecap="round">
+    <line x1="12" y1="6" x2="12" y2="18" />
     <line x1="5" y1="12" x2="19" y2="12" />
   </svg>
 );
@@ -201,10 +205,19 @@ const css = `
     flex-direction: column;
     position: relative;
   }
-  /* The horizontal sidebar+main row sits below the top shell bar.
-     Explicit opaque background so the codex-frame blue underneath
-     the mock can't bleed through (background:inherit on the shorthand
-     did not actually re-paint the sam-root fill here). */
+  .sam-window {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: var(--background);
+    background-image: var(--mock-window-gradient, none);
+  }
+  /* Sidebar + main fill the mock; the top shell bar overlays them. */
   .sam-body-row {
     flex: 1;
     min-height: 0;
@@ -213,30 +226,40 @@ const css = `
     position: relative;
     background: var(--background);
   }
-  /* Top shell bar — mirrors the desktop ShellTopBar: macOS traffic
-     lights on the left, sidebar/back-forward affordances next to them,
-     and a panel toggle on the right. Uses the same opaque surface as
-     the rest of the mock so it reads as part of the window chrome. */
+  /* Dashboard surface — tabs + cards only; sidebar collapses to 0
+     with a smooth width transition (handled by .sam-sidebar's own
+     width transition rule) so the change reads as Stella reshaping
+     the chrome in place, not a hard cut. */
+  .sam-body-row:has(.sam-body[data-modern="true"]) .sam-sidebar {
+    width: 0;
+    min-width: 0;
+    border-right-width: 0;
+  }
+  /* Top shell bar — mirrors the desktop ShellTopBar: absolute overlay
+     across the window, macOS traffic lights + sidebar toggle on the
+     left, panel toggle on the right. Transparent so the sidebar edge
+     can run flush to the top. */
   .sam-topbar {
-    flex-shrink: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 30px;
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 0 12px;
-    border-bottom: 1px solid var(--border-base);
-    background: var(--background);
-    position: relative;
+    background: transparent;
     z-index: 3;
   }
   .sam-traffic {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
   }
   .sam-traffic-dot {
-    width: 11px;
-    height: 11px;
+    width: 9px;
+    height: 9px;
     border-radius: 999px;
     background: var(--c, #c1c1c1);
     box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.15);
@@ -252,7 +275,6 @@ const css = `
     color: var(--text-weak);
   }
   .sam-topbar-icon-btn svg { width: 13px; height: 13px; }
-  .sam-topbar-icon-btn--disabled { opacity: 0.4; }
   .sam-topbar-spacer { flex: 1; }
   .sam-topbar-right {
     display: inline-flex;
@@ -288,25 +310,26 @@ const css = `
   .sam-root * { box-sizing: border-box; }
 
   /* ──────────────────────────────────────────
-     SIDEBAR — default: matches the real 170px
-     '.sidebar' with brand + nav + footer.
+     SIDEBAR — default: matches the real 180px
+     '.sidebar' with brand + nav + account footer.
      ────────────────────────────────────────── */
   .sam-sidebar {
-    width: 170px;
+    width: 180px;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
+    border-right: 1px solid var(--border-weak);
     overflow: hidden;
     position: relative;
     z-index: 2;
     transition: width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* Icon rail — collapsed sidebar for dashboard surfaces. Labels and
-     account chrome hide; nav icons stay centered in a narrow strip. */
+  /* Icon rail — collapsed sidebar when the workspace-rail pill is on.
+     Labels and account chrome hide; nav icons stay centered in a narrow strip. */
   .sam-sidebar[data-rail="true"] {
     width: 52px;
   }
@@ -315,8 +338,7 @@ const css = `
     padding: 18px 0 8px;
   }
   .sam-sidebar[data-rail="true"] .sam-sidebar-brand-text,
-  .sam-sidebar[data-rail="true"] .sam-nav-item > span:not(.sam-nav-icon),
-  .sam-sidebar[data-rail="true"] .sam-nav-item-tag {
+  .sam-sidebar[data-rail="true"] .sam-nav-item > span:not(.sam-nav-icon) {
     display: none;
   }
   .sam-sidebar[data-rail="true"] .sam-sidebar-nav {
@@ -328,18 +350,12 @@ const css = `
     border-radius: 8px;
   }
   .sam-sidebar[data-rail="true"] .sam-sidebar-footer,
-  .sam-sidebar[data-rail="true"] .sam-sidebar-footer-row {
+  .sam-sidebar[data-rail="true"] .sam-account-trigger {
     justify-content: center;
     padding-inline: 0;
   }
-  .sam-sidebar[data-rail="true"] .sam-sidebar-footer-row {
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-  }
-  .sam-sidebar[data-rail="true"] .sam-footer-actions {
-    flex-direction: column;
-    gap: 2px;
+  .sam-sidebar[data-rail="true"] .sam-account-label {
+    display: none;
   }
 
   .sam-sidebar-default {
@@ -360,15 +376,15 @@ const css = `
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 12px;
-    padding: 24px 16px 10px 28px;
+    gap: 11px;
+    padding: 12px 12px 10px 21px;
   }
   .sam-sidebar-brand-logo {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 17px;
-    height: 17px;
+    width: 19px;
+    height: 19px;
     flex-shrink: 0;
     opacity: 0.55;
   }
@@ -380,7 +396,7 @@ const css = `
   .sam-sidebar-brand-text {
     color: var(--text-weak);
     font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 450;
     font-style: italic;
     letter-spacing: -0.02em;
@@ -392,23 +408,49 @@ const css = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     flex-shrink: 0;
     border-radius: 50%;
     border: 1px solid var(--border-weak);
     background: oklch(0.88 0.06 250);
     color: oklch(0.32 0.05 250);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
+  }
+
+  .sam-account-trigger {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    min-width: 0;
+    padding: 8px 9px;
+    border-radius: var(--radius-md, 8px);
+    border: none;
+    background: transparent;
+    color: var(--text-base);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    cursor: default;
+  }
+
+  .sam-account-label {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .sam-sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    padding: 0 12px 12px;
+    gap: 1px;
+    padding: 0 12px;
     flex: 1;
     min-height: 0;
   }
@@ -416,33 +458,31 @@ const css = `
   .sam-nav-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
+    gap: 11px;
+    padding: 8px 9px;
     border-radius: var(--radius-md, 8px);
     background: transparent;
     border: none;
     color: var(--text-base);
     font-family: inherit;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
     text-align: left;
     width: 100%;
     cursor: default;
   }
   .sam-nav-item.active,
-  .sam-root:not([data-create-app]) .sam-nav-item--home,
   .sam-root[data-create-app] .sam-nav-item--studio {
     background: color-mix(in oklch, var(--foreground) 8%, transparent);
     color: var(--text-strong);
   }
   .sam-nav-item.active .sam-nav-icon,
-  .sam-root:not([data-create-app]) .sam-nav-item--home .sam-nav-icon,
   .sam-root[data-create-app] .sam-nav-item--studio .sam-nav-icon {
     color: var(--primary);
   }
 
-  /* "Music Studio" rail item — hidden until the user creates the app,
-     then slides in with a soft "New" tag to make the addition legible. */
+  /* "Music" rail item — hidden until the user creates the app, then
+     slides in so the sidebar reads as freshly extended. */
   .sam-nav-item--studio {
     max-height: 0;
     padding-top: 0;
@@ -464,67 +504,27 @@ const css = `
     opacity: 1;
     pointer-events: auto;
   }
-  .sam-nav-item-tag {
-    margin-left: auto;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 1px 6px;
-    border-radius: 999px;
-    background: color-mix(in oklch, var(--primary) 18%, transparent);
-    color: var(--primary);
-  }
 
   .sam-nav-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
     color: var(--text-weak);
   }
 
   .sam-nav-icon svg {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
   }
 
   .sam-sidebar-footer {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    padding: 12px;
-  }
-  .sam-sidebar-footer-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-    padding: 4px 4px 0;
-  }
-  .sam-footer-actions {
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
-  }
-  .sam-footer-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-    padding: 0;
-    border-radius: var(--radius-md, 8px);
-    border: 1px solid transparent;
-    background: transparent;
-    color: var(--text-weak);
-  }
-  .sam-footer-icon svg {
-    width: 14px;
-    height: 14px;
+    padding: 0 12px 8px;
+    margin-top: auto;
   }
 
   /* SIDEBAR — modern: dense workspace with project list & badges. */
@@ -622,8 +622,9 @@ const css = `
     display: flex;
     flex-direction: column;
     min-width: 0;
-    border-left: 1px solid var(--border-weak);
     border-top: 1px solid var(--border-weak);
+    padding-top: 30px;
+    box-sizing: border-box;
     position: relative;
   }
 
@@ -635,20 +636,28 @@ const css = `
     transition: height 0.3s ease;
   }
   .sam-header[data-modern="true"] {
-    height: 38px;
+    height: 34px;
     padding: 0;
     display: flex;
     align-items: stretch;
-    background: color-mix(in oklch, var(--foreground) 4%, transparent);
+    background: var(--background);
     border-bottom: 1px solid var(--border-weak);
     animation: samFadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
     overflow: hidden;
+  }
+  /* When tabs are on, the main column starts flush at the top of the
+     window (no 30px reservation for the absolute topbar) so the tab
+     strip sits on the same row as the traffic lights — leave room on
+     the left for the topbar's traffic lights + sidebar toggle. */
+  .sam-main:has(.sam-header[data-modern="true"]) {
+    padding-top: 0;
+    border-top: none;
   }
   .sam-tabs {
     display: flex;
     align-items: stretch;
     width: 100%;
-    padding: 6px 6px 0;
+    padding: 4px 6px 0 88px;
     gap: 1px;
   }
   .sam-tab {
@@ -681,16 +690,6 @@ const css = `
     margin-bottom: -1px;
     z-index: 1;
   }
-  .sam-tab.active::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 8px;
-    right: 8px;
-    height: 2px;
-    background: var(--primary);
-    border-radius: 0 0 2px 2px;
-  }
   .sam-tab-icon {
     width: 12px;
     height: 12px;
@@ -700,7 +699,7 @@ const css = `
     flex-shrink: 0;
     color: var(--text-weak);
   }
-  .sam-tab.active .sam-tab-icon { color: var(--primary); }
+  .sam-tab.active .sam-tab-icon { color: var(--text-strong); }
   .sam-tab-label {
     text-overflow: ellipsis;
     overflow: hidden;
@@ -724,7 +723,7 @@ const css = `
     line-height: 1;
   }
 
-  /* BODY — default: home content (centered title + category pills). */
+  /* BODY — default: home content (centered title + composer). */
   .sam-body {
     flex: 1;
     display: flex;
@@ -735,12 +734,11 @@ const css = `
     min-height: 0;
     overflow: hidden;
   }
-  /* Default home column: title + inline composer + plain-text category
-     footer pinned to the bottom — mirrors the real home-content
-     layout in the desktop app. */
+  /* Default home column: title + inline composer, biased slightly above
+     vertical center so the cluster reads higher in the mock frame. */
   .sam-body-default {
     display: grid;
-    grid-template-rows: 1fr auto 1fr auto;
+    grid-template-rows: 0.88fr auto 1.12fr;
     align-items: center;
     justify-items: center;
     width: 100%;
@@ -752,55 +750,17 @@ const css = `
   .sam-body-default::after {
     content: "";
   }
-  /* The {title, chips, composer} cluster sits in the middle auto row,
-     visually centered between the two 1fr spacer rows. Footer pills
-     occupy the last auto row, pinned to the bottom. */
+  /* Title + composer cluster sits in the middle auto row. */
   .sam-home-cluster {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 18px;
     width: 100%;
   }
-  .sam-home-context {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    width: 100%;
-    max-width: 480px;
-    padding: 0 4px;
-  }
-  .sam-home-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 3px 10px 3px 7px;
-    border-radius: 999px;
-    background: color-mix(in oklch, var(--background) 70%, transparent);
-    border: 1px dashed color-mix(in oklch, var(--foreground) 22%, transparent);
-    color: var(--text-base);
-    font-size: 11.5px;
-    font-weight: 500;
-    line-height: 1;
-  }
-  .sam-home-chip-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 14px;
-    height: 14px;
-    border-radius: 4px;
-    background: color-mix(in oklch, var(--foreground) 8%, transparent);
-    color: var(--text-base);
-  }
-  .sam-home-chip-icon svg { width: 9px; height: 9px; }
-  .sam-home-chip-label { font-weight: 600; }
-  .sam-home-chip-meta { color: var(--text-weak); font-weight: 400; }
   .sam-home-title {
     font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
-    font-size: clamp(1.4rem, 2.6vw, 2rem);
+    font-size: clamp(1.25rem, 2.2vw, 1.75rem);
     font-weight: 450;
     font-style: italic;
     letter-spacing: -0.03em;
@@ -816,39 +776,37 @@ const css = `
   .sam-home-composer {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
-    max-width: 480px;
-    min-height: 38px;
-    padding: 5px 8px;
-    background: var(--background);
+    max-width: 420px;
+    min-height: 34px;
+    padding: 4px 7px;
+    background: var(--panel-surface-bg);
+    border: 1px solid var(--panel-surface-border);
     border-radius: 999px;
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-md), var(--panel-surface-highlight);
+  }
+  .sam-home-composer .sam-composer-add,
+  .sam-home-composer .sam-composer-submit {
+    width: 22px;
+    height: 22px;
+  }
+  .sam-home-composer .sam-composer-add svg {
+    width: 13px;
+    height: 13px;
+  }
+  .sam-home-composer .sam-composer-submit svg {
+    width: 11px;
+    height: 11px;
+  }
+  .sam-home-composer .sam-composer-input {
+    font-size: 12px;
   }
 
-  /* Bottom composer-wrap stays for modern / create-app / cozy stages,
-     but on the default stage the composer lives inline (above), so
-     hide the floor-anchored one. */
-  .sam-root:not([data-create-app]) .sam-main:not(:has(.sam-body[data-modern="true"])) .sam-composer-wrap {
+  /* Default home uses the inline composer; dashboard and studio omit the
+     floor composer entirely. Cozy hides the whole main column anyway. */
+  .sam-root:not([data-create-app]) .sam-main .sam-composer-wrap {
     display: none;
-  }
-
-  /* Plain-text category footer pills — no boxy chrome, hover-only
-     emphasis. Matches .home-ideas-footer__pill on the desktop. */
-  .sam-home-footer-pills {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 18px;
-    padding-top: 24px;
-    width: 100%;
-  }
-  .sam-home-footer-pill {
-    padding: 4px 2px;
-    color: var(--text-weak);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0;
   }
 
   /* BODY — modern: dashboard surface (header row + card grid). */
@@ -1036,7 +994,7 @@ const css = `
      This is the "personalize the whole app" demo: a single toggle
      drastically transforms every surface, not just one panel.
      ══════════════════════════════════════════ */
-  .sam-root[data-cozy="true"] {
+  .sam-root[data-cozy="true"] .sam-window {
     background-color: #fbf2e1;
     background-image:
       radial-gradient(circle at 12% 22%, rgba(139, 105, 75, 0.08) 4px, transparent 5px),
@@ -1047,7 +1005,6 @@ const css = `
       radial-gradient(120% 90% at 80% 0%, rgba(232, 154, 152, 0.18), transparent 60%),
       radial-gradient(90% 80% at 0% 100%, rgba(212, 134, 154, 0.12), transparent 55%),
       linear-gradient(135deg, #fef3e2, #f5e1c4);
-    border-color: rgba(139, 105, 75, 0.25);
   }
   .sam-root[data-cozy="true"] .sam-main {
     border-color: rgba(139, 105, 75, 0.2);
@@ -1323,13 +1280,7 @@ const css = `
     grid-template-rows: auto 1fr auto;
     gap: 0;
     width: 100%;
-    background:
-      radial-gradient(
-        110% 60% at 50% 0%,
-        color-mix(in oklch, var(--primary) 5%, transparent),
-        transparent 70%
-      ),
-      var(--background);
+    background: var(--background);
     color: var(--text-base);
   }
 
@@ -1344,11 +1295,11 @@ const css = `
   }
   .sam-studio-identity { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   .sam-studio-eyebrow {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--primary);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--text-weaker);
   }
   .sam-studio-name {
     margin: 0;
@@ -1394,18 +1345,20 @@ const css = `
     letter-spacing: -0.01em;
   }
 
-  /* STAGE — arrange + inspector */
+  /* STAGE — full-width arrange surface */
   .sam-studio-stage {
-    display: grid;
-    grid-template-columns: 1fr 200px;
+    display: flex;
+    flex-direction: column;
     min-height: 0;
     overflow: hidden;
   }
   .sam-studio-arrange {
+    flex: 1;
     position: relative;
     display: flex;
     flex-direction: column;
     min-width: 0;
+    min-height: 0;
     overflow: hidden;
   }
 
@@ -1447,20 +1400,9 @@ const css = `
     top: 0;
     bottom: 0;
     width: 1px;
-    background: color-mix(in oklch, var(--primary) 75%, transparent);
+    background: color-mix(in oklch, var(--foreground) 55%, transparent);
     z-index: 3;
     pointer-events: none;
-  }
-  .sam-studio-playhead::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -3.5px;
-    width: 8px;
-    height: 8px;
-    border-radius: 2px;
-    background: var(--primary);
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 18%, transparent);
   }
 
   .sam-studio-tracks {
@@ -1480,14 +1422,26 @@ const css = `
   .sam-studio-track:last-child { border-bottom: none; }
 
   .sam-studio-track-head {
+    position: relative;
     display: grid;
     grid-template-columns: 1fr auto;
     grid-template-rows: auto auto;
     align-items: center;
     column-gap: 8px;
-    padding: 10px 12px;
+    padding: 10px 12px 10px 16px;
     border-right: 1px solid var(--border-weak);
     background: color-mix(in oklch, var(--foreground) 1.5%, transparent);
+  }
+  .sam-studio-track-head::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    width: 3px;
+    border-radius: 0 2px 2px 0;
+    background: var(--studio-accent);
+    opacity: 0.7;
   }
   .sam-studio-track-name {
     grid-column: 1;
@@ -1500,14 +1454,7 @@ const css = `
     color: var(--text-strong);
     letter-spacing: -0.005em;
   }
-  .sam-studio-track-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--studio-accent);
-    box-shadow: 0 0 0 2px color-mix(in oklch, var(--studio-accent) 22%, transparent);
-    flex-shrink: 0;
-  }
+  .sam-studio-track-dot { display: none; }
   .sam-studio-track-instrument {
     grid-column: 1;
     grid-row: 2;
@@ -1562,17 +1509,10 @@ const css = `
     position: absolute;
     top: 8px;
     bottom: 8px;
-    border-radius: 6px;
-    background: linear-gradient(
-      180deg,
-      color-mix(in oklch, var(--studio-accent) 22%, transparent),
-      color-mix(in oklch, var(--studio-accent) 14%, transparent)
-    );
-    border: 1px solid color-mix(in oklch, var(--studio-accent) 38%, transparent);
-    box-shadow:
-      0 1px 0 color-mix(in oklch, white 22%, transparent) inset,
-      0 4px 12px -8px color-mix(in oklch, var(--studio-accent) 50%, transparent);
-    color: var(--studio-accent);
+    border-radius: 4px;
+    background: color-mix(in oklch, var(--studio-accent) 16%, var(--background));
+    border: 1px solid color-mix(in oklch, var(--studio-accent) 32%, transparent);
+    color: color-mix(in oklch, var(--studio-accent) 78%, var(--foreground));
     overflow: hidden;
     transform-origin: left center;
     animation: samStudioRegion 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -1582,87 +1522,6 @@ const css = `
     width: 100%;
     height: 100%;
     display: block;
-  }
-
-  /* INSPECTOR */
-  .sam-studio-inspector {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 18px 18px 18px 16px;
-    border-left: 1px solid var(--border-weak);
-    background: color-mix(in oklch, var(--foreground) 2%, transparent);
-    overflow: hidden;
-  }
-  .sam-studio-card {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    background: var(--background);
-    border: 1px solid var(--border-strong);
-    box-shadow: var(--shadow-md);
-  }
-  .sam-studio-card-eyebrow {
-    font-size: 8.5px;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--primary);
-  }
-  .sam-studio-card-title {
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--text-strong);
-    line-height: 1.35;
-    letter-spacing: -0.005em;
-  }
-  .sam-studio-card-prompt {
-    font-family: var(--font-family-display, "Cormorant Garamond", Georgia, serif);
-    font-style: italic;
-    font-size: 13px;
-    color: var(--text-weak);
-    line-height: 1.35;
-    letter-spacing: -0.005em;
-  }
-
-  .sam-studio-knobs {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-  .sam-studio-knob {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-  }
-  .sam-studio-knob-dial {
-    position: relative;
-    width: 44px;
-    height: 44px;
-    color: var(--primary);
-  }
-  .sam-studio-knob-dial svg { width: 100%; height: 100%; display: block; }
-  .sam-studio-knob-readout {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-family-mono, ui-monospace, monospace);
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-strong);
-    font-variant-numeric: tabular-nums;
-  }
-  .sam-studio-knob-label {
-    font-size: 9.5px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text-weak);
   }
 
   /* TRANSPORT */
@@ -1693,10 +1552,9 @@ const css = `
   .sam-studio-tx--play {
     width: 40px;
     height: 40px;
-    background: var(--primary);
-    color: var(--primary-foreground);
-    border-color: var(--primary);
-    box-shadow: 0 6px 18px color-mix(in oklch, var(--primary) 38%, transparent);
+    background: var(--text-strong);
+    color: var(--background);
+    border-color: var(--text-strong);
   }
   .sam-studio-time {
     display: inline-flex;
@@ -1726,11 +1584,7 @@ const css = `
     width: 3px;
     height: var(--meter-h);
     border-radius: 1px;
-    background: linear-gradient(
-      0deg,
-      color-mix(in oklch, var(--primary) 70%, transparent),
-      color-mix(in oklch, var(--primary) 95%, transparent)
-    );
+    background: color-mix(in oklch, var(--foreground) 50%, transparent);
     animation: samStudioMeter 1.4s ease-in-out infinite alternate;
   }
   .sam-studio-meter-bar:nth-child(2) { animation-delay: 0.08s; }
@@ -1772,10 +1626,11 @@ const css = `
   .sam-composer {
     width: 100%;
     max-width: 480px;
-    background: var(--background);
+    background: var(--panel-surface-bg);
+    border: 1px solid var(--panel-surface-border);
     border-radius: 999px;
-    box-shadow: var(--shadow-md);
-    transition: border-radius 0.3s ease;
+    box-shadow: var(--shadow-md), var(--panel-surface-highlight);
+    transition: border-radius 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     overflow: hidden;
   }
   .sam-composer-form {
@@ -1790,9 +1645,9 @@ const css = `
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    border: 1px solid color-mix(in oklch, var(--text-base) 28%, transparent);
-    background: color-mix(in oklch, var(--foreground) 4%, transparent);
-    color: var(--text-base);
+    border: none;
+    background: color-mix(in oklch, var(--foreground) 6%, transparent);
+    color: var(--text-weak);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1802,7 +1657,7 @@ const css = `
     flex: 1;
     padding: 4px 4px;
     font-family: inherit;
-    font-size: 13.5px;
+    font-size: 12.5px;
     color: var(--text-strong);
   }
   .sam-composer-input-placeholder {
@@ -1839,7 +1694,6 @@ const css = `
     z-index: 4;
     display: none;
     overflow: hidden;
-    border-radius: 12px;
     color: #f1f2f5;
     font-family: var(--font-family-sans, system-ui);
     background:
@@ -2265,8 +2119,6 @@ const STELLA_GLYPH = (
   </svg>
 );
 
-const HOME_CATEGORIES = ["Stella", "Task", "Explore", "Schedule"] as const;
-
 /* Tabs rendered when the `header` toggle is ON. Reads as a multi-context
  * workspace where Stella keeps several conversations/apps alive at once. */
 const TAB_ICON = (d: string) => (
@@ -2427,7 +2279,7 @@ const STUDIO_TRACKS: StudioTrack[] = [
   {
     label: "Drums",
     instrument: "Kit · Analog",
-    color: "#0f62fe",
+    color: "#c97a6b",
     regions: [
       { start: 0, length: 4, points: [50, 80, 30, 90, 45, 85, 35, 95, 50, 80, 30, 88, 42, 90, 35, 92] },
       { start: 4, length: 4, points: [55, 82, 32, 88, 48, 86, 38, 94, 52, 78, 34, 90, 44, 92, 38, 95] },
@@ -2436,7 +2288,7 @@ const STUDIO_TRACKS: StudioTrack[] = [
   {
     label: "Bass",
     instrument: "Sub · Mono",
-    color: "#9c5bff",
+    color: "#5b6b95",
     regions: [
       { start: 0, length: 6, points: [55, 60, 65, 70, 60, 55, 50, 60, 70, 75, 65, 55, 50, 60, 70, 65] },
     ],
@@ -2444,7 +2296,7 @@ const STUDIO_TRACKS: StudioTrack[] = [
   {
     label: "Pads",
     instrument: "Strings · Soft",
-    color: "#37c2a4",
+    color: "#7a9279",
     regions: [
       { start: 1, length: 3, points: [40, 45, 50, 55, 60, 58, 55, 52, 50, 48, 50, 55, 58, 60, 55, 50] },
       { start: 4, length: 4, points: [45, 50, 55, 60, 65, 62, 58, 55, 52, 50, 52, 55, 58, 60, 58, 55] },
@@ -2453,7 +2305,7 @@ const STUDIO_TRACKS: StudioTrack[] = [
   {
     label: "Lead",
     instrument: "Synth · Lyrical",
-    color: "#ff8a4c",
+    color: "#c79556",
     regions: [
       { start: 2, length: 2, points: [30, 60, 80, 70, 50, 70, 85, 60, 40, 65, 80, 70, 50, 60, 75, 55] },
       { start: 5, length: 3, points: [40, 70, 85, 75, 55, 65, 80, 70, 45, 60, 75, 80, 60, 50, 70, 65] },
@@ -2652,58 +2504,34 @@ export function StellaAppMock({
   );
 
   const anyActive = Object.values(toggles).some(Boolean);
+  const mockThemeConfig = resolveStellaMockThemeConfig(toggles);
+  const mockThemeStyle = useMemo(
+    () =>
+      mockThemeConfig ? themeConfigToSamRootStyle(mockThemeConfig) : undefined,
+    [mockThemeConfig],
+  );
 
   return (
     <>
       <style>{css}</style>
       <div
         className="sam-root"
+        style={mockThemeStyle}
         data-interactive={interactive || undefined}
         data-any-active={interactive ? String(anyActive) : undefined}
+        data-theme={mockThemeConfig?.id}
+        data-color-mode={mockThemeConfig?.colorMode}
+        data-gradient-mode={mockThemeConfig?.gradientMode}
+        data-gradient-color={mockThemeConfig?.gradientColor}
         data-cozy={toggles.composer || undefined}
         data-create-app={toggles.createApp || undefined}
       >
-        {/* TOP SHELL BAR — traffic lights + sidebar/back/forward
-            (left) and panel toggle (right), same chrome as the real
-            desktop app's ShellTopBar. */}
-        <div className="sam-topbar" aria-hidden="true">
-          <span className="sam-traffic">
-            <span className="sam-traffic-dot" style={{ ["--c" as string]: "#ff5f57" }} />
-            <span className="sam-traffic-dot" style={{ ["--c" as string]: "#febc2e" }} />
-            <span className="sam-traffic-dot" style={{ ["--c" as string]: "#28c840" }} />
-          </span>
-          <span className="sam-topbar-icon-btn" title="Toggle sidebar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="4" width="18" height="16" rx="2" />
-              <path d="M9 4v16" />
-            </svg>
-          </span>
-          <span className="sam-topbar-icon-btn sam-topbar-icon-btn--disabled">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-          </span>
-          <span className="sam-topbar-icon-btn sam-topbar-icon-btn--disabled">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 6l6 6-6 6" />
-            </svg>
-          </span>
-          <span className="sam-topbar-spacer" />
-          <span className="sam-topbar-right">
-            <span className="sam-topbar-icon-btn" title="Toggle panel">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="4" width="18" height="16" rx="2" />
-                <path d="M15 4v16" />
-              </svg>
-            </span>
-          </span>
-        </div>
-
+        <div className="sam-window">
         <div className="sam-body-row">
         {/* SIDEBAR ─────────────────────────────────────────────── */}
         <aside
           className="sam-sidebar"
-          data-rail={toggles.messages || undefined}
+          data-rail={toggles.sidebar || undefined}
         >
           <div className="sam-sidebar-default">
             <div className="sam-sidebar-header" />
@@ -2721,38 +2549,25 @@ export function StellaAppMock({
                 <span>Home</span>
               </button>
               <button type="button" className="sam-nav-item">
-                <span className="sam-nav-icon">{ICON_USERS}</span>
-                <span>Social</span>
+                <span className="sam-nav-icon">{ICON_STORE}</span>
+                <span>Store</span>
               </button>
               <button type="button" className="sam-nav-item">
-                <span className="sam-nav-icon">{ICON_PLUS_SQUARE}</span>
-                <span>New App</span>
+                <span className="sam-nav-icon">{ICON_USERS}</span>
+                <span>Social</span>
               </button>
               <button type="button" className="sam-nav-item sam-nav-item--studio">
                 <span className="sam-nav-icon">{ICON_MUSIC}</span>
                 <span>Music</span>
-                <span className="sam-nav-item-tag" aria-hidden="true">New</span>
               </button>
             </nav>
             <div className="sam-sidebar-footer">
-              <button type="button" className="sam-nav-item">
-                <span className="sam-nav-icon">{ICON_STORE}</span>
-                <span>Store</span>
+              <button type="button" className="sam-account-trigger">
+                <span className="sam-account-avatar" aria-hidden="true">
+                  A
+                </span>
+                <span className="sam-account-label">Alex</span>
               </button>
-              <div className="sam-sidebar-footer-row">
-                <span className="sam-account-avatar" aria-hidden="true">A</span>
-                <div className="sam-footer-actions">
-                  <button type="button" className="sam-footer-icon" aria-label="Theme">
-                    {ICON_PALETTE}
-                  </button>
-                  <button type="button" className="sam-footer-icon" aria-label="Settings">
-                    {ICON_SETTINGS}
-                  </button>
-                  <button type="button" className="sam-footer-icon" aria-label="Connect">
-                    {ICON_DEVICE}
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -2879,39 +2694,10 @@ export function StellaAppMock({
             data-create-app={toggles.createApp || undefined}
           >
             <div className="sam-body-default">
-              {/* {title, context chips, composer} are clustered and
-                  vertically centered in the column. The footer pills
-                  remain pinned to the bottom via their own margin. */}
               <div className="sam-home-cluster">
                 <h1 className="sam-home-title">
                   What can I do for you today?
                 </h1>
-
-                {/* Auto-detected context chips (active window / tab)
-                    sit directly above the composer, matching the real
-                    home content's `ComposerContextRow`. */}
-                <div className="sam-home-context" aria-hidden="true">
-                  <span className="sam-home-chip">
-                    <span className="sam-home-chip-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="3" y="4" width="18" height="14" rx="2" />
-                        <path d="M3 9h18" />
-                      </svg>
-                    </span>
-                    <span className="sam-home-chip-label">Chrome</span>
-                    <span className="sam-home-chip-meta">Pricing — Linear</span>
-                  </span>
-                  <span className="sam-home-chip">
-                    <span className="sam-home-chip-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="4" y="3" width="16" height="18" rx="2" />
-                        <path d="M8 7h8M8 11h8M8 15h5" />
-                      </svg>
-                    </span>
-                    <span className="sam-home-chip-label">Notion</span>
-                    <span className="sam-home-chip-meta">Q3 launch plan</span>
-                  </span>
-                </div>
 
                 <div className="sam-home-composer">
                   <span className="sam-composer-add" aria-hidden="true">
@@ -2926,16 +2712,6 @@ export function StellaAppMock({
                     {ICON_SEND}
                   </span>
                 </div>
-              </div>
-
-              {/* Plain-text category footer pills — no boxy chrome, no
-                  inline suggestion list, matches `home-ideas-footer`. */}
-              <div className="sam-home-footer-pills">
-                {HOME_CATEGORIES.map((label) => (
-                  <span key={label} className="sam-home-footer-pill">
-                    {label}
-                  </span>
-                ))}
               </div>
             </div>
 
@@ -2991,8 +2767,8 @@ export function StellaAppMock({
                 {/* TOPBAR — project identity, transport-adjacent meta. */}
                 <div className="sam-studio-topbar">
                   <div className="sam-studio-identity">
-                    <span className="sam-studio-eyebrow">Built just now</span>
-                    <h2 className="sam-studio-name">Untitled Track</h2>
+                    <span className="sam-studio-eyebrow">Untitled project</span>
+                    <h2 className="sam-studio-name">Late-night drive</h2>
                   </div>
                   <div className="sam-studio-meta">
                     <div className="sam-studio-meta-item">
@@ -3010,7 +2786,7 @@ export function StellaAppMock({
                   </div>
                 </div>
 
-                {/* TIMELINE + INSPECTOR */}
+                {/* TIMELINE */}
                 <div className="sam-studio-stage">
                   <div className="sam-studio-arrange">
                     <span className="sam-studio-playhead" aria-hidden="true" />
@@ -3098,58 +2874,6 @@ export function StellaAppMock({
                       ))}
                     </div>
                   </div>
-
-                  {/* INSPECTOR */}
-                  <aside className="sam-studio-inspector">
-                    <div className="sam-studio-card">
-                      <div className="sam-studio-card-eyebrow">Generated by Stella</div>
-                      <div className="sam-studio-card-title">
-                        Late-night drive · lo-fi keys, soft kick
-                      </div>
-                      <div className="sam-studio-card-prompt">
-                        &ldquo;something I can write to&rdquo;
-                      </div>
-                    </div>
-
-                    <div className="sam-studio-knobs">
-                      {[
-                        { label: "Warmth", value: 0.72 },
-                        { label: "Air", value: 0.46 },
-                        { label: "Reverb", value: 0.58 },
-                      ].map((knob) => (
-                        <div key={knob.label} className="sam-studio-knob">
-                          <div className="sam-studio-knob-dial">
-                            <svg viewBox="0 0 36 36">
-                              <circle
-                                cx="18"
-                                cy="18"
-                                r="14"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeOpacity="0.12"
-                                strokeWidth="2.5"
-                              />
-                              <circle
-                                cx="18"
-                                cy="18"
-                                r="14"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                                strokeDasharray={`${knob.value * 88} 88`}
-                                transform="rotate(-220 18 18)"
-                              />
-                            </svg>
-                            <span className="sam-studio-knob-readout">
-                              {Math.round(knob.value * 100)}
-                            </span>
-                          </div>
-                          <span className="sam-studio-knob-label">{knob.label}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </aside>
                 </div>
 
                 {/* TRANSPORT */}
@@ -3317,6 +3041,33 @@ export function StellaAppMock({
               </svg>
             </button>
           </footer>
+        </div>
+        </div>
+
+        {/* TOP SHELL BAR — traffic lights + sidebar toggle (left)
+            and panel toggle (right), overlaid like the real desktop
+            ShellTopBar. */}
+        <div className="sam-topbar" aria-hidden="true">
+          <span className="sam-traffic">
+            <span className="sam-traffic-dot" style={{ ["--c" as string]: "#ff5f57" }} />
+            <span className="sam-traffic-dot" style={{ ["--c" as string]: "#febc2e" }} />
+            <span className="sam-traffic-dot" style={{ ["--c" as string]: "#28c840" }} />
+          </span>
+          <span className="sam-topbar-icon-btn" title="Toggle sidebar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path d="M9 4v16" />
+            </svg>
+          </span>
+          <span className="sam-topbar-spacer" />
+          <span className="sam-topbar-right">
+            <span className="sam-topbar-icon-btn" title="Toggle panel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4" width="18" height="16" rx="2" />
+                <path d="M15 4v16" />
+              </svg>
+            </span>
+          </span>
         </div>
         </div>
 
