@@ -8,6 +8,67 @@ export type ChangelogEntry = {
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: "May 23, 2026",
+    tags: ["New", "Polish"],
+    features: [
+      "Locked computer use — Stella can now keep computer-control work more contained when needed.",
+      "General settings now includes a macOS font-smoothing toggle.",
+      "Stella state moved into your home folder, making local app data more predictable across installs.",
+    ],
+    fixes: [
+      "Chat now auto-focuses the composer, with softer focus styling.",
+      "Sidebar navigation and the account footer were reorganized for a cleaner layout.",
+      "The feedback prompt now only appears once.",
+      "The workspace strip stays hidden on Home where it does not belong.",
+      "Connector cleanup is more reliable after a connected-app session ends.",
+      "Windows startup, shutdown, and background worker reliability improved.",
+      "Onboarding no longer overflows the viewport, and global shortcuts pause during onboarding demos.",
+      "Settings and app startup are faster.",
+      "Native helper release publishing and installer launch paths were fixed.",
+    ],
+  },
+  {
+    date: "May 22, 2026",
+    tags: ["New", "Polish"],
+    features: [
+      "Composer now has a New Chat action.",
+      "The display sidebar can open straight into a launcher from Home.",
+      "The phone Connect dialog now starts with a clearer two-step download + pair flow.",
+      "Discover is simpler: one compact mixed stream instead of a wall of chips.",
+    ],
+    fixes: [
+      "Chat feels steadier: fewer message flashes, better queued-message cleanup, fewer resize loops, and no double-jump after follow-ups.",
+      "Streaming text and emoji rendering are smoother and stay local.",
+      "The working indicator no longer gets stuck after resuming.",
+      "Onboarding completion now persists correctly.",
+      "Updates refresh native helpers and stop chasing personal skill state.",
+      "Mobile connector follow-ups work more reliably.",
+      "Shell and composer glass surfaces are faster, with lighter tint-only panels.",
+      "Composer add menu was reordered and simplified.",
+      "Display sidebar delete confirmation is simpler, and fresh Discover reports get a subtle unread dot.",
+    ],
+  },
+  {
+    date: "May 21, 2026",
+    tags: ["New", "Polish"],
+    features: [
+      "New Engine onboarding phase for technical users.",
+      "The workspace strip got overflow actions and a clearer Open panel for suggestions and discovery.",
+      "Pearl is now the default desktop theme for new users, with Pearl made whiter and Noir made blacker.",
+      "The \"Hey Stella\" wake word model was updated.",
+    ],
+    fixes: [
+      "Onboarding capabilities, theme, engine, and permissions flows got a broad polish pass.",
+      "The Engine onboarding phase now shows Stella correctly and advances without lag.",
+      "Chat typography is lighter and more consistent, with tighter message sizing and smoother working indicators.",
+      "Radial capture no longer creates duplicate thumbnails, and removed composer capture context was restored.",
+      "Desktop Google sign-in uses a more reliable callback flow.",
+      "Update install prompts and changed-file inspection are clearer.",
+      "Top shell/sidebar spacing, update pill typography, and shell breakpoint animations were tightened.",
+      "A window-listener leak was fixed.",
+    ],
+  },
+  {
     date: "May 20, 2026",
     tags: ["New", "Polish"],
     features: [
@@ -17,6 +78,7 @@ export const changelogEntries: ChangelogEntry[] = [
       "Canvas previews use compact tab-style chips instead of bulky rail thumbnails.",
       "The chat surface is getting a workspace strip, so conversation-specific work can stay easier to find.",
       "Workspace section toggles now live in the Open card header, closer to the work they control.",
+      "Media and Canvas tabs got calmer, more useful empty/loading states and cleaner history controls.",
     ],
     fixes: [
       "Stella shuts down and updates more reliably.",
@@ -32,6 +94,10 @@ export const changelogEntries: ChangelogEntry[] = [
       "Streaming chat messages no longer re-fade after they finish.",
       "Media tab errors now show as toasts instead of awkward inline text.",
       "The sidebar footer is cleaner, without the extra divider or sticky selected state on the toggle.",
+      "Expanded display-panel chat better matches the main chat width.",
+      "The workspace strip stays visible in expanded display-panel chat.",
+      "The Store tab inside the display sidebar has a calmer publish flow.",
+      "The display sidebar confirmation flow was tidied up.",
     ],
   },
   {
