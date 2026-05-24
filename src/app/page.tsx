@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { Github } from "lucide-react";
 import { DownloadButton } from "@/components/download-button";
 import { FooterLegalLinks } from "@/components/footer-legal-links";
 import { HeroMorphTitle } from "@/components/hero-morph-title";
@@ -134,7 +135,16 @@ export default function Home() {
             <div className="hero-stack__cta reveal reveal-delay-2">
               <DownloadButton />
               <p className="hero-research-note">
-                Private. Open source.
+                Private.{" "}
+                <a
+                  className="hero-research-note__link"
+                  href="https://github.com/ruuxi/stella"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open source.
+                  <Github size={14} aria-hidden="true" />
+                </a>
               </p>
             </div>
           </div>

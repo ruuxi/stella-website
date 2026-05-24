@@ -607,6 +607,9 @@ html[data-embedded="true"] .site-header {
 }
 
 .hero-research-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
   margin: 0;
   color: var(--page-muted);
   font-family: var(--font-sans), system-ui, sans-serif;
@@ -614,6 +617,20 @@ html[data-embedded="true"] .site-header {
   font-style: italic;
   letter-spacing: -0.005em;
   text-align: center;
+}
+
+.hero-research-note__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: inherit;
+  opacity: 0.72;
+  transition: opacity 160ms ease, color 160ms ease;
+}
+
+.hero-research-note__link:hover {
+  color: var(--page-foreground);
+  opacity: 1;
 }
 
 /* pi.dev-style hero pitch — long sentence headline. Two block lines;
