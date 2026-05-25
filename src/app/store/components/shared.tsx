@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { useState } from "react";
 import { X } from "lucide-react";
 import { resolveStoreAuthorDisplay } from "../lib/format";
 import type { StoreBadge } from "../lib/types";
@@ -218,36 +218,18 @@ export function EmptyState({
   );
 }
 
-/** Skeleton card matching `.store-card` geometry exactly. */
-export function StoreSkeletonCard({ index = 0 }: { index?: number }) {
+export function StoreLoadingSpinner({
+  compact = false,
+}: {
+  compact?: boolean;
+}) {
   return (
     <div
-      className="store-skeleton-card"
-      style={{ "--i": index } as CSSProperties}
-      aria-hidden="true"
+      className={`store-loading${compact ? " store-loading--compact" : ""}`}
+      aria-busy="true"
+      aria-live="polite"
     >
-      <div className="store-skeleton-card-main">
-        <div className="store-skeleton-icon" />
-        <div className="store-skeleton-body">
-          <div className="store-skeleton-line store-skeleton-line--name" />
-          <div className="store-skeleton-line store-skeleton-line--desc" />
-          <div className="store-skeleton-line store-skeleton-line--short" />
-        </div>
-      </div>
-      <div className="store-skeleton-footer">
-        <div className="store-skeleton-chip" />
-        <div className="store-skeleton-pill" />
-      </div>
-    </div>
-  );
-}
-
-export function SkeletonGrid({ count = 6 }: { count?: number }) {
-  return (
-    <div className="store-grid" aria-busy="true" aria-live="polite">
-      {Array.from({ length: count }).map((_, i) => (
-        <StoreSkeletonCard key={i} index={i} />
-      ))}
+      <span className="store-loading-spinner" aria-hidden="true" />
     </div>
   );
 }

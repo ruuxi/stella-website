@@ -37,7 +37,7 @@ import {
   EmptyState,
   PackageArtwork,
   StoreModal,
-  StoreSkeletonCard,
+  StoreLoadingSpinner,
 } from "../components/shared";
 
 export function CreateEmojiPackDialog({
@@ -481,11 +481,7 @@ export function EmojisTab() {
         </div>
       ) : null}
       {isLoadingFirstPage ? (
-        <div className="emoji-pack-grid" aria-busy="true" aria-live="polite">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <StoreSkeletonCard key={index} index={index} />
-          ))}
-        </div>
+        <StoreLoadingSpinner />
       ) : visiblePacks.length === 0 ? (
         <div className="emoji-page-empty">
           {trimmedSearch ? "No packs match that search." : "No community packs yet."}
@@ -522,12 +518,7 @@ export function EmojisTab() {
               data-loading={isLoadingMore || undefined}
               aria-hidden="true"
             >
-              {isLoadingMore ? (
-                <>
-                  <StoreSkeletonCard index={0} />
-                  <StoreSkeletonCard index={1} />
-                </>
-              ) : null}
+              {isLoadingMore ? <StoreLoadingSpinner compact /> : null}
             </div>
           ) : null}
         </section>

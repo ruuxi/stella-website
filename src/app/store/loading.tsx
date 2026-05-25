@@ -1,10 +1,10 @@
 import { SiteHeader } from "@/components/site-header";
-import { SkeletonGrid } from "./components/shared";
+import { StoreLoadingSpinner } from "./components/shared";
 import "./store.css";
 
 /**
  * Route-level loading shell. Renders the store layout chrome with a
- * content-shaped skeleton grid so the page never paints empty before
+ * centered loading spinner so the page never paints empty before
  * Convex resolves. Embedded desktop webview hides the marketing
  * header via `data-embedded="true"`.
  */
@@ -24,7 +24,7 @@ export default function StoreLoading() {
         </div>
         <div className="store-scroll">
           <div className="store-section">
-            <SkeletonGrid count={6} />
+            <StoreLoadingSpinner />
           </div>
         </div>
       </main>

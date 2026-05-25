@@ -27,7 +27,7 @@ import { isStoreUpdateAvailable } from "../lib/format";
 import type { NativeIntegration, StoreCategory, StoreInstall, StorePackage } from "../lib/types";
 import {
   EmptyState,
-  SkeletonGrid,
+  StoreLoadingSpinner,
   StoreWebHeader,
   useIsEmbeddedWebsite,
 } from "../components/shared";
@@ -341,7 +341,7 @@ export function StoreClientInner() {
 
   // Lazy-mount Pets/Emojis on first visit, then keep them mounted so their
   // Convex subscriptions and scroll state persist across tab switches. Without
-  // this, returning to a tab tears down its queries and re-renders skeletons.
+  // this, returning to a tab tears down its queries and re-renders the spinner.
   const [mountedTabs, setMountedTabs] = useState<Set<string>>(
     () => new Set([activeTab]),
   );
@@ -451,7 +451,7 @@ export function StoreClientInner() {
               />
             ) : null}
             {!allPackages ? (
-              <SkeletonGrid />
+              <StoreLoadingSpinner />
             ) : rest.length === 0 ? (
               <EmptyState
                 icon={

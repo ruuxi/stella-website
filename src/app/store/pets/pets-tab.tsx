@@ -61,7 +61,7 @@ import {
   EmptyState,
   PackageArtwork,
   StoreModal,
-  StoreSkeletonCard,
+  StoreLoadingSpinner,
 } from "../components/shared";
 
 export function CreatePetDialog({
@@ -898,11 +898,7 @@ export function PetsTab() {
         </div>
       ) : null}
       {isLoadingFirstPage ? (
-        <div className="store-grid" aria-busy="true" aria-live="polite">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <StoreSkeletonCard key={index} index={index} />
-          ))}
-        </div>
+        <StoreLoadingSpinner />
       ) : visiblePets.length === 0 ? (
         <div className="pets-empty">
           No pets match that filter. Try a different tag or clear the search.
@@ -939,10 +935,7 @@ export function PetsTab() {
               aria-hidden="true"
             >
               {isLoadingMore || isLoadingMoreUserPets ? (
-                <>
-                  <StoreSkeletonCard index={0} />
-                  <StoreSkeletonCard index={1} />
-                </>
+                <StoreLoadingSpinner compact />
               ) : null}
             </div>
           ) : null}

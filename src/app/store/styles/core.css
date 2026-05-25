@@ -1078,86 +1078,47 @@
   max-width: 300px;
 }
 
-/* --- Loading placeholders ---
-   Shared primitives (`.loading-text`, `.loading-block`, keyframes)
-   live in `globals.css` so non-store pages can use them. Cards below
-   mirror real `.store-card` geometry so content lands without layout
-   shift. */
+/* --- Loading --- */
 
-.store-skeleton-card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  height: 100%;
-  min-height: 116px;
-  padding: 12px;
-  border-radius: 14px;
-  background: color-mix(in oklch, var(--foreground) 2%, transparent);
-  border: 1px solid color-mix(in oklch, var(--foreground) 5%, transparent);
-  animation: loading-pulse 1.6s ease-in-out infinite;
-  animation-delay: calc(var(--i, 0) * 80ms);
-}
-
-.store-skeleton-card-main {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  flex: 1;
-  min-height: 0;
-}
-
-.store-skeleton-icon {
-  width: 58px;
-  height: 58px;
-  border-radius: 14px;
-  flex: 0 0 auto;
-  background: color-mix(in oklch, var(--foreground) 8%, transparent);
-}
-
-.store-skeleton-body {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
-  min-width: 0;
-  padding-top: 6px;
-}
-
-.store-skeleton-line {
-  height: 10px;
-  border-radius: 5px;
-  background: color-mix(in oklch, var(--foreground) 8%, transparent);
-}
-
-.store-skeleton-line--name { width: 55%; height: 12px; }
-.store-skeleton-line--desc { width: 92%; }
-.store-skeleton-line--short { width: 60%; }
-
-.store-skeleton-footer {
+.store-loading {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 520px;
+  padding: 64px 24px;
 }
 
-.store-skeleton-chip {
-  height: 16px;
-  width: 88px;
-  border-radius: 999px;
-  background: color-mix(in oklch, var(--foreground) 6%, transparent);
+.store-loading--compact {
+  min-height: 120px;
+  padding: 32px 24px;
 }
 
-.store-skeleton-pill {
-  height: 28px;
-  width: 64px;
-  border-radius: var(--radius-full);
-  background: color-mix(in oklch, var(--foreground) 8%, transparent);
+.emoji-page-sentinel .store-loading,
+.pets-grid-sentinel .store-loading {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+.store-loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid color-mix(in oklch, var(--foreground) 10%, transparent);
+  border-top-color: var(--text-weaker);
+  border-radius: 50%;
+  animation: store-spin 0.85s linear infinite;
+}
+
+@keyframes store-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .store-skeleton-card {
+  .store-loading-spinner {
     animation: none;
-    opacity: 0.85;
+    opacity: 0.65;
   }
 }
 

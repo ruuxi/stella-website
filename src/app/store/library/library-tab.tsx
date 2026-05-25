@@ -13,7 +13,7 @@ import type {
   StoreInstall,
   StorePackage,
 } from "../lib/types";
-import { EmptyState, StoreSkeletonCard } from "../components/shared";
+import { EmptyState, StoreLoadingSpinner } from "../components/shared";
 import { isStoreUpdateAvailable } from "../lib/format";
 import { useEmojiBridge, usePetBridge } from "../lib/use-store-bridge";
 import { PetCard, PetDetailsDialog } from "../pets/pets-tab";
@@ -255,11 +255,7 @@ function LibrarySection({
         <span className="library-section-count">{count}</span>
       </div>
       {loading ? (
-        <div className="store-grid" aria-busy="true" aria-live="polite">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <StoreSkeletonCard key={index} index={index} />
-          ))}
-        </div>
+        <StoreLoadingSpinner compact />
       ) : count === 0 ? (
         <div className="library-section-empty">{empty}</div>
       ) : (
