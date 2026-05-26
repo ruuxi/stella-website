@@ -162,6 +162,12 @@ export type DesktopStoreBridge = {
     packageId: string;
     releaseNumber: number;
   }) => Promise<StoreInstall | null>;
+  showToast?: (payload: {
+    title?: string;
+    description?: string;
+    variant?: "default" | "success" | "error" | "loading";
+    duration?: number;
+  }) => Promise<unknown>;
   listInstalledMods: () => Promise<StoreInstall[]>;
   uninstallPackage?: (packageId: string) => Promise<unknown>;
   installPet?: (payload: { pet: PublicPet }) => Promise<unknown>;

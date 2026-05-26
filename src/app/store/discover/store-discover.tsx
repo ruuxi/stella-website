@@ -226,6 +226,12 @@ export function StoreClientInner() {
     const bridge = getDesktopStoreBridge();
     if (!bridge?.requestPackageInstall) return;
     setInstallingId(pkg.packageId);
+    setPendingInstall(null);
+    void bridge.showToast?.({
+      title: "Installing",
+      description: "Stella is installing in the background.",
+      variant: "loading",
+    });
     try {
       const installRecord = await bridge.requestPackageInstall({
         packageId: pkg.packageId,
@@ -243,7 +249,18 @@ export function StoreClientInner() {
           installedAt: Date.now(),
         },
       ]);
-      setPendingInstall(null);
+      void bridge.showToast?.({
+        title: "Installed",
+        description: `${pkg.displayName} is ready.`,
+        variant: "success",
+      });
+    } catch (error) {
+      void bridge.showToast?.({
+        title: "Install failed",
+        description:
+          error instanceof Error ? error.message : "Stella couldn't install it.",
+        variant: "error",
+      });
     } finally {
       setInstallingId(null);
     }

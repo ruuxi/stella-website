@@ -229,14 +229,54 @@
  * force horizontal scroll.
  */
 .markdown [data-streamdown="table-wrapper"] {
-  /* Outer card collapses to invisible — inner border already frames the table. */
-  border-color: transparent;
-  background: transparent;
+  margin: 1rem 0;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--border-weak, var(--border));
+  border-radius: 10px;
+  background: color-mix(in oklch, var(--background) 94%, var(--foreground) 6%);
   padding: 0;
 }
 
+.markdown [data-streamdown="table-wrapper"] > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-weak, var(--border));
+  background: color-mix(in oklch, var(--foreground) 3%, transparent);
+}
+
+.markdown [data-streamdown="table-wrapper"] button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-weak, var(--muted-foreground));
+  cursor: pointer;
+}
+
+.markdown [data-streamdown="table-wrapper"] button:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--foreground) 7%, transparent);
+  color: var(--text-strong, var(--foreground));
+}
+
+.markdown [data-streamdown="table-wrapper"] > div:last-child {
+  overflow-x: auto;
+  background: var(--background);
+}
+
 .markdown [data-streamdown="table"] {
+  width: 100%;
+  border-collapse: collapse;
   font-size: 14px;
+  line-height: 1.45;
 }
 
 .markdown [data-streamdown="table-header-cell"],
@@ -245,10 +285,24 @@
    * sideways for any table with multi-word headers — wrap instead. */
   white-space: normal;
   vertical-align: top;
+  padding: 8px 12px;
+  text-align: left;
+  border-top: 1px solid var(--border-weak, var(--border));
+}
+
+.markdown [data-streamdown="table-header"] [data-streamdown="table-row"]:first-child
+  [data-streamdown="table-header-cell"] {
+  border-top: 0;
 }
 
 .markdown [data-streamdown="table-header-cell"] {
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
   color: var(--text-strong, var(--foreground));
+  font-weight: 600;
+}
+
+.markdown [data-streamdown="table-cell"] {
+  color: var(--text-base, var(--foreground));
 }
 
 /* Images */
