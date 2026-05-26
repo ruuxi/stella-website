@@ -15,11 +15,13 @@ export default function StoreLoading() {
       <main className="store-root" data-tab="discover" aria-busy="true">
         <div className="store-web-shell">
           <header className="store-web-header">
-            <nav className="store-web-tabs" aria-label="Store sections">
-              <span className="store-web-tab" data-active="true">Discover</span>
-              <span className="store-web-tab">Pets</span>
-              <span className="store-web-tab">Emojis</span>
-            </nav>
+            <div className="store-web-header-main">
+              <nav className="store-web-tabs" aria-label="Store sections">
+                <span className="store-web-tab" data-active="true">Discover</span>
+                <span className="store-web-tab">Pets</span>
+                <span className="store-web-tab">Emojis</span>
+              </nav>
+            </div>
           </header>
         </div>
         <div className="store-scroll">

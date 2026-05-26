@@ -271,10 +271,20 @@
  * same `StoreWebHeader` component; the hosted site overrides this with the
  * page-aware palette and a bottom border. */
 .store-web-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 14px;
   padding: 12px 20px;
+}
+
+.store-web-header-main {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* Reset the standalone-tabs treatment when tabs live inside the header
@@ -286,9 +296,9 @@
 }
 
 .store-web-header-search {
-  flex: 1 1 280px;
+  flex: 0 1 380px;
   min-width: 0;
-  max-width: 380px;
+  width: min(380px, 42vw);
 }
 
 .store-web-header-search .store-search {
@@ -298,7 +308,8 @@
 }
 
 .store-web-upload-cta {
-  margin-left: auto;
+  grid-column: 3;
+  justify-self: end;
   flex-shrink: 0;
   font-family: inherit;
   font-size: 12.5px;

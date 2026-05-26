@@ -268,12 +268,11 @@ export function StoreWebTabs({
 
 /**
  * Single-row page header for both hosted and embedded views: section
- * tabs sit on the left, optional search input grows in the middle, and
- * the Upload CTA pins to the right. The eyebrow, h1 title, lead
- * paragraph, and separate Upload button that used to stack above the
- * content are all collapsed into this one row — the route + tab
- * already tells the user they're in the Store, so the h1 was just
- * repeating itself.
+ * tabs and optional search sit centered as one group, and the Upload
+ * CTA pins to the right. The eyebrow, h1 title, lead paragraph, and
+ * separate Upload button that used to stack above the content are all
+ * collapsed into this one row — the route + tab already tells the user
+ * they're in the Store, so the h1 was just repeating itself.
  */
 export function StoreWebHeader({
   activeTab,
@@ -290,10 +289,12 @@ export function StoreWebHeader({
 }) {
   return (
     <header className="store-web-header">
-      <StoreWebTabs activeTab={activeTab} onSelectTab={onSelectTab} />
-      {searchSlot ? (
-        <div className="store-web-header-search">{searchSlot}</div>
-      ) : null}
+      <div className="store-web-header-main">
+        <StoreWebTabs activeTab={activeTab} onSelectTab={onSelectTab} />
+        {searchSlot ? (
+          <div className="store-web-header-search">{searchSlot}</div>
+        ) : null}
+      </div>
       {showUpload ? (
         <button
           className="store-web-upload-cta"

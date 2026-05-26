@@ -84,14 +84,14 @@ html:not([data-embedded="true"]) .store-web-shell {
   padding: clamp(1.25rem, 2.5vw, 2rem) var(--page-margin) 0;
 }
 
-/* Single-row page header: tabs on the left, search grows in the
- * middle, Upload pins to the right. Replaces the old eyebrow + h1 +
- * lead + separate tab row + separate search/filter row stack. */
+/* Single-row page header: tabs + search centered as one group, Upload
+ * pins to the right. Replaces the old eyebrow + h1 + lead + separate
+ * tab row + separate search/filter row stack. */
 html:not([data-embedded="true"]) .store-web-header {
-  display: flex;
-  align-items: center;
   gap: 16px;
   margin-bottom: 12px;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 html:not([data-embedded="true"]) .store-web-header .store-web-tabs {
@@ -106,9 +106,9 @@ html:not([data-embedded="true"]) .store-web-header .store-web-tabs {
 }
 
 html:not([data-embedded="true"]) .store-web-header-search {
-  flex: 1 1 320px;
+  flex: 0 1 440px;
+  width: min(440px, 42vw);
   min-width: 0;
-  max-width: 440px;
   display: flex;
   align-items: center;
 }
@@ -141,18 +141,25 @@ html:not([data-embedded="true"]) .store-web-upload-cta:hover {
 
 @media (max-width: 720px) {
   html:not([data-embedded="true"]) .store-web-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 12px;
+  }
+
+  html:not([data-embedded="true"]) .store-web-header-main {
+    grid-column: 1 / -1;
     flex-wrap: wrap;
-    gap: 12px;
+    justify-content: center;
   }
 
   html:not([data-embedded="true"]) .store-web-header-search {
-    flex-basis: 100%;
-    max-width: none;
-    order: 3;
+    flex: 1 1 100%;
+    width: 100%;
   }
 
   html:not([data-embedded="true"]) .store-web-upload-cta {
-    margin-left: auto;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
   }
 }
 
