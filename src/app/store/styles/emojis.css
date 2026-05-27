@@ -250,6 +250,53 @@
   gap: 12px;
 }
 
+@media (max-width: 640px) {
+  .emoji-page {
+    padding: 16px 18px 40px;
+    gap: 16px;
+  }
+
+  .emoji-page-heading {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  .emoji-page-toolbar {
+    gap: 10px;
+  }
+
+  .emoji-page-search {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .emoji-page-toolbar-actions {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .emoji-pack-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .emoji-pack-card {
+    padding: 10px 12px;
+    gap: 12px;
+  }
+
+  .emoji-pack-cover {
+    width: 56px;
+    height: 56px;
+  }
+
+  .emoji-pack-cover-img {
+    width: 48px;
+    height: 48px;
+  }
+}
+
 .emoji-pack-card {
   display: grid;
   grid-template-columns: auto 1fr auto;

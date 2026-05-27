@@ -266,6 +266,48 @@
   color: var(--text-strong);
 }
 
+/* Narrow viewports: ease the dialog backdrop padding and inner gutters
+ * so dialogs (install confirm, share, pet detail, emoji detail) read as
+ * fullish-screen sheets instead of cramped cards. */
+@media (max-width: 520px) {
+  .store-web-dialog-backdrop {
+    padding: 12px;
+  }
+
+  .store-web-dialog {
+    border-radius: 14px;
+    padding: 20px;
+  }
+
+  .store-install-dialog-header {
+    padding: 18px 18px 14px;
+    gap: 12px;
+  }
+
+  .store-install-dialog-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+  }
+
+  .store-install-dialog-icon-letter {
+    font-size: 20px;
+  }
+
+  .store-install-dialog-viewer {
+    padding: 14px 18px;
+  }
+
+  .store-install-dialog-actions {
+    padding: 12px 18px 16px;
+    flex-wrap: wrap;
+  }
+
+  .store-install-dialog-actions > * {
+    flex: 1 1 auto;
+  }
+}
+
 /* Base layout for the consolidated Store header (tabs · search · Upload).
  * Both the hosted marketing site and the embedded desktop view render the
  * same `StoreWebHeader` component; the hosted site overrides this with the
@@ -980,12 +1022,35 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    gap: 18px;
+    margin-bottom: 24px;
   }
   .store-detail-meta {
     justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px 18px;
   }
   .store-detail-actions {
     justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@container store (max-width: 420px) {
+  .store-detail-image {
+    width: 104px;
+    height: 104px;
+    border-radius: 24px;
+  }
+  .store-detail-image-letter {
+    font-size: 44px;
+  }
+  .store-detail-name {
+    font-size: 24px;
+  }
+  .store-action-btn--lg {
+    padding: 9px 22px;
+    font-size: 14px;
   }
 }
 
@@ -1060,6 +1125,18 @@
   padding: 64px 24px;
   text-align: center;
   animation: store-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@container store (max-width: 520px) {
+  .store-empty {
+    min-height: 360px;
+    padding: 40px 20px;
+  }
+
+  .store-loading {
+    min-height: 320px;
+    padding: 40px 20px;
+  }
 }
 
 .store-empty-icon {

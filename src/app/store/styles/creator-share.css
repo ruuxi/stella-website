@@ -671,6 +671,42 @@
   }
 }
 
+/* Mobile-friendly Pets layout: drop the heavy desktop gutters, let the
+ * toolbar wrap naturally (search full-width on one row, sort + create
+ * row below), and keep two pet cards per row so sprites stay roomy. */
+@media (max-width: 640px) {
+  .pets-page {
+    padding: 16px 18px 40px;
+    gap: 16px;
+  }
+
+  .pets-page-heading {
+    flex-wrap: wrap;
+    align-items: baseline;
+    row-gap: 4px;
+  }
+
+  .pets-toolbar {
+    gap: 10px;
+  }
+
+  .pets-search {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .pets-toolbar-actions {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .pets-card-sprite {
+    height: 84px;
+  }
+}
+
 .pets-card-wrapper {
   position: relative;
 }
@@ -885,4 +921,16 @@
   font-size: 13px;
   color: var(--text-weak);
   padding: 12px 0;
+}
+
+@media (max-width: 640px) {
+  .library-page {
+    padding: 16px 18px 40px;
+    gap: 22px;
+  }
+
+  .library-page-heading {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
 }
