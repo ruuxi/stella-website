@@ -44,43 +44,56 @@ html {
   scrollbar-gutter: stable;
 }
 
-/* The site background lives entirely on `body` (+ `body::before` for the
- * fixed top highlight). Body persists across App Router navigations, so
- * the gradient stack is painted once at first load and never re-painted
- * when the user moves between routes.
- *
- * Per-page wrappers (`.stella-page`, `.legal-doc-page`, etc.) are
- * intentionally transparent — they show body through. The only override
- * is embedded mode below, which clears body so the desktop webview's
- * canvas shows through instead. */
+/* The site sits on a flat `--page-background` color; ambient
+ * decoration lives in `<PageBackground />` (fixed to the viewport),
+ * which paints a top blue wash + three blurred elongated triangles.
+ * Per-page wrappers (`.stella-page`, `.legal-doc-page`, etc.) stay
+ * transparent so the body color + PageBackground show through. */
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, var(--page-glow-cyan), transparent 28%),
-    radial-gradient(circle at 82% 10%, var(--page-glow-blue), transparent 26%),
-    radial-gradient(circle at 50% 100%, var(--page-glow-mint), transparent 30%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.18)),
-    var(--page-background);
+  background: var(--page-background);
   color: var(--page-foreground);
   font-family: var(--font-sans), sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Top highlight + soft top-down vignette, locked to the viewport so it
- * keeps reading as "ambient light from above" no matter how far the
- * user scrolls. Persists across navigations because `body` does. */
-body::before {
-  content: "";
+.page-background {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.45), transparent 35%),
-    linear-gradient(180deg, rgba(12, 22, 38, 0.035), rgba(12, 22, 38, 0));
   pointer-events: none;
+  overflow: hidden;
+}
+
+/* Soft blue wash anchored to the top of the viewport. Fades out around
+ * halfway through the home hero (hero is `min-height: calc(100svh -
+ * 4rem)`), then disappears entirely before the page mock below it. */
+.page-background__wash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 55svh;
+  background: linear-gradient(
+    180deg,
+    rgba(79, 159, 218, 0.32) 0%,
+    rgba(79, 159, 218, 0.18) 45%,
+    rgba(79, 159, 218, 0) 100%
+  );
+}
+
+/* Three rounded-triangle blurs that drift across the upper band of
+ * the page. Sized to roughly the same vertical region as the wash so
+ * the whole composition reads as one cohesive band of color. */
+.page-background__blurs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70svh;
 }
 
 a {
@@ -123,7 +136,7 @@ html[data-embedded="true"] body {
   color: var(--embedded-fg, var(--page-foreground));
 }
 
-html[data-embedded="true"] body::before {
+html[data-embedded="true"] .page-background {
   display: none;
 }
 
@@ -276,7 +289,7 @@ html[data-embedded="true"] .site-header {
 
 .site-nav a,
 .site-nav button.site-nav__signin {
-  padding: 0.48rem 0.7rem;
+  padding: 0.48rem 0.62rem;
   color: rgba(18, 18, 15, 0.68);
   font-size: 0.78rem;
   font-weight: 700;
@@ -379,7 +392,7 @@ html[data-embedded="true"] .site-header {
   background: rgba(18, 18, 15, 0.05);
 }
 
-@media (max-width: 720px) {
+@media (max-width: 860px) {
   .site-nav__inline {
     display: none;
   }
@@ -495,21 +508,31 @@ html[data-embedded="true"] .site-header {
   background: rgba(255, 255, 255, 0.92);
 }
 
-/* pi.dev-style centered hero: large orb on top, two-line italic
-   headline, soft subtitle, single CTA. Everything stacks centered
-   on a single grid cell. */
+/* Stripe-style hero: left pitch and right product-shot stack. */
 .hero-section {
   position: relative;
   align-items: center;
-  justify-items: center;
   min-height: calc(100svh - 4rem);
-  padding-top: clamp(3rem, 6vw, 6rem);
-  padding-bottom: clamp(3rem, 6vw, 6rem);
+  padding-top: clamp(3.2rem, 5.8vw, 6.1rem);
+  padding-bottom: clamp(2.4rem, 5vw, 5rem);
 }
 
 .hero-section > * {
   position: relative;
   z-index: 1;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  inset: 6% var(--page-margin) auto;
+  height: min(44vw, 31rem);
+  transform: skewY(-7deg);
+  transform-origin: 50% 0;
+  border-radius: 42px;
+  background:
+    linear-gradient(115deg, rgba(98, 176, 232, 0.2), rgba(27, 103, 205, 0.08) 44%, rgba(255, 255, 255, 0));
+  pointer-events: none;
 }
 
 /* Research-preview status — pinned to the hero's bottom-right corner
@@ -527,6 +550,143 @@ html[data-embedded="true"] .site-header {
   letter-spacing: -0.005em;
   text-align: right;
   pointer-events: none;
+}
+
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(0.82rem, 1.45vw, 1.1rem);
+}
+
+.hero-eyebrow {
+  margin: 0;
+  color: color-mix(in oklch, var(--page-accent) 82%, var(--page-foreground));
+  font-size: clamp(0.78rem, 0.9vw, 0.88rem);
+  font-weight: 820;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.hero-surface-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.72rem;
+  max-width: 48rem;
+  margin: -0.34rem 0 0.1rem;
+  color: rgba(15, 23, 40, 0.66);
+  font-size: clamp(0.78rem, 0.9vw, 0.9rem);
+  font-weight: 720;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+}
+
+.hero-surface-strip span {
+  flex: 0 0 auto;
+  color: rgba(15, 23, 40, 0.72);
+}
+
+.hero-surface-strip ul {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.32rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero-surface-strip li {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.55rem;
+  padding: 0.22rem 0.48rem 0.24rem;
+  border: 1px solid rgba(77, 104, 138, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.54);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68);
+  color: rgba(15, 23, 40, 0.62);
+  font-size: 0.72rem;
+  font-weight: 760;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+}
+
+.hero-copy h1 {
+  max-width: 12ch;
+  margin: 0;
+  color: var(--page-foreground);
+  font-family: var(--font-sans), sans-serif;
+  font-size: clamp(3rem, 5vw, 5.6rem);
+  font-weight: 850;
+  letter-spacing: -0.065em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+
+.hero-dek {
+  max-width: 44rem;
+  margin: 0;
+  color: rgba(15, 23, 40, 0.72);
+  font-size: clamp(1.04rem, 1.55vw, 1.34rem);
+  font-weight: 560;
+  letter-spacing: -0.035em;
+  line-height: 1.48;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.hero-actions .button--primary,
+.hero-actions .button--ghost {
+  align-self: center;
+  padding: 0.78rem 1.05rem;
+  border-radius: 999px;
+  font-size: 0.92rem;
+}
+
+.hero-proof-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.85rem, 1.4vw, 1.25rem);
+  width: 100%;
+  max-width: 47rem;
+  margin: clamp(0.6rem, 1.4vw, 1rem) 0 0;
+}
+
+.hero-proof-row div {
+  min-width: 0;
+  padding-top: 0.78rem;
+  border-top: 1px solid rgba(82, 104, 134, 0.24);
+}
+
+.hero-proof-row dt {
+  color: var(--page-foreground);
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+}
+
+.hero-proof-row dd {
+  margin: 0.22rem 0 0;
+  color: rgba(15, 23, 40, 0.58);
+  font-size: 0.78rem;
+  font-weight: 620;
+  letter-spacing: -0.02em;
+  line-height: 1.36;
+}
+
+.hero-product-column {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.72rem;
 }
 
 .hero-stack {
@@ -564,8 +724,8 @@ html[data-embedded="true"] .site-header {
 /* `.button--primary` defaults to `align-self: flex-start` so it hugs the
    left in left-aligned CTA columns. Inside the centered hero stack we
    want it centered like its siblings. */
-/* Hero download — Cormorant label on the same page-gradient wash as
-   `body`, with the site's standard corner radius. */
+/* Hero download — Cormorant label sized up. Inherits the saturated
+   blue `.button--primary` gradient so it pops against the blue wash. */
 .hero-stack__cta .button--primary {
   align-self: center;
   font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
@@ -574,29 +734,7 @@ html[data-embedded="true"] .site-header {
   font-size: 1.5rem;
   letter-spacing: -0.005em;
   padding: 0.7rem 1.85rem;
-  color: var(--page-accent);
-  /* Same gradient stack as `body` — opaque chip that reads as part of
-     the page wash, not a window through it. */
-  background:
-    radial-gradient(circle at top left, var(--page-glow-cyan), transparent 28%),
-    radial-gradient(circle at 82% 10%, var(--page-glow-blue), transparent 26%),
-    radial-gradient(circle at 50% 100%, var(--page-glow-mint), transparent 30%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.18)),
-    var(--page-background);
   border-radius: var(--page-radius);
-  border: 1px solid var(--page-border);
-  box-shadow: none;
-}
-
-.hero-stack__cta .button--primary:hover {
-  background:
-    radial-gradient(circle at top left, var(--page-glow-cyan), transparent 26%),
-    radial-gradient(circle at 82% 10%, var(--page-glow-blue), transparent 24%),
-    radial-gradient(circle at 50% 100%, var(--page-glow-mint), transparent 28%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.22)),
-    var(--page-background);
-  border-color: var(--page-border-strong);
-  box-shadow: none;
 }
 
 /* The Apple/Windows glyph next to the label sits a hair tighter and
@@ -709,6 +847,26 @@ html[data-embedded="true"] .site-header {
 }
 
 @media (max-width: 767px) {
+  .hero-section {
+    padding-top: clamp(2.7rem, 12vw, 4rem);
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(3rem, 15vw, 4.6rem);
+  }
+
+  .hero-surface-strip {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.48rem;
+    max-width: 24rem;
+  }
+
+  .hero-proof-row {
+    grid-template-columns: 1fr;
+    max-width: 24rem;
+  }
+
   .hero-stack__title h1.hero-pitch {
     font-size: clamp(1.8rem, 7vw, 2.6rem);
   }
@@ -1291,6 +1449,11 @@ html[data-embedded="true"] .site-header {
     grid-column: 1 / -1;
   }
 
+  .hero-copy,
+  .hero-product-column {
+    grid-column: 1 / -1;
+  }
+
   .section-kicker,
   .product-demos-slot,
   .install-panels,
@@ -1325,6 +1488,14 @@ html[data-embedded="true"] .site-header {
     grid-column: 1 / -1;
   }
 
+  .hero-copy {
+    grid-column: 1 / 3;
+  }
+
+  .hero-product-column {
+    grid-column: 3 / 6;
+  }
+
   .section-kicker {
     grid-column: 1;
   }
@@ -1340,6 +1511,6 @@ html[data-embedded="true"] .site-header {
   }
 
   .footer-columns {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }

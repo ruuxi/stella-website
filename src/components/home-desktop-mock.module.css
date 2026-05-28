@@ -923,7 +923,8 @@
 
   .themePanel {
     flex-direction: row;
-    width: auto;
+    width: min(100%, 21.5rem);
+    max-width: 100%;
     justify-content: flex-start;
     overflow-x: auto;
     padding: 0.1rem 0 0.2rem;
@@ -932,6 +933,18 @@
   .modeToggle,
   .themeGrid {
     flex-direction: row;
+  }
+
+  .themeGrid {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .themeGrid::-webkit-scrollbar {
+    display: none;
   }
 
   .modeToggle {

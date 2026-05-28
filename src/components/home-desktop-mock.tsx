@@ -681,28 +681,28 @@ export function HomeDesktopMock() {
   const renderChatCenter = () => (
     <div className={styles.chatContent}>
       <div className={styles.chatTranscript} aria-label="Stella chat mock conversation">
-        <div className={styles.userMessage}>Can you turn this sketch into a launch checklist?</div>
+        <div className={styles.userMessage}>Can you help plan Saturday around the school form and dinner?</div>
         <div className={styles.assistantRow}>
           <p className={styles.assistantMessage}>
-            Yes. I split it into design, build, QA, and release steps so each owner has a clear next action.
+            Yes. I found the form deadline, a dinner slot near the theater, and a grocery route that fits.
           </p>
         </div>
-        <div className={styles.userMessage}>Make the QA section specific to desktop.</div>
+        <div className={styles.userMessage}>Text Mom the plan and make a short checklist.</div>
         <div className={styles.assistantRow}>
           <p className={styles.assistantMessage}>
-            Added checks for window state, update prompts, signed helpers, and the first-run flow.
+            Drafted the message and made a checklist with tickets, the form, groceries, and the reservation.
           </p>
         </div>
-        <div className={styles.userMessage}>Keep it short and add owners.</div>
+        <div className={styles.userMessage}>Turn the receipt into a spreadsheet too.</div>
         <div className={styles.assistantRow}>
           <p className={styles.assistantMessage}>
-            Done. Design owns the copy pass, engineering owns telemetry, and PM owns the rollout note.
+            Done. I added item totals and highlighted the cheaper store.
           </p>
         </div>
-        <div className={styles.userMessage}>Send it to the release note.</div>
+        <div className={styles.userMessage}>Remind me Friday if the form is not signed.</div>
         <div className={styles.assistantRow}>
           <p className={styles.assistantMessage}>
-            Drafted a concise release note with the owner list and launch checklist attached.
+            Scheduled a Friday reminder and kept the PDF in the workspace panel.
           </p>
         </div>
       </div>

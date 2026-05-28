@@ -5,6 +5,7 @@ import { ConvexAuthProvider } from "@/components/auth/convex-auth-provider";
 import { SignInDialogProvider } from "@/components/auth/sign-in-dialog";
 import { EmbeddedInitScript } from "@/components/embedded/embedded-init-script";
 import { EmbeddedThemeBridge } from "@/components/embedded/embedded-theme-bridge";
+import { PageBackground } from "@/components/page-background";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import "./globals.css";
 /* Product demos (self-mod, radial, canvas) — partials in ./demos/ */
@@ -136,6 +137,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <PageBackground />
         <ConvexAuthProvider>
           <SignInDialogProvider>{children}</SignInDialogProvider>
         </ConvexAuthProvider>

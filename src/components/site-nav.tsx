@@ -8,10 +8,12 @@ import { SiteHeaderAccount } from "@/components/auth/site-header-account";
 type NavItem = { label: string; href: string; external?: boolean };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "Learn More", href: "/learn-more" },
-  { label: "Store", href: "/store" },
+  { label: "Product", href: "/learn-more" },
+  { label: "Solutions", href: "/how-it-works" },
+  { label: "Developers", href: "https://github.com/ruuxi/stella", external: true },
+  { label: "Resources", href: "/learn-more/whats-new" },
   { label: "Pricing", href: "/pricing" },
-  { label: "Community", href: "https://discord.gg/HXVCCeE542", external: true },
+  { label: "Store", href: "/store" },
 ];
 
 /**
@@ -20,7 +22,7 @@ const NAV_ITEMS: NavItem[] = [
  * On wide screens it renders the inline horizontal links plus the
  * `SiteHeaderAccount` button, matching the historical `.site-nav` layout.
  *
- * On narrow screens (<= 720px) the inline links collapse into a hamburger
+ * On narrow screens (<= 860px) the inline links collapse into a hamburger
  * toggle that opens a full-width sheet from the top of the viewport. The
  * `SiteHeaderAccount` sign-in button stays visible in the header bar
  * regardless of viewport — auth is the single most important CTA, and the

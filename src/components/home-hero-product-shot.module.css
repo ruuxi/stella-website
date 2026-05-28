@@ -1,0 +1,559 @@
+.heroProductShot {
+  position: relative;
+  width: min(100%, 48rem);
+  min-height: clamp(24rem, 46vw, 35rem);
+  perspective: 1400px;
+}
+
+.heroProductShot::before {
+  content: "";
+  position: absolute;
+  inset: 9% 0 7% 10%;
+  transform: skewY(-8deg);
+  border-radius: 36px;
+  background:
+    radial-gradient(circle at 24% 18%, rgba(120, 210, 255, 0.42), transparent 26%),
+    linear-gradient(135deg, rgba(65, 139, 229, 0.16), rgba(79, 207, 232, 0.06));
+  filter: blur(1px);
+}
+
+.desktopWindow {
+  position: absolute;
+  inset: 3% 0 0 4%;
+  overflow: hidden;
+  border: 1px solid rgba(8, 19, 38, 0.13);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(170, 225, 252, 0.28), transparent 34%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(244, 250, 255, 0.88));
+  box-shadow:
+    0 34px 70px rgba(28, 74, 145, 0.24),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  transform: rotateX(3deg) rotateY(-8deg) rotateZ(-1.5deg);
+  transform-origin: center;
+}
+
+.windowTopBar {
+  display: grid;
+  grid-template-columns: 5.2rem 1fr;
+  align-items: center;
+  height: 2.9rem;
+  padding-inline: 1rem;
+  border-bottom: 1px solid rgba(8, 19, 38, 0.08);
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(18px);
+}
+
+.trafficLights {
+  display: inline-flex;
+  gap: 0.42rem;
+}
+
+.trafficLights span {
+  width: 0.68rem;
+  height: 0.68rem;
+  border-radius: 999px;
+  background: #ff5f57;
+  box-shadow: 0 0 0 1px rgba(8, 19, 38, 0.1) inset;
+}
+
+.trafficLights span:nth-child(2) {
+  background: #ffbd2e;
+}
+
+.trafficLights span:nth-child(3) {
+  background: #28c840;
+}
+
+.windowTopBar nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.8rem, 1.4vw, 1.35rem);
+  color: rgba(8, 19, 38, 0.42);
+  font-size: 0.73rem;
+  font-weight: 760;
+  letter-spacing: -0.02em;
+}
+
+.windowTopBar nav span[data-active="true"] {
+  color: rgba(8, 19, 38, 0.86);
+}
+
+.windowBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 13.8rem;
+  min-height: clamp(20rem, 38vw, 29rem);
+}
+
+.chatPane {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  min-width: 0;
+  padding: clamp(1.15rem, 2vw, 1.7rem);
+}
+
+.messageStack {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  min-height: 0;
+  padding-bottom: 0.75rem;
+}
+
+.userBubble {
+  align-self: flex-end;
+  max-width: 20rem;
+  padding: 0.66rem 0.92rem;
+  border-radius: 18px 18px 5px 18px;
+  background: color-mix(in oklch, var(--page-accent) 10%, white);
+  color: rgba(8, 19, 38, 0.86);
+  font-size: 0.82rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.42;
+}
+
+.assistantBlock {
+  display: flex;
+  max-width: 24rem;
+  flex-direction: column;
+  gap: 0.28rem;
+  color: rgba(8, 19, 38, 0.78);
+  font-size: 0.82rem;
+  line-height: 1.56;
+}
+
+.assistantBlock span {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  clip-path: inset(0 100% 0 0);
+  white-space: nowrap;
+  animation: heroStreamLine 8s steps(72, end) infinite;
+}
+
+.assistantBlock span:nth-child(2) {
+  animation-delay: 760ms;
+}
+
+.workingIndicator {
+  display: inline-flex;
+  width: max-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 0.48rem;
+  color: rgba(8, 19, 38, 0.72);
+  font-size: 0.78rem;
+  font-weight: 500;
+  animation: heroWorkingFade 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.workingIndicator strong {
+  overflow: hidden;
+  color: rgba(8, 19, 38, 0.76);
+  font-weight: 540;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workingStella,
+.contextWorking span {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 999px;
+}
+
+.workingStella {
+  width: 1.38rem;
+  height: 1.38rem;
+}
+
+.workingStella :global(.stella-animation-container) {
+  width: 5.7rem;
+  height: 5.7rem;
+  transform: scale(0.22);
+}
+
+.composerArea {
+  padding-inline: clamp(0.25rem, 1vw, 1.15rem);
+}
+
+.contextRow {
+  display: flex;
+  min-height: 1.78rem;
+  align-items: center;
+  gap: 0.42rem;
+  overflow: hidden;
+  padding: 0 0.25rem 0.3rem 1.05rem;
+}
+
+.contextWorking {
+  display: inline-flex;
+  max-width: 8rem;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.36rem;
+  overflow: hidden;
+  color: rgba(8, 19, 38, 0.74);
+  font-size: 0.76rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.contextWorking span {
+  width: 1.22rem;
+  height: 1.22rem;
+}
+
+.contextWorking span :global(.stella-animation-container) {
+  width: 5rem;
+  height: 2.2rem;
+  transform: scale(0.25);
+}
+
+.contextWorking b {
+  font-weight: 520;
+}
+
+.contextLanes {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.38rem;
+}
+
+.contextChip {
+  display: inline-flex;
+  height: 1.5rem;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.26rem;
+  padding: 0.18rem 0.45rem 0.18rem 0.34rem;
+  border: 1px dashed rgba(8, 19, 38, 0.22);
+  border-radius: 999px;
+  color: rgba(8, 19, 38, 0.46);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.contextChip b {
+  font-weight: 650;
+  opacity: 0.62;
+}
+
+.contextChip img {
+  border-radius: 4px;
+}
+
+.composerShell {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.65rem;
+  padding: 0.4rem 0.44rem;
+  border: 1px solid rgba(8, 19, 38, 0.1);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(248, 251, 255, 0.94));
+  box-shadow:
+    0 1px 2px rgba(8, 19, 38, 0.05),
+    0 8px 22px rgba(8, 19, 38, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.composerButton,
+.composerSubmit {
+  display: inline-flex;
+  width: 1.76rem;
+  height: 1.76rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+}
+
+.composerButton {
+  background: rgba(8, 19, 38, 0.05);
+  color: rgba(8, 19, 38, 0.68);
+}
+
+.composerSubmit {
+  background: rgba(36, 104, 216, 0.88);
+  color: white;
+}
+
+.composerPlaceholder {
+  flex: 1;
+  min-width: 0;
+  color: rgba(8, 19, 38, 0.42);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.workspacePane {
+  display: flex;
+  flex-direction: column;
+  gap: 0.86rem;
+  min-width: 0;
+  padding: 1.05rem;
+  border-left: 1px solid rgba(8, 19, 38, 0.08);
+  background: rgba(244, 250, 255, 0.64);
+}
+
+.workspaceHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.16rem;
+}
+
+.workspaceHeader span {
+  color: rgba(8, 19, 38, 0.44);
+  font-size: 0.62rem;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.workspaceHeader strong {
+  color: rgba(8, 19, 38, 0.86);
+  font-size: 1rem;
+  letter-spacing: -0.03em;
+}
+
+.taskList {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.taskList span {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid rgba(8, 19, 38, 0.07);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.74);
+  color: rgba(8, 19, 38, 0.68);
+  font-size: 0.68rem;
+  font-weight: 650;
+  line-height: 1.28;
+  animation: heroTaskPulse 5.4s ease-in-out infinite;
+  animation-delay: calc(var(--task-index) * 520ms);
+}
+
+.artifactList {
+  display: grid;
+  gap: 0.48rem;
+  margin-top: auto;
+}
+
+.artifact {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.48rem;
+  padding: 0.56rem 0.58rem;
+  border: 1px solid rgba(8, 19, 38, 0.08);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.78);
+  color: rgba(8, 19, 38, 0.58);
+}
+
+.artifact div {
+  display: grid;
+  min-width: 0;
+  gap: 0.08rem;
+}
+
+.artifact b {
+  color: rgba(36, 104, 216, 0.86);
+  font-size: 0.57rem;
+  letter-spacing: 0.07em;
+}
+
+.artifact span {
+  overflow: hidden;
+  color: rgba(8, 19, 38, 0.72);
+  font-size: 0.65rem;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.phoneCard {
+  position: absolute;
+  right: 4%;
+  bottom: 2%;
+  width: clamp(8.6rem, 13vw, 10.8rem);
+  min-height: 15.2rem;
+  padding: 0.88rem 0.72rem;
+  border: 1px solid rgba(8, 19, 38, 0.16);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 250, 255, 0.96)),
+    #f8fbff;
+  box-shadow:
+    0 24px 48px rgba(28, 74, 145, 0.22),
+    inset 0 0 0 4px rgba(8, 19, 38, 0.05);
+  transform: rotateZ(4deg);
+}
+
+.phoneNotch {
+  width: 2.8rem;
+  height: 0.34rem;
+  margin: 0 auto 0.82rem;
+  border-radius: 999px;
+  background: rgba(8, 19, 38, 0.16);
+}
+
+.phoneHeader {
+  color: rgba(8, 19, 38, 0.86);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.phoneBubble,
+.phoneReply {
+  margin-top: 1rem;
+  padding: 0.52rem 0.58rem;
+  border-radius: 14px;
+  font-size: 0.66rem;
+  font-weight: 670;
+  line-height: 1.26;
+}
+
+.phoneBubble {
+  margin-right: 0.8rem;
+  background: rgba(8, 19, 38, 0.06);
+  color: rgba(8, 19, 38, 0.68);
+}
+
+.phoneReply {
+  margin-left: 1rem;
+  background: rgba(36, 104, 216, 0.88);
+  color: white;
+}
+
+@keyframes heroStreamLine {
+  0%,
+  10% {
+    clip-path: inset(0 100% 0 0);
+  }
+  38%,
+  90% {
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+
+@keyframes heroWorkingFade {
+  0%,
+  20%,
+  100% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.96);
+  }
+  34%,
+  82% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes heroTaskPulse {
+  0%,
+  100% {
+    border-color: rgba(8, 19, 38, 0.07);
+    transform: translateY(0);
+  }
+  45% {
+    border-color: rgba(36, 104, 216, 0.24);
+    transform: translateY(-1px);
+  }
+}
+
+@media (max-width: 980px) {
+  .heroProductShot {
+    min-height: clamp(23rem, 70vw, 31rem);
+  }
+
+  .desktopWindow {
+    inset: 0 0 6% 0;
+    transform: none;
+  }
+
+  .phoneCard {
+    right: 1rem;
+    bottom: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .heroProductShot {
+    min-height: 25rem;
+  }
+
+  .desktopWindow {
+    border-radius: 15px;
+  }
+
+  .windowTopBar {
+    grid-template-columns: 4.6rem 1fr;
+    padding-inline: 0.75rem;
+  }
+
+  .windowTopBar nav {
+    justify-content: flex-start;
+    gap: 0.65rem;
+    overflow: hidden;
+  }
+
+  .windowBody {
+    grid-template-columns: 1fr;
+  }
+
+  .workspacePane {
+    display: none;
+  }
+
+  .chatPane {
+    min-height: 20rem;
+    padding: 1rem;
+  }
+
+  .assistantBlock span {
+    white-space: normal;
+  }
+
+  .phoneCard {
+    width: 8rem;
+    min-height: 12rem;
+    right: 0.2rem;
+    bottom: -0.2rem;
+    border-radius: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .assistantBlock span,
+  .workingIndicator,
+  .taskList span {
+    animation: none;
+  }
+
+  .assistantBlock span {
+    clip-path: none;
+  }
+
+  .workingIndicator {
+    opacity: 1;
+    transform: none;
+  }
+}
