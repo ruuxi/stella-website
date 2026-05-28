@@ -1,7 +1,9 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Github } from "lucide-react";
 import { DownloadButton } from "@/components/download-button";
 import { FooterLegalLinks } from "@/components/footer-legal-links";
+import { HomeDesktopMock } from "@/components/home-desktop-mock";
 import { HeroMorphTitle } from "@/components/hero-morph-title";
 import { HeroStellaOrb } from "@/components/hero-stella-orb-dynamic";
 import { SiteHeader } from "@/components/site-header";
@@ -67,14 +69,15 @@ export default function Home() {
           </div>
           <p className="hero-preview-badge reveal">Stella is in research preview</p>
         </section>
+        <HomeDesktopMock />
       </main>
 
       <footer className="grid-shell site-footer section-deferred-render section-border">
         <div className="footer-brand">
-          <a className="brand-mark brand-mark--footer" href="/">
+          <Link className="brand-mark brand-mark--footer" href="/">
             <Image src="/stella-logo.svg" alt="Stella" width={42} height={42} />
             <span className="brand-text">Stella</span>
-          </a>
+          </Link>
 
           <FooterLegalLinks />
         </div>
