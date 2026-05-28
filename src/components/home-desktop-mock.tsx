@@ -2,14 +2,23 @@
 
 import {
   ArrowUp,
+  CheckCircle2,
   ChevronDown,
   ChevronRight,
+  Circle,
+  FileArchive,
+  FileImage,
+  FileText,
+  LoaderCircle,
+  MessageSquarePlus,
   Mic,
   Moon,
   PanelRight,
   Plus,
+  Scan,
   Settings,
   Sun,
+  VolumeX,
 } from "lucide-react";
 import Image from "next/image";
 import {
@@ -234,6 +243,28 @@ const CONTEXT_CHIPS = [
   { label: "Mail", iconSrc: "/mock-app-icons/mail.png" },
   { label: "Maps", iconSrc: "/mock-app-icons/maps.png" },
   { label: "Notes", iconSrc: "/mock-app-icons/notes.png" },
+];
+const WORKSPACE_ACTIONS = [
+  { label: "Read replies aloud", icon: VolumeX },
+  { label: "New chat", icon: MessageSquarePlus },
+  { label: "Select area", icon: Scan },
+];
+const WORKSPACE_ACTIVITY = [
+  { label: "Comparing flight options to Lisbon", icon: LoaderCircle, state: "running" },
+  { label: "Summarized the school email", icon: CheckCircle2, state: "done" },
+  { label: "Added dinner reservation reminders", icon: CheckCircle2, state: "done" },
+  { label: "Grocery list export canceled", icon: Circle, state: "canceled" },
+];
+const WORKSPACE_FILES = [
+  { label: "lisbon-options.md", icon: FileText },
+  { label: "receipt-photo.png", icon: FileImage },
+  { label: "meal-plan.txt", icon: FileText },
+  { label: "tax-documents.zip", icon: FileArchive },
+];
+const WORKSPACE_SCHEDULE = [
+  { label: "Send weekly family update", meta: "Tomorrow" },
+  { label: "Check flight prices", meta: "Fri" },
+  { label: "Renew library books", meta: "Mon" },
 ];
 
 function theme(
@@ -679,6 +710,98 @@ export function HomeDesktopMock() {
     </div>
   );
 
+  const renderWorkspacePanel = () => (
+    <div className={styles.workspacePanelFrame}>
+      <aside className={styles.workspacePanel} aria-label="Workspace panel mock">
+        <section className={styles.workspaceSection}>
+          <header className={styles.workspaceSectionHeader}>
+            <span className={styles.workspaceSectionTitle}>Actions</span>
+          </header>
+          <div className={styles.workspaceActionsBody}>
+            <ul className={styles.workspaceList}>
+              {WORKSPACE_ACTIONS.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <li key={item.label}>
+                    <button type="button" className={styles.workspaceActionRow}>
+                      <span className={styles.workspaceActionIcon} aria-hidden="true">
+                        <Icon size={15} strokeWidth={1.8} />
+                      </span>
+                      <span className={styles.workspaceActionLabel}>{item.label}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </section>
+
+        <div className={styles.workspaceDivider} />
+
+        <section className={styles.workspaceSection}>
+          <header className={styles.workspaceSectionHeader}>
+            <span className={styles.workspaceSectionTitle}>Activity</span>
+          </header>
+          <ul className={`${styles.workspaceList} ${styles.workspaceTaskList}`}>
+            {WORKSPACE_ACTIVITY.map((item) => {
+              const Icon = item.icon;
+              return (
+                <li key={item.label} className={styles.workspaceTaskRow}>
+                  <span className={styles.workspaceTaskIconWrap} aria-hidden="true">
+                    <Icon
+                      size={15}
+                      strokeWidth={2}
+                      className={styles.workspaceTaskIcon}
+                      data-state={item.state}
+                    />
+                  </span>
+                  <span className={styles.workspaceTaskLabel}>{item.label}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+
+        <div className={styles.workspaceDivider} />
+
+        <section className={styles.workspaceSection}>
+          <header className={styles.workspaceSectionHeader}>
+            <span className={styles.workspaceSectionTitle}>Files</span>
+          </header>
+          <ul className={styles.workspaceList}>
+            {WORKSPACE_FILES.map((item) => {
+              const Icon = item.icon;
+              return (
+                <li key={item.label} className={styles.workspaceRow}>
+                  <button type="button" className={styles.workspaceFileButton}>
+                    <Icon size={15} strokeWidth={1.8} aria-hidden="true" />
+                    <span className={styles.workspaceFileName}>{item.label}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+
+        <div className={styles.workspaceDivider} />
+
+        <section className={styles.workspaceSection}>
+          <header className={styles.workspaceSectionHeader}>
+            <span className={styles.workspaceSectionTitle}>Schedule</span>
+          </header>
+          <ul className={styles.workspaceList}>
+            {WORKSPACE_SCHEDULE.map((item) => (
+              <li key={item.label} className={styles.workspaceRow}>
+                <span className={styles.workspaceRowLabel}>{item.label}</span>
+                <span className={styles.workspaceRowMeta}>{item.meta}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </aside>
+    </div>
+  );
+
   return (
     <section className="grid-shell section-border">
       <div className={styles.shell}>
@@ -750,6 +873,15 @@ export function HomeDesktopMock() {
               <header className={styles.miniTopbar} aria-label="Stella mini chat window" />
               <main className={styles.chatSurface}>{renderChatCenter()}</main>
             </div>
+          </div>
+
+          <div
+            className={styles.workspaceStage}
+            style={vars}
+            data-mode={resolvedMode}
+            data-theme={selectedTheme.id}
+          >
+            {renderWorkspacePanel()}
           </div>
 
           <div className={styles.themePanel} aria-label="Stella themes">
