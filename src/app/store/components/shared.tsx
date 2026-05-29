@@ -289,12 +289,10 @@ export function StoreWebHeader({
 }) {
   return (
     <header className="store-web-header">
-      <div className="store-web-header-main">
-        <StoreWebTabs activeTab={activeTab} onSelectTab={onSelectTab} />
-        {searchSlot ? (
-          <div className="store-web-header-search">{searchSlot}</div>
-        ) : null}
-      </div>
+      {searchSlot ? (
+        <div className="store-web-header-search">{searchSlot}</div>
+      ) : null}
+      <StoreWebTabs activeTab={activeTab} onSelectTab={onSelectTab} />
       {showUpload ? (
         <button
           className="store-web-upload-cta"
