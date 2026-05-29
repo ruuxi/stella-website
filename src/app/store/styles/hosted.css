@@ -115,7 +115,7 @@ html:not([data-embedded="true"]) .store-web-header .store-web-tabs {
   background: color-mix(in oklch, var(--page-foreground) 5%, var(--page-background));
   border: 1px solid var(--page-border);
   box-shadow: none;
-  flex-shrink: 0;
+  flex: 0 1 auto;
 }
 
 html:not([data-embedded="true"]) .store-web-header-search {
@@ -184,13 +184,12 @@ html:not([data-embedded="true"]) .store-search-input:focus {
   }
 
   html:not([data-embedded="true"]) .store-web-header .store-web-tabs {
+    width: 100%;
     max-width: 100%;
-    overflow-x: auto;
-    scrollbar-width: none;
   }
 
-  html:not([data-embedded="true"]) .store-web-header .store-web-tabs::-webkit-scrollbar {
-    display: none;
+  html:not([data-embedded="true"]) .store-web-header .store-web-tab {
+    padding-inline: 10px;
   }
 
   html:not([data-embedded="true"]) .store-web-header-search {
