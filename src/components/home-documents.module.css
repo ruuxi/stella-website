@@ -1,0 +1,140 @@
+.section {
+  --ink: #0c1b33;
+  --muted: #54627a;
+  --blue: #2563eb;
+  row-gap: 2.4rem;
+}
+
+.section > * {
+  grid-column: 1 / -1;
+}
+
+/* ---- Intro ------------------------------------------------------------- */
+.intro {
+  width: min(100%, 60rem);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--blue);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.intro h2 {
+  margin: 0.9rem 0 0;
+  color: var(--ink);
+  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  font-weight: 650;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+}
+
+.intro p {
+  max-width: 42rem;
+  margin: 1rem auto 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ---- Diagonal layered deck --------------------------------------------- */
+.stage {
+  width: min(100%, 52rem);
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.deck {
+  position: relative;
+  aspect-ratio: 1.5 / 1;
+}
+
+.card {
+  --w: 64%;
+  position: absolute;
+  top: calc(var(--i) * 13.3%);
+  left: calc(var(--i) * 12%);
+  width: var(--w);
+  margin: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid rgba(8, 19, 38, 0.12);
+  background: #fff;
+  box-shadow:
+    0 2px 6px rgba(8, 19, 38, 0.08),
+    0 34px 70px -30px rgba(8, 19, 38, 0.5);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card:nth-child(1) { z-index: 1; }
+.card:nth-child(2) { z-index: 2; }
+.card:nth-child(3) { z-index: 3; }
+.card:nth-child(4) { z-index: 4; }
+
+/* lift the whole stack apart slightly on hover for a tactile feel */
+.deck:hover .card:nth-child(1) { transform: translate(-2.2%, -2.6%); }
+.deck:hover .card:nth-child(4) { transform: translate(2.2%, 2.6%); }
+
+/* accent hairline along the top edge, per file type */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 2;
+  height: 3px;
+}
+
+.card[data-kind="word"]::after { background: #2b5fc0; }
+.card[data-kind="excel"]::after { background: #1f8a52; }
+.card[data-kind="pptx"]::after { background: #d24625; }
+.card[data-kind="pdf"]::after { background: #d33a36; }
+
+.shotImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* file-type tab sits in each card's exposed top-left corner */
+.chip {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 3;
+  padding: 0.24rem 0.62rem;
+  border-radius: 7px;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: 0 4px 10px rgba(8, 19, 38, 0.25);
+}
+
+.chip[data-kind="word"] { background: #2b5fc0; }
+.chip[data-kind="excel"] { background: #1f8a52; }
+.chip[data-kind="pptx"] { background: #d24625; }
+.chip[data-kind="pdf"] { background: #d33a36; }
+
+/* ---- Responsive -------------------------------------------------------- */
+@media (max-width: 760px) {
+  .deck {
+    aspect-ratio: 1.18 / 1;
+  }
+
+  .card {
+    --w: 74%;
+    top: calc(var(--i) * 9%);
+    left: calc(var(--i) * 8.6%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}

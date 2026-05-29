@@ -1,0 +1,223 @@
+.section {
+  --ink: #0c1b33;
+  --muted: #54627a;
+  --blue: #2563eb;
+  row-gap: 2.6rem;
+}
+
+.section > * {
+  grid-column: 1 / -1;
+}
+
+/* ---- Intro ------------------------------------------------------------- */
+.intro {
+  width: min(100%, 60rem);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--blue);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.intro h2 {
+  margin: 0.9rem 0 0;
+  color: var(--ink);
+  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  font-weight: 650;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+}
+
+.intro p {
+  max-width: 40rem;
+  margin: 1rem auto 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ---- Stage ------------------------------------------------------------- */
+.stage {
+  width: min(100%, 62rem);
+  margin: 0 auto;
+}
+
+.frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #0b1220;
+  border: 1px solid rgba(8, 19, 38, 0.1);
+  box-shadow:
+    0 2px 8px rgba(8, 19, 38, 0.08),
+    0 44px 90px -36px rgba(8, 19, 38, 0.55);
+}
+
+/* WebGL ripple-morph canvas — ported from Stella desktop MorphTransition */
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.canvas[data-ready] {
+  opacity: 1;
+}
+
+/* SSR / no-WebGL fallback — single contained still */
+.fallback {
+  object-fit: contain;
+  object-position: center;
+}
+
+/* ---- Caption ----------------------------------------------------------- */
+.caption {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  max-width: min(28rem, calc(100% - 2rem));
+  padding: 0.7rem 0.95rem 0.7rem 0.75rem;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  box-shadow: 0 14px 34px -16px rgba(8, 19, 38, 0.5);
+  animation: captionIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.captionTag {
+  flex: none;
+  padding: 0.32rem 0.6rem;
+  border-radius: 8px;
+  background: var(--blue);
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.captionBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  min-width: 0;
+}
+
+.captionBody strong {
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 650;
+  letter-spacing: -0.005em;
+}
+
+.captionBody span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+@keyframes captionIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Thumbnail rail ---------------------------------------------------- */
+.rail {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  overflow-x: auto;
+  padding: 0.3rem 0.1rem;
+  scrollbar-width: none;
+}
+
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+.thumb {
+  flex: 1 1 0;
+  min-width: 6.6rem;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid rgba(8, 19, 38, 0.1);
+  background: #0b1220;
+  cursor: pointer;
+  opacity: 0.5;
+  filter: saturate(0.85);
+  transition:
+    opacity 0.25s ease,
+    filter 0.25s ease,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease;
+}
+
+.thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb:hover {
+  opacity: 0.85;
+}
+
+.thumbActive {
+  opacity: 1;
+  filter: none;
+  border-color: rgba(37, 99, 235, 0.55);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35);
+  transform: translateY(-2px);
+}
+
+/* ---- Responsive -------------------------------------------------------- */
+@media (max-width: 760px) {
+  .caption {
+    left: 0.6rem;
+    bottom: 0.6rem;
+    padding: 0.55rem 0.7rem 0.55rem 0.55rem;
+  }
+
+  .captionBody span {
+    display: none;
+  }
+
+  .thumb {
+    min-width: 5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot,
+  .caption,
+  .thumb {
+    transition: none;
+    animation: none;
+  }
+}

@@ -1,0 +1,666 @@
+.section {
+  --ink: #0c1b33;
+  --muted: #54627a;
+  --blue: #2563eb;
+  row-gap: 2.4rem;
+}
+
+.section > * {
+  grid-column: 1 / -1;
+}
+
+/* ---- Intro ------------------------------------------------------------- */
+.intro {
+  width: min(100%, 60rem);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--blue);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.intro h2 {
+  margin: 0.9rem 0 0;
+  color: var(--ink);
+  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  font-weight: 650;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+}
+
+.intro p {
+  max-width: 40rem;
+  margin: 1rem auto 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ---- Lineup ------------------------------------------------------------ */
+.lineup {
+  --phone-w: 15.5rem;
+  --overlap: 6.6rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 1rem 0 0.5rem;
+  font-family: -apple-system, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+}
+
+.slot {
+  position: relative;
+  width: var(--phone-w);
+  margin-left: calc(var(--overlap) * -1);
+  transform: translateY(calc(var(--i) * 0.6rem));
+  transition: transform 0.3s ease;
+}
+
+.slot:first-child {
+  margin-left: 0;
+}
+
+/* fan the stack: outer phones tilt slightly, raise z so each overlaps the next */
+.slot:nth-child(1) { z-index: 1; }
+.slot:nth-child(2) { z-index: 2; }
+.slot:nth-child(3) { z-index: 3; }
+.slot:nth-child(4) { z-index: 4; }
+
+.caption {
+  margin-top: 1.1rem;
+  text-align: center;
+}
+
+.caption strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 650;
+}
+
+.caption span {
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+/* ---- iPhone frame ------------------------------------------------------ */
+.phone {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 219 / 444;
+}
+
+.phoneEdge {
+  position: absolute;
+  inset: 0;
+  border-radius: 2.6rem;
+  padding: 0.32rem;
+  background: linear-gradient(160deg, #2c3340, #0c0f15 55%, #20262f);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 30px 60px -24px rgba(8, 19, 38, 0.55),
+    0 8px 18px -10px rgba(8, 19, 38, 0.4);
+}
+
+.screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 2.3rem;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+}
+
+.statusBar {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 1.95rem;
+  padding: 0 1.15rem 0 1.3rem;
+  color: #0c1b33;
+  pointer-events: none;
+}
+
+.statusBar[data-dark] {
+  color: #fff;
+}
+
+.statusTime {
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.statusIcons {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+}
+
+.signal {
+  width: 1.05rem;
+  height: 0.62rem;
+  fill: currentColor;
+}
+
+.wifi {
+  width: 0.95rem;
+  height: 0.68rem;
+}
+
+.battery {
+  width: 1.5rem;
+  height: 0.72rem;
+}
+
+.island {
+  position: absolute;
+  top: 0.55rem;
+  left: 50%;
+  z-index: 7;
+  width: 33%;
+  height: 1.05rem;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #000;
+}
+
+.homeIndicator {
+  position: absolute;
+  bottom: 0.55rem;
+  left: 50%;
+  z-index: 8;
+  width: 32%;
+  height: 0.28rem;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgba(8, 19, 38, 0.32);
+}
+
+/* ---- App container ----------------------------------------------------- */
+.app {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.thread {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.7rem 0.7rem 0.5rem;
+  overflow: hidden;
+  justify-content: flex-start;
+}
+
+/* ================================================================== */
+/*  iMessage                                                          */
+/* ================================================================== */
+.imessage {
+  background: #fff;
+}
+
+.imHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.18rem;
+  padding: 2.15rem 0 0.6rem;
+  border-bottom: 0.5px solid rgba(8, 19, 38, 0.08);
+  background: rgba(249, 249, 249, 0.92);
+  backdrop-filter: blur(10px);
+}
+
+.imBack {
+  position: absolute;
+  top: 2.35rem;
+  left: 0.85rem;
+  color: #3f8bff;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.imAvatar {
+  display: inline-flex;
+  width: 2.1rem;
+  height: 2.1rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #eef3ff, #dbe7ff);
+}
+
+.imHeader strong {
+  color: #0c1b33;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.imBubble {
+  max-width: 78%;
+  padding: 0.42rem 0.66rem;
+  font-size: 0.74rem;
+  line-height: 1.32;
+  border-radius: 16px;
+}
+
+.imThem {
+  align-self: flex-start;
+  background: #e9e9eb;
+  color: #0c1b33;
+  border-bottom-left-radius: 5px;
+}
+
+.imYou {
+  align-self: flex-end;
+  background: linear-gradient(180deg, #34a0ff, #1f7bf5);
+  color: #fff;
+  border-bottom-right-radius: 5px;
+}
+
+.imComposer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0.6rem 1.4rem;
+  padding: 0.4rem 0.4rem 0.4rem 0.75rem;
+  border: 1px solid rgba(8, 19, 38, 0.14);
+  border-radius: 999px;
+  color: rgba(8, 19, 38, 0.4);
+  font-size: 0.72rem;
+}
+
+.imComposer span {
+  flex: 1;
+}
+
+.imSend {
+  display: inline-flex;
+  width: 1.45rem;
+  height: 1.45rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #d7d9dd;
+  color: #fff;
+  font-size: 0.85rem;
+  font-style: normal;
+}
+
+/* ================================================================== */
+/*  Telegram                                                          */
+/* ================================================================== */
+.telegram {
+  background: #acb7c2;
+}
+
+.tgHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2.1rem 0.7rem 0.55rem;
+  background: #517da2;
+  color: #fff;
+}
+
+.tgBack {
+  color: #fff;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.tgAvatar {
+  display: inline-flex;
+  width: 1.85rem;
+  height: 1.85rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.tgHeader div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.tgHeader strong {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.tgHeader span {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.62rem;
+}
+
+.tgThread {
+  background:
+    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.16), transparent 30%),
+    radial-gradient(circle at 82% 72%, rgba(255, 255, 255, 0.14), transparent 32%),
+    linear-gradient(160deg, #b6c4cf, #9fb1be);
+}
+
+.tgBubble {
+  position: relative;
+  max-width: 80%;
+  padding: 0.42rem 1.9rem 0.42rem 0.6rem;
+  font-size: 0.72rem;
+  line-height: 1.34;
+  border-radius: 12px;
+  box-shadow: 0 1px 1px rgba(8, 19, 38, 0.12);
+}
+
+.tgThem {
+  align-self: flex-start;
+  background: #fff;
+  color: #0c1b33;
+  border-bottom-left-radius: 4px;
+}
+
+.tgYou {
+  align-self: flex-end;
+  background: #eaffd2;
+  color: #0c1b33;
+  border-bottom-right-radius: 4px;
+}
+
+.tgTime {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.36rem;
+  color: rgba(8, 19, 38, 0.36);
+  font-size: 0.52rem;
+  font-style: normal;
+}
+
+.tgComposer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.7rem 1.5rem;
+  background: #fff;
+  color: rgba(8, 19, 38, 0.4);
+  font-size: 0.74rem;
+}
+
+.tgComposer span {
+  flex: 1;
+}
+
+.tgSend {
+  color: #4aa3e8;
+  font-size: 1rem;
+  font-style: normal;
+}
+
+/* ================================================================== */
+/*  Discord                                                           */
+/* ================================================================== */
+.discord {
+  background: #313338;
+}
+
+.dcHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 2.15rem 0.85rem 0.55rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+  background: #313338;
+  color: #f2f3f5;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.dcHash {
+  color: #87898c;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.dcHeader strong {
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.dcThread {
+  background: #313338;
+  gap: 0.7rem;
+}
+
+.dcDay {
+  align-self: center;
+  color: #949ba4;
+  font-size: 0.56rem;
+  font-weight: 600;
+}
+
+.dcMessage {
+  display: grid;
+  grid-template-columns: 1.85rem 1fr;
+  gap: 0.55rem;
+  align-self: stretch;
+}
+
+.dcAvatar {
+  display: inline-flex;
+  width: 1.85rem;
+  height: 1.85rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.dcAvatar[data-you] {
+  background: linear-gradient(180deg, #5865f2, #4752c4);
+}
+
+.dcAvatar[data-bot] {
+  background: #fff;
+}
+
+.dcAuthor {
+  display: flex;
+  align-items: center;
+  gap: 0.34rem;
+  margin: 0 0 0.18rem;
+  color: #f2f3f5;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.dcAuthor em {
+  color: #949ba4;
+  font-size: 0.55rem;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.dcBot {
+  padding: 0.04rem 0.26rem;
+  border-radius: 4px;
+  background: #5865f2;
+  color: #fff;
+  font-size: 0.46rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.dcText {
+  margin: 0;
+  color: #dbdee1;
+  font-size: 0.74rem;
+  line-height: 1.36;
+}
+
+.dcComposer {
+  margin: 0 0.7rem 1.5rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 999px;
+  background: #383a40;
+  color: #87898c;
+  font-size: 0.72rem;
+}
+
+/* ================================================================== */
+/*  Stella app                                                        */
+/* ================================================================== */
+.stella {
+  position: relative;
+  background: #0f1622;
+  color: #eaf0f7;
+}
+
+.stGradient {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(80% 55% at 20% 8%, rgba(96, 140, 220, 0.45), transparent 60%),
+    radial-gradient(70% 50% at 88% 30%, rgba(120, 99, 216, 0.35), transparent 60%),
+    radial-gradient(90% 60% at 70% 100%, rgba(58, 110, 180, 0.4), transparent 60%),
+    linear-gradient(170deg, #16213a 0%, #111a2c 55%, #0d1422 100%);
+}
+
+.stHeader {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2.15rem 0.85rem 0.6rem;
+}
+
+.stMenu {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.stMenu i {
+  width: 1.05rem;
+  height: 1.6px;
+  border-radius: 2px;
+  background: rgba(234, 240, 247, 0.8);
+}
+
+.stMenu i:nth-child(2) {
+  width: 0.75rem;
+}
+
+.stBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.34rem;
+  margin: 0 auto;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.stModel {
+  padding: 0.16rem 0.46rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 0.62rem;
+  font-weight: 600;
+}
+
+.stThread {
+  position: relative;
+  z-index: 1;
+  gap: 0.6rem;
+}
+
+.stYou {
+  align-self: flex-end;
+  max-width: 80%;
+  padding: 0.46rem 0.68rem;
+  border-radius: 16px 16px 5px 16px;
+  background: rgba(120, 165, 245, 0.28);
+  border: 1px solid rgba(150, 185, 250, 0.25);
+  color: #eef4fd;
+  font-size: 0.74rem;
+  line-height: 1.36;
+}
+
+.stAssistant {
+  align-self: flex-start;
+  max-width: 90%;
+  margin: 0;
+  color: rgba(234, 240, 247, 0.92);
+  font-size: 0.75rem;
+  line-height: 1.46;
+}
+
+.stComposer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0.6rem 1.4rem;
+  padding: 0.42rem 0.5rem 0.42rem 0.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(234, 240, 247, 0.5);
+  font-size: 0.72rem;
+}
+
+.stComposer span {
+  flex: 1;
+}
+
+.stPlus {
+  display: inline-flex;
+  width: 1.4rem;
+  height: 1.4rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(234, 240, 247, 0.8);
+  font-size: 0.85rem;
+  font-style: normal;
+}
+
+.stMic {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ---- Responsive -------------------------------------------------------- */
+@media (max-width: 900px) {
+  .lineup {
+    --phone-w: 12.5rem;
+    --overlap: 6.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .lineup {
+    flex-wrap: wrap;
+    gap: 1.5rem 0;
+    --phone-w: 13rem;
+    --overlap: 0rem;
+  }
+
+  .slot {
+    margin-left: 0;
+    transform: none;
+  }
+}

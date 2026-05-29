@@ -1,0 +1,228 @@
+.section {
+  --ink: #0c1b33;
+  --muted: #54627a;
+  --blue: #2563eb;
+  row-gap: 2.8rem;
+}
+
+.section > * {
+  grid-column: 1 / -1;
+}
+
+/* ---- Intro ------------------------------------------------------------- */
+.intro {
+  width: min(100%, 60rem);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--blue);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.intro h2 {
+  margin: 0.9rem 0 0;
+  color: var(--ink);
+  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  font-weight: 650;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+}
+
+.intro p {
+  max-width: 40rem;
+  margin: 1rem auto 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ---- Privacy pillars (one wide dark-blue gradient panel) --------------- */
+.panel {
+  width: min(100%, 60rem);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.6rem;
+  padding: clamp(1.5rem, 3vw, 2.3rem);
+  border-radius: 0.6rem;
+  color: #eaf2ff;
+  background:
+    radial-gradient(
+      130% 120% at 0% 0%,
+      rgba(86, 156, 232, 0.35),
+      rgba(86, 156, 232, 0) 55%
+    ),
+    linear-gradient(150deg, #11407f, #0c2c63 58%, #0a2350);
+  border: 1px solid rgba(120, 170, 230, 0.22);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.1) inset,
+    0 34px 66px -36px rgba(8, 32, 78, 0.75);
+}
+
+.pillar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pillar:not(:first-child) {
+  border-left: 1px solid rgba(160, 195, 240, 0.16);
+  padding-left: 1.6rem;
+}
+
+.pillarIcon {
+  width: 2.4rem;
+  height: 2.4rem;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.55rem;
+  background: rgba(255, 255, 255, 0.12);
+  color: #e3eeff;
+}
+
+.pillar strong {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.005em;
+}
+
+.pillar span {
+  color: rgba(223, 236, 255, 0.78);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+/* ---- Compatibility wall ------------------------------------------------ */
+.wall {
+  width: min(100%, 62rem);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2.2rem;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.groupLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.logos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem 2.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: 6.4rem;
+}
+
+.logoMark {
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #38475d;
+  transition:
+    color 0.25s ease,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.glyph {
+  height: 100%;
+  width: auto;
+  max-width: 2.4rem;
+  display: block;
+}
+
+.logoName {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color 0.25s ease;
+}
+
+.logo:hover .logoMark {
+  transform: translateY(-3px);
+}
+
+.logo:hover .logoName {
+  color: var(--ink);
+}
+
+/* per-brand color on hover — resting state stays a cohesive ink */
+.logo[data-brand="claudeCode"]:hover .logoMark,
+.logo[data-brand="anthropic"]:hover .logoMark {
+  color: #d97757;
+}
+.logo[data-brand="openai"]:hover .logoMark {
+  color: #10a37f;
+}
+.logo[data-brand="google"]:hover .logoMark {
+  color: #1a73e8;
+}
+.logo[data-brand="deepseek"]:hover .logoMark {
+  color: #4d6bfe;
+}
+.logo[data-brand="moonshot"]:hover .logoMark {
+  color: #2b2a6b;
+}
+.logo[data-brand="openclaw"]:hover .logoMark {
+  color: #e8492f;
+}
+.logo[data-brand="hermes"]:hover .logoMark {
+  color: #c0991f;
+}
+.logo[data-brand="cursor"]:hover .logoMark,
+.logo[data-brand="codex"]:hover .logoMark,
+.logo[data-brand="xai"]:hover .logoMark {
+  color: #11151c;
+}
+
+/* ---- Responsive -------------------------------------------------------- */
+@media (max-width: 760px) {
+  .panel {
+    grid-template-columns: 1fr;
+    gap: 1.3rem;
+  }
+
+  .pillar:not(:first-child) {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid rgba(160, 195, 240, 0.16);
+    padding-top: 1.3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logoMark,
+  .logoName {
+    transition: none;
+  }
+}

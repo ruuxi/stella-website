@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Github } from "lucide-react";
-import { DownloadButton } from "@/components/download-button";
 import { FooterLegalLinks } from "@/components/footer-legal-links";
+import { HomeComputerUse } from "@/components/home-computer-use";
 import { HomeDesktopMock } from "@/components/home-desktop-mock";
-import { HomeHeroProductShot } from "@/components/home-hero-product-shot";
-import { HomeStripeSections } from "@/components/home-stripe-sections";
+import { HomeDocuments } from "@/components/home-documents";
+import { HomeOpenPrivate } from "@/components/home-open-private";
+import { HomePhoneConnectors } from "@/components/home-phone-connectors";
+import { HomeSelfmod } from "@/components/home-selfmod";
 import { SiteHeader } from "@/components/site-header";
 
 const footerGroups: {
@@ -79,87 +80,18 @@ const footerGroups: {
   },
 ];
 
-const heroSurfaceItems = [
-  "Chat",
-  "Desktop",
-  "Browser",
-  "Voice",
-  "Phone",
-  "Docs",
-  "Store",
-];
-
 export default function Home() {
   return (
     <div className="stella-page">
       <SiteHeader />
 
       <main>
-        <section className="grid-shell hero-section section-border">
-          <div className="hero-copy reveal">
-            <p className="hero-eyebrow">Stella is in research preview</p>
-            <div
-              className="hero-surface-strip"
-              aria-label="Personal work running through Stella"
-            >
-              <span>Personal work running through Stella:</span>
-              <ul>
-                {heroSurfaceItems.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-            <h1>The world&apos;s first personal software.</h1>
-            <p className="hero-dek">
-              One ongoing conversation that can use your desktop, browser,
-              files, phone, voice, memory, and background agents. Everything
-              can change, including the interface itself.
-            </p>
-            <div className="hero-actions">
-              <DownloadButton />
-              <a
-                className="button button--ghost"
-                href="https://github.com/ruuxi/stella"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View GitHub
-                <Github size={15} aria-hidden="true" />
-              </a>
-            </div>
-            <dl className="hero-proof-row" aria-label="Stella proof points">
-              <div>
-                <dt>Local</dt>
-                <dd>Your data stays on your computer</dd>
-              </div>
-              <div>
-                <dt>Open</dt>
-                <dd>UI, prompts, skills, and runtime can change</dd>
-              </div>
-              <div>
-                <dt>One chat</dt>
-                <dd>No thread sprawl or history to manage</dd>
-              </div>
-            </dl>
-          </div>
-          <div className="hero-product-column reveal reveal-delay-1">
-            <HomeHeroProductShot />
-            <p className="hero-research-note">
-              Private.{" "}
-              <a
-                className="hero-research-note__link"
-                href="https://github.com/ruuxi/stella"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Open source.
-                <Github size={14} aria-hidden="true" />
-              </a>
-            </p>
-          </div>
-        </section>
         <HomeDesktopMock />
-        <HomeStripeSections />
+        <HomeComputerUse />
+        <HomePhoneConnectors />
+        <HomeSelfmod />
+        <HomeDocuments />
+        <HomeOpenPrivate />
       </main>
 
       <footer className="grid-shell site-footer section-deferred-render section-border">
