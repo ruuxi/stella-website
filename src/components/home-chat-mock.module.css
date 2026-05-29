@@ -1,0 +1,315 @@
+.chat {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: 100%;
+  min-height: 23rem;
+  margin: 1.1rem;
+  overflow: hidden;
+  border: 1px solid rgba(8, 19, 38, 0.09);
+  border-radius: 12px;
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(58, 160, 226, 0.1), transparent 55%),
+    linear-gradient(180deg, #ffffff, #fcfdff);
+  box-shadow:
+    0 1px 2px rgba(8, 19, 38, 0.05),
+    0 18px 40px rgba(8, 19, 38, 0.08);
+}
+
+.transcript {
+  min-height: 0;
+  overflow: hidden;
+  padding: 1.3rem 1.4rem 0.5rem;
+  mask-image: linear-gradient(180deg, transparent, #000 12%);
+}
+
+.transcriptInner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-height: 100%;
+  justify-content: flex-end;
+}
+
+.userBubble {
+  align-self: flex-end;
+  max-width: 80%;
+  padding: 0.5rem 0.78rem;
+  border-radius: 16px 16px 5px 16px;
+  background: color-mix(in oklch, #2563eb 13%, white);
+  color: #0c1b33;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  animation: bubbleIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.assistant {
+  align-self: flex-start;
+  max-width: 92%;
+  margin: 0;
+  color: rgba(8, 19, 38, 0.9);
+  font-size: 0.86rem;
+  line-height: 1.62;
+  animation: bubbleIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.caret {
+  display: inline-block;
+  width: 0.46rem;
+  height: 0.92rem;
+  margin-left: 0.12rem;
+  border-radius: 1px;
+  background: #2563eb;
+  vertical-align: text-bottom;
+  animation: caretBlink 1s steps(2, start) infinite;
+}
+
+/* Inline working indicator — Stella circle + shimmering status, matching
+   the desktop's next-line indicator below a streaming reply. */
+.inlineIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 0;
+  margin-top: -0.2rem;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(3px);
+  transition:
+    height 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.28s ease,
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.inlineIndicator[data-active] {
+  height: 1.55rem;
+  margin-top: 0.05rem;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.indicatorStella {
+  position: relative;
+  display: inline-flex;
+  width: 1.38rem;
+  height: 1.38rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 999px;
+}
+
+.indicatorStella :global(.stella-animation-container),
+.pillStella :global(.stella-animation-container) {
+  width: 5.6rem;
+  height: 5.6rem;
+  transform: scale(0.24);
+}
+
+.indicatorStatus {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.indicatorStatusText {
+  display: inline-block;
+  white-space: nowrap;
+  background: linear-gradient(
+    100deg,
+    rgba(8, 19, 38, 0.42) 20%,
+    rgba(8, 19, 38, 0.92) 50%,
+    rgba(8, 19, 38, 0.42) 80%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation:
+    statusShimmer 2.1s linear infinite,
+    statusSwap 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Composer */
+.composer {
+  position: relative;
+  z-index: 1;
+  padding: 0 1.1rem 1.05rem;
+}
+
+.contextRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 1.9rem;
+  padding: 0 0.2rem 0.32rem;
+  overflow: hidden;
+}
+
+/* Working pill slides in from the left, pushing the chips right. */
+.workingPill {
+  display: inline-flex;
+  max-width: 0;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.36rem;
+  overflow: hidden;
+  color: rgba(8, 19, 38, 0.78);
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+    max-width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.workingPill[data-active] {
+  max-width: 9rem;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.pillStella {
+  position: relative;
+  display: inline-flex;
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 999px;
+}
+
+.chips {
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.chip {
+  display: inline-flex;
+  height: 1.55rem;
+  align-items: center;
+  gap: 0.26rem;
+  padding: 0 0.42rem 0 0.32rem;
+  border: 1px dashed rgba(8, 19, 38, 0.2);
+  border-radius: 999px;
+  color: rgba(8, 19, 38, 0.42);
+}
+
+.chip img {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 4px;
+}
+
+.chipPlus {
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.inputBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.85rem;
+  padding: 0 0.42rem 0 0.62rem;
+  border: 1px solid rgba(8, 19, 38, 0.1);
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(8, 19, 38, 0.05);
+}
+
+.inputBar button {
+  display: inline-flex;
+  width: 1.85rem;
+  height: 1.85rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(8, 19, 38, 0.5);
+  cursor: pointer;
+}
+
+.placeholder {
+  flex: 1;
+  color: rgba(8, 19, 38, 0.4);
+  font-size: 0.86rem;
+}
+
+.send {
+  background: #2563eb !important;
+  color: #fff !important;
+}
+
+@keyframes bubbleIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes caretBlink {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes statusShimmer {
+  to {
+    background-position: -220% 0;
+  }
+}
+
+@keyframes statusSwap {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .chat {
+    min-height: 21rem;
+    margin: 0.85rem;
+  }
+
+  .userBubble,
+  .assistant {
+    font-size: 0.82rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret,
+  .indicatorStatusText {
+    animation: none;
+  }
+
+  .indicatorStatusText {
+    -webkit-text-fill-color: rgba(8, 19, 38, 0.8);
+  }
+}

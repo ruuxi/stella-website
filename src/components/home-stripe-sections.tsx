@@ -8,46 +8,21 @@ import {
   Mic,
   Monitor,
   MousePointer2,
-  Plus,
   Search,
   Smartphone,
+  Sparkles,
   Volume2,
   X,
 } from "lucide-react";
-import Image from "next/image";
 import {
   MobilePhoneVisual,
   type Platform,
 } from "@/components/product-demos/mobile-showcase";
 import { DownloadButton } from "@/components/download-button";
+import { HomeChatMock } from "@/components/home-chat-mock";
+import { FileGlyph, type FileKind } from "@/components/home-file-icons";
 import { StellaAnimation } from "@/components/stella-animation/stella-animation";
 import styles from "./home-stripe-sections.module.css";
-
-const assistantStreamLines = [
-  "I can keep the other requests queued while this runs.",
-  "Browser, calendar, messages, and files can work in parallel.",
-  "I'll bring each result back into this same chat.",
-];
-
-const queuedUserMessages = [
-  "Compare grocery prices for the list in Notes.",
-  "Add the school form deadline to Calendar.",
-  "Text Mom once the plan is set.",
-  "Turn the receipt into a spreadsheet.",
-];
-
-const workingStatuses = [
-  "Browser \u00b7 Comparing restaurants",
-  "Calendar \u00b7 Adding the school deadline",
-  "Messages \u00b7 Drafting Mom's reply",
-  "Spreadsheet \u00b7 Reading receipt totals",
-];
-
-const contextChips = [
-  { label: "Mail", iconSrc: "/mock-app-icons/mail.png" },
-  { label: "Maps", iconSrc: "/mock-app-icons/maps.png" },
-  { label: "Notes", iconSrc: "/mock-app-icons/notes.png" },
-] as const;
 
 const browserRows = [
   ["Luna Cucina", "7:30 PM", "4.8"],
@@ -75,60 +50,21 @@ const mailMessages = [
   ["Receipt from Market Lane", "Total: $82.14"],
 ];
 
-const calendarEvents = [
-  ["3:00", "Field trip form"],
-  ["6:20", "Groceries pickup"],
-  ["7:30", "Dinner reservation"],
-];
-
-const desktopFiles = ["form.pdf", "receipts", "dinner.eml", "list.xlsx"];
-
 const dictationWaveBars = Array.from({ length: 22 }, (_, index) => index);
 const compactWaveBars = Array.from({ length: 16 }, (_, index) => index);
 
-const documentArtifacts = [
-  {
-    kind: "docx",
-    title: "Weekend plan.docx",
-    meta: "Document · DOCX",
-    status: "Live preview",
-  },
-  {
-    kind: "xlsx",
-    title: "Grocery compare.xlsx",
-    meta: "Spreadsheet · XLSX",
-    status: "Open preview",
-  },
-  {
-    kind: "pptx",
-    title: "Family recap.pptx",
-    meta: "Slides · PPTX",
-    status: "Open preview",
-  },
-  {
-    kind: "pdf",
-    title: "school-form.pdf",
-    meta: "PDF · PDF",
-    status: "Open preview",
-  },
+const documentArtifacts: { kind: FileKind; title: string; meta: string }[] = [
+  { kind: "xlsx", title: "Grocery compare.xlsx", meta: "Spreadsheet · 3 stores" },
+  { kind: "docx", title: "Weekend plan.docx", meta: "Document · 1 page" },
+  { kind: "pptx", title: "Family recap.pptx", meta: "Slides · 6 slides" },
+  { kind: "pdf", title: "school-form.pdf", meta: "PDF · 3 pages" },
 ];
 
-const spreadsheetCells = [
-  "Store",
-  "Total",
-  "Drive",
-  "Market",
-  "$82",
-  "18m",
-  "Aldi",
-  "$74",
-  "22m",
-  "Target",
-  "$89",
-  "12m",
+const spreadsheetRows = [
+  ["Market Lane", "$82", "18 min"],
+  ["Aldi", "$74", "22 min"],
+  ["Target", "$89", "12 min"],
 ];
-
-const pdfChecklist = ["Permission slip", "Emergency contact", "Due Friday"];
 
 const phoneSurfaces: {
   platform: Platform;
@@ -195,25 +131,6 @@ const runtimeLayers = [
   ["Surfaces", "Desktop, mini window, phone, Discord, and Telegram"],
 ];
 
-const surfaceRailItems = [
-  "Desktop",
-  "Mini window",
-  "Browser",
-  "Computer use",
-  "Dictation",
-  "Phone",
-  "Discord",
-  "Telegram",
-  "Word",
-  "Excel",
-  "PowerPoint",
-  "PDF",
-  "Media",
-  "Store",
-  "Social",
-  "Reminders",
-];
-
 const integrationPaths = [
   {
     title: "Open and ask",
@@ -238,67 +155,25 @@ const integrationPaths = [
   },
 ];
 
-const integrationFlow = [
-  ["Ask", "One ongoing chat"],
-  ["Context", "Memory, files, app chips"],
-  ["Act", "Computer, browser, voice, Office"],
-  ["Return", "Artifacts and follow-ups"],
-];
-
-const infrastructureCapabilities = [
-  "stella-browser bridge",
-  "stella-computer sessions",
-  "~/.stella memory",
-  "Store add-ons",
-  "Phone and Discord routes",
-  "Self-editable UI",
-];
-
-const starterTasks = [
-  {
-    label: "Clear a pileup",
-    detail: "Messages, calendar, browser, and files in one thread",
-    surfaces: ["Chat", "Calendar", "Browser"],
-  },
-  {
-    label: "Make a document",
-    detail: "Turn notes, PDFs, receipts, or research into Office files",
-    surfaces: ["Word", "Excel", "PDF"],
-  },
-  {
-    label: "Change Stella",
-    detail: "Ask for a new shortcut, sidebar app, layout, or workflow",
-    surfaces: ["UI", "Skills", "Runtime"],
-  },
-];
-
 const workflowStories = [
   {
-    scene: "parent",
     title: "A parent clearing the Saturday pileup.",
     body: "Compare groceries, read the school PDF, hold a dinner reservation, and text the plan from the same thread.",
-    result: ["Dinner held", "Form due Friday", "Mom text drafted"],
     surfaces: ["Chat", "Browser", "PDF", "Phone"],
   },
   {
-    scene: "freelancer",
     title: "A freelancer turning receipts into admin.",
-    body: "Let Stella read mail, make a spreadsheet, draft the follow-up, and schedule a reminder before the deadline.",
-    result: ["Receipt table", "Invoice reminder", "Follow-up draft"],
+    body: "Stella reads mail, builds a spreadsheet, drafts the follow-up, and schedules a reminder before the deadline.",
     surfaces: ["Computer use", "Excel", "Dictation", "Reminders"],
   },
   {
-    scene: "student",
     title: "A student turning research into a deck.",
     body: "Open the downloaded PDF, summarize the useful pages, make slides, and keep the sources in the workspace panel.",
-    result: ["Sources pinned", "Deck outline", "PDF summary"],
     surfaces: ["Browser", "PDF", "PowerPoint", "Workspace"],
   },
   {
-    scene: "creator",
     title: "A creator assembling a weekly drop.",
     body: "Use voice notes, generated media, Store add-ons, and background agents without losing the main conversation.",
-    result: ["Voice notes", "Media queue", "Store add-on"],
     surfaces: ["Voice", "Media", "Store", "Agents"],
   },
 ];
@@ -338,20 +213,6 @@ const updateCards = [
 export function HomeStripeSections() {
   return (
     <section className={`grid-shell section-border ${styles.solutions}`}>
-      <div className={styles.surfaceRail} aria-label="Stella connected surfaces">
-        <span>Personal work running through Stella</span>
-        <div>
-          {surfaceRailItems.map((item, index) => (
-            <b
-              key={item}
-              style={{ ["--surface-index" as string]: index }}
-            >
-              {item}
-            </b>
-          ))}
-        </div>
-      </div>
-
       <div className={styles.sectionIntro}>
         <p className={styles.kicker}>Modular personal software</p>
         <h2>Every Stella surface, working as one system.</h2>
@@ -371,124 +232,11 @@ export function HomeStripeSections() {
             </span>
             <h3>One chat can run several jobs at once.</h3>
             <p>
-              Messages stream in, background work stays visible, and Stella keeps
-              moving through independent tasks without creating a new chat.
+              Replies stream in while background work stays visible. Stella keeps
+              moving through independent tasks in the same ongoing chat.
             </p>
           </div>
-
-          <div className={styles.chatMock} aria-label="Animated Stella chat mock">
-            <div className={styles.chatMessages}>
-              <div className={styles.userBubble}>
-                Find the best dinner option near the theater.
-              </div>
-              <div className={styles.assistantBlock}>
-                <span
-                  className={styles.streamLine}
-                  style={{ ["--line-index" as string]: 0 }}
-                >
-                  I&apos;m checking restaurant availability and recent reviews.
-                </span>
-              </div>
-              <div className={styles.userBubble}>
-                Also compare grocery prices, add the school form to my calendar,
-                text Mom, and make a receipt spreadsheet.
-              </div>
-              <div className={`${styles.assistantBlock} ${styles.assistantBlockStreaming}`}>
-                {assistantStreamLines.map((line, index) => (
-                  <span
-                    className={styles.streamLine}
-                    key={line}
-                    style={{ ["--line-index" as string]: index + 1 }}
-                  >
-                    {line}
-                  </span>
-                ))}
-              </div>
-              <div className={styles.inlineWorkingMock}>
-                <div className={styles.inlineWorkingIndicatorMock}>
-                  <span className={styles.inlineWorkingStella} aria-hidden="true">
-                    <StellaAnimation
-                      width={20}
-                      height={20}
-                      maxDpr={1}
-                      frameSkip={2}
-                      initialBirthProgress={1}
-                    />
-                  </span>
-                  <span className={styles.workingStatusTicker}>
-                    {workingStatuses.map((status, index) => (
-                      <b
-                        key={status}
-                        style={{ ["--status-index" as string]: index }}
-                      >
-                        {status}
-                      </b>
-                    ))}
-                  </span>
-                </div>
-              </div>
-              <div className={styles.queuedMessageStack}>
-                {queuedUserMessages.map((message, index) => (
-                  <div
-                    className={styles.queuedMessage}
-                    key={message}
-                    style={{ ["--queue-index" as string]: index }}
-                  >
-                    {message}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.composerZone}>
-              <div className={styles.contextSuggestionRow}>
-                <div className={styles.contextWorkingIndicator}>
-                  <span className={styles.workingStella} aria-hidden="true">
-                    <StellaAnimation
-                      width={18}
-                      height={9}
-                      maxDpr={1}
-                      frameSkip={1}
-                      initialBirthProgress={1}
-                    />
-                  </span>
-                  <span>Working</span>
-                </div>
-                <div className={styles.contextSuggestionLanes}>
-                  {contextChips.map((chip) => (
-                    <button
-                      className={styles.contextSuggestionChip}
-                      key={chip.label}
-                      type="button"
-                      aria-label={`Add ${chip.label} as context`}
-                    >
-                      <span aria-hidden="true">+</span>
-                      <Image
-                        src={chip.iconSrc}
-                        alt=""
-                        aria-hidden="true"
-                        width={16}
-                        height={16}
-                        draggable={false}
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className={styles.chatComposer}>
-                <button type="button" aria-label="Add context">
-                  <Plus size={15} strokeWidth={2.1} />
-                </button>
-                <span>Ask me anything...</span>
-                <button type="button" aria-label="Dictate">
-                  <Mic size={14} strokeWidth={1.9} />
-                </button>
-                <button type="button" aria-label="Send">
-                  <ArrowUpRight size={15} strokeWidth={2.1} />
-                </button>
-              </div>
-            </div>
-          </div>
+          <HomeChatMock />
         </article>
 
         <article className={`${styles.productCard} ${styles.computerCard}`}>
@@ -506,45 +254,20 @@ export function HomeStripeSections() {
           <div className={styles.computerMock} aria-hidden="true">
             <div className={styles.menuBar}>
               <span className={styles.menuApple} />
-              <span>Finder</span>
+              <b>Mail</b>
               <span>File</span>
               <span>Edit</span>
               <span>View</span>
-              <span>Window</span>
+              <span>Message</span>
               <span className={styles.menuTime}>10:42 AM</span>
             </div>
             <div className={styles.desktopBody}>
-              <div className={styles.desktopIcons}>
-                {desktopFiles.map((file) => (
-                  <span key={file}>
-                    <i />
-                    <b>{file}</b>
-                  </span>
-                ))}
-              </div>
-              <div className={styles.computerAutomationHud}>
-                <strong>stella-computer</strong>
-                <span>isolated task session</span>
-              </div>
-              <div className={styles.computerActionRail}>
-                {computerActions.map(([action, target, detail], index) => (
-                  <div
-                    className={styles.computerAction}
-                    key={`${action}-${target}-${detail}`}
-                    style={{ ["--action-index" as string]: index }}
-                  >
-                    <b>{action}</b>
-                    <span>{target}</span>
-                    <em>{detail}</em>
-                  </div>
-                ))}
-              </div>
               <div className={`${styles.appWindow} ${styles.mailWindow}`}>
                 <div className={styles.windowChrome}>
-                  <span>Mail</span>
+                  <span>Mail — Inbox</span>
                 </div>
                 <div className={styles.mailSidebar}>
-                  <span>Inbox</span>
+                  <span data-active="true">Inbox</span>
                   <span>Travel</span>
                   <span>Receipts</span>
                   <span>Family</span>
@@ -563,44 +286,34 @@ export function HomeStripeSections() {
                 </div>
                 <div className={styles.mailPreview}>
                   <strong>Reservation confirmed</strong>
-                  <span>Table for two at Luna Cucina.</span>
+                  <span>Table for two at Luna Cucina, Saturday 7:30 PM.</span>
                   <button type="button" data-ref="@e12">
                     Reply
                   </button>
                 </div>
               </div>
-              <div className={`${styles.appWindow} ${styles.finderWindow}`}>
-                <div className={styles.windowChrome}>
-                  <span>Documents</span>
+
+              <div className={styles.computerHud}>
+                <div className={styles.computerHudHead}>
+                  <span className={styles.computerHudDot} />
+                  <strong>stella-computer</strong>
+                  <em>isolated session</em>
                 </div>
-                <div className={styles.finderGrid}>
-                  {desktopFiles.map((file) => (
-                    <span key={file}>
-                      <i />
-                      <b>{file}</b>
-                    </span>
+                <ol className={styles.computerHudSteps}>
+                  {computerActions.map(([action, target, detail], index) => (
+                    <li
+                      key={`${action}-${target}-${detail}`}
+                      data-current={index === computerActions.length - 1 || undefined}
+                    >
+                      <b>{action}</b>
+                      <span>
+                        {target} <em>{detail}</em>
+                      </span>
+                    </li>
                   ))}
-                </div>
+                </ol>
               </div>
-              <div className={`${styles.appWindow} ${styles.calendarWindow}`}>
-                <div className={styles.windowChrome}>
-                  <span>Calendar</span>
-                </div>
-                <div className={styles.calendarHeader}>
-                  <strong>Saturday 24</strong>
-                  <span>3 events</span>
-                </div>
-                <div className={styles.calendarAgenda}>
-                  {calendarEvents.map(([time, title]) => (
-                    <div className={styles.calendarEvent} key={title}>
-                      <span>{time}</span>
-                      <strong>{title}</strong>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <span className={styles.automationRefMail}>@e12</span>
-              <span className={styles.automationRefCalendar}>@e4</span>
+
               <div className={styles.dock}>
                 <span data-app="finder" />
                 <span data-app="mail" />
@@ -609,7 +322,7 @@ export function HomeStripeSections() {
                 <span data-app="notes" />
                 <span data-app="files" />
               </div>
-              <MousePointer2 className={styles.computerCursor} size={22} />
+              <MousePointer2 className={styles.computerCursor} size={20} />
             </div>
           </div>
         </article>
@@ -783,72 +496,72 @@ export function HomeStripeSections() {
               <aside className={styles.officeArtifactList}>
                 {documentArtifacts.map((artifact, index) => (
                   <div
-                    className={styles.officeArtifactPill}
-                    data-kind={artifact.kind}
+                    className={styles.officeArtifactRow}
+                    data-active={index === 0 || undefined}
                     key={artifact.title}
-                    style={{ ["--artifact-index" as string]: index }}
                   >
-                    <span>{artifact.kind.toUpperCase()}</span>
+                    <span className={styles.officeArtifactIcon}>
+                      <FileGlyph kind={artifact.kind} />
+                    </span>
                     <div>
                       <strong>{artifact.title}</strong>
                       <em>{artifact.meta}</em>
                     </div>
-                    <b>{artifact.status}</b>
                   </div>
                 ))}
               </aside>
               <div className={styles.officePreviewPanel}>
                 <div className={styles.officePreviewToolbar}>
+                  <span className={styles.officePreviewIcon}>
+                    <FileGlyph kind="xlsx" />
+                  </span>
                   <div>
-                    <span>Live preview</span>
                     <strong>Grocery compare.xlsx</strong>
+                    <em>Updated just now</em>
                   </div>
-                  <em>Updated 9:41</em>
-                  <b>Copy</b>
-                  <b>Save</b>
+                  <button type="button" aria-label="Save to files">
+                    <Check size={13} strokeWidth={2.2} />
+                  </button>
                 </div>
-                <div className={styles.officePreviewCanvas}>
-                  <section className={styles.wordPreview}>
-                    <h4>Weekend plan</h4>
-                    <p>Dinner near the theater</p>
-                    <span />
-                    <span />
-                    <ul>
-                      <li>Reservation at 7:30 PM</li>
-                      <li>Bring tickets and school form</li>
-                    </ul>
-                  </section>
-                  <section className={styles.sheetPreview}>
-                    {spreadsheetCells.map((cell, index) => (
-                      <i
-                        data-head={index < 3 || undefined}
-                        key={`${cell}-${index}`}
-                      >
-                        {cell}
-                      </i>
-                    ))}
-                  </section>
-                  <section className={styles.deckPreview}>
-                    <div>
+                <div className={styles.sheetPreview}>
+                  <div className={styles.sheetFormula}>
+                    <b>fx</b>
+                    <span>=MIN(B2:B4) → cheapest is Aldi at $74</span>
+                  </div>
+                  <div className={styles.sheetGrid}>
+                    <div className={styles.sheetColHeader}>
                       <i />
-                      <i />
-                      <i />
+                      <span>A</span>
+                      <span>B</span>
+                      <span>C</span>
                     </div>
-                    <main>
-                      <strong>Family plan</strong>
-                      <span />
-                      <span />
-                    </main>
-                  </section>
-                  <section className={styles.pdfPreview}>
-                    <header>
-                      <b>PDF</b>
-                      <em>1 / 3</em>
-                    </header>
-                    {pdfChecklist.map((item) => (
-                      <span key={item}>{item}</span>
+                    <div className={styles.sheetHeaderRow}>
+                      <i>1</i>
+                      <span>Store</span>
+                      <span>Total</span>
+                      <span>Drive</span>
+                    </div>
+                    {spreadsheetRows.map((row, rowIndex) => (
+                      <div
+                        className={styles.sheetRow}
+                        data-best={rowIndex === 1 || undefined}
+                        key={row[0]}
+                      >
+                        <i>{rowIndex + 2}</i>
+                        {row.map((cell, cellIndex) => (
+                          <span key={`${row[0]}-${cellIndex}`}>{cell}</span>
+                        ))}
+                      </div>
                     ))}
-                  </section>
+                    {[5, 6, 7].map((rowNumber) => (
+                      <div className={styles.sheetRow} key={rowNumber}>
+                        <i>{rowNumber}</i>
+                        <span />
+                        <span />
+                        <span />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -921,84 +634,23 @@ export function HomeStripeSections() {
         </article>
       </div>
 
-      <section className={styles.starterGuide}>
-        <div className={styles.starterGuideCopy}>
-          <p className={styles.kicker}>Not sure where to start?</p>
-          <h2>Give Stella one real task, then let the surfaces connect.</h2>
-          <p>
-            Stella is useful when the work crosses apps. Start with the thing
-            you are already avoiding, and Stella can decide whether it needs
-            chat, browser, computer use, voice, files, phone, or memory.
-          </p>
-          <a href="/how-it-works">
-            Find what to ask first
-            <ArrowUpRight size={13} strokeWidth={2} aria-hidden="true" />
-          </a>
-        </div>
-        <div className={styles.starterTaskStack}>
-          {starterTasks.map((task, index) => (
-            <article
-              className={styles.starterTask}
-              key={task.label}
-              style={{ ["--starter-index" as string]: index }}
-            >
-              <span>{`0${index + 1}`}</span>
-              <strong>{task.label}</strong>
-              <p>{task.detail}</p>
-              <div>
-                {task.surfaces.map((surface) => (
-                  <b key={surface}>{surface}</b>
-                ))}
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
       <section className={styles.workflowSection}>
-        <div className={styles.workflowIntro}>
+        <div className={styles.sectionIntro}>
           <p className={styles.kicker}>For ordinary workflows</p>
-          <h2>Personal software for the work that does not fit one app.</h2>
+          <h2>Built for work that does not fit one app.</h2>
           <p>
-            Stella is useful when a task crosses messages, files, websites,
-            reminders, voice, and the desktop itself.
+            Stella earns its place when a task crosses messages, files,
+            websites, reminders, voice, and the desktop itself.
           </p>
         </div>
         <div className={styles.workflowGrid}>
-          {workflowStories.map((story, index) => (
-            <article
-              className={styles.workflowCard}
-              key={story.title}
-              style={{ ["--workflow-index" as string]: index }}
-            >
-              <span>{`0${index + 1}`}</span>
-              <div className={styles.workflowScene} data-scene={story.scene}>
-                <div className={styles.workflowSceneWindow}>
-                  <i />
-                  <i />
-                  <i />
-                </div>
-                <div className={styles.workflowSceneStack}>
-                  {story.result.map((item, resultIndex) => (
-                    <b
-                      key={item}
-                      style={{ ["--result-index" as string]: resultIndex }}
-                    >
-                      {item}
-                    </b>
-                  ))}
-                </div>
-              </div>
+          {workflowStories.map((story) => (
+            <article className={styles.workflowCard} key={story.title}>
               <h3>{story.title}</h3>
               <p>{story.body}</p>
-              <div>
-                <b>Surfaces used</b>
-                <ul>
-                  {story.surfaces.map((surface) => (
-                    <li key={surface}>{surface}</li>
-                  ))}
-                </ul>
-              </div>
+              <span className={styles.workflowSurfaces}>
+                {story.surfaces.join("  ·  ")}
+              </span>
             </article>
           ))}
         </div>
@@ -1301,32 +953,25 @@ export function HomeStripeSections() {
         </div>
 
         <div className={styles.extensibilityPanel}>
-          <div className={styles.integrationFlow} aria-label="Stella integration flow">
-            {integrationFlow.map(([title, detail], index) => (
-              <span
-                key={title}
-                style={{ ["--flow-index" as string]: index }}
-              >
-                <b>{title}</b>
-                <em>{detail}</em>
-              </span>
-            ))}
-          </div>
           <div className={styles.extensibilityTerminal}>
             <div>
               <span />
               <span />
               <span />
+              <em>ask Stella to edit herself</em>
             </div>
-            <code>~/.stella/memories</code>
-            <code>runtime/home-seed/skills</code>
-            <code>desktop/src/app</code>
-            <code>Store add-ons</code>
-          </div>
-          <div className={styles.infrastructureCapabilities}>
-            {infrastructureCapabilities.map((capability) => (
-              <span key={capability}>{capability}</span>
-            ))}
+            <code>
+              <b>~/.stella/memories</b> — markdown memory and skills
+            </code>
+            <code>
+              <b>runtime/home-seed/skills</b> — bundled capabilities
+            </code>
+            <code>
+              <b>desktop/src/app</b> — the UI you are looking at
+            </code>
+            <code>
+              <b>Store add-ons</b> — install what others build
+            </code>
           </div>
           <div className={styles.extensibilityPaths}>
             {integrationPaths.map((path, index) => (
@@ -1369,13 +1014,18 @@ export function HomeStripeSections() {
               rel={card.external ? "noopener noreferrer" : undefined}
               target={card.external ? "_blank" : undefined}
             >
-              <div className={styles.updateVisual} aria-hidden="true">
-                <i />
-                <i />
-                <i />
-                <i />
-              </div>
-              <span>{card.topic}</span>
+              <span className={styles.updateIcon} aria-hidden="true">
+                {card.kind === "phone" ? (
+                  <Smartphone size={18} strokeWidth={1.7} />
+                ) : card.kind === "files" ? (
+                  <FileText size={18} strokeWidth={1.7} />
+                ) : card.kind === "voice" ? (
+                  <Volume2 size={18} strokeWidth={1.7} />
+                ) : (
+                  <Sparkles size={18} strokeWidth={1.7} />
+                )}
+              </span>
+              <span className={styles.updateTopic}>{card.topic}</span>
               <strong>{card.title}</strong>
               <p>{card.body}</p>
               <b>
