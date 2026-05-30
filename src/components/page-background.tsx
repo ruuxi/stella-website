@@ -31,22 +31,22 @@ export function PageBackground() {
         <g filter="url(#page-background-blur)">
           {/* Upper-left, pointing right toward center. */}
           <polygon
-            points="-60,80 540,160 80,380"
+            points="-495,80 1155,160 -105,380"
             fill="#6ec3f0"
             opacity="0.55"
           />
           {/* Center, pointing down — the darkest of the three so it
               anchors the middle of the band. */}
           <polygon
-            points="640,40 1060,90 870,440"
+            points="495,40 1195,90 880,360"
             fill="#2e7fd0"
-            opacity="0.45"
+            opacity="0.33"
           />
           {/* Upper-right, pointing left back toward center. */}
           <polygon
-            points="1660,110 1100,180 1520,420"
-            fill="#7cc8f2"
-            opacity="0.5"
+            points="2070,110 535,180 1675,420"
+            fill="#9bd4f6"
+            opacity="0.85"
           />
         </g>
       </svg>
