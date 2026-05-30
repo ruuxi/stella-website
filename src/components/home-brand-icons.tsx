@@ -23,7 +23,10 @@ export type BrandName =
 
 type Glyph = {
   viewBox: string;
-  paths: string[];
+  paths?: string[];
+  /** Stroked (outline) paths — for line-art marks like antennae or snakes. */
+  strokePaths?: string[];
+  strokeWidth?: number;
   evenOdd?: boolean;
 };
 
@@ -85,20 +88,33 @@ const GLYPHS: Record<BrandName, Glyph> = {
   },
   // ── Niche open-source harnesses: clean glyphs in the spirit of each ──
   openclaw: {
-    // A crab/lobster pincer (OpenClaw's 🦞 identity), opening to the left.
-    viewBox: "0 0 24 24",
+    // OpenClaw's official lobster mark (from openclaw.ai): body with eye
+    // cutouts, two side claws, and antennae.
+    viewBox: "0 0 120 120",
+    evenOdd: true,
+    strokeWidth: 5,
     paths: [
-      "M20.2 12C20.2 7.7 16.6 5 12 5 7.8 5 4.2 7 3.5 9.6 3.4 10 3.7 10.4 4.3 10.5L13 11.8 4.3 13.5C3.7 13.6 3.4 14 3.5 14.4 4.2 17 7.8 19 12 19 16.6 19 20.2 16.3 20.2 12Z",
+      "M60 10C30 10 15 35 15 55 15 75 30 95 45 100L45 110 55 110 55 100C55 100 60 102 65 100L65 110 75 110 75 100C90 95 105 75 105 55 105 35 90 10 60 10ZM45 29a6 6 0 1 0 0 12 6 6 0 0 0 0-12ZM75 29a6 6 0 1 0 0 12 6 6 0 0 0 0-12Z",
+      "M20 45C5 40 0 50 5 60 10 70 20 65 25 55 28 48 25 45 20 45Z",
+      "M100 45C115 40 120 50 115 60 110 70 100 65 95 55 92 48 95 45 100 45Z",
     ],
+    strokePaths: ["M45 15Q35 5 30 8", "M75 15Q85 5 90 8"],
   },
   hermes: {
-    // Hermes' caduceus, distilled to a winged orb on a short staff (☤).
+    // Hermes' caduceus (☤): winged staff with two coiling snakes.
     viewBox: "0 0 24 24",
+    strokeWidth: 1.5,
     paths: [
-      "M12 9.3a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z",
-      "M11.15 13.4h1.7v4.85a.85.85 0 0 1-1.7 0Z",
-      "M10.5 10.5C7.6 8.4 5 6.7 2.5 5.5c.8 1.9 2 3.5 3.7 4.7-1.4-.3-2.7-.4-4-.3 2.2 1.4 4.9 1.9 7.6 1.7Z",
-      "M13.5 10.5C16.4 8.4 19 6.7 21.5 5.5c-.8 1.9-2 3.5-3.7 4.7 1.4-.3 2.7-.4 4-.3-2.2 1.4-4.9 1.9-7.6 1.7Z",
+      "M12 2.7a1.35 1.35 0 1 0 0 2.7 1.35 1.35 0 0 0 0-2.7Z",
+      "M11.5 6.6C9.6 5.7 7.5 5.5 5.7 6.1 6.8 7 8.3 7.5 9.9 7.5 8.6 7.9 7.5 8.6 6.6 9.6 8.4 9.5 10.3 8.7 11.5 7.4Z",
+      "M12.5 6.6C14.4 5.7 16.5 5.5 18.3 6.1 17.2 7 15.7 7.5 14.1 7.5 15.4 7.9 16.5 8.6 17.4 9.6 15.6 9.5 13.7 8.7 12.5 7.4Z",
+      "M10.4 7.7a.95.95 0 1 0 0 1.9.95.95 0 0 0 0-1.9Z",
+      "M13.6 7.7a.95.95 0 1 0 0 1.9.95.95 0 0 0 0-1.9Z",
+    ],
+    strokePaths: [
+      "M12 8.6V20.4",
+      "M10.6 8.6C8.7 9.6 8.7 11.3 11 12.1 13.3 12.9 13.3 14.6 11.4 15.6",
+      "M13.4 8.6C15.3 9.6 15.3 11.3 13 12.1 10.7 12.9 10.7 14.6 12.6 15.6",
     ],
   },
 };
@@ -121,8 +137,19 @@ export function BrandGlyph({
       aria-hidden="true"
       focusable="false"
     >
-      {glyph.paths.map((d, i) => (
-        <path key={i} d={d} />
+      {glyph.paths?.map((d, i) => (
+        <path key={`f${i}`} d={d} />
+      ))}
+      {glyph.strokePaths?.map((d, i) => (
+        <path
+          key={`s${i}`}
+          d={d}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={glyph.strokeWidth ?? 1.6}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       ))}
     </svg>
   );

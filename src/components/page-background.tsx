@@ -1,7 +1,6 @@
 /* Site-wide ambient background:
  *   - a soft blue linear gradient pinned to the top of the viewport that
- *     fades out roughly halfway through the home hero (hero is
- *     `min-height: calc(100svh - 4rem)`), and
+ *     fades out partway down the first screen, and
  *   - three elongated rounded-triangle blue blurs drifting across the
  *     upper band of the page.
  *
