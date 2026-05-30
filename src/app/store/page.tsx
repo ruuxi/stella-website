@@ -6,6 +6,7 @@ import "./store.css";
 export const metadata: Metadata = {
   title: "Store",
   description: "Discover Stella apps, mods, and customizations.",
+  alternates: { canonical: "/store" },
 };
 
 export default function StorePage() {

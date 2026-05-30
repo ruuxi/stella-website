@@ -48,7 +48,8 @@ export function HomeDocuments() {
                 alt={`${doc.label} document created by Stella`}
                 width={1400}
                 height={933}
-                loading="eager"
+                loading="lazy"
+                quality={82}
                 className={styles.shotImg}
                 sizes="(max-width: 860px) 92vw, 48rem"
               />

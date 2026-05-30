@@ -92,8 +92,8 @@ export function HomeCanvasDemos() {
                 alt={surface.alt}
                 width={surface.width}
                 height={surface.height}
-                loading="eager"
-                unoptimized
+                loading="lazy"
+                quality={82}
                 sizes="(max-width: 820px) 92vw, 42rem"
                 className={styles.image}
               />

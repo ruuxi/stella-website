@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, IBM_Plex_Mono, Manrope } from "next/font/google";
 import { getSiteUrl } from "@/lib/site-url";
 import { ConvexAuthProvider } from "@/components/auth/convex-auth-provider";
@@ -8,15 +8,10 @@ import { EmbeddedThemeBridge } from "@/components/embedded/embedded-theme-bridge
 import { PageBackground } from "@/components/page-background";
 import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import "./globals.css";
-/* Product demos (self-mod, radial, canvas) — partials in ./demos/ */
-import "./demos.css";
 
 const siteUrl = getSiteUrl();
 const description =
   "Stella is your personal AI assistant that lives on your computer. Chat, voice, scheduling, and a fully customizable interface.";
-const ogDescription =
-  "Your personal AI assistant. Chat, voice, automation, and a fully customizable interface — all in one place.";
-
 const sans = Manrope({
   variable: "--font-sans",
   subsets: ["latin"],
@@ -25,11 +20,14 @@ const sans = Manrope({
   adjustFontFallback: true,
 });
 
+// Cormorant Garamond is a variable font: a single file per style covers the
+// full 300–600 weight range we use, so we rely on the variable axis instead of
+// enumerating discrete weights. This collapses dozens of redundant @font-face
+// rules and lets in-between weights (e.g. 450) interpolate correctly.
 const display = Cormorant_Garamond({
   variable: "--font-display",
   subsets: ["latin"],
   display: "swap",
-  weight: ["300", "400", "500", "600"],
   style: ["normal", "italic"],
   preload: true,
   adjustFontFallback: true,
@@ -69,9 +67,10 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
+  // og:/twitter: title and description are intentionally omitted so each
+  // route's own title + description flow into the social tags. The homepage
+  // falls back to the default title and root `description`.
   openGraph: {
-    title: "Stella",
-    description: ogDescription,
     siteName: "Stella",
     type: "website",
     locale: "en_US",
@@ -79,8 +78,6 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Stella",
-    description: ogDescription,
     site: "@stella",
   },
   robots: {
@@ -100,6 +97,11 @@ export const metadata: Metadata = {
   category: "technology",
 };
 
+export const viewport: Viewport = {
+  themeColor: "#f3f8ff",
+  colorScheme: "light",
+};
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -117,7 +119,22 @@ const jsonLd = {
       name: "Stella",
       url: siteUrl.origin,
       logo: new URL("/stella-logo.svg", siteUrl).href,
-      sameAs: ["https://x.com/stella"],
+      sameAs: ["https://x.com/stella", "https://github.com/ruuxi/stella"],
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${siteUrl.origin}/#app`,
+      name: "Stella",
+      description,
+      url: siteUrl.origin,
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "macOS, Windows",
+      publisher: { "@id": `${siteUrl.origin}/#organization` },
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
     },
   ],
 };
