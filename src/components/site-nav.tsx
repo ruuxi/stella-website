@@ -2,31 +2,99 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { SiteHeaderAccount } from "@/components/auth/site-header-account";
+import {
+  chromeExtensionLink,
+  openSourceFooterItems,
+} from "@/components/site-footer-groups";
 
-type NavItem = { label: string; href: string; external?: boolean };
+type NavLink = { label: string; href: string; external?: boolean };
+type NavEntry = {
+  label: string;
+  href?: string;
+  external?: boolean;
+  items?: NavLink[];
+};
 
-const NAV_ITEMS: NavItem[] = [
-  { label: "Product", href: "/learn-more" },
-  { label: "Solutions", href: "/how-it-works" },
-  { label: "Developers", href: "https://github.com/ruuxi/stella", external: true },
-  { label: "Resources", href: "/learn-more/whats-new" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "Store", href: "/store" },
+const NAV_ENTRIES: NavEntry[] = [
+  {
+    label: "Product",
+    items: [
+      { label: "Learn More", href: "/learn-more" },
+      { label: "Memory", href: "/memory" },
+      { label: "Storage", href: "/storage" },
+      { label: "Agents", href: "/agents" },
+      { label: "Voice", href: "/voice" },
+      { label: "Pricing", href: "/pricing" },
+      { label: "How It Works", href: "/how-it-works" },
+    ],
+  },
+  {
+    label: "Resources",
+    items: [
+      { label: "What's New", href: "/learn-more/whats-new" },
+      { label: "Changelog", href: "/changelog" },
+      chromeExtensionLink,
+      { label: "Install for macOS", href: "/install.sh" },
+      { label: "Install for Windows", href: "/install.ps1" },
+    ],
+  },
+  {
+    label: "Open Source",
+    items: openSourceFooterItems,
+  },
+  {
+    label: "Community",
+    items: [
+      { label: "Discord", href: "https://discord.gg/HXVCCeE542", external: true },
+      { label: "Store", href: "/store" },
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
+    ],
+  },
 ];
+
+function NavItemLink({
+  item,
+  onNavigate,
+  className,
+}: {
+  item: NavLink;
+  onNavigate?: () => void;
+  className?: string;
+}) {
+  if (item.external) {
+    return (
+      <a
+        href={item.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+        onClick={onNavigate}
+      >
+        {item.label}
+      </a>
+    );
+  }
+  return (
+    <Link href={item.href} className={className} onClick={onNavigate}>
+      {item.label}
+    </Link>
+  );
+}
 
 /**
  * Primary site navigation used in every marketing-page header.
  *
- * On wide screens it renders the inline horizontal links plus the
- * `SiteHeaderAccount` button, matching the historical `.site-nav` layout.
+ * On wide screens each top-level tab is either a direct link (Store) or a
+ * footer-style category (Product, Resources, Community) that reveals its
+ * links in a popover on hover or keyboard focus.
  *
- * On narrow screens (<= 860px) the inline links collapse into a hamburger
- * toggle that opens a full-width sheet from the top of the viewport. The
- * `SiteHeaderAccount` sign-in button stays visible in the header bar
- * regardless of viewport — auth is the single most important CTA, and the
- * sign-in dialog is more important than secondary nav links.
+ * On narrow screens (<= 860px) the tabs collapse into a hamburger sheet that
+ * lists every category and its links. The `SiteHeaderAccount` sign-in button
+ * stays in the header bar at all widths — auth is the single most important
+ * CTA.
  */
 export function SiteNav() {
   const [open, setOpen] = useState(false);
@@ -48,20 +116,34 @@ export function SiteNav() {
   return (
     <nav className="site-nav" aria-label="Primary">
       <div className="site-nav__inline">
-        {NAV_ITEMS.map((item) =>
-          item.external ? (
-            <a
-              key={item.label}
-              href={item.href}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {item.label}
-            </a>
+        {NAV_ENTRIES.map((entry) =>
+          entry.items ? (
+            <div key={entry.label} className="site-nav__group">
+              <button
+                type="button"
+                className="site-nav__trigger"
+                aria-haspopup="true"
+              >
+                {entry.label}
+                <ChevronDown size={13} aria-hidden="true" />
+              </button>
+              <div className="site-nav__menu">
+                <div className="site-nav__panel">
+                  {entry.items.map((item) => (
+                    <NavItemLink key={item.label} item={item} />
+                  ))}
+                </div>
+              </div>
+            </div>
           ) : (
-            <Link key={item.label} href={item.href}>
-              {item.label}
-            </Link>
+            <NavItemLink
+              key={entry.label}
+              item={{
+                label: entry.label,
+                href: entry.href as string,
+                external: entry.external,
+              }}
+            />
           )
         )}
       </div>
@@ -94,26 +176,35 @@ export function SiteNav() {
         data-open={open ? "true" : "false"}
         hidden={!open}
       >
-        <ul>
-          {NAV_ITEMS.map((item) => (
-            <li key={item.label}>
-              {item.external ? (
-                <a
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setOpen(false)}
-                >
-                  {item.label}
-                </a>
-              ) : (
-                <Link href={item.href} onClick={() => setOpen(false)}>
-                  {item.label}
-                </Link>
-              )}
-            </li>
-          ))}
-        </ul>
+        {NAV_ENTRIES.map((entry) =>
+          entry.items ? (
+            <div key={entry.label} className="site-nav__sheet-group">
+              <p className="site-nav__sheet-title">{entry.label}</p>
+              <ul>
+                {entry.items.map((item) => (
+                  <li key={item.label}>
+                    <NavItemLink item={item} onNavigate={() => setOpen(false)} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div key={entry.label} className="site-nav__sheet-group">
+              <ul>
+                <li>
+                  <NavItemLink
+                    item={{
+                      label: entry.label,
+                      href: entry.href as string,
+                      external: entry.external,
+                    }}
+                    onNavigate={() => setOpen(false)}
+                  />
+                </li>
+              </ul>
+            </div>
+          )
+        )}
       </div>
     </nav>
   );
