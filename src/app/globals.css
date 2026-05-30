@@ -174,27 +174,12 @@ html[data-embedded="true"] .site-header {
 }
 
 .site-header {
-  --scroll-progress: 0;
   grid-template-columns: 1fr auto;
   align-items: center;
-  position: sticky;
-  top: 0;
   z-index: 50;
   padding-block: clamp(0.15rem, 0.45vw, 0.4rem) clamp(0.2rem, 0.55vw, 0.5rem);
   background: transparent;
-  border-bottom: 1px solid transparent;
-  border-bottom-color: rgba(82, 104, 134, calc(var(--scroll-progress) * 0.18));
-  box-shadow: 0 6px 24px -18px rgba(12, 22, 38, calc(var(--scroll-progress) * 0.4));
-}
-
-.site-header::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: var(--page-background);
-  opacity: var(--scroll-progress);
+  border-bottom: none;
 }
 
 .site-header .brand-mark__logo {
