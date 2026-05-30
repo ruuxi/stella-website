@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { FooterLegalLinks } from "@/components/footer-legal-links";
+import { homeFooterGroups } from "@/components/site-footer-groups";
 import { SiteHeader } from "@/components/site-header";
 import "./pricing.css";
 
@@ -75,35 +76,6 @@ const included = [
   "Private by default",
   "Customizable interface",
   "Desktop and mobile access",
-];
-
-const footerGroups: {
-  title: string;
-  items: { label: string; href: string; external?: boolean }[];
-}[] = [
-  {
-    title: "Product",
-    items: [
-      { label: "Learn More", href: "/learn-more" },
-      { label: "Store", href: "/store" },
-      { label: "Pricing", href: "/pricing" },
-      { label: "Sign In", href: "/sign-in" },
-    ],
-  },
-  {
-    title: "Resources",
-    items: [{ label: "What's New", href: "/learn-more/whats-new" }],
-  },
-  {
-    title: "Community",
-    items: [
-      {
-        label: "Discord",
-        href: "https://discord.gg/HXVCCeE542",
-        external: true,
-      },
-    ],
-  },
 ];
 
 export default function Pricing() {
@@ -232,7 +204,7 @@ export default function Pricing() {
           <FooterLegalLinks />
         </div>
         <div className="footer-columns">
-          {footerGroups.map((group) => (
+          {homeFooterGroups.map((group) => (
             <div key={group.title} className="footer-column">
               <h3>{group.title}</h3>
               <ul>

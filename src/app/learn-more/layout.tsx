@@ -2,44 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { FooterLegalLinks } from "@/components/footer-legal-links";
+import { homeFooterGroups } from "@/components/site-footer-groups";
 import { SiteHeader } from "@/components/site-header";
 import "./learn-more.css";
-
-const footerGroups: {
-  title: string;
-  items: { label: string; href: string; external?: boolean }[];
-}[] = [
-  {
-    title: "Product",
-    items: [
-      { label: "Learn More", href: "/learn-more" },
-      { label: "Store", href: "/store" },
-      { label: "Pricing", href: "/pricing" },
-      { label: "Sign In", href: "/sign-in" },
-    ],
-  },
-  {
-    title: "Resources",
-    items: [
-      { label: "What's New", href: "/learn-more/whats-new" },
-      {
-        label: "GitHub",
-        href: "https://github.com/ruuxi/stella",
-        external: true,
-      },
-    ],
-  },
-  {
-    title: "Community",
-    items: [
-      {
-        label: "Discord",
-        href: "https://discord.gg/HXVCCeE542",
-        external: true,
-      },
-    ],
-  },
-];
 
 export default function LearnMoreLayout({
   children,
@@ -66,7 +31,7 @@ export default function LearnMoreLayout({
           <FooterLegalLinks />
         </div>
         <div className="footer-columns">
-          {footerGroups.map((group) => (
+          {homeFooterGroups.map((group) => (
             <div key={group.title} className="footer-column">
               <h3>{group.title}</h3>
               <ul>

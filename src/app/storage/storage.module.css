@@ -1,0 +1,539 @@
+.page {
+  --ink: #0c1b33;
+  --muted: #54627a;
+  --blue: #2563eb;
+}
+
+/* ── Shared section frame ─────────────────────────────── */
+
+.section {
+  row-gap: clamp(1.6rem, 3vw, 2.6rem);
+  padding-block: clamp(3rem, 7vw, 6.5rem);
+}
+
+.section > * {
+  grid-column: 1 / -1;
+}
+
+.eyebrow {
+  display: inline-flex;
+  width: max-content;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--blue);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.eyebrow::after {
+  content: "";
+  width: clamp(2.5rem, 7vw, 6rem);
+  height: 1px;
+  background: rgba(82, 104, 134, 0.24);
+}
+
+/* ── Hero ────────────────────────────────────────────── */
+
+.heroSection {
+  padding-block: clamp(3.5rem, 9vw, 8rem) clamp(2rem, 5vw, 4rem);
+}
+
+.heroSection > * {
+  grid-column: 1 / -1;
+}
+
+.hero {
+  display: grid;
+  gap: clamp(1rem, 2vw, 1.4rem);
+  width: min(100%, 60rem);
+  margin-inline: auto;
+  text-align: center;
+  justify-items: center;
+}
+
+.hero h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(2.4rem, 6vw, 5rem);
+  font-weight: 650;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.hero p {
+  max-width: 38rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(1.02rem, 1.3vw, 1.22rem);
+  line-height: 1.7;
+}
+
+/* ── Split rows: copy + visual ───────────────────────── */
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  align-items: center;
+  gap: clamp(1.6rem, 4vw, 4.5rem);
+  width: min(100%, 74rem);
+  margin-inline: auto;
+}
+
+.row--flip .copy {
+  order: 2;
+}
+
+.copy {
+  display: grid;
+  gap: 1.05rem;
+}
+
+.copy h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(1.85rem, 3.4vw, 3.1rem);
+  font-weight: 650;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.copy p {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 1.2vw, 1.14rem);
+  line-height: 1.72;
+}
+
+/* ── Visual panel (grid-paper) ───────────────────────── */
+
+.visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 22rem;
+  padding: clamp(1.4rem, 3vw, 2.4rem);
+  overflow: hidden;
+  border: 1px solid rgba(82, 104, 134, 0.16);
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.7), transparent 32%),
+    linear-gradient(180deg, rgba(248, 252, 255, 0.7), rgba(226, 237, 249, 0.52));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.82) inset,
+    0 36px 96px -62px rgba(12, 22, 38, 0.5);
+}
+
+.visual::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(82, 104, 134, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(82, 104, 134, 0.08) 1px, transparent 1px);
+  background-size: 3.4rem 3.4rem;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent 78%);
+  pointer-events: none;
+}
+
+.flow {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  max-width: 22rem;
+}
+
+/* ── Generic bordered nodes ──────────────────────────── */
+
+.node,
+.device,
+.bubble,
+.pile,
+.toggle,
+.hashRow,
+.endpoint {
+  border: 1px solid rgba(82, 104, 134, 0.16);
+  background: rgba(247, 251, 255, 0.82);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.75) inset,
+    0 22px 48px -38px rgba(12, 22, 38, 0.5);
+}
+
+.node {
+  display: grid;
+  justify-items: center;
+  gap: 0.38rem;
+  width: 100%;
+  max-width: 17rem;
+  padding: 1.1rem 1rem;
+  text-align: center;
+}
+
+.nodeIcon {
+  display: inline-flex;
+  width: 2.6rem;
+  height: 2.6rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.9), transparent 55%),
+    linear-gradient(180deg, rgba(37, 99, 235, 0.16), rgba(37, 99, 235, 0.05));
+  color: var(--blue);
+}
+
+.node strong {
+  color: var(--ink);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.node em {
+  color: rgba(84, 98, 122, 0.86);
+  font-size: 0.76rem;
+  font-style: normal;
+  line-height: 1.45;
+}
+
+/* ── Connectors ──────────────────────────────────────── */
+
+.down {
+  width: 1px;
+  height: 2.1rem;
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.42), rgba(37, 99, 235, 0.06));
+}
+
+/* ── Local-first: device window ──────────────────────── */
+
+.device {
+  width: 100%;
+  max-width: 18rem;
+  padding: 0;
+  overflow: hidden;
+}
+
+.deviceBar {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.55rem 0.7rem;
+  border-bottom: 1px solid rgba(82, 104, 134, 0.14);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.deviceBar i {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: rgba(82, 104, 134, 0.28);
+}
+
+.deviceBody {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.95rem 0.95rem;
+}
+
+.deviceIcon {
+  display: inline-flex;
+  width: 2.2rem;
+  height: 2.2rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.9), transparent 55%),
+    linear-gradient(180deg, rgba(37, 99, 235, 0.16), rgba(37, 99, 235, 0.05));
+  color: var(--blue);
+}
+
+.deviceText {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.deviceText strong {
+  color: var(--ink);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.deviceText em {
+  color: rgba(84, 98, 122, 0.82);
+  font-size: 0.74rem;
+  font-style: normal;
+}
+
+.crossed {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px dashed rgba(82, 104, 134, 0.28);
+  color: rgba(84, 98, 122, 0.72);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+}
+
+.crossed svg {
+  color: rgba(84, 98, 122, 0.6);
+}
+
+/* ── Backups: toggle + lock ──────────────────────────── */
+
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  max-width: 17rem;
+  padding: 0.7rem 0.85rem;
+}
+
+.toggleLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.toggleLabel svg {
+  color: var(--blue);
+}
+
+.switch {
+  position: relative;
+  display: inline-flex;
+  width: 2.3rem;
+  height: 1.3rem;
+  flex: 0 0 auto;
+  align-items: center;
+  border-radius: 999px;
+  background: rgba(82, 104, 134, 0.22);
+}
+
+.switch i {
+  position: absolute;
+  left: 0.18rem;
+  width: 0.94rem;
+  height: 0.94rem;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(12, 22, 38, 0.28);
+}
+
+.toggleHint {
+  color: rgba(84, 98, 122, 0.7);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+}
+
+/* ── Connectors: bubbles + hashed number ─────────────── */
+
+.bubble {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 19rem;
+  padding: 0.72rem 0.9rem;
+  color: var(--ink);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.bubble svg {
+  flex: 0 0 auto;
+  color: var(--blue);
+}
+
+.bubble--reply {
+  background: linear-gradient(180deg, rgba(14, 28, 50, 0.94), rgba(13, 27, 49, 0.88));
+  border-color: rgba(14, 28, 50, 0.6);
+  color: #edf6ff;
+}
+
+.bubble--reply svg {
+  color: #8ec6ff;
+}
+
+.hashRow {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.8rem;
+  border-style: dashed;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+}
+
+.hashRow svg {
+  color: rgba(84, 98, 122, 0.55);
+}
+
+.hashRaw {
+  color: rgba(84, 98, 122, 0.6);
+  text-decoration: line-through;
+}
+
+.hashOut {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ── Phone control: tunnel ───────────────────────────── */
+
+.tunnel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.endpoint {
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  padding: 0.95rem 0.9rem;
+  color: var(--blue);
+}
+
+.endpoint em {
+  color: rgba(84, 98, 122, 0.82);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  font-style: normal;
+}
+
+.tunnelLink {
+  position: relative;
+  display: inline-flex;
+  flex: 1 1 auto;
+  max-width: 5rem;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  color: var(--blue);
+}
+
+.tunnelLink::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: 1px;
+  background-image: linear-gradient(
+    90deg,
+    rgba(37, 99, 235, 0.5) 0 6px,
+    transparent 6px 12px
+  );
+  background-size: 12px 1px;
+}
+
+.tunnelLink svg {
+  position: relative;
+  padding: 0.18rem;
+  border-radius: 999px;
+  background: rgba(248, 252, 255, 0.95);
+}
+
+.pile {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.62rem 0.9rem;
+  color: rgba(84, 98, 122, 0.9);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+}
+
+.pile svg {
+  color: var(--blue);
+}
+
+/* ── Sharing: two cards ──────────────────────────────── */
+
+.shareGrid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  width: 100%;
+  max-width: 24rem;
+}
+
+.shareGrid .node {
+  max-width: none;
+}
+
+/* ── Closing CTA ─────────────────────────────────────── */
+
+.closingSection {
+  padding-block: clamp(3rem, 7vw, 6rem);
+}
+
+.closingSection > * {
+  grid-column: 1 / -1;
+}
+
+.closing {
+  display: grid;
+  gap: 1.1rem;
+  width: min(100%, 48rem);
+  margin-inline: auto;
+  justify-items: center;
+  text-align: center;
+}
+
+.closing h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(1.9rem, 4vw, 3.4rem);
+  font-weight: 650;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.closing p {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 1.2vw, 1.16rem);
+  line-height: 1.7;
+}
+
+.closingCta {
+  margin-top: 0.5rem;
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+
+@media (max-width: 880px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: clamp(1.4rem, 5vw, 2.2rem);
+  }
+
+  .row--flip .copy {
+    order: 0;
+  }
+
+  .visual {
+    min-height: 0;
+  }
+}
