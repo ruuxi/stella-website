@@ -53,7 +53,6 @@ export const homeFooterGroups: FooterGroup[] = [
       { label: "Agents", href: "/agents" },
       { label: "Voice", href: "/voice" },
       { label: "Pricing", href: "/pricing" },
-      { label: "How It Works", href: "/how-it-works" },
       { label: "Sign In", href: "/sign-in" },
     ],
   },
@@ -61,7 +60,6 @@ export const homeFooterGroups: FooterGroup[] = [
     title: "Resources",
     items: [
       { label: "What's New", href: "/learn-more/whats-new" },
-      { label: "Changelog", href: "/changelog" },
       chromeExtensionLink,
       { label: "Install for macOS", href: "/install.sh" },
       { label: "Install for Windows", href: "/install.ps1" },
