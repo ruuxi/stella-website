@@ -13,8 +13,8 @@
 }
 
 .orb {
-  width: clamp(5.6rem, 8vw, 7rem);
-  height: clamp(3.9rem, 5.8vw, 5rem);
+  width: clamp(8.5rem, 12.5vw, 11rem);
+  height: clamp(5.5rem, 8vw, 7rem);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26,6 +26,13 @@
   --spinner-color-3: #8ff7db;
   opacity: 0.96;
   filter: saturate(1.08);
+}
+
+/* Scale the whole orb up: the glyph cell size (--ascii-font-size) drives the
+   rendered size; the global container hardcodes 7px, so override it here. */
+.orb :global(.stella-animation-container) {
+  --ascii-font-size: 9px;
+  --ascii-line-height: 9px;
 }
 
 .title {
@@ -179,8 +186,8 @@
   }
 
   .orb {
-    width: 6.25rem;
-    height: 5rem;
+    width: 9.5rem;
+    height: 6.6rem;
   }
 
   .line {

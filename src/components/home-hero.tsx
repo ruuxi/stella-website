@@ -6,20 +6,20 @@ import {
   StellaAnimation,
   type StellaAnimationHandle,
 } from "@/components/stella-animation/stella-animation";
-import styles from "./home-hero.module.css";
-
 /* Apple-style word-by-word blur reveal. Line 1 reads as a calm statement;
- * after a beat, line 2 lands with weight on the accent word "yours." */
-const REVEAL_DUR_MS = 900;
-const L1_START = 800;
-const L1_STEP = 145;
-const L1 = ["There", "are", "many", "assistants,"];
-const L1_END = L1_START + (L1.length - 1) * L1_STEP + REVEAL_DUR_MS;
-const L2_START = L1_END + 460;
-const L2_STEP = 200;
-const L2 = ["but", "this", "one", "is"];
-const ACCENT_DELAY = L2_START + L2.length * L2_STEP;
-const CTA_DELAY = ACCENT_DELAY + REVEAL_DUR_MS + 160;
+ * after a beat, line 2 lands with weight on the accent word "yours."
+ * Timing lives in hero-timing.ts so the desktop-mock entrance can sync. */
+import {
+  ACCENT_DELAY,
+  CTA_DELAY,
+  L1,
+  L1_START,
+  L1_STEP,
+  L2,
+  L2_START,
+  L2_STEP,
+} from "./hero-timing";
+import styles from "./home-hero.module.css";
 
 function RevealWords({
   words,
@@ -52,7 +52,7 @@ export function HomeHero() {
       orbRef.current?.reset(1);
       return;
     }
-    const id = window.setTimeout(() => orbRef.current?.startBirth(), 240);
+    const id = window.setTimeout(() => orbRef.current?.startBirth(), 2000);
     return () => window.clearTimeout(id);
   }, []);
 
@@ -61,8 +61,8 @@ export function HomeHero() {
       <div className={styles.orb} aria-hidden="true">
         <StellaAnimation
           ref={orbRef}
-          width={18}
-          height={12}
+          width={26}
+          height={17}
           maxDpr={1.5}
           frameSkip={1}
           initialBirthProgress={0.22}

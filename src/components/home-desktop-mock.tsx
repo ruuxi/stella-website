@@ -27,6 +27,7 @@ import {
   useState,
   type CSSProperties,
 } from "react";
+import { CTA_DELAY } from "./hero-timing";
 import styles from "./home-desktop-mock.module.css";
 
 type Rgb = { r: number; g: number; b: number };
@@ -885,7 +886,10 @@ export function HomeDesktopMock() {
   return (
     <section className="grid-shell section-border" ref={sectionRef}>
       <div className={styles.shell}>
-        <div className={styles.showcase}>
+        <div
+          className={styles.showcase}
+          style={{ "--mock-emerge-delay": `${CTA_DELAY}ms` } as CSSProperties}
+        >
           <div
             className={styles.window}
             style={vars}

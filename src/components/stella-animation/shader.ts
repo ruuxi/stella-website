@@ -123,7 +123,7 @@ export const getFragmentShader = (): string => {
     float dblCurve = smoothstep(0.0, 1.0, abs(bt2 * 2.0 - 1.0));
     blink *= mix(1.0, dblCurve, doDouble);
 
-    vec2 eyeHalf = vec2(1.0 / u_gridSize.x, 1.5 / u_gridSize.y * blink);
+    vec2 eyeHalf = vec2(0.82 / u_gridSize.x, 1.25 / u_gridSize.y * blink);
     float leftEye = step(abs(uv.x - eyeOrigin.x + eyeGap), eyeHalf.x)
                   * step(abs(uv.y - eyeOrigin.y), eyeHalf.y);
     float rightEye = step(abs(uv.x - eyeOrigin.x - eyeGap), eyeHalf.x)

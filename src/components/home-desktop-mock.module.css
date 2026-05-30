@@ -25,6 +25,28 @@
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.75) inset,
     0 38px 90px -50px rgba(12, 22, 38, 0.46);
+  /* The full app window slides up into view from below, settling into
+     place. Delay is aligned with the hero CTA reveal so the window
+     appears together with the download button. */
+  transform-origin: bottom center;
+  animation: mockRise 1150ms cubic-bezier(0.22, 1, 0.36, 1)
+    var(--mock-emerge-delay, 4500ms) both;
+}
+
+@keyframes mockRise {
+  0% {
+    opacity: 0;
+    transform: translateY(96px) scale(0.96);
+    filter: blur(6px);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
 }
 
 .window {
@@ -324,6 +346,13 @@
 @media (prefers-reduced-motion: reduce) {
   .gradientFade {
     transition: none !important;
+  }
+
+  .showcase {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    filter: none;
   }
 }
 
