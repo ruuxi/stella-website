@@ -23,7 +23,7 @@ export function HomeDocuments() {
       <div className={styles.intro}>
         <span className={styles.eyebrow}>
           <FileText size={15} strokeWidth={1.9} aria-hidden="true" />
-          Documents
+          5.0 Documents
         </span>
         <h2>Word, Excel, PowerPoint, and PDFs are first-class work.</h2>
         <p>
@@ -34,13 +34,11 @@ export function HomeDocuments() {
       </div>
 
       <div className={styles.stage}>
-        <div className={styles.deck}>
-          {DOCS.map((doc, index) => (
+        <div className={styles.documentShell}>
+          {DOCS.map((doc) => (
             <figure
-              className={styles.card}
-              data-kind={doc.kind}
+              className={`${styles.docPreview} ${styles[`docPreview_${doc.kind}`]}`}
               key={doc.kind}
-              style={{ ["--i" as string]: index }}
             >
               <span className={styles.chip} data-kind={doc.kind}>
                 {doc.label}
@@ -50,8 +48,9 @@ export function HomeDocuments() {
                 alt={`${doc.label} document created by Stella`}
                 width={1400}
                 height={933}
+                loading="eager"
                 className={styles.shotImg}
-                sizes="(max-width: 640px) 100vw, 44rem"
+                sizes="(max-width: 860px) 92vw, 48rem"
               />
             </figure>
           ))}

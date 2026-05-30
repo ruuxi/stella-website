@@ -2,7 +2,8 @@
   --ink: #0c1b33;
   --muted: #54627a;
   --blue: #2563eb;
-  row-gap: 2.4rem;
+  row-gap: clamp(1.6rem, 3vw, 2.7rem);
+  padding-block: clamp(3rem, 7vw, 7rem);
 }
 
 .section > * {
@@ -11,9 +12,12 @@
 
 /* ---- Intro ------------------------------------------------------------- */
 .intro {
-  width: min(100%, 60rem);
+  display: grid;
+  grid-template-columns: minmax(0, 0.28fr) minmax(0, 0.72fr);
+  gap: clamp(1rem, 3vw, 3rem);
+  width: min(100%, 74rem);
   margin: 0 auto;
-  text-align: center;
+  text-align: left;
 }
 
 .eyebrow {
@@ -21,25 +25,37 @@
   align-items: center;
   gap: 0.45rem;
   color: var(--blue);
+  font-family: var(--font-mono), monospace;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.eyebrow::after {
+  content: "";
+  width: clamp(2.5rem, 7vw, 6rem);
+  height: 1px;
+  background: rgba(82, 104, 134, 0.24);
 }
 
 .intro h2 {
-  margin: 0.9rem 0 0;
+  grid-column: 2;
+  margin: 0;
   color: var(--ink);
-  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  font-size: clamp(2.15rem, 4.8vw, 4.7rem);
   font-weight: 650;
   line-height: 1.02;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
+  text-wrap: balance;
 }
 
 .intro p {
-  max-width: 40rem;
-  margin: 1rem auto 0;
+  grid-column: 2;
+  max-width: 42rem;
+  margin: 0;
   color: var(--muted);
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: clamp(1rem, 1.2vw, 1.18rem);
+  line-height: 1.72;
 }
 
 /* ---- Lineup ------------------------------------------------------------ */
@@ -49,7 +65,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 1rem 0 0.5rem;
+  padding: 1.45rem 0 0.8rem;
   font-family: -apple-system, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
 }
 
@@ -57,7 +73,8 @@
   position: relative;
   width: var(--phone-w);
   margin-left: calc(var(--overlap) * -1);
-  transform: translateY(calc(var(--i) * 0.6rem));
+  transform: translateY(calc(var(--i) * 0.55rem));
+  transform-style: preserve-3d;
   transition: transform 0.3s ease;
 }
 
@@ -65,7 +82,6 @@
   margin-left: 0;
 }
 
-/* fan the stack: outer phones tilt slightly, raise z so each overlaps the next */
 .slot:nth-child(1) { z-index: 1; }
 .slot:nth-child(2) { z-index: 2; }
 .slot:nth-child(3) { z-index: 3; }
@@ -93,27 +109,86 @@
   position: relative;
   width: 100%;
   aspect-ratio: 219 / 444;
+  filter:
+    drop-shadow(0 30px 18px rgba(17, 31, 50, 0.18))
+    drop-shadow(0 46px 38px rgba(17, 31, 50, 0.18));
+  transform-style: preserve-3d;
+}
+
+.phone::before,
+.phone::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #6c7480, #11161d 62%, #05070a);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16) inset;
+}
+
+.phone::before {
+  top: 18%;
+  left: -0.16rem;
+  width: 0.18rem;
+  height: 5.2rem;
+}
+
+.phone::after {
+  top: 29%;
+  right: -0.16rem;
+  width: 0.18rem;
+  height: 3.6rem;
 }
 
 .phoneEdge {
   position: absolute;
   inset: 0;
-  border-radius: 2.6rem;
-  padding: 0.32rem;
-  background: linear-gradient(160deg, #2c3340, #0c0f15 55%, #20262f);
+  z-index: 1;
+  border-radius: 2.82rem;
+  padding: 0.42rem;
+  background:
+    linear-gradient(90deg, #05070b 0%, #3c4653 7%, #111720 20%, #090d13 54%, #4f5966 92%, #06080c 100%),
+    linear-gradient(160deg, #2c3340, #0c0f15 55%, #20262f);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
-    0 30px 60px -24px rgba(8, 19, 38, 0.55),
-    0 8px 18px -10px rgba(8, 19, 38, 0.4);
+    0 0 0 1px rgba(255, 255, 255, 0.16) inset,
+    0 0 0 2px rgba(0, 0, 0, 0.35) inset,
+    0 24px 44px -20px rgba(8, 19, 38, 0.58),
+    0 8px 18px -10px rgba(8, 19, 38, 0.45);
+  transform: translateZ(0.01px);
+}
+
+.phoneEdge::before {
+  content: "";
+  position: absolute;
+  inset: 0.12rem;
+  border-radius: 2.68rem;
+  background:
+    linear-gradient(112deg, rgba(255, 255, 255, 0.2), transparent 19% 77%, rgba(255, 255, 255, 0.12)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 34%);
+  pointer-events: none;
 }
 
 .screen {
   position: relative;
   height: 100%;
   overflow: hidden;
-  border-radius: 2.3rem;
+  border-radius: 2.42rem;
   background: #fff;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.74),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+    0 12px 22px rgba(0, 0, 0, 0.22) inset;
+}
+
+.screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  border-radius: inherit;
+  background:
+    linear-gradient(118deg, rgba(255, 255, 255, 0.2), transparent 18% 66%, rgba(255, 255, 255, 0.08)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 10% 86%, rgba(0, 0, 0, 0.16));
+  pointer-events: none;
 }
 
 .statusBar {
@@ -123,8 +198,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 1.95rem;
-  padding: 0 1.15rem 0 1.3rem;
+  height: 2.12rem;
+  padding: 0.06rem 1.17rem 0 1.28rem;
   color: #0c1b33;
   pointer-events: none;
 }
@@ -134,9 +209,9 @@
 }
 
 .statusTime {
-  font-size: 0.72rem;
+  font-size: 0.69rem;
   font-weight: 650;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
 }
 
 .statusIcons {
@@ -163,14 +238,20 @@
 
 .island {
   position: absolute;
-  top: 0.55rem;
+  top: 0.6rem;
   left: 50%;
   z-index: 7;
-  width: 33%;
-  height: 1.05rem;
+  width: 34%;
+  height: 1.12rem;
   transform: translateX(-50%);
   border-radius: 999px;
-  background: #000;
+  background:
+    radial-gradient(circle at 76% 50%, #151c28 0 0.18rem, transparent 0.2rem),
+    linear-gradient(180deg, #050505, #0a0a0b);
+  box-shadow:
+    0 1px 1px rgba(255, 255, 255, 0.08) inset,
+    0 0 0 1px rgba(0, 0, 0, 0.8),
+    0 8px 16px rgba(0, 0, 0, 0.18);
 }
 
 .homeIndicator {
@@ -196,8 +277,8 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 0.4rem;
-  padding: 0.7rem 0.7rem 0.5rem;
+  gap: 0.42rem;
+  padding: 0.82rem 0.74rem 0.64rem;
   overflow: hidden;
   justify-content: flex-start;
 }
@@ -214,7 +295,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.18rem;
-  padding: 2.15rem 0 0.6rem;
+  padding: 2.3rem 0 0.62rem;
   border-bottom: 0.5px solid rgba(8, 19, 38, 0.08);
   background: rgba(249, 249, 249, 0.92);
   backdrop-filter: blur(10px);
@@ -222,7 +303,7 @@
 
 .imBack {
   position: absolute;
-  top: 2.35rem;
+  top: 2.46rem;
   left: 0.85rem;
   color: #3f8bff;
   font-size: 1.4rem;
@@ -231,8 +312,8 @@
 
 .imAvatar {
   display: inline-flex;
-  width: 2.1rem;
-  height: 2.1rem;
+  width: 2.22rem;
+  height: 2.22rem;
   align-items: center;
   justify-content: center;
   border-radius: 999px;
@@ -241,21 +322,21 @@
 
 .imHeader strong {
   color: #0c1b33;
-  font-size: 0.7rem;
+  font-size: 0.69rem;
   font-weight: 600;
 }
 
 .imBubble {
-  max-width: 78%;
-  padding: 0.42rem 0.66rem;
-  font-size: 0.74rem;
-  line-height: 1.32;
-  border-radius: 16px;
+  max-width: 82%;
+  padding: 0.48rem 0.7rem;
+  font-size: 0.7rem;
+  line-height: 1.34;
+  border-radius: 17px;
 }
 
 .imThem {
   align-self: flex-start;
-  background: #e9e9eb;
+  background: linear-gradient(180deg, #f0f0f2, #e3e4e8);
   color: #0c1b33;
   border-bottom-left-radius: 5px;
 }
@@ -271,8 +352,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin: 0 0.6rem 1.4rem;
-  padding: 0.4rem 0.4rem 0.4rem 0.75rem;
+  margin: 0 0.68rem 1.48rem;
+  padding: 0.42rem 0.42rem 0.42rem 0.78rem;
   border: 1px solid rgba(8, 19, 38, 0.14);
   border-radius: 999px;
   color: rgba(8, 19, 38, 0.4);
@@ -300,15 +381,15 @@
 /*  Telegram                                                          */
 /* ================================================================== */
 .telegram {
-  background: #acb7c2;
+  background: #afbdc8;
 }
 
 .tgHeader {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 2.1rem 0.7rem 0.55rem;
-  background: #517da2;
+  padding: 2.22rem 0.72rem 0.62rem;
+  background: linear-gradient(180deg, #5a90b7, #457fa9);
   color: #fff;
 }
 
@@ -346,19 +427,20 @@
 
 .tgThread {
   background:
-    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.16), transparent 30%),
-    radial-gradient(circle at 82% 72%, rgba(255, 255, 255, 0.14), transparent 32%),
+    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.2), transparent 28%),
+    radial-gradient(circle at 82% 72%, rgba(255, 255, 255, 0.16), transparent 30%),
+    linear-gradient(45deg, rgba(255, 255, 255, 0.07) 25%, transparent 25% 75%, rgba(255, 255, 255, 0.07) 75%) 0 0 / 1.2rem 1.2rem,
     linear-gradient(160deg, #b6c4cf, #9fb1be);
 }
 
 .tgBubble {
   position: relative;
-  max-width: 80%;
-  padding: 0.42rem 1.9rem 0.42rem 0.6rem;
-  font-size: 0.72rem;
+  max-width: 84%;
+  padding: 0.47rem 1.92rem 0.48rem 0.64rem;
+  font-size: 0.69rem;
   line-height: 1.34;
-  border-radius: 12px;
-  box-shadow: 0 1px 1px rgba(8, 19, 38, 0.12);
+  border-radius: 13px;
+  box-shadow: 0 1px 2px rgba(8, 19, 38, 0.16);
 }
 
 .tgThem {
@@ -370,7 +452,7 @@
 
 .tgYou {
   align-self: flex-end;
-  background: #eaffd2;
+  background: linear-gradient(180deg, #eaffd7, #d7f7bd);
   color: #0c1b33;
   border-bottom-right-radius: 4px;
 }
@@ -388,7 +470,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.7rem 1.5rem;
+  padding: 0.58rem 0.74rem 1.55rem;
   background: #fff;
   color: rgba(8, 19, 38, 0.4);
   font-size: 0.74rem;
@@ -415,7 +497,7 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 2.15rem 0.85rem 0.55rem;
+  padding: 2.25rem 0.85rem 0.62rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.25);
   background: #313338;
   color: #f2f3f5;
@@ -434,28 +516,30 @@
 }
 
 .dcThread {
-  background: #313338;
-  gap: 0.7rem;
+  background:
+    radial-gradient(circle at 85% 8%, rgba(88, 101, 242, 0.14), transparent 34%),
+    #313338;
+  gap: 0.58rem;
 }
 
 .dcDay {
   align-self: center;
   color: #949ba4;
-  font-size: 0.56rem;
+  font-size: 0.54rem;
   font-weight: 600;
 }
 
 .dcMessage {
   display: grid;
-  grid-template-columns: 1.85rem 1fr;
-  gap: 0.55rem;
+  grid-template-columns: 1.7rem 1fr;
+  gap: 0.5rem;
   align-self: stretch;
 }
 
 .dcAvatar {
   display: inline-flex;
-  width: 1.85rem;
-  height: 1.85rem;
+  width: 1.7rem;
+  height: 1.7rem;
   align-items: center;
   justify-content: center;
   border-radius: 999px;
@@ -478,7 +562,7 @@
   gap: 0.34rem;
   margin: 0 0 0.18rem;
   color: #f2f3f5;
-  font-size: 0.74rem;
+  font-size: 0.7rem;
   font-weight: 600;
 }
 
@@ -502,13 +586,13 @@
 .dcText {
   margin: 0;
   color: #dbdee1;
-  font-size: 0.74rem;
+  font-size: 0.69rem;
   line-height: 1.36;
 }
 
 .dcComposer {
-  margin: 0 0.7rem 1.5rem;
-  padding: 0.5rem 0.7rem;
+  margin: 0 0.72rem 1.52rem;
+  padding: 0.54rem 0.72rem;
   border-radius: 999px;
   background: #383a40;
   color: #87898c;
@@ -528,10 +612,10 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(80% 55% at 20% 8%, rgba(96, 140, 220, 0.45), transparent 60%),
-    radial-gradient(70% 50% at 88% 30%, rgba(120, 99, 216, 0.35), transparent 60%),
-    radial-gradient(90% 60% at 70% 100%, rgba(58, 110, 180, 0.4), transparent 60%),
-    linear-gradient(170deg, #16213a 0%, #111a2c 55%, #0d1422 100%);
+    radial-gradient(80% 55% at 20% 8%, rgba(96, 140, 220, 0.48), transparent 60%),
+    radial-gradient(70% 50% at 88% 30%, rgba(80, 172, 196, 0.28), transparent 60%),
+    radial-gradient(90% 60% at 70% 100%, rgba(58, 110, 180, 0.42), transparent 60%),
+    linear-gradient(170deg, #17213a 0%, #111b2c 55%, #0d1422 100%);
 }
 
 .stHeader {
@@ -540,7 +624,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 2.15rem 0.85rem 0.6rem;
+  padding: 2.28rem 0.86rem 0.68rem;
 }
 
 .stMenu {
@@ -580,18 +664,18 @@
 .stThread {
   position: relative;
   z-index: 1;
-  gap: 0.6rem;
+  gap: 0.58rem;
 }
 
 .stYou {
   align-self: flex-end;
   max-width: 80%;
-  padding: 0.46rem 0.68rem;
+  padding: 0.5rem 0.7rem;
   border-radius: 16px 16px 5px 16px;
-  background: rgba(120, 165, 245, 0.28);
+  background: linear-gradient(180deg, rgba(128, 174, 255, 0.34), rgba(88, 129, 214, 0.24));
   border: 1px solid rgba(150, 185, 250, 0.25);
   color: #eef4fd;
-  font-size: 0.74rem;
+  font-size: 0.69rem;
   line-height: 1.36;
 }
 
@@ -600,7 +684,7 @@
   max-width: 90%;
   margin: 0;
   color: rgba(234, 240, 247, 0.92);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   line-height: 1.46;
 }
 
@@ -610,8 +694,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin: 0 0.6rem 1.4rem;
-  padding: 0.42rem 0.5rem 0.42rem 0.4rem;
+  margin: 0 0.68rem 1.48rem;
+  padding: 0.44rem 0.52rem 0.44rem 0.42rem;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
@@ -645,6 +729,15 @@
 
 /* ---- Responsive -------------------------------------------------------- */
 @media (max-width: 900px) {
+  .intro {
+    grid-template-columns: 1fr;
+  }
+
+  .intro h2,
+  .intro p {
+    grid-column: 1;
+  }
+
   .lineup {
     --phone-w: 12.5rem;
     --overlap: 6.5rem;

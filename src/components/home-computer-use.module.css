@@ -2,7 +2,8 @@
   --ink: #0c1b33;
   --muted: #54627a;
   --blue: #2563eb;
-  row-gap: 2rem;
+  row-gap: clamp(1.6rem, 3vw, 2.7rem);
+  padding-block: clamp(3rem, 7vw, 7rem);
 }
 
 .section > * {
@@ -11,9 +12,12 @@
 
 /* ---- Intro ------------------------------------------------------------- */
 .intro {
-  width: min(100%, 60rem);
+  display: grid;
+  grid-template-columns: minmax(0, 0.28fr) minmax(0, 0.72fr);
+  gap: clamp(1rem, 3vw, 3rem);
+  width: min(100%, 74rem);
   margin: 0 auto;
-  text-align: center;
+  text-align: left;
 }
 
 .eyebrow {
@@ -21,26 +25,37 @@
   align-items: center;
   gap: 0.45rem;
   color: var(--blue);
+  font-family: var(--font-mono), monospace;
   font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.eyebrow::after {
+  content: "";
+  width: clamp(2.5rem, 7vw, 6rem);
+  height: 1px;
+  background: rgba(82, 104, 134, 0.24);
 }
 
 .intro h2 {
-  margin: 0.9rem 0 0;
+  grid-column: 2;
+  margin: 0;
   color: var(--ink);
-  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  font-size: clamp(2.15rem, 4.8vw, 4.7rem);
   font-weight: 650;
   line-height: 1.02;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
+  text-wrap: balance;
 }
 
 .intro p {
-  max-width: 38rem;
-  margin: 1rem auto 0;
+  grid-column: 2;
+  max-width: 42rem;
+  margin: 0;
   color: var(--muted);
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: clamp(1rem, 1.2vw, 1.18rem);
+  line-height: 1.72;
 }
 
 /* ---- Display frame ----------------------------------------------------- */
@@ -48,7 +63,7 @@
   width: min(100%, 72rem);
   margin: 0 auto;
   padding: 0.55rem;
-  border-radius: 22px;
+  border-radius: 0;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(232, 238, 247, 0.5));
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.8) inset,
@@ -60,7 +75,7 @@
   position: relative;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 0;
   border: 1px solid rgba(8, 19, 38, 0.12);
   /* macOS-style font for everything inside the screen */
   font-family: -apple-system, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
@@ -696,8 +711,22 @@
 
 /* ---- Responsive -------------------------------------------------------- */
 @media (max-width: 640px) {
+  .intro {
+    grid-template-columns: 1fr;
+  }
+
+  .intro h2,
+  .intro p {
+    grid-column: 1;
+  }
+
+  .display {
+    width: min(100%, 25rem);
+    padding: 0.35rem;
+  }
+
   .screen {
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 16 / 11;
   }
 
   .mailWindow {
@@ -719,7 +748,26 @@
   }
 
   .automation {
-    bottom: 12%;
+    top: 2.4%;
+    left: 4%;
+    gap: 0.32rem;
+    padding: 0.22rem 0.48rem 0.22rem 0.24rem;
+    font-size: 0.54rem;
+  }
+
+  .automationMark {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  .automationMark img {
+    width: 0.58rem;
+    height: 0.58rem;
+  }
+
+  .automationStep {
+    width: 5.1rem;
+    height: 0.75rem;
   }
 }
 

@@ -242,7 +242,7 @@ function StellaSkin() {
         </div>
         <div className={styles.stComposer}>
           <i className={styles.stPlus}>+</i>
-          <span>Ask Stella anything…</span>
+          <span>Do anything…</span>
           <i className={styles.stMic} />
         </div>
       </div>
@@ -263,7 +263,7 @@ export function HomePhoneConnectors() {
       <div className={styles.intro}>
         <span className={styles.eyebrow}>
           <Smartphone size={15} strokeWidth={1.9} aria-hidden="true" />
-          Phone and connectors
+          3.0 Phone and connectors
         </span>
         <h2>Your phone reaches the same Stella on your computer.</h2>
         <p>

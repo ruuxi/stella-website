@@ -12,12 +12,10 @@ import {
   LoaderCircle,
   MessageSquarePlus,
   Mic,
-  Moon,
   PanelRight,
   Plus,
   Scan,
   Settings,
-  Sun,
   VolumeX,
 } from "lucide-react";
 import Image from "next/image";
@@ -238,6 +236,16 @@ const BASE_POSITIONS = [
 ];
 
 const NAV_ITEMS = ["Home", "Store", "Social", "Apps"];
+// Curated palette journey used for the scroll-driven theme crossfade.
+const SCROLL_THEMES = [
+  "pearl",
+  "sage",
+  "slate",
+  "cocoa",
+  "crimson",
+  "aura",
+  "nightowl",
+];
 const RENDER_SCALE = 0.6;
 const CONTEXT_CHIPS = [
   { label: "Mail", iconSrc: "/mock-app-icons/mail.png" },
@@ -591,10 +599,15 @@ function cssVars(colors: ThemeColors, mode: ThemeMode, themeId: string): CSSProp
 
 export function HomeDesktopMock() {
   const [themeId, setThemeId] = useState("pearl");
-  const [mode, setMode] = useState<ThemeMode>("light");
+  const mode: ThemeMode = "light";
+  const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const miniCanvasRef = useRef<HTMLCanvasElement>(null);
   const chatCanvasRef = useRef<HTMLCanvasElement>(null);
+  const fadeCanvasRef = useRef<HTMLCanvasElement>(null);
+  const miniFadeRef = useRef<HTMLCanvasElement>(null);
+  const chatFadeRef = useRef<HTMLCanvasElement>(null);
+  const firstPaintRef = useRef(true);
   const selectedTheme = THEMES.find((candidate) => candidate.id === themeId) ?? THEMES[0];
   const resolvedMode = selectedTheme.forcedMode ?? mode;
   const colors = selectedTheme[resolvedMode];
@@ -610,9 +623,82 @@ export function HomeDesktopMock() {
     }
   }, [colors, resolvedMode, selectedTheme.id]);
 
+  // Repaint on theme change. After the first paint, crossfade between themes:
+  // snapshot the outgoing gradient onto an overlay canvas, repaint the base
+  // with the new theme, then fade the overlay out (the chrome colors ease via
+  // CSS transitions over the same window).
   useEffect(() => {
+    const pairs: Array<[HTMLCanvasElement | null, HTMLCanvasElement | null]> = [
+      [canvasRef.current, fadeCanvasRef.current],
+      [miniCanvasRef.current, miniFadeRef.current],
+      [chatCanvasRef.current, chatFadeRef.current],
+    ];
+
+    if (firstPaintRef.current) {
+      firstPaintRef.current = false;
+      paint();
+      return;
+    }
+
+    for (const [base, fade] of pairs) {
+      if (!base || !fade) continue;
+      fade.width = base.width;
+      fade.height = base.height;
+      const ctx = fade.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, fade.width, fade.height);
+        ctx.drawImage(base, 0, 0);
+      }
+      fade.style.transition = "none";
+      fade.style.opacity = "1";
+    }
+
     paint();
+
+    let raf = requestAnimationFrame(() => {
+      raf = requestAnimationFrame(() => {
+        for (const [, fade] of pairs) {
+          if (!fade) continue;
+          fade.style.transition = "opacity 620ms ease";
+          fade.style.opacity = "0";
+        }
+      });
+    });
+    return () => cancelAnimationFrame(raf);
   }, [paint]);
+
+  // Drive the theme from scroll position: as this section travels up through
+  // the viewport, step through a curated palette journey. Not pinned — the
+  // section scrolls normally; only the theme changes.
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight || 1;
+      const travel = rect.height + vh;
+      const p = Math.min(Math.max((vh - rect.top) / travel, 0), 1);
+      const idx = Math.min(
+        SCROLL_THEMES.length - 1,
+        Math.floor(p * SCROLL_THEMES.length),
+      );
+      const next = SCROLL_THEMES[idx];
+      setThemeId((prev) => (prev === next ? prev : next));
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    update();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof ResizeObserver === "undefined") return;
@@ -697,12 +783,6 @@ export function HomeDesktopMock() {
         <div className={styles.assistantRow}>
           <p className={styles.assistantMessage}>
             Done. I added item totals and highlighted the cheaper store.
-          </p>
-        </div>
-        <div className={styles.userMessage}>Remind me Friday if the form is not signed.</div>
-        <div className={styles.assistantRow}>
-          <p className={styles.assistantMessage}>
-            Scheduled a Friday reminder and kept the PDF in the workspace panel.
           </p>
         </div>
       </div>
@@ -803,7 +883,7 @@ export function HomeDesktopMock() {
   );
 
   return (
-    <section className="grid-shell section-border">
+    <section className="grid-shell section-border" ref={sectionRef}>
       <div className={styles.shell}>
         <div className={styles.showcase}>
           <div
@@ -813,6 +893,11 @@ export function HomeDesktopMock() {
             data-theme={selectedTheme.id}
           >
             <canvas ref={canvasRef} className={styles.gradient} aria-hidden="true" />
+            <canvas
+              ref={fadeCanvasRef}
+              className={`${styles.gradient} ${styles.gradientFade}`}
+              aria-hidden="true"
+            />
             <header className={styles.topbar}>
               <div className={styles.topbarLeft}>
                 <nav className={styles.nav} aria-label="Stella mock apps">
@@ -856,20 +941,12 @@ export function HomeDesktopMock() {
               data-mode={resolvedMode}
               data-theme={selectedTheme.id}
             >
-              <canvas ref={miniCanvasRef} className={styles.gradient} aria-hidden="true" />
-              <header className={styles.miniTopbar} aria-label="Stella mini window" />
-              <main className={`${styles.homeSurface} ${styles.miniHomeSurface}`}>
-                {renderHomeCenter(styles.miniHomeContent)}
-              </main>
-            </div>
-
-            <div
-              className={styles.miniWindow}
-              style={vars}
-              data-mode={resolvedMode}
-              data-theme={selectedTheme.id}
-            >
               <canvas ref={chatCanvasRef} className={styles.gradient} aria-hidden="true" />
+              <canvas
+                ref={chatFadeRef}
+                className={`${styles.gradient} ${styles.gradientFade}`}
+                aria-hidden="true"
+              />
               <header className={styles.miniTopbar} aria-label="Stella mini chat window" />
               <main className={styles.chatSurface}>{renderChatCenter()}</main>
             </div>
@@ -882,56 +959,6 @@ export function HomeDesktopMock() {
             data-theme={selectedTheme.id}
           >
             {renderWorkspacePanel()}
-          </div>
-
-          <div className={styles.themePanel} aria-label="Stella themes">
-            <div className={styles.themeGrid}>
-              {THEMES.map((item) => {
-                const swatchMode = item.forcedMode ?? mode;
-                const swatch = item[swatchMode];
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    className={styles.themeButton}
-                    data-active={item.id === selectedTheme.id ? "true" : undefined}
-                    onClick={() => setThemeId(item.id)}
-                    onFocus={() => setThemeId(item.id)}
-                    onMouseEnter={() => setThemeId(item.id)}
-                    aria-label={`Use ${item.name} theme`}
-                    title={item.name}
-                    style={
-                      {
-                        "--theme-bg": swatch.background,
-                        "--theme-fg": swatch.foreground,
-                        "--theme-accent": swatch.primary,
-                      } as CSSProperties
-                    }
-                  >
-                    <span className={styles.themeSwatch} aria-hidden="true" />
-                  </button>
-                );
-              })}
-            </div>
-            <div className={styles.modeToggle}>
-              {(["light", "dark"] as const).map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  className={styles.modeButton}
-                  data-active={mode === value ? "true" : undefined}
-                  onClick={() => setMode(value)}
-                  aria-label={value === "light" ? "Light mode" : "Dark mode"}
-                  title={value === "light" ? "Light" : "Dark"}
-                >
-                  {value === "light" ? (
-                    <Sun size={15} strokeWidth={2} aria-hidden="true" />
-                  ) : (
-                    <Moon size={15} strokeWidth={2} aria-hidden="true" />
-                  )}
-                </button>
-              ))}
-            </div>
           </div>
         </div>
       </div>

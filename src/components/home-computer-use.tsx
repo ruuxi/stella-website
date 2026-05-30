@@ -51,9 +51,9 @@ export function HomeComputerUse() {
       <div className={styles.intro}>
         <span className={styles.eyebrow}>
           <Monitor size={15} strokeWidth={1.9} aria-hidden="true" />
-          Computer use
+          2.0 Computer use
         </span>
-        <h2>Stella can drive your Mac in the background.</h2>
+        <h2>Stella can drive your computer in the background.</h2>
         <p>
           Keep working in one window while Stella moves through another — clicking,
           typing, and finishing real tasks in your actual apps, not a sandbox.

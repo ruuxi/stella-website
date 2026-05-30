@@ -117,7 +117,6 @@ const PERSONAS: Persona[] = [
 const FRAME_W = 1664;
 const FRAME_H = 936;
 const HOLD_MS = 4400;
-// Faster cover (320) + glimm sweep midpoint (1100).
 const CAPTION_SWAP_MS = 870;
 
 export function HomeSelfmod() {
@@ -138,7 +137,6 @@ export function HomeSelfmod() {
     pausedRef.current = paused;
   }, [paused]);
 
-  // Build composites + init the WebGL morph engine.
   useEffect(() => {
     let cancelled = false;
     reducedRef.current =
@@ -164,7 +162,7 @@ export function HomeSelfmod() {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const engine = createMorphEngine(canvas, FRAME_W, FRAME_H);
-        if (!engine) return; // WebGL unavailable → fallback <img> stays.
+        if (!engine) return;
         engineRef.current = engine;
         engine.show(compositesRef.current[0]);
         setReady(true);
@@ -202,7 +200,6 @@ export function HomeSelfmod() {
       });
   };
 
-  // Auto-rotate.
   useEffect(() => {
     if (!ready) return;
     const timer = window.setInterval(() => {
@@ -219,7 +216,7 @@ export function HomeSelfmod() {
       <div className={styles.intro}>
         <span className={styles.eyebrow}>
           <Sparkles size={15} strokeWidth={1.9} aria-hidden="true" />
-          Yours
+          4.0 Yours
         </span>
         <h2>An app that becomes you.</h2>
         <p>
@@ -233,6 +230,23 @@ export function HomeSelfmod() {
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
+        <aside className={styles.commandPanel} aria-label="Self-mod request examples">
+          <span>Self-mod request</span>
+          <strong>Turn Stella into a trip planner for Vietnam.</strong>
+          <p>
+            Stella keeps the same assistant underneath while rebuilding the app
+            surface around the job: maps, bookings, budgets, and agents.
+          </p>
+          <div className={styles.commandMeta}>
+            <span>Theme</span>
+            <b>{caption.name}</b>
+          </div>
+          <div className={styles.commandMeta}>
+            <span>Agent</span>
+            <b>interface-builder</b>
+          </div>
+        </aside>
+
         <div className={styles.frame}>
           <canvas
             ref={canvasRef}
@@ -246,6 +260,7 @@ export function HomeSelfmod() {
               alt={`Stella reshaped into a ${PERSONAS[selected].name.toLowerCase()}`}
               fill
               priority
+              unoptimized
               className={styles.fallback}
               sizes="(max-width: 960px) 100vw, 62rem"
             />
@@ -277,6 +292,7 @@ export function HomeSelfmod() {
                 width={480}
                 height={270}
                 aria-hidden="true"
+                unoptimized
                 sizes="11rem"
               />
             </button>

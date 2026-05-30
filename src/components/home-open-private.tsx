@@ -1,4 +1,4 @@
-import { GitBranch, KeyRound, Lock, ShieldCheck } from "lucide-react";
+import { GitBranch, Github, KeyRound, Lock, ShieldCheck } from "lucide-react";
 import { BrandGlyph, type BrandName } from "./home-brand-icons";
 import styles from "./home-open-private.module.css";
 
@@ -63,7 +63,7 @@ export function HomeOpenPrivate() {
       <div className={styles.intro}>
         <span className={styles.eyebrow}>
           <ShieldCheck size={15} strokeWidth={1.9} aria-hidden="true" />
-          Open &amp; private
+          6.0 Open &amp; private
         </span>
         <h2>Private by default. Open by design.</h2>
         <p>
@@ -71,6 +71,15 @@ export function HomeOpenPrivate() {
           source, and built to work with the agents, providers, and models you
           already use.
         </p>
+        <a
+          className={styles.githubLink}
+          href="https://github.com/ruuxi/stella"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Github size={16} strokeWidth={1.9} aria-hidden="true" />
+          View Stella on GitHub
+        </a>
       </div>
 
       <div className={styles.panel}>

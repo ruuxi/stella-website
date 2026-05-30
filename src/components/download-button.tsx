@@ -113,7 +113,7 @@ export function DownloadButton() {
 
   return (
     <button
-      className="button button--primary"
+      className="button button--primary button--download"
       onClick={handleClick}
       type="button"
       aria-label={ariaLabels[resolvedPlatform]}

@@ -2,7 +2,8 @@
   --ink: #0c1b33;
   --muted: #54627a;
   --blue: #2563eb;
-  row-gap: 2.8rem;
+  row-gap: clamp(1.6rem, 3vw, 2.8rem);
+  padding-block: clamp(3rem, 7vw, 7rem);
 }
 
 .section > * {
@@ -11,9 +12,12 @@
 
 /* ---- Intro ------------------------------------------------------------- */
 .intro {
-  width: min(100%, 60rem);
+  display: grid;
+  grid-template-columns: minmax(0, 0.28fr) minmax(0, 0.72fr);
+  gap: clamp(1rem, 3vw, 3rem);
+  width: min(100%, 74rem);
   margin: 0 auto;
-  text-align: center;
+  text-align: left;
 }
 
 .eyebrow {
@@ -21,25 +25,69 @@
   align-items: center;
   gap: 0.45rem;
   color: var(--blue);
+  font-family: var(--font-mono), monospace;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.eyebrow::after {
+  content: "";
+  width: clamp(2.5rem, 7vw, 6rem);
+  height: 1px;
+  background: rgba(82, 104, 134, 0.24);
 }
 
 .intro h2 {
-  margin: 0.9rem 0 0;
+  grid-column: 2;
+  margin: 0;
   color: var(--ink);
-  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  font-size: clamp(2.15rem, 4.8vw, 4.7rem);
   font-weight: 650;
   line-height: 1.02;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
+  text-wrap: balance;
 }
 
 .intro p {
-  max-width: 40rem;
-  margin: 1rem auto 0;
+  grid-column: 2;
+  max-width: 42rem;
+  margin: 0;
   color: var(--muted);
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: clamp(1rem, 1.2vw, 1.18rem);
+  line-height: 1.72;
+}
+
+.githubLink {
+  grid-column: 1 / -1;
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.48rem;
+  width: max-content;
+  max-width: 100%;
+  padding: 0.62rem 0.86rem;
+  border: 1px solid rgba(82, 104, 134, 0.2);
+  background: rgba(255, 255, 255, 0.56);
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 650;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.75) inset;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.githubLink svg {
+  flex: 0 0 auto;
+}
+
+.githubLink:hover {
+  transform: translateY(-1px);
+  border-color: rgba(82, 104, 134, 0.32);
+  background: rgba(255, 255, 255, 0.86);
 }
 
 /* ---- Privacy pillars (one wide dark-blue gradient panel) --------------- */
@@ -207,6 +255,19 @@
 
 /* ---- Responsive -------------------------------------------------------- */
 @media (max-width: 760px) {
+  .intro {
+    grid-template-columns: 1fr;
+  }
+
+  .intro h2,
+  .intro p {
+    grid-column: 1;
+  }
+
+  .githubLink {
+    justify-self: center;
+  }
+
   .panel {
     grid-template-columns: 1fr;
     gap: 1.3rem;

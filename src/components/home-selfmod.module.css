@@ -2,18 +2,21 @@
   --ink: #0c1b33;
   --muted: #54627a;
   --blue: #2563eb;
-  row-gap: 2.6rem;
+  row-gap: clamp(1.6rem, 3vw, 2.7rem);
+  padding-block: clamp(3rem, 7vw, 7rem);
 }
 
 .section > * {
   grid-column: 1 / -1;
 }
 
-/* ---- Intro ------------------------------------------------------------- */
 .intro {
-  width: min(100%, 60rem);
+  display: grid;
+  grid-template-columns: minmax(0, 0.28fr) minmax(0, 0.72fr);
+  gap: clamp(1rem, 3vw, 3rem);
+  width: min(100%, 74rem);
   margin: 0 auto;
-  text-align: center;
+  text-align: left;
 }
 
 .eyebrow {
@@ -21,46 +24,114 @@
   align-items: center;
   gap: 0.45rem;
   color: var(--blue);
+  font-family: var(--font-mono), monospace;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.eyebrow::after {
+  content: "";
+  width: clamp(2.5rem, 7vw, 6rem);
+  height: 1px;
+  background: rgba(82, 104, 134, 0.24);
 }
 
 .intro h2 {
-  margin: 0.9rem 0 0;
+  grid-column: 2;
+  margin: 0;
   color: var(--ink);
-  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  font-size: clamp(2.15rem, 4.8vw, 4.7rem);
   font-weight: 650;
   line-height: 1.02;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
+  text-wrap: balance;
 }
 
 .intro p {
-  max-width: 40rem;
-  margin: 1rem auto 0;
+  grid-column: 2;
+  max-width: 42rem;
+  margin: 0;
   color: var(--muted);
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: clamp(1rem, 1.2vw, 1.18rem);
+  line-height: 1.72;
 }
 
-/* ---- Stage ------------------------------------------------------------- */
 .stage {
-  width: min(100%, 62rem);
+  display: grid;
+  grid-template-columns: minmax(14rem, 0.34fr) minmax(0, 0.66fr);
+  gap: 1px;
+  width: min(100%, 74rem);
   margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid rgba(82, 104, 134, 0.16);
+  background: rgba(82, 104, 134, 0.15);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 36px 90px -58px rgba(12, 22, 38, 0.45);
+}
+
+.commandPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-width: 0;
+  padding: clamp(1rem, 2.2vw, 1.8rem);
+  background:
+    radial-gradient(circle at 20% 12%, rgba(255, 255, 255, 0.7), transparent 34%),
+    rgba(247, 251, 255, 0.66);
+}
+
+.commandPanel > span {
+  color: var(--blue);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+.commandPanel strong {
+  margin-top: auto;
+  color: var(--ink);
+  font-size: clamp(1.55rem, 2.8vw, 2.45rem);
+  font-weight: 650;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.commandPanel p {
+  margin: 0 0 1.2rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.64;
+}
+
+.commandMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid rgba(82, 104, 134, 0.16);
+  padding-top: 0.75rem;
+  color: rgba(15, 27, 51, 0.54);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+}
+
+.commandMeta b {
+  color: rgba(15, 27, 51, 0.78);
+  font-weight: 500;
 }
 
 .frame {
   position: relative;
+  align-self: stretch;
   aspect-ratio: 16 / 9;
-  border-radius: 16px;
   overflow: hidden;
   background: #0b1220;
-  border: 1px solid rgba(8, 19, 38, 0.1);
-  box-shadow:
-    0 2px 8px rgba(8, 19, 38, 0.08),
-    0 44px 90px -36px rgba(8, 19, 38, 0.55);
+  border: 0;
+  box-shadow: none;
 }
 
-/* WebGL ripple-morph canvas — ported from Stella desktop MorphTransition */
 .canvas {
   position: absolute;
   inset: 0;
@@ -75,13 +146,11 @@
   opacity: 1;
 }
 
-/* SSR / no-WebGL fallback — single contained still */
 .fallback {
   object-fit: contain;
   object-position: center;
 }
 
-/* ---- Caption ----------------------------------------------------------- */
 .caption {
   position: absolute;
   left: 1rem;
@@ -144,13 +213,14 @@
   }
 }
 
-/* ---- Thumbnail rail ---------------------------------------------------- */
 .rail {
+  grid-column: 1 / -1;
   display: flex;
   gap: 0.6rem;
-  margin-top: 1rem;
+  margin-top: 0;
   overflow-x: auto;
-  padding: 0.3rem 0.1rem;
+  padding: 0.75rem;
+  background: rgba(247, 251, 255, 0.66);
   scrollbar-width: none;
 }
 
@@ -196,8 +266,24 @@
   transform: translateY(-2px);
 }
 
-/* ---- Responsive -------------------------------------------------------- */
 @media (max-width: 760px) {
+  .intro {
+    grid-template-columns: 1fr;
+  }
+
+  .intro h2,
+  .intro p {
+    grid-column: 1;
+  }
+
+  .stage {
+    grid-template-columns: 1fr;
+  }
+
+  .commandPanel strong {
+    margin-top: 2rem;
+  }
+
   .caption {
     left: 0.6rem;
     bottom: 0.6rem;
@@ -214,7 +300,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .shot,
   .caption,
   .thumb {
     transition: none;

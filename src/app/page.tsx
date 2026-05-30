@@ -1,84 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FooterLegalLinks } from "@/components/footer-legal-links";
+import { homeFooterGroups } from "@/components/site-footer-groups";
+import { HomeCanvasDemos } from "@/components/home-canvas-demos";
 import { HomeComputerUse } from "@/components/home-computer-use";
 import { HomeDesktopMock } from "@/components/home-desktop-mock";
 import { HomeDocuments } from "@/components/home-documents";
+import { HomeHero } from "@/components/home-hero";
+import { HomeMemorySystem } from "@/components/home-memory-system";
 import { HomeOpenPrivate } from "@/components/home-open-private";
 import { HomePhoneConnectors } from "@/components/home-phone-connectors";
-import { HomeSelfmod } from "@/components/home-selfmod";
 import { SiteHeader } from "@/components/site-header";
-
-const footerGroups: {
-  title: string;
-  items: { label: string; href: string; external?: boolean }[];
-}[] = [
-  {
-    title: "Product",
-    items: [
-      { label: "Learn More", href: "/learn-more" },
-      { label: "Store", href: "/store" },
-      { label: "Pricing", href: "/pricing" },
-      { label: "How It Works", href: "/how-it-works" },
-      { label: "Sign In", href: "/sign-in" },
-    ],
-  },
-  {
-    title: "Surfaces",
-    items: [
-      { label: "Desktop Window", href: "/learn-more" },
-      { label: "Mini Window", href: "/learn-more" },
-      { label: "Phone and Connectors", href: "/learn-more" },
-      { label: "Voice and Dictation", href: "/learn-more" },
-    ],
-  },
-  {
-    title: "Resources",
-    items: [
-      { label: "What's New", href: "/learn-more/whats-new" },
-      { label: "Changelog", href: "/changelog" },
-      { label: "Install for macOS", href: "/install.sh" },
-      { label: "Install for Windows", href: "/install.ps1" },
-    ],
-  },
-  {
-    title: "Developers",
-    items: [
-      {
-        label: "GitHub",
-        href: "https://github.com/ruuxi/stella",
-        external: true,
-      },
-      {
-        label: "Chrome Extension",
-        href: "https://chromewebstore.google.com/detail/stella-browser/kfnchfpocpmdblhfgcnpfaaebaioojnl",
-        external: true,
-      },
-      {
-        label: "Backend Repo",
-        href: "https://github.com/ruuxi/stella-backend",
-        external: true,
-      },
-      {
-        label: "Mobile Repo",
-        href: "https://github.com/ruuxi/stella-mobile",
-        external: true,
-      },
-    ],
-  },
-  {
-    title: "Community",
-    items: [
-      {
-        label: "Discord",
-        href: "https://discord.gg/HXVCCeE542",
-        external: true,
-      },
-      { label: "Privacy", href: "/privacy" },
-      { label: "Terms", href: "/terms" },
-    ],
-  },
-];
 
 export default function Home() {
   return (
@@ -86,11 +18,13 @@ export default function Home() {
       <SiteHeader />
 
       <main>
+        <HomeHero />
         <HomeDesktopMock />
+        <HomeCanvasDemos />
         <HomeComputerUse />
         <HomePhoneConnectors />
-        <HomeSelfmod />
         <HomeDocuments />
+        <HomeMemorySystem />
         <HomeOpenPrivate />
       </main>
 
@@ -105,7 +39,7 @@ export default function Home() {
         </div>
 
         <div className="footer-columns">
-          {footerGroups.map((group) => (
+          {homeFooterGroups.map((group) => (
             <div key={group.title} className="footer-column">
               <h3>{group.title}</h3>
               <ul>
