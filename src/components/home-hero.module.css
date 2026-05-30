@@ -65,11 +65,23 @@
 
 .lede {
   max-width: 44rem;
-  margin: 0.35rem auto 0;
+  margin: 0;
   color: rgba(15, 27, 51, 0.66);
   font-size: clamp(1rem, 1.25vw, 1.18rem);
   line-height: 1.72;
   text-wrap: balance;
+}
+
+.followUp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(100%, 44rem);
+  margin-top: 0.35rem;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: heroCta 800ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes heroReveal {
@@ -96,10 +108,7 @@
   gap: 0.8rem;
   justify-content: center;
   width: min(100%, 34rem);
-  margin-top: 0.4rem;
-  opacity: 0;
-  transform: translateY(10px);
-  animation: heroCta 800ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  margin-top: 0;
 }
 
 .cta :global(.button--primary) {
@@ -148,7 +157,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .word,
-  .cta {
+  .followUp {
     animation: none;
     opacity: 1;
     filter: none;

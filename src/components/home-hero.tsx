@@ -94,10 +94,12 @@ export function HomeHero() {
         </span>
       </h1>
 
-      <p className={styles.lede}>The only app that reshapes itself around you.</p>
+      <div className={styles.followUp} style={{ animationDelay: `${CTA_DELAY}ms` }}>
+        <p className={styles.lede}>The only app that reshapes itself around you.</p>
 
-      <div className={styles.cta} style={{ animationDelay: `${CTA_DELAY}ms` }}>
-        <DownloadButton />
+        <div className={styles.cta}>
+          <DownloadButton />
+        </div>
       </div>
     </section>
   );
