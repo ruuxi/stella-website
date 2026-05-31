@@ -15,7 +15,7 @@ type StoreMarkdownProps = {
   className?: string;
 };
 
-/** Renders store blueprint / release copy with the same Streamdown stack as desktop chat. */
+/** Renders Store release copy with the same Streamdown stack as desktop chat. */
 export const StoreMarkdown = memo(function StoreMarkdown({
   text,
   className,

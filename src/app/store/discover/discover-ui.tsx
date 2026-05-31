@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type KeyboardEvent } from "react";
+import type { KeyboardEvent } from "react";
 import { ChevronLeft, Clock, Layers } from "lucide-react";
 import {
   formatDate,
@@ -281,8 +281,10 @@ export function Detail({
   onRemove: () => void;
 }) {
   const latestRelease = releases[0];
-  const latestBlueprint = latestRelease?.blueprintMarkdown?.trim();
-  const latestNotes = latestRelease ? getReleaseNotes(latestRelease) : undefined;
+  const latestReleaseSummary = latestRelease?.blueprintMarkdown?.trim();
+  const latestNotes = latestRelease
+    ? getReleaseNotes(latestRelease)
+    : undefined;
   const installed = Boolean(installedRecord);
   const updateAvailable = isStoreUpdateAvailable(pkg, installedRecord);
   const installLabel = formatInstallCount(pkg.installCount);
@@ -361,19 +363,19 @@ export function Detail({
 
       {releasesLoading ? (
         <div className="store-detail-section store-detail-blueprint">
-          <div className="store-detail-section-title">Blueprint</div>
+          <div className="store-detail-section-title">Release Summary</div>
           <div
             className="store-detail-blueprint-body store-detail-blueprint-body--loading"
             aria-busy="true"
           >
-            Loading blueprint…
+            Loading release…
           </div>
         </div>
-      ) : latestBlueprint ? (
+      ) : latestReleaseSummary ? (
         <div className="store-detail-section store-detail-blueprint">
-          <div className="store-detail-section-title">Blueprint</div>
+          <div className="store-detail-section-title">Release Summary</div>
           <div className="store-detail-blueprint-body">
-            <StoreMarkdown text={latestBlueprint} />
+            <StoreMarkdown text={latestReleaseSummary} />
           </div>
         </div>
       ) : null}

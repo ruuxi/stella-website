@@ -24,14 +24,22 @@ import {
   ensureStoreAuth,
 } from "../lib/bridge";
 import { isStoreUpdateAvailable } from "../lib/format";
-import type { NativeIntegration, StoreCategory, StoreInstall, StorePackage } from "../lib/types";
+import type {
+  NativeIntegration,
+  StoreCategory,
+  StoreInstall,
+  StorePackage,
+} from "../lib/types";
 import {
   EmptyState,
   StoreLoadingSpinner,
   StoreWebHeader,
   useIsEmbeddedWebsite,
 } from "../components/shared";
-import { pickFeaturedPackage, sortPackagesForYou } from "../lib/discover-ranking";
+import {
+  pickFeaturedPackage,
+  sortPackagesForYou,
+} from "../lib/discover-ranking";
 import {
   Detail,
   FeaturedCard,
@@ -47,7 +55,9 @@ export function StoreClientInner() {
   const isEmbedded = useIsEmbeddedWebsite();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<StoreCategory | "all">("all");
-  const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null);
+  const [selectedPackageId, setSelectedPackageId] = useState<string | null>(
+    null,
+  );
   const [installedIds, setInstalledIds] = useState<Set<string>>(new Set());
   const [installingId, setInstallingId] = useState<string | null>(null);
   const [connectingIntegrationId, setConnectingIntegrationId] = useState<
@@ -206,11 +216,10 @@ export function StoreClientInner() {
     return () => observer.disconnect();
   }, [canLoadMoreIntegrations]);
   /**
-   * Surfaces the in-app blueprint confirmation dialog. The actual
-   * install call only fires after the user clicks Install in
-   * `InstallConfirmDialog` → `confirmInstall` below. We still gate on
-   * the desktop bridge / auth here so non-desktop visitors get
-   * redirected to sign-in like before.
+   * Surfaces the in-app release confirmation dialog. The actual install call
+   * only fires after the user clicks Install in `InstallConfirmDialog` →
+   * `confirmInstall` below. We still gate on the desktop bridge / auth here so
+   * non-desktop visitors get redirected to sign-in like before.
    */
   const installPackage = async (pkg: StorePackage) => {
     const bridge = getDesktopStoreBridge();
@@ -258,7 +267,9 @@ export function StoreClientInner() {
       void bridge.showToast?.({
         title: "Install failed",
         description:
-          error instanceof Error ? error.message : "Stella couldn't install it.",
+          error instanceof Error
+            ? error.message
+            : "Stella couldn't install it.",
         variant: "error",
       });
     } finally {
@@ -294,7 +305,9 @@ export function StoreClientInner() {
     setNativeIntegrationError(null);
     setConnectingIntegrationId(integration.id);
     try {
-      const next = await bridge.connectNativeIntegration({ id: integration.id });
+      const next = await bridge.connectNativeIntegration({
+        id: integration.id,
+      });
       setLocalNativeIntegrations((previous) =>
         mergeNativeIntegrationUpdate(
           previous.length > 0 ? previous : (storeIntegrations ?? []),
@@ -311,7 +324,9 @@ export function StoreClientInner() {
     }
   };
 
-  const disconnectNativeIntegration = async (integration: NativeIntegration) => {
+  const disconnectNativeIntegration = async (
+    integration: NativeIntegration,
+  ) => {
     const bridge = getDesktopStoreBridge();
     if (!bridge?.disconnectNativeIntegration) {
       setNativeIntegrationError("Open Stella to remove this integration.");

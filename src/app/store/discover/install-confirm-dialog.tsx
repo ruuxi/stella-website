@@ -16,10 +16,9 @@ type InstallConfirmDialogProps = {
 };
 
 /**
- * Replaces the OS install-confirmation dialog with an in-app modal
- * that renders the package blueprint as proper markdown. Used for
- * every Store package install/update entry point (cards, featured,
- * detail page, Library).
+ * Replaces the OS install-confirmation dialog with an in-app modal that renders
+ * the source-backed release summary as proper markdown. Used for every Store
+ * package install/update entry point (cards, featured, detail page, Library).
  */
 export function InstallConfirmDialog({
   pkg,
@@ -30,7 +29,7 @@ export function InstallConfirmDialog({
 }: InstallConfirmDialogProps) {
   const releases = useQuery(listPublicReleases, { packageId: pkg.packageId });
   const latestRelease = releases?.[0];
-  const blueprint = latestRelease?.blueprintMarkdown?.trim();
+  const releaseSummary = latestRelease?.blueprintMarkdown?.trim();
   const loading = releases === undefined;
   const confirmLabel = installing
     ? isUpdate
@@ -54,8 +53,8 @@ export function InstallConfirmDialog({
               {isUpdate ? "Update" : "Install"} {pkg.displayName}?
             </div>
             <div className="store-install-dialog-sub">
-              Review the blueprint Stella will apply to your desktop app.
-              Version {pkg.latestReleaseNumber}
+              Review the source-backed release Stella will import. Version{" "}
+              {pkg.latestReleaseNumber}
               {pkg.authorUsername ? ` · @${pkg.authorUsername}` : ""}
             </div>
           </div>
@@ -63,13 +62,13 @@ export function InstallConfirmDialog({
         <div className="store-install-dialog-viewer">
           {loading ? (
             <div className="store-install-dialog-loading" aria-busy="true">
-              Loading blueprint…
+              Loading release…
             </div>
-          ) : blueprint ? (
-            <StoreMarkdown text={blueprint} />
+          ) : releaseSummary ? (
+            <StoreMarkdown text={releaseSummary} />
           ) : (
             <div className="store-install-dialog-loading">
-              This package has no blueprint content to display.
+              This package has no release summary to display.
             </div>
           )}
         </div>
@@ -88,7 +87,7 @@ export function InstallConfirmDialog({
             className="store-action-btn"
             data-variant={installing ? "working" : "get"}
             onClick={onConfirm}
-            disabled={installing || loading || !blueprint}
+            disabled={installing || loading || !releaseSummary}
           >
             {confirmLabel}
           </button>
