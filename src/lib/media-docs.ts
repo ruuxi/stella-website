@@ -80,16 +80,39 @@ The backend wraps the value into the right shape for the picked endpoint
 
 ## Watching for completion
 
-You almost never need to. The Stella desktop renderer subscribes to every
-succeeded media job for the signed-in user, downloads the output to
+Use the local \`stella-media\` command when you want normal
+\`exec_command\`-style behavior. It submits the same gateway request, can wait
+until the job reaches a terminal state, and saves completed outputs to
+\`state/media/outputs/\`.
+
+\`\`\`bash
+cat > /tmp/stella-media-request.json <<'JSON'
+{
+  "capability": "text_to_image",
+  "prompt": "a clean product render of a translucent blue desk lamp",
+  "aspectRatio": "1:1"
+}
+JSON
+
+stella-media generate --request-file /tmp/stella-media-request.json --wait --timeout 240
+\`\`\`
+
+Without \`--wait\`, \`stella-media generate\` returns after submit with a
+\`jobId\`. To check a job later:
+
+\`\`\`bash
+stella-media status --job-id <jobId> --save
+\`\`\`
+
+The Stella desktop renderer also subscribes to every succeeded media job for
+the signed-in user, downloads the output to
 \`state/media/outputs/<jobId>_<i>.<ext>\`, and pops it open in the Display
-sidebar automatically. Just submit the job and report back to the user; the
-asset will appear on their screen.
+sidebar automatically. If generation fails, Stella shows a failure
+notification.
 
 If you do need the raw status, subscribe to Convex:
 \`useQuery(api.media_jobs.getByJobId, { jobId })\`. Status values:
-\`queued\`, \`in_progress\`, \`processing\`, \`succeeded\`, \`failed\`,
-\`cancelled\`.
+\`queued\`, \`running\`, \`succeeded\`, \`failed\`, \`canceled\`.
 
 ## Auth failure (401)
 
@@ -195,9 +218,13 @@ curl -X POST "$STELLA_API/api/media/v1/generate" \\
 
 ## Notes for agents
 
-- After submitting, just tell the user what you generated. The Display sidebar
-  will open with the result automatically — you do not need to download, save,
-  or re-upload the file.
+- If you need to know whether generation completed, use
+  \`stella-media generate --request-file ... --wait --timeout 240\`. The
+  command exits nonzero on failure or timeout and prints saved output paths on
+  success.
+- If you only need to kick off generation, submit without \`--wait\` and tell
+  the user what you started. The Display sidebar will open with the result
+  automatically when it finishes.
 - For multi-image jobs, the materializer writes \`<jobId>_0.png\`, \`<jobId>_1.png\`, …
   to \`state/media/outputs/\` and shows them as a gallery.
 `.trim();
