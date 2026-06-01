@@ -9,61 +9,95 @@
   grid-column: 1 / -1;
 }
 
-.row {
-  display: grid;
-  grid-template-columns: minmax(17rem, 0.78fr) minmax(0, 1fr);
-  align-items: center;
-  gap: clamp(2rem, 6vw, 6rem);
-  width: min(100%, 74rem);
-  margin: 0 auto;
-}
-
-.copy {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  color: var(--blue);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.8rem;
-  font-weight: 300;
-  letter-spacing: 0;
-}
-
-.copy h2 {
-  max-width: 13ch;
-  margin: 1rem 0 0;
-  color: var(--ink);
-  font-size: clamp(2.35rem, 5vw, 5.6rem);
-  font-weight: 300;
-  line-height: 0.96;
-  letter-spacing: 0;
-  text-wrap: balance;
-}
-
-.copy p {
-  max-width: 34rem;
-  margin: clamp(1rem, 2vw, 1.35rem) 0 0;
-  color: var(--muted);
-  font-size: clamp(1rem, 1.2vw, 1.18rem);
-  line-height: 1.72;
-}
-
 .media {
   position: relative;
-  display: flex;
-  justify-content: center;
   min-width: 0;
+}
+
+/* Many parallel requests funnel into one chat. */
+.diagram {
+  position: relative;
+  display: grid;
+  grid-template-columns: 13.5rem minmax(2rem, 1fr) auto;
+  align-items: stretch;
+  width: min(100%, 46rem);
+  margin-left: auto;
+}
+
+.inputs {
+  position: relative;
+  z-index: 2;
+}
+
+.node {
+  position: absolute;
+  right: 0;
+  top: var(--top);
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.42rem 0.95rem 0.42rem 0.45rem;
+  border: 1px solid rgba(82, 104, 134, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85) inset,
+    0 14px 30px -22px rgba(12, 22, 38, 0.55);
+}
+
+.nodeIcon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--blue);
+}
+
+.nodeLabel {
+  white-space: nowrap;
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-weight: 300;
+  letter-spacing: 0;
+}
+
+.connectors {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.connectors path {
+  fill: none;
+  stroke: url(#oneChatFlow);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Convergence point where every thread meets the one chat. */
+.merge {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0.55rem;
+  height: 0.55rem;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: var(--blue);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.16);
+  z-index: 3;
 }
 
 .frame {
   position: relative;
-  width: min(100%, 34rem);
+  width: min(100%, 27rem);
   padding: clamp(0.85rem, 1.8vw, 1.35rem);
   border: 1px solid rgba(82, 104, 134, 0.16);
   background:
@@ -90,11 +124,12 @@
 
 .callout {
   position: absolute;
-  right: clamp(-1rem, -2vw, -0.35rem);
-  bottom: clamp(1.2rem, 4vw, 3rem);
+  left: clamp(-1.25rem, -2.5vw, -0.35rem);
+  bottom: clamp(-0.5rem, 1vw, 0.75rem);
+  z-index: 4;
   display: grid;
   gap: 0.1rem;
-  min-width: 10rem;
+  min-width: 9.5rem;
   padding: 0.78rem 0.9rem;
   border: 1px solid rgba(82, 104, 134, 0.18);
   background: rgba(248, 251, 255, 0.92);
@@ -116,13 +151,29 @@
 }
 
 @media (max-width: 860px) {
-  .row {
+  .diagram {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    width: 100%;
+    gap: 1.4rem;
+    justify-items: center;
   }
 
-  .copy h2 {
-    max-width: 15ch;
+  .inputs {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+  }
+
+  .node {
+    position: static;
+    transform: none;
+  }
+
+  .connectors,
+  .merge {
+    display: none;
   }
 
   .frame {
@@ -130,7 +181,7 @@
   }
 
   .callout {
-    right: 0.6rem;
+    left: 0.6rem;
     bottom: 0.8rem;
   }
 }

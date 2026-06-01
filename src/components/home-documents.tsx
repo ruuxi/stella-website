@@ -33,7 +33,7 @@ export function HomeDocuments() {
 
       <div className="home-atlas-scene">
         <div
-          className={`home-atlas-media home-atlas-media--left ${styles.stage}`}
+          className={`home-atlas-media home-atlas-media--left home-atlas-fade ${styles.stage}`}
           data-reveal-child
           style={{ ["--reveal-index" as string]: 1 }}
         >

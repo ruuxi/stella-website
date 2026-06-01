@@ -127,8 +127,6 @@
   position: relative;
   width: 100%;
   aspect-ratio: 219 / 444;
-  filter: drop-shadow(0 30px 18px rgba(17, 31, 50, 0.18))
-    drop-shadow(0 46px 38px rgba(17, 31, 50, 0.18));
   transform-style: preserve-3d;
 }
 

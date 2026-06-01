@@ -9,97 +9,56 @@
   grid-column: 1 / -1;
 }
 
-.row {
-  display: grid;
-  grid-template-columns: minmax(0, 1.12fr) minmax(18rem, 0.88fr);
-  align-items: center;
-  gap: clamp(2rem, 6vw, 6rem);
-  width: min(100%, 74rem);
-  margin: 0 auto;
-}
-
-.copy {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  color: var(--blue);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.8rem;
-  font-weight: 300;
-  letter-spacing: 0;
-}
-
-.eyebrow::after {
-  content: "";
-  width: clamp(2.5rem, 7vw, 6rem);
-  height: 1px;
-  background: rgba(82, 104, 134, 0.24);
-}
-
-.copy h2 {
-  max-width: 13ch;
-  margin: 1rem 0 0;
-  color: var(--ink);
-  font-size: clamp(2.35rem, 5.4vw, 5.8rem);
-  font-weight: 300;
-  line-height: 0.96;
-  letter-spacing: 0;
-  text-wrap: balance;
-}
-
-.copy p {
-  max-width: 36rem;
-  margin: clamp(1rem, 2vw, 1.35rem) 0 0;
-  color: var(--muted);
-  font-size: clamp(1rem, 1.2vw, 1.18rem);
-  line-height: 1.72;
-}
-
 .media {
   min-width: 0;
 }
 
-.carousel {
+/* Three diagonal surfaces; each swaps its own image on a staggered loop so
+   something is always changing. */
+.cluster {
   position: relative;
-  aspect-ratio: 16 / 9;
-  min-height: 17rem;
-  overflow: hidden;
-  border: 1px solid rgba(82, 104, 134, 0.16);
-  background:
-    radial-gradient(
-      circle at 22% 8%,
-      rgba(255, 255, 255, 0.76),
-      transparent 32%
-    ),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.54), rgba(226, 236, 248, 0.5));
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.8) inset,
-    0 38px 90px -54px rgba(12, 22, 38, 0.54);
+  width: 100%;
+  aspect-ratio: 7 / 5;
+  min-height: 16rem;
 }
 
-.slide {
+.card {
   position: absolute;
-  inset: clamp(0.25rem, 0.55vw, 0.45rem);
-  display: block;
   margin: 0;
   overflow: hidden;
-  border: 1px solid rgba(82, 104, 134, 0.13);
-  background: rgba(247, 251, 255, 0.86);
-  opacity: 0;
-  animation: surfaceFade 24s infinite ease;
-  animation-delay: var(--delay);
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgba(82, 104, 134, 0.14);
+  background: rgba(247, 251, 255, 0.9);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.82) inset,
-    0 24px 58px -38px rgba(12, 22, 38, 0.5);
+    0 30px 64px -42px rgba(12, 22, 38, 0.55);
+}
+
+/* Diagonal cascade: cards step down and to the right, overlapping. */
+.slot0 {
+  top: 0;
+  left: 0;
+  width: 64%;
+  z-index: 1;
+}
+
+.slot1 {
+  top: 22%;
+  left: 18%;
+  width: 64%;
+  z-index: 2;
+}
+
+.slot2 {
+  top: 44%;
+  left: 36%;
+  width: 64%;
+  z-index: 3;
 }
 
 .image {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -108,84 +67,42 @@
   background: #f8fbff;
 }
 
-.rail {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 0.42rem;
-  margin-top: 0.85rem;
+.base {
+  z-index: 1;
 }
 
-.rail span {
-  height: 2px;
-  background: rgba(82, 104, 134, 0.22);
-  overflow: hidden;
+.overlay {
+  z-index: 2;
+  opacity: 0;
+  animation: swap 10.5s infinite ease-in-out;
+  animation-delay: calc(var(--slot) * -3.5s);
 }
 
-.rail span::before {
-  content: "";
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: var(--blue);
-  transform: scaleX(0);
-  transform-origin: left;
-  animation: railFill 24s infinite linear;
-  animation-delay: var(--delay);
-}
-
-@keyframes surfaceFade {
+@keyframes swap {
   0% {
     opacity: 0;
   }
 
-  2%,
-  14.8% {
+  10%,
+  45% {
     opacity: 1;
   }
 
-  18.8%,
+  55%,
   100% {
     opacity: 0;
-  }
-}
-
-@keyframes railFill {
-  0% {
-    transform: scaleX(0);
-  }
-
-  14.8% {
-    transform: scaleX(1);
-  }
-
-  14.9%,
-  100% {
-    transform: scaleX(0);
   }
 }
 
 @media (max-width: 860px) {
-  .row {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-
-  .copy h2 {
-    max-width: 15ch;
-  }
-
-  .carousel {
-    min-height: 15rem;
+  .cluster {
+    aspect-ratio: 7 / 5;
+    min-height: 14rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .slide,
-  .rail span::before {
+  .overlay {
     animation: none;
-  }
-
-  .slide:first-child {
-    opacity: 1;
   }
 }

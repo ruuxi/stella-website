@@ -73,7 +73,7 @@ export function HomeComputerUse() {
 
       <div className="home-atlas-scene">
         <div
-          className={`home-atlas-media home-atlas-media--left ${styles.media}`}
+          className={`home-atlas-media home-atlas-media--left home-atlas-fade ${styles.media}`}
           data-reveal-child
           style={{ ["--reveal-index" as string]: 1 }}
           aria-hidden="true"

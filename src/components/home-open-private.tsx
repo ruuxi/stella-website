@@ -68,20 +68,20 @@ export function HomeOpenPrivate() {
         data-reveal-child
         style={{ ["--reveal-index" as string]: 0 }}
       >
-        <h2>Private by default. Open by design.</h2>
+        <h2>Private and open source.</h2>
       </div>
 
-      <div className="home-atlas-scene home-atlas-scene--reverse">
+      <div className={styles.center}>
         <div
-          className="home-atlas-copy"
+          className={styles.intro}
           data-reveal-child
-          style={{ ["--reveal-index" as string]: 2 }}
+          style={{ ["--reveal-index" as string]: 1 }}
         >
           <span className="home-atlas-kicker">
             <ShieldCheck size={15} strokeWidth={1.9} aria-hidden="true" />
             Open &amp; private
           </span>
-          <p>
+          <p className={styles.lede}>
             Stella runs locally, stays open source, and works with your agents,
             providers, keys, and models.
           </p>
@@ -97,26 +97,28 @@ export function HomeOpenPrivate() {
         </div>
 
         <div
-          className={`home-atlas-media home-atlas-media--right ${styles.media}`}
+          className={styles.panel}
           data-reveal-child
-          style={{ ["--reveal-index" as string]: 1 }}
+          style={{ ["--reveal-index" as string]: 2 }}
         >
-          <div className={styles.panel}>
-            {PILLARS.map((pillar) => (
-              <div className={styles.pillar} key={pillar.title}>
-                <span className={styles.pillarIcon}>
-                  <pillar.icon size={20} strokeWidth={1.7} aria-hidden="true" />
-                </span>
-                <strong>{pillar.title}</strong>
-                <span>{pillar.body}</span>
-              </div>
-            ))}
-          </div>
+          {PILLARS.map((pillar) => (
+            <div className={styles.pillar} key={pillar.title}>
+              <span className={styles.pillarIcon}>
+                <pillar.icon size={20} strokeWidth={1.7} aria-hidden="true" />
+              </span>
+              <strong>{pillar.title}</strong>
+              <span>{pillar.body}</span>
+            </div>
+          ))}
+        </div>
 
-          <div className={styles.wall}>
-            <LogoRow title="Agents & harnesses" brands={HARNESSES} />
-            <LogoRow title="Models & providers" brands={PROVIDERS} />
-          </div>
+        <div
+          className={styles.wall}
+          data-reveal-child
+          style={{ ["--reveal-index" as string]: 3 }}
+        >
+          <LogoRow title="Agents & harnesses" brands={HARNESSES} />
+          <LogoRow title="Models & providers" brands={PROVIDERS} />
         </div>
       </div>
     </section>

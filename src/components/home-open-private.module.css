@@ -9,57 +9,29 @@
   grid-column: 1 / -1;
 }
 
-.row {
-  display: grid;
-  grid-template-columns: minmax(17rem, 0.82fr) minmax(0, 1.18fr);
-  align-items: center;
-  gap: clamp(2rem, 6vw, 6rem);
-  width: min(100%, 74rem);
-  margin: 0 auto;
-}
-
-.copy {
+.center {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-}
-
-.eyebrow {
-  display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  color: var(--blue);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.8rem;
-  font-weight: 300;
-  letter-spacing: 0;
+  text-align: center;
+  width: min(100%, 64rem);
+  margin: 0 auto;
+  gap: clamp(1.6rem, 3.4vw, 2.6rem);
 }
 
-.eyebrow::after {
-  content: "";
-  width: clamp(2.5rem, 7vw, 6rem);
-  height: 1px;
-  background: rgba(82, 104, 134, 0.24);
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.copy h2 {
-  max-width: 13ch;
+.lede {
+  max-width: 42rem;
   margin: 1rem 0 0;
-  color: var(--ink);
-  font-size: clamp(2.35rem, 5vw, 5.6rem);
-  font-weight: 300;
-  line-height: 0.98;
-  letter-spacing: 0;
-  text-wrap: balance;
-}
-
-.copy p {
-  max-width: 34rem;
-  margin: clamp(1rem, 2vw, 1.35rem) 0 0;
   color: var(--muted);
-  font-size: clamp(1rem, 1.2vw, 1.18rem);
-  line-height: 1.72;
+  font-size: clamp(1.05rem, 1.4vw, 1.3rem);
+  line-height: 1.62;
+  text-wrap: balance;
 }
 
 .githubLink {
@@ -69,7 +41,7 @@
   gap: 0.48rem;
   width: max-content;
   max-width: 100%;
-  margin-top: 1.4rem;
+  margin-top: 1.5rem;
   padding: 0.62rem 0.86rem;
   border: 1px solid rgba(82, 104, 134, 0.2);
   background: rgba(255, 255, 255, 0.56);
@@ -94,17 +66,13 @@
 }
 
 /* ---- Privacy pillars (one wide dark-blue gradient panel) --------------- */
-.media {
-  display: grid;
-  gap: clamp(1.1rem, 2vw, 1.6rem);
-  min-width: 0;
-}
-
 .panel {
+  width: 100%;
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.2rem;
-  padding: clamp(1.25rem, 2.4vw, 1.9rem);
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1.1rem, 2.4vw, 2rem);
+  text-align: left;
+  padding: clamp(1.5rem, 2.8vw, 2.4rem);
   border-radius: 0.6rem;
   color: #eaf2ff;
   background:
@@ -127,8 +95,8 @@
 }
 
 .pillar + .pillar {
-  border-top: 1px solid rgba(160, 195, 240, 0.16);
-  padding-top: 1.2rem;
+  border-left: 1px solid rgba(160, 195, 240, 0.16);
+  padding-left: clamp(1.1rem, 2.4vw, 2rem);
 }
 
 .pillarIcon {
@@ -158,6 +126,7 @@
 
 /* ---- Compatibility wall ------------------------------------------------ */
 .wall {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -266,13 +235,16 @@
 
 /* ---- Responsive -------------------------------------------------------- */
 @media (max-width: 760px) {
-  .row {
+  .panel {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.3rem;
   }
 
-  .panel {
-    gap: 1.3rem;
+  .pillar + .pillar {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid rgba(160, 195, 240, 0.16);
+    padding-top: 1.3rem;
   }
 }
 

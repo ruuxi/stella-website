@@ -47,6 +47,14 @@ const SURFACES = [
   },
 ];
 
+// Each diagonal slot cycles through its own pair of surfaces, staggered in
+// time so at least one card is always mid-swap.
+const SLOTS = [
+  [SURFACES[0], SURFACES[3]],
+  [SURFACES[1], SURFACES[4]],
+  [SURFACES[2], SURFACES[5]],
+];
+
 export function HomeCanvasDemos() {
   return (
     <section
@@ -68,35 +76,31 @@ export function HomeCanvasDemos() {
           style={{ ["--reveal-index" as string]: 1 }}
         >
           <div
-            className={styles.carousel}
+            className={styles.cluster}
             aria-label="Examples of Stella app surfaces"
           >
-            {SURFACES.map((surface, index) => (
+            {SLOTS.map((images, slotIndex) => (
               <figure
-                className={styles.slide}
-                key={surface.src}
-                style={{ "--delay": `${index * 4}s` } as CSSProperties}
+                className={`${styles.card} ${styles[`slot${slotIndex}`]}`}
+                key={slotIndex}
+                style={{ ["--slot" as string]: slotIndex } as CSSProperties}
               >
-                <Image
-                  src={surface.src}
-                  alt={surface.alt}
-                  width={surface.width}
-                  height={surface.height}
-                  loading={index === 0 ? "eager" : "lazy"}
-                  quality={82}
-                  sizes="(max-width: 860px) 92vw, 44rem"
-                  className={styles.image}
-                />
+                {images.map((surface, layer) => (
+                  <Image
+                    key={surface.src}
+                    src={surface.src}
+                    alt={surface.alt}
+                    width={surface.width}
+                    height={surface.height}
+                    loading={layer === 0 ? "eager" : "lazy"}
+                    quality={82}
+                    sizes="(max-width: 860px) 50vw, 24rem"
+                    className={`${styles.image} ${
+                      layer === 0 ? styles.base : styles.overlay
+                    }`}
+                  />
+                ))}
               </figure>
-            ))}
-          </div>
-
-          <div className={styles.rail} aria-hidden="true">
-            {SURFACES.map((surface, index) => (
-              <span
-                key={surface.label}
-                style={{ "--delay": `${index * 4}s` } as CSSProperties}
-              />
             ))}
           </div>
         </div>

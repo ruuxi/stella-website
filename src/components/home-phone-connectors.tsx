@@ -343,7 +343,7 @@ export function HomePhoneConnectors() {
         data-reveal-child
         style={{ ["--reveal-index" as string]: 0 }}
       >
-        <h2>Your phone reaches the same Stella on your computer.</h2>
+        <h2>Text Stella.</h2>
       </div>
 
       <div className="home-atlas-scene home-atlas-scene--reverse">
@@ -363,7 +363,7 @@ export function HomePhoneConnectors() {
         </div>
 
         <div
-          className={`home-atlas-media home-atlas-media--right ${styles.media}`}
+          className={`home-atlas-media home-atlas-media--right home-atlas-fade ${styles.media}`}
           data-reveal-child
           style={{ ["--reveal-index" as string]: 1 }}
           aria-hidden="true"

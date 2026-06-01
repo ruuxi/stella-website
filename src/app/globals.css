@@ -907,6 +907,10 @@ html[data-embedded="true"] .site-header {
   position: relative;
   min-width: 0;
   isolation: isolate;
+  --atlas-fade-width: clamp(3.5rem, 12vw, 10rem);
+  /* The dissolve runs a hair past the mock's top and bottom so the side
+     fade stays slightly taller than whatever it covers. */
+  --atlas-fade-overshoot: 0.75rem;
 }
 
 .home-atlas-media--left {
@@ -917,48 +921,27 @@ html[data-embedded="true"] .site-header {
   margin-right: calc(-1 * min(var(--page-margin), 5.25rem));
 }
 
-.home-atlas-media::before,
-.home-atlas-media::after {
-  content: "";
-  position: absolute;
-  top: -1px;
-  bottom: -1px;
-  z-index: 5;
-  width: clamp(3.5rem, 12vw, 10rem);
-  pointer-events: none;
-  display: none;
+/* Dissolve the bleeding edge to true transparency with a mask so the
+   page's ambient gradient shows through, instead of washing the mock
+   with a flat fill. */
+.home-atlas-media--left.home-atlas-fade,
+.home-atlas-media--left .home-atlas-fade,
+.home-atlas-media--right.home-atlas-fade,
+.home-atlas-media--right .home-atlas-fade {
+  padding-block: var(--atlas-fade-overshoot);
+  margin-block: calc(-1 * var(--atlas-fade-overshoot));
 }
 
-.home-atlas-media--left::before {
-  display: block;
-  left: -1px;
-  background: linear-gradient(
-    90deg,
-    var(--atlas-bg) 0%,
-    rgba(237, 243, 251, 0.98) 8%,
-    rgba(237, 243, 251, 0.92) 18%,
-    rgba(237, 243, 251, 0.78) 32%,
-    rgba(237, 243, 251, 0.56) 50%,
-    rgba(237, 243, 251, 0.3) 72%,
-    rgba(237, 243, 251, 0.1) 90%,
-    rgba(237, 243, 251, 0) 100%
-  );
+.home-atlas-media--left.home-atlas-fade,
+.home-atlas-media--left .home-atlas-fade {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--atlas-fade-width));
+  mask-image: linear-gradient(90deg, transparent 0, #000 var(--atlas-fade-width));
 }
 
-.home-atlas-media--right::after {
-  display: block;
-  right: -1px;
-  background: linear-gradient(
-    270deg,
-    var(--atlas-bg) 0%,
-    rgba(237, 243, 251, 0.98) 8%,
-    rgba(237, 243, 251, 0.92) 18%,
-    rgba(237, 243, 251, 0.78) 32%,
-    rgba(237, 243, 251, 0.56) 50%,
-    rgba(237, 243, 251, 0.3) 72%,
-    rgba(237, 243, 251, 0.1) 90%,
-    rgba(237, 243, 251, 0) 100%
-  );
+.home-atlas-media--right.home-atlas-fade,
+.home-atlas-media--right .home-atlas-fade {
+  -webkit-mask-image: linear-gradient(270deg, transparent 0, #000 var(--atlas-fade-width));
+  mask-image: linear-gradient(270deg, transparent 0, #000 var(--atlas-fade-width));
 }
 
 .home-atlas-copy {
@@ -1031,9 +1014,8 @@ html[data-embedded="true"] .site-header {
     margin-inline: 0;
   }
 
-  .home-atlas-media::before,
-  .home-atlas-media::after {
-    width: clamp(2.2rem, 13vw, 5rem);
+  .home-atlas-media {
+    --atlas-fade-width: clamp(2.2rem, 13vw, 5rem);
   }
 
   .home-atlas-copy,
