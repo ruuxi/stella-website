@@ -2,21 +2,26 @@
   --ink: #0c1b33;
   --muted: #54627a;
   --blue: #2563eb;
-  row-gap: clamp(1.6rem, 3vw, 2.7rem);
-  padding-block: clamp(3rem, 7vw, 7rem);
+  padding-block: clamp(4.5rem, 9vw, 9rem);
 }
 
 .section > * {
   grid-column: 1 / -1;
 }
 
-/* ---- Intro ------------------------------------------------------------- */
-.intro {
+.row {
   display: grid;
-  grid-template-columns: minmax(0, 0.28fr) minmax(0, 0.72fr);
-  gap: clamp(1rem, 3vw, 3rem);
+  grid-template-columns: minmax(0, 1.12fr) minmax(17rem, 0.88fr);
+  align-items: center;
+  gap: clamp(2rem, 6vw, 6rem);
   width: min(100%, 74rem);
   margin: 0 auto;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   text-align: left;
 }
 
@@ -27,7 +32,7 @@
   color: var(--blue);
   font-family: var(--font-mono), monospace;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 300;
   letter-spacing: 0;
 }
 
@@ -38,33 +43,40 @@
   background: rgba(82, 104, 134, 0.24);
 }
 
-.intro h2 {
-  grid-column: 2;
-  margin: 0;
+.copy h2 {
+  max-width: 14ch;
+  margin: 1rem 0 0;
   color: var(--ink);
-  font-size: clamp(2.15rem, 4.8vw, 4.7rem);
-  font-weight: 650;
-  line-height: 1.02;
+  font-size: clamp(2.35rem, 5vw, 5.6rem);
+  font-weight: 300;
+  line-height: 0.98;
   letter-spacing: 0;
   text-wrap: balance;
 }
 
-.intro p {
-  grid-column: 2;
-  max-width: 42rem;
-  margin: 0;
+.copy p {
+  max-width: 34rem;
+  margin: clamp(1rem, 2vw, 1.35rem) 0 0;
   color: var(--muted);
   font-size: clamp(1rem, 1.2vw, 1.18rem);
   line-height: 1.72;
 }
 
+.media {
+  min-width: 0;
+}
+
 /* ---- Display frame ----------------------------------------------------- */
 .display {
-  width: min(100%, 72rem);
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   padding: 0.55rem;
   border-radius: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(232, 238, 247, 0.5));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.7),
+    rgba(232, 238, 247, 0.5)
+  );
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.8) inset,
     0 2px 6px rgba(8, 19, 38, 0.06),
@@ -78,7 +90,8 @@
   border-radius: 0;
   border: 1px solid rgba(8, 19, 38, 0.12);
   /* macOS-style font for everything inside the screen */
-  font-family: -apple-system, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+  font-family:
+    -apple-system, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
   isolation: isolate;
 }
 
@@ -149,7 +162,7 @@
 .title {
   color: rgba(8, 19, 38, 0.66);
   font-size: 0.76rem;
-  font-weight: 600;
+  font-weight: 300;
 }
 
 .toolGhost {
@@ -206,7 +219,7 @@
   display: block;
   color: rgba(8, 19, 38, 0.82);
   font-size: 0.62rem;
-  font-weight: 650;
+  font-weight: 300;
 }
 
 .calEvent span {
@@ -277,7 +290,7 @@
 
 .mailField b {
   color: rgba(8, 19, 38, 0.82);
-  font-weight: 500;
+  font-weight: 300;
 }
 
 .recipient {
@@ -378,7 +391,7 @@
 .noteRow strong {
   color: rgba(8, 19, 38, 0.85);
   font-size: 0.72rem;
-  font-weight: 650;
+  font-weight: 300;
 }
 
 .noteRow span {
@@ -392,7 +405,7 @@
 .noteRow em {
   color: rgba(8, 19, 38, 0.42);
   font-style: normal;
-  font-weight: 600;
+  font-weight: 300;
 }
 
 .noteRow[data-active] span,
@@ -409,7 +422,7 @@
   margin: 0;
   color: rgba(8, 19, 38, 0.9);
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 300;
 }
 
 .noteDate {
@@ -534,7 +547,7 @@
 
 .automation strong {
   color: rgba(8, 19, 38, 0.85);
-  font-weight: 650;
+  font-weight: 300;
 }
 
 .automationStep {
@@ -549,7 +562,7 @@
 .automationStep b {
   grid-area: 1 / 1;
   color: #2f6fd6;
-  font-weight: 600;
+  font-weight: 300;
   white-space: nowrap;
   opacity: 0;
   transform: translateY(0.4rem);
@@ -580,7 +593,7 @@
   padding: 0.2rem 0.62rem;
   border-radius: 8px;
   font-size: 0.66rem;
-  font-weight: 650;
+  font-weight: 300;
   line-height: 1;
   white-space: nowrap;
   color: #fff;
@@ -638,90 +651,199 @@
 
 /* ---- Keyframes --------------------------------------------------------- */
 @keyframes caretBlink {
-  to { opacity: 0; }
+  to {
+    opacity: 0;
+  }
 }
 
 /* You cursor: dwell in the body, glide up to the unchecked item, click,
    then glide back. 0% and 100% match for a seamless loop. */
 @keyframes youDrive {
-  0% { transform: translate(1.7rem, 3.6rem); }
-  20% { transform: translate(1.7rem, 3.6rem); }
-  44% { transform: translate(0, 0); }
-  50% { transform: translate(0, 0) scale(0.88); }
-  56% { transform: translate(0, 0) scale(1); }
-  74% { transform: translate(0, 0); }
-  100% { transform: translate(1.7rem, 3.6rem); }
+  0% {
+    transform: translate(1.7rem, 3.6rem);
+  }
+  20% {
+    transform: translate(1.7rem, 3.6rem);
+  }
+  44% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(0, 0) scale(0.88);
+  }
+  56% {
+    transform: translate(0, 0) scale(1);
+  }
+  74% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(1.7rem, 3.6rem);
+  }
 }
 
 @keyframes cbFill {
-  0%, 44% { border-color: rgba(8, 19, 38, 0.22); background: transparent; }
-  50% { border-color: #f0b400; background: #f0b400; transform: scale(1.15); }
-  56% { transform: scale(1); }
-  90% { border-color: #f0b400; background: #f0b400; }
-  98%, 100% { border-color: rgba(8, 19, 38, 0.22); background: transparent; }
+  0%,
+  44% {
+    border-color: rgba(8, 19, 38, 0.22);
+    background: transparent;
+  }
+  50% {
+    border-color: #f0b400;
+    background: #f0b400;
+    transform: scale(1.15);
+  }
+  56% {
+    transform: scale(1);
+  }
+  90% {
+    border-color: #f0b400;
+    background: #f0b400;
+  }
+  98%,
+  100% {
+    border-color: rgba(8, 19, 38, 0.22);
+    background: transparent;
+  }
 }
 
 @keyframes cbCheck {
-  0%, 46% { opacity: 0; transform: scale(0.4); }
-  54% { opacity: 1; transform: scale(1); }
-  90% { opacity: 1; transform: scale(1); }
-  98%, 100% { opacity: 0; transform: scale(0.4); }
+  0%,
+  46% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  54% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  90% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  98%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
 }
 
 @keyframes cbStrike {
-  0%, 46% { transform: scaleX(0); }
-  56% { transform: scaleX(1); }
-  90% { transform: scaleX(1); }
-  98%, 100% { transform: scaleX(0); }
+  0%,
+  46% {
+    transform: scaleX(0);
+  }
+  56% {
+    transform: scaleX(1);
+  }
+  90% {
+    transform: scaleX(1);
+  }
+  98%,
+  100% {
+    transform: scaleX(0);
+  }
 }
 
 @keyframes cbDim {
-  0%, 46% { color: rgba(8, 19, 38, 0.82); }
-  56% { color: rgba(8, 19, 38, 0.42); }
-  90% { color: rgba(8, 19, 38, 0.42); }
-  98%, 100% { color: rgba(8, 19, 38, 0.82); }
+  0%,
+  46% {
+    color: rgba(8, 19, 38, 0.82);
+  }
+  56% {
+    color: rgba(8, 19, 38, 0.42);
+  }
+  90% {
+    color: rgba(8, 19, 38, 0.42);
+  }
+  98%,
+  100% {
+    color: rgba(8, 19, 38, 0.82);
+  }
 }
 
 /* Stella cursor: dwell, drift onto the Send button, click, then glide back
    to the start so the loop is seamless (no snap). 0% and 100% match. */
 @keyframes stellaDrive {
-  0% { transform: translate(2.4rem, 1.6rem); }
-  16% { transform: translate(2.4rem, 1.6rem); }
-  40% { transform: translate(0, 0); }
-  46% { transform: translate(0, 0) scale(0.88); }
-  52% { transform: translate(0, 0) scale(1); }
-  68% { transform: translate(0, 0); }
-  100% { transform: translate(2.4rem, 1.6rem); }
+  0% {
+    transform: translate(2.4rem, 1.6rem);
+  }
+  16% {
+    transform: translate(2.4rem, 1.6rem);
+  }
+  40% {
+    transform: translate(0, 0);
+  }
+  46% {
+    transform: translate(0, 0) scale(0.88);
+  }
+  52% {
+    transform: translate(0, 0) scale(1);
+  }
+  68% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(2.4rem, 1.6rem);
+  }
 }
 
 @keyframes clickRing {
-  0%, 42% { opacity: 0; transform: scale(0.4); }
-  48% { opacity: 0.9; transform: scale(0.6); }
-  64% { opacity: 0; transform: scale(1.45); }
-  100% { opacity: 0; transform: scale(1.45); }
+  0%,
+  42% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  48% {
+    opacity: 0.9;
+    transform: scale(0.6);
+  }
+  64% {
+    opacity: 0;
+    transform: scale(1.45);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.45);
+  }
 }
 
 @keyframes stepCycle {
-  0% { opacity: 0; transform: translateY(0.4rem); }
-  3% { opacity: 1; transform: translateY(0); }
-  31% { opacity: 1; transform: translateY(0); }
-  37% { opacity: 0; transform: translateY(-0.4rem); }
-  100% { opacity: 0; transform: translateY(-0.4rem); }
+  0% {
+    opacity: 0;
+    transform: translateY(0.4rem);
+  }
+  3% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  31% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  37% {
+    opacity: 0;
+    transform: translateY(-0.4rem);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-0.4rem);
+  }
 }
 
 /* ---- Responsive -------------------------------------------------------- */
-@media (max-width: 640px) {
-  .intro {
+@media (max-width: 860px) {
+  .row {
     grid-template-columns: 1fr;
+    gap: 2rem;
   }
 
-  .intro h2,
-  .intro p {
-    grid-column: 1;
+  .copy {
+    order: -1;
   }
 
   .display {
-    width: min(100%, 25rem);
+    width: min(100%, 28rem);
     padding: 0.35rem;
   }
 

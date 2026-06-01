@@ -34,26 +34,69 @@ function PhoneFrame({
     <div className={styles.phone}>
       <div className={styles.phoneEdge}>
         <div className={styles.screen}>
-          <div
-            className={styles.statusBar}
-            data-dark={statusDark || undefined}
-          >
+          <div className={styles.statusBar} data-dark={statusDark || undefined}>
             <span className={styles.statusTime}>9:41</span>
             <span className={styles.statusIcons}>
-              <svg viewBox="0 0 20 12" aria-hidden="true" className={styles.signal}>
+              <svg
+                viewBox="0 0 20 12"
+                aria-hidden="true"
+                className={styles.signal}
+              >
                 <rect x="0" y="8" width="3" height="4" rx="1" />
                 <rect x="5" y="5.5" width="3" height="6.5" rx="1" />
                 <rect x="10" y="3" width="3" height="9" rx="1" />
                 <rect x="15" y="0.5" width="3" height="11.5" rx="1" />
               </svg>
-              <svg viewBox="0 0 18 13" aria-hidden="true" className={styles.wifi}>
-                <path d="M9 12.2 1 5.6a12 12 0 0 1 16 0Z" fill="none" stroke="currentColor" strokeWidth="1.4" opacity="0.4" />
-                <path d="M9 12.2 4.2 8.2a7 7 0 0 1 9.6 0Z" fill="currentColor" />
+              <svg
+                viewBox="0 0 18 13"
+                aria-hidden="true"
+                className={styles.wifi}
+              >
+                <path
+                  d="M9 12.2 1 5.6a12 12 0 0 1 16 0Z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  opacity="0.4"
+                />
+                <path
+                  d="M9 12.2 4.2 8.2a7 7 0 0 1 9.6 0Z"
+                  fill="currentColor"
+                />
               </svg>
-              <svg viewBox="0 0 27 13" aria-hidden="true" className={styles.battery}>
-                <rect x="0.6" y="0.6" width="22" height="11.8" rx="3.2" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.45" />
-                <rect x="2.2" y="2.2" width="17" height="8.6" rx="1.8" fill="currentColor" />
-                <rect x="24" y="4" width="1.8" height="5" rx="0.9" fill="currentColor" opacity="0.45" />
+              <svg
+                viewBox="0 0 27 13"
+                aria-hidden="true"
+                className={styles.battery}
+              >
+                <rect
+                  x="0.6"
+                  y="0.6"
+                  width="22"
+                  height="11.8"
+                  rx="3.2"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  opacity="0.45"
+                />
+                <rect
+                  x="2.2"
+                  y="2.2"
+                  width="17"
+                  height="8.6"
+                  rx="1.8"
+                  fill="currentColor"
+                />
+                <rect
+                  x="24"
+                  y="4"
+                  width="1.8"
+                  height="5"
+                  rx="0.9"
+                  fill="currentColor"
+                  opacity="0.45"
+                />
               </svg>
             </span>
           </div>
@@ -72,7 +115,10 @@ function PhoneFrame({
 const imessageThread: Bubble[] = [
   { from: "you", text: "Move my 7:30 dinner to 8 and let Maya know." },
   { from: "them", text: "Done — moved it to 8:00 and texted Maya." },
-  { from: "them", text: "She's good with it. Want me to push the reminder back too?" },
+  {
+    from: "them",
+    text: "She's good with it. Want me to push the reminder back too?",
+  },
   { from: "you", text: "Yeah, 30 min before." },
   { from: "them", text: "Set for 7:30. 👍" },
   { from: "you", text: "Perfect, thanks 🙏" },
@@ -113,9 +159,12 @@ function IMessageSkin() {
 /* ------------------------------------------------------------------ */
 const telegramThread: Bubble[] = [
   { from: "you", text: "Find the PDF I downloaded about neural nets." },
-  { from: "them", text: "Found it — \"intro_to_neural_nets.pdf\" in Downloads." },
+  { from: "them", text: 'Found it — "intro_to_neural_nets.pdf" in Downloads.' },
   { from: "you", text: "Summarize the first 10 pages for me." },
-  { from: "them", text: "It's an intro to feed-forward nets, backprop, and a worked MNIST example." },
+  {
+    from: "them",
+    text: "It's an intro to feed-forward nets, backprop, and a worked MNIST example.",
+  },
   { from: "them", text: "Want the 5 key takeaways?" },
 ];
 
@@ -157,10 +206,24 @@ function TelegramSkin() {
 /*  Discord skin                                                     */
 /* ------------------------------------------------------------------ */
 const discordThread: { author: string; you?: boolean; text: string }[] = [
-  { author: "you", you: true, text: "@Stella make a playlist folder on my desktop and add my lo-fi bookmarks" },
-  { author: "Stella", text: "On it — created \"lo-fi\" on your desktop and saved 12 bookmarks into it." },
-  { author: "you", you: true, text: "nice, also close the chrome tabs I left open" },
-  { author: "Stella", text: "Closed 14 tabs across 2 windows. Your desktop is clear." },
+  {
+    author: "you",
+    you: true,
+    text: "@Stella make a playlist folder on my desktop and add my lo-fi bookmarks",
+  },
+  {
+    author: "Stella",
+    text: 'On it — created "lo-fi" on your desktop and saved 12 bookmarks into it.',
+  },
+  {
+    author: "you",
+    you: true,
+    text: "nice, also close the chrome tabs I left open",
+  },
+  {
+    author: "Stella",
+    text: "Closed 14 tabs across 2 windows. Your desktop is clear.",
+  },
 ];
 
 function DiscordSkin() {
@@ -180,7 +243,11 @@ function DiscordSkin() {
                 data-you={m.you || undefined}
                 data-bot={!m.you || undefined}
               >
-                {m.you ? "Y" : <Image src="/stella-logo.svg" alt="" width={20} height={20} />}
+                {m.you ? (
+                  "Y"
+                ) : (
+                  <Image src="/stella-logo.svg" alt="" width={20} height={20} />
+                )}
               </span>
               <div>
                 <p className={styles.dcAuthor}>
@@ -206,10 +273,16 @@ function DiscordSkin() {
 /* ------------------------------------------------------------------ */
 const stellaThread: Bubble[] = [
   { from: "you", text: "What was I working on before lunch?" },
-  { from: "them", text: "You were comparing flights to Lisbon and had the budget spreadsheet open." },
+  {
+    from: "them",
+    text: "You were comparing flights to Lisbon and had the budget spreadsheet open.",
+  },
   { from: "them", text: "Want me to pull it back up?" },
   { from: "you", text: "Yes, and book the cheapest morning one." },
-  { from: "them", text: "Booked the 8:05 AM — $214. Added it to your calendar." },
+  {
+    from: "them",
+    text: "Booked the 8:05 AM — $214. Added it to your calendar.",
+  },
 ];
 
 function StellaSkin() {
@@ -219,7 +292,9 @@ function StellaSkin() {
         <div className={styles.stGradient} />
         <header className={styles.stHeader}>
           <span className={styles.stMenu}>
-            <i /><i /><i />
+            <i />
+            <i />
+            <i />
           </span>
           <span className={styles.stBrand}>
             <Image src="/stella-logo.svg" alt="" width={20} height={20} />
@@ -259,34 +334,56 @@ const SKINS: Record<Platform["id"], ReactNode> = {
 
 export function HomePhoneConnectors() {
   return (
-    <section className={`grid-shell section-border ${styles.section}`}>
-      <div className={styles.intro}>
-        <span className={styles.eyebrow}>
-          <Smartphone size={15} strokeWidth={1.9} aria-hidden="true" />
-          3.0 Phone and connectors
-        </span>
+    <section
+      className={`grid-shell section-border home-atlas-section ${styles.section}`}
+      data-reveal
+    >
+      <div
+        className="home-atlas-heading"
+        data-reveal-child
+        style={{ ["--reveal-index" as string]: 0 }}
+      >
         <h2>Your phone reaches the same Stella on your computer.</h2>
-        <p>
-          Text from iMessage, Telegram, or Discord, or open the Stella app — when
-          you&apos;re signed in and your computer is on, every message routes to
-          your real Stella.
-        </p>
       </div>
 
-      <div className={styles.lineup} aria-hidden="true">
-        {PLATFORMS.map((platform, index) => (
-          <div
-            className={styles.slot}
-            key={platform.id}
-            style={{ ["--i" as string]: index }}
-          >
-            {SKINS[platform.id]}
-            <div className={styles.caption}>
-              <strong>{platform.label}</strong>
-              <span>{platform.sub}</span>
-            </div>
+      <div className="home-atlas-scene home-atlas-scene--reverse">
+        <div
+          className="home-atlas-copy"
+          data-reveal-child
+          style={{ ["--reveal-index" as string]: 2 }}
+        >
+          <span className="home-atlas-kicker">
+            <Smartphone size={15} strokeWidth={1.9} aria-hidden="true" />
+            Phone and connectors
+          </span>
+          <p>
+            Text Stella from iMessage, Telegram, Discord, or the mobile app.
+            Every message reaches the same assistant on your computer.
+          </p>
+        </div>
+
+        <div
+          className={`home-atlas-media home-atlas-media--right ${styles.media}`}
+          data-reveal-child
+          style={{ ["--reveal-index" as string]: 1 }}
+          aria-hidden="true"
+        >
+          <div className={styles.lineup}>
+            {PLATFORMS.map((platform, index) => (
+              <div
+                className={styles.slot}
+                key={platform.id}
+                style={{ ["--i" as string]: index }}
+              >
+                {SKINS[platform.id]}
+                <div className={styles.caption}>
+                  <strong>{platform.label}</strong>
+                  <span>{platform.sub}</span>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </section>
   );

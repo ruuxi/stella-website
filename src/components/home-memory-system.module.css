@@ -26,7 +26,7 @@
   color: var(--blue);
   font-family: var(--font-mono), monospace;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 300;
   letter-spacing: 0;
 }
 
@@ -42,7 +42,7 @@
   margin: 0;
   color: var(--ink);
   font-size: clamp(2.15rem, 4.8vw, 4.7rem);
-  font-weight: 650;
+  font-weight: 300;
   line-height: 1.02;
   letter-spacing: 0;
   text-wrap: balance;
@@ -60,7 +60,10 @@
 .diagram {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(12rem, 0.72fr) minmax(28rem, 2fr) minmax(13rem, 0.86fr);
+  grid-template-columns: minmax(12rem, 0.72fr) minmax(28rem, 2fr) minmax(
+      13rem,
+      0.86fr
+    );
   gap: clamp(0.9rem, 1.6vw, 1.2rem);
   width: min(100%, 74rem);
   min-height: 30rem;
@@ -69,7 +72,11 @@
   overflow: hidden;
   border: 1px solid rgba(82, 104, 134, 0.16);
   background:
-    radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.7), transparent 30%),
+    radial-gradient(
+      circle at 18% 8%,
+      rgba(255, 255, 255, 0.7),
+      transparent 30%
+    ),
     linear-gradient(180deg, rgba(248, 252, 255, 0.68), rgba(226, 237, 249, 0.5));
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.82) inset,
@@ -143,7 +150,7 @@
 .turnNode strong {
   color: var(--ink);
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 300;
   line-height: 1.2;
 }
 
@@ -163,7 +170,11 @@
   justify-self: center;
   width: 1px;
   height: 6rem;
-  background: linear-gradient(180deg, rgba(37, 99, 235, 0.28), rgba(37, 99, 235, 0.04));
+  background: linear-gradient(
+    180deg,
+    rgba(37, 99, 235, 0.28),
+    rgba(37, 99, 235, 0.04)
+  );
 }
 
 .promptChip {
@@ -178,7 +189,9 @@
 
 .pipeline {
   display: grid;
-  grid-template-columns: minmax(10rem, 0.9fr) 3.2rem minmax(9rem, 0.72fr) minmax(11rem, 0.95fr);
+  grid-template-columns:
+    minmax(10rem, 0.9fr) 3.2rem minmax(9rem, 0.72fr)
+    minmax(11rem, 0.95fr);
   align-items: center;
   gap: clamp(0.7rem, 1.4vw, 1rem);
   padding: clamp(0.9rem, 1.8vw, 1.35rem);
@@ -202,7 +215,7 @@
 .inputNode span {
   color: var(--ink);
   font-size: 0.84rem;
-  font-weight: 650;
+  font-weight: 300;
   line-height: 1.2;
 }
 
@@ -239,7 +252,11 @@
   width: 3.2rem;
   height: 3.2rem;
   background:
-    radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.9), transparent 50%),
+    radial-gradient(
+      circle at 50% 35%,
+      rgba(255, 255, 255, 0.9),
+      transparent 50%
+    ),
     linear-gradient(180deg, rgba(37, 99, 235, 0.18), rgba(37, 99, 235, 0.06));
 }
 
@@ -252,7 +269,7 @@
   color: var(--ink);
   font-family: var(--font-mono), monospace;
   font-size: 0.72rem;
-  font-weight: 500;
+  font-weight: 300;
 }
 
 .fileNode svg {
@@ -282,7 +299,11 @@
 }
 
 .turnNode {
-  background: linear-gradient(180deg, rgba(14, 28, 50, 0.92), rgba(13, 27, 49, 0.86));
+  background: linear-gradient(
+    180deg,
+    rgba(14, 28, 50, 0.92),
+    rgba(13, 27, 49, 0.86)
+  );
 }
 
 .turnNode strong {
@@ -306,7 +327,11 @@
   .coreArrow {
     width: 4rem;
     height: 1px;
-    background: linear-gradient(90deg, rgba(37, 99, 235, 0.28), rgba(37, 99, 235, 0.04));
+    background: linear-gradient(
+      90deg,
+      rgba(37, 99, 235, 0.28),
+      rgba(37, 99, 235, 0.04)
+    );
   }
 }
 

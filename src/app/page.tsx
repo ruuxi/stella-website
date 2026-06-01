@@ -7,9 +7,9 @@ import { HomeComputerUse } from "@/components/home-computer-use";
 import { HomeDesktopMock } from "@/components/home-desktop-mock";
 import { HomeDocuments } from "@/components/home-documents";
 import { HomeHero } from "@/components/home-hero";
-import { HomeMemorySystem } from "@/components/home-memory-system";
 import { HomeOpenPrivate } from "@/components/home-open-private";
 import { HomePhoneConnectors } from "@/components/home-phone-connectors";
+import { HomeSingleChat } from "@/components/home-single-chat";
 import { SiteHeader } from "@/components/site-header";
 
 export default function Home() {
@@ -21,10 +21,10 @@ export default function Home() {
         <HomeHero />
         <HomeDesktopMock />
         <HomeCanvasDemos />
+        <HomeSingleChat />
         <HomeComputerUse />
         <HomePhoneConnectors />
         <HomeDocuments />
-        <HomeMemorySystem />
         <HomeOpenPrivate />
       </main>
 

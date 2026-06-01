@@ -2,21 +2,26 @@
   --ink: #0c1b33;
   --muted: #54627a;
   --blue: #2563eb;
-  row-gap: clamp(1.6rem, 3vw, 2.7rem);
-  padding-block: clamp(3rem, 7vw, 7rem);
+  padding-block: clamp(4.5rem, 9vw, 9rem);
 }
 
 .section > * {
   grid-column: 1 / -1;
 }
 
-/* ---- Intro ------------------------------------------------------------- */
-.intro {
+.row {
   display: grid;
-  grid-template-columns: minmax(0, 0.28fr) minmax(0, 0.72fr);
-  gap: clamp(1rem, 3vw, 3rem);
+  grid-template-columns: minmax(17rem, 0.82fr) minmax(0, 1.18fr);
+  align-items: center;
+  gap: clamp(2rem, 6vw, 6rem);
   width: min(100%, 74rem);
   margin: 0 auto;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   text-align: left;
 }
 
@@ -27,7 +32,7 @@
   color: var(--blue);
   font-family: var(--font-mono), monospace;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 300;
   letter-spacing: 0;
 }
 
@@ -38,35 +43,40 @@
   background: rgba(82, 104, 134, 0.24);
 }
 
-.intro h2 {
-  grid-column: 2;
-  margin: 0;
+.copy h2 {
+  max-width: 13ch;
+  margin: 1rem 0 0;
   color: var(--ink);
-  font-size: clamp(2.15rem, 4.8vw, 4.7rem);
-  font-weight: 650;
-  line-height: 1.02;
+  font-size: clamp(2.35rem, 5vw, 5.6rem);
+  font-weight: 300;
+  line-height: 0.98;
   letter-spacing: 0;
   text-wrap: balance;
 }
 
-.intro p {
-  grid-column: 2;
-  max-width: 42rem;
-  margin: 0;
+.copy p {
+  max-width: 34rem;
+  margin: clamp(1rem, 2vw, 1.35rem) 0 0;
   color: var(--muted);
   font-size: clamp(1rem, 1.2vw, 1.18rem);
   line-height: 1.72;
 }
 
+.media {
+  min-width: 0;
+  overflow: visible;
+}
+
 /* ---- Lineup ------------------------------------------------------------ */
 .lineup {
-  --phone-w: 15.5rem;
-  --overlap: 6.6rem;
+  --phone-w: clamp(10rem, 18vw, 14rem);
+  --overlap: clamp(4.8rem, 8vw, 6.2rem);
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding: 1.45rem 0 0.8rem;
-  font-family: -apple-system, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+  font-family:
+    -apple-system, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
 }
 
 .slot {
@@ -82,10 +92,18 @@
   margin-left: 0;
 }
 
-.slot:nth-child(1) { z-index: 1; }
-.slot:nth-child(2) { z-index: 2; }
-.slot:nth-child(3) { z-index: 3; }
-.slot:nth-child(4) { z-index: 4; }
+.slot:nth-child(1) {
+  z-index: 1;
+}
+.slot:nth-child(2) {
+  z-index: 2;
+}
+.slot:nth-child(3) {
+  z-index: 3;
+}
+.slot:nth-child(4) {
+  z-index: 4;
+}
 
 .caption {
   margin-top: 1.1rem;
@@ -96,7 +114,7 @@
   display: block;
   color: var(--ink);
   font-size: 0.92rem;
-  font-weight: 650;
+  font-weight: 300;
 }
 
 .caption span {
@@ -109,8 +127,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 219 / 444;
-  filter:
-    drop-shadow(0 30px 18px rgba(17, 31, 50, 0.18))
+  filter: drop-shadow(0 30px 18px rgba(17, 31, 50, 0.18))
     drop-shadow(0 46px 38px rgba(17, 31, 50, 0.18));
   transform-style: preserve-3d;
 }
@@ -146,7 +163,15 @@
   border-radius: 2.82rem;
   padding: 0.42rem;
   background:
-    linear-gradient(90deg, #05070b 0%, #3c4653 7%, #111720 20%, #090d13 54%, #4f5966 92%, #06080c 100%),
+    linear-gradient(
+      90deg,
+      #05070b 0%,
+      #3c4653 7%,
+      #111720 20%,
+      #090d13 54%,
+      #4f5966 92%,
+      #06080c 100%
+    ),
     linear-gradient(160deg, #2c3340, #0c0f15 55%, #20262f);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.16) inset,
@@ -162,7 +187,12 @@
   inset: 0.12rem;
   border-radius: 2.68rem;
   background:
-    linear-gradient(112deg, rgba(255, 255, 255, 0.2), transparent 19% 77%, rgba(255, 255, 255, 0.12)),
+    linear-gradient(
+      112deg,
+      rgba(255, 255, 255, 0.2),
+      transparent 19% 77%,
+      rgba(255, 255, 255, 0.12)
+    ),
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 34%);
   pointer-events: none;
 }
@@ -186,8 +216,18 @@
   z-index: 9;
   border-radius: inherit;
   background:
-    linear-gradient(118deg, rgba(255, 255, 255, 0.2), transparent 18% 66%, rgba(255, 255, 255, 0.08)),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 10% 86%, rgba(0, 0, 0, 0.16));
+    linear-gradient(
+      118deg,
+      rgba(255, 255, 255, 0.2),
+      transparent 18% 66%,
+      rgba(255, 255, 255, 0.08)
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.14),
+      transparent 10% 86%,
+      rgba(0, 0, 0, 0.16)
+    );
   pointer-events: none;
 }
 
@@ -210,7 +250,7 @@
 
 .statusTime {
   font-size: 0.69rem;
-  font-weight: 650;
+  font-weight: 300;
   letter-spacing: 0;
 }
 
@@ -323,7 +363,7 @@
 .imHeader strong {
   color: #0c1b33;
   font-size: 0.69rem;
-  font-weight: 600;
+  font-weight: 300;
 }
 
 .imBubble {
@@ -417,7 +457,7 @@
 
 .tgHeader strong {
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 300;
 }
 
 .tgHeader span {
@@ -427,9 +467,23 @@
 
 .tgThread {
   background:
-    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.2), transparent 28%),
-    radial-gradient(circle at 82% 72%, rgba(255, 255, 255, 0.16), transparent 30%),
-    linear-gradient(45deg, rgba(255, 255, 255, 0.07) 25%, transparent 25% 75%, rgba(255, 255, 255, 0.07) 75%) 0 0 / 1.2rem 1.2rem,
+    radial-gradient(
+      circle at 20% 18%,
+      rgba(255, 255, 255, 0.2),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 82% 72%,
+      rgba(255, 255, 255, 0.16),
+      transparent 30%
+    ),
+    linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.07) 25%,
+        transparent 25% 75%,
+        rgba(255, 255, 255, 0.07) 75%
+      )
+      0 0 / 1.2rem 1.2rem,
     linear-gradient(160deg, #b6c4cf, #9fb1be);
 }
 
@@ -507,17 +561,21 @@
 .dcHash {
   color: #87898c;
   font-size: 1.05rem;
-  font-weight: 500;
+  font-weight: 300;
 }
 
 .dcHeader strong {
   font-size: 0.82rem;
-  font-weight: 650;
+  font-weight: 300;
 }
 
 .dcThread {
   background:
-    radial-gradient(circle at 85% 8%, rgba(88, 101, 242, 0.14), transparent 34%),
+    radial-gradient(
+      circle at 85% 8%,
+      rgba(88, 101, 242, 0.14),
+      transparent 34%
+    ),
     #313338;
   gap: 0.58rem;
 }
@@ -526,7 +584,7 @@
   align-self: center;
   color: #949ba4;
   font-size: 0.54rem;
-  font-weight: 600;
+  font-weight: 300;
 }
 
 .dcMessage {
@@ -544,7 +602,7 @@
   justify-content: center;
   border-radius: 999px;
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 300;
   color: #fff;
 }
 
@@ -563,14 +621,14 @@
   margin: 0 0 0.18rem;
   color: #f2f3f5;
   font-size: 0.7rem;
-  font-weight: 600;
+  font-weight: 300;
 }
 
 .dcAuthor em {
   color: #949ba4;
   font-size: 0.55rem;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 300;
 }
 
 .dcBot {
@@ -579,7 +637,7 @@
   background: #5865f2;
   color: #fff;
   font-size: 0.46rem;
-  font-weight: 700;
+  font-weight: 300;
   letter-spacing: 0.03em;
 }
 
@@ -612,9 +670,21 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(80% 55% at 20% 8%, rgba(96, 140, 220, 0.48), transparent 60%),
-    radial-gradient(70% 50% at 88% 30%, rgba(80, 172, 196, 0.28), transparent 60%),
-    radial-gradient(90% 60% at 70% 100%, rgba(58, 110, 180, 0.42), transparent 60%),
+    radial-gradient(
+      80% 55% at 20% 8%,
+      rgba(96, 140, 220, 0.48),
+      transparent 60%
+    ),
+    radial-gradient(
+      70% 50% at 88% 30%,
+      rgba(80, 172, 196, 0.28),
+      transparent 60%
+    ),
+    radial-gradient(
+      90% 60% at 70% 100%,
+      rgba(58, 110, 180, 0.42),
+      transparent 60%
+    ),
     linear-gradient(170deg, #17213a 0%, #111b2c 55%, #0d1422 100%);
 }
 
@@ -650,7 +720,7 @@
   gap: 0.34rem;
   margin: 0 auto;
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: 300;
 }
 
 .stModel {
@@ -658,7 +728,7 @@
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.12);
   font-size: 0.62rem;
-  font-weight: 600;
+  font-weight: 300;
 }
 
 .stThread {
@@ -672,7 +742,11 @@
   max-width: 80%;
   padding: 0.5rem 0.7rem;
   border-radius: 16px 16px 5px 16px;
-  background: linear-gradient(180deg, rgba(128, 174, 255, 0.34), rgba(88, 129, 214, 0.24));
+  background: linear-gradient(
+    180deg,
+    rgba(128, 174, 255, 0.34),
+    rgba(88, 129, 214, 0.24)
+  );
   border: 1px solid rgba(150, 185, 250, 0.25);
   color: #eef4fd;
   font-size: 0.69rem;
@@ -729,13 +803,9 @@
 
 /* ---- Responsive -------------------------------------------------------- */
 @media (max-width: 900px) {
-  .intro {
+  .row {
     grid-template-columns: 1fr;
-  }
-
-  .intro h2,
-  .intro p {
-    grid-column: 1;
+    gap: 2rem;
   }
 
   .lineup {

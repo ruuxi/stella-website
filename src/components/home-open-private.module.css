@@ -2,21 +2,26 @@
   --ink: #0c1b33;
   --muted: #54627a;
   --blue: #2563eb;
-  row-gap: clamp(1.6rem, 3vw, 2.8rem);
-  padding-block: clamp(3rem, 7vw, 7rem);
+  padding-block: clamp(4.5rem, 9vw, 9rem);
 }
 
 .section > * {
   grid-column: 1 / -1;
 }
 
-/* ---- Intro ------------------------------------------------------------- */
-.intro {
+.row {
   display: grid;
-  grid-template-columns: minmax(0, 0.28fr) minmax(0, 0.72fr);
-  gap: clamp(1rem, 3vw, 3rem);
+  grid-template-columns: minmax(17rem, 0.82fr) minmax(0, 1.18fr);
+  align-items: center;
+  gap: clamp(2rem, 6vw, 6rem);
   width: min(100%, 74rem);
   margin: 0 auto;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   text-align: left;
 }
 
@@ -27,7 +32,7 @@
   color: var(--blue);
   font-family: var(--font-mono), monospace;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 300;
   letter-spacing: 0;
 }
 
@@ -38,41 +43,39 @@
   background: rgba(82, 104, 134, 0.24);
 }
 
-.intro h2 {
-  grid-column: 2;
-  margin: 0;
+.copy h2 {
+  max-width: 13ch;
+  margin: 1rem 0 0;
   color: var(--ink);
-  font-size: clamp(2.15rem, 4.8vw, 4.7rem);
-  font-weight: 650;
-  line-height: 1.02;
+  font-size: clamp(2.35rem, 5vw, 5.6rem);
+  font-weight: 300;
+  line-height: 0.98;
   letter-spacing: 0;
   text-wrap: balance;
 }
 
-.intro p {
-  grid-column: 2;
-  max-width: 42rem;
-  margin: 0;
+.copy p {
+  max-width: 34rem;
+  margin: clamp(1rem, 2vw, 1.35rem) 0 0;
   color: var(--muted);
   font-size: clamp(1rem, 1.2vw, 1.18rem);
   line-height: 1.72;
 }
 
 .githubLink {
-  grid-column: 1 / -1;
-  justify-self: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.48rem;
   width: max-content;
   max-width: 100%;
+  margin-top: 1.4rem;
   padding: 0.62rem 0.86rem;
   border: 1px solid rgba(82, 104, 134, 0.2);
   background: rgba(255, 255, 255, 0.56);
   color: var(--ink);
   font-size: 0.88rem;
-  font-weight: 650;
+  font-weight: 300;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.75) inset;
   transition:
     background-color 160ms ease,
@@ -91,13 +94,17 @@
 }
 
 /* ---- Privacy pillars (one wide dark-blue gradient panel) --------------- */
-.panel {
-  width: min(100%, 60rem);
-  margin: 0 auto;
+.media {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.6rem;
-  padding: clamp(1.5rem, 3vw, 2.3rem);
+  gap: clamp(1.1rem, 2vw, 1.6rem);
+  min-width: 0;
+}
+
+.panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.2rem;
+  padding: clamp(1.25rem, 2.4vw, 1.9rem);
   border-radius: 0.6rem;
   color: #eaf2ff;
   background:
@@ -119,9 +126,9 @@
   gap: 0.5rem;
 }
 
-.pillar:not(:first-child) {
-  border-left: 1px solid rgba(160, 195, 240, 0.16);
-  padding-left: 1.6rem;
+.pillar + .pillar {
+  border-top: 1px solid rgba(160, 195, 240, 0.16);
+  padding-top: 1.2rem;
 }
 
 .pillarIcon {
@@ -139,7 +146,7 @@
 .pillar strong {
   color: #fff;
   font-size: 1rem;
-  font-weight: 650;
+  font-weight: 300;
   letter-spacing: -0.005em;
 }
 
@@ -151,11 +158,15 @@
 
 /* ---- Compatibility wall ------------------------------------------------ */
 .wall {
-  width: min(100%, 62rem);
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 2.2rem;
+  gap: 1.5rem;
+  padding: clamp(1.1rem, 2.2vw, 1.5rem);
+  border: 1px solid rgba(82, 104, 134, 0.16);
+  background: rgba(255, 255, 255, 0.48);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.72) inset,
+    0 28px 62px -46px rgba(12, 22, 38, 0.4);
 }
 
 .group {
@@ -167,7 +178,7 @@
 
 .groupLabel {
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 300;
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--muted);
@@ -177,7 +188,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1.5rem 2.6rem;
+  gap: 1.1rem 1.8rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -188,7 +199,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.6rem;
-  width: 6.4rem;
+  width: 5.6rem;
 }
 
 .logoMark {
@@ -211,7 +222,7 @@
 
 .logoName {
   font-size: 0.78rem;
-  font-weight: 500;
+  font-weight: 300;
   color: var(--muted);
   transition: color 0.25s ease;
 }
@@ -255,29 +266,13 @@
 
 /* ---- Responsive -------------------------------------------------------- */
 @media (max-width: 760px) {
-  .intro {
+  .row {
     grid-template-columns: 1fr;
-  }
-
-  .intro h2,
-  .intro p {
-    grid-column: 1;
-  }
-
-  .githubLink {
-    justify-self: center;
+    gap: 2rem;
   }
 
   .panel {
-    grid-template-columns: 1fr;
     gap: 1.3rem;
-  }
-
-  .pillar:not(:first-child) {
-    border-left: none;
-    padding-left: 0;
-    border-top: 1px solid rgba(160, 195, 240, 0.16);
-    padding-top: 1.3rem;
   }
 }
 

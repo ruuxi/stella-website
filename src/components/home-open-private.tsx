@@ -59,44 +59,65 @@ function LogoRow({ title, brands }: { title: string; brands: Brand[] }) {
 
 export function HomeOpenPrivate() {
   return (
-    <section className={`grid-shell section-border ${styles.section}`}>
-      <div className={styles.intro}>
-        <span className={styles.eyebrow}>
-          <ShieldCheck size={15} strokeWidth={1.9} aria-hidden="true" />
-          6.0 Open &amp; private
-        </span>
+    <section
+      className={`grid-shell section-border home-atlas-section ${styles.section}`}
+      data-reveal
+    >
+      <div
+        className="home-atlas-heading"
+        data-reveal-child
+        style={{ ["--reveal-index" as string]: 0 }}
+      >
         <h2>Private by default. Open by design.</h2>
-        <p>
-          Stella runs on your machine and keeps your files local — fully open
-          source, and built to work with the agents, providers, and models you
-          already use.
-        </p>
-        <a
-          className={styles.githubLink}
-          href="https://github.com/ruuxi/stella"
-          target="_blank"
-          rel="noopener noreferrer"
+      </div>
+
+      <div className="home-atlas-scene home-atlas-scene--reverse">
+        <div
+          className="home-atlas-copy"
+          data-reveal-child
+          style={{ ["--reveal-index" as string]: 2 }}
         >
-          <Github size={16} strokeWidth={1.9} aria-hidden="true" />
-          View Stella on GitHub
-        </a>
-      </div>
+          <span className="home-atlas-kicker">
+            <ShieldCheck size={15} strokeWidth={1.9} aria-hidden="true" />
+            Open &amp; private
+          </span>
+          <p>
+            Stella runs locally, stays open source, and works with your agents,
+            providers, keys, and models.
+          </p>
+          <a
+            className={styles.githubLink}
+            href="https://github.com/ruuxi/stella"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Github size={16} strokeWidth={1.9} aria-hidden="true" />
+            View Stella on GitHub
+          </a>
+        </div>
 
-      <div className={styles.panel}>
-        {PILLARS.map((pillar) => (
-          <div className={styles.pillar} key={pillar.title}>
-            <span className={styles.pillarIcon}>
-              <pillar.icon size={20} strokeWidth={1.7} aria-hidden="true" />
-            </span>
-            <strong>{pillar.title}</strong>
-            <span>{pillar.body}</span>
+        <div
+          className={`home-atlas-media home-atlas-media--right ${styles.media}`}
+          data-reveal-child
+          style={{ ["--reveal-index" as string]: 1 }}
+        >
+          <div className={styles.panel}>
+            {PILLARS.map((pillar) => (
+              <div className={styles.pillar} key={pillar.title}>
+                <span className={styles.pillarIcon}>
+                  <pillar.icon size={20} strokeWidth={1.7} aria-hidden="true" />
+                </span>
+                <strong>{pillar.title}</strong>
+                <span>{pillar.body}</span>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      <div className={styles.wall}>
-        <LogoRow title="Agents & harnesses" brands={HARNESSES} />
-        <LogoRow title="Models & providers" brands={PROVIDERS} />
+          <div className={styles.wall}>
+            <LogoRow title="Agents & harnesses" brands={HARNESSES} />
+            <LogoRow title="Models & providers" brands={PROVIDERS} />
+          </div>
+        </div>
       </div>
     </section>
   );

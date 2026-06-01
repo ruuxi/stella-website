@@ -26,7 +26,7 @@
   color: var(--blue);
   font-family: var(--font-mono), monospace;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 300;
   letter-spacing: 0;
 }
 
@@ -42,7 +42,7 @@
   margin: 0;
   color: var(--ink);
   font-size: clamp(2.15rem, 4.8vw, 4.7rem);
-  font-weight: 650;
+  font-weight: 300;
   line-height: 1.02;
   letter-spacing: 0;
   text-wrap: balance;
@@ -78,7 +78,11 @@
   min-width: 0;
   padding: clamp(1rem, 2.2vw, 1.8rem);
   background:
-    radial-gradient(circle at 20% 12%, rgba(255, 255, 255, 0.7), transparent 34%),
+    radial-gradient(
+      circle at 20% 12%,
+      rgba(255, 255, 255, 0.7),
+      transparent 34%
+    ),
     rgba(247, 251, 255, 0.66);
 }
 
@@ -86,14 +90,14 @@
   color: var(--blue);
   font-family: var(--font-mono), monospace;
   font-size: 0.76rem;
-  font-weight: 500;
+  font-weight: 300;
 }
 
 .commandPanel strong {
   margin-top: auto;
   color: var(--ink);
   font-size: clamp(1.55rem, 2.8vw, 2.45rem);
-  font-weight: 650;
+  font-weight: 300;
   line-height: 1.08;
   letter-spacing: 0;
 }
@@ -119,7 +123,7 @@
 
 .commandMeta b {
   color: rgba(15, 27, 51, 0.78);
-  font-weight: 500;
+  font-weight: 300;
 }
 
 .frame {
@@ -177,7 +181,7 @@
   background: var(--blue);
   color: #fff;
   font-size: 0.66rem;
-  font-weight: 700;
+  font-weight: 300;
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
@@ -192,7 +196,7 @@
 .captionBody strong {
   color: var(--ink);
   font-size: 0.92rem;
-  font-weight: 650;
+  font-weight: 300;
   letter-spacing: -0.005em;
 }
 

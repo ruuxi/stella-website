@@ -55,9 +55,15 @@ body {
   min-height: 100vh;
   background: var(--page-background);
   color: var(--page-foreground);
-  font-family: var(--font-sans), sans-serif;
+  font-family: var(--font-sans), "Manrope", system-ui, sans-serif;
+  font-weight: 300;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+:where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-weight: 300;
 }
 
 .page-background {
@@ -254,7 +260,7 @@ html[data-embedded="true"] .site-header {
 .brand-text {
   font-family: var(--font-display), serif;
   font-size: clamp(1.5rem, 3.2vw, 2rem);
-  font-weight: 600;
+  font-weight: 300;
   letter-spacing: -0.06em;
 }
 
@@ -277,7 +283,7 @@ html[data-embedded="true"] .site-header {
   padding: 0.48rem 0.62rem;
   color: rgba(18, 18, 15, 0.68);
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 300;
   letter-spacing: -0.03em;
   transition:
     color 150ms ease,
@@ -348,7 +354,11 @@ html[data-embedded="true"] .site-header {
   padding: 0.55rem;
   border: 1px solid rgba(82, 104, 134, 0.16);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 249, 255, 0.96)),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.96),
+      rgba(244, 249, 255, 0.96)
+    ),
     var(--page-panel);
   box-shadow: var(--shadow-soft);
   backdrop-filter: blur(18px);
@@ -367,7 +377,7 @@ html[data-embedded="true"] .site-header {
   padding: 0.7rem 0.85rem;
   color: var(--page-foreground);
   font-size: 0.92rem;
-  font-weight: 600;
+  font-weight: 300;
   letter-spacing: -0.02em;
   text-decoration: none;
   transition: background-color 150ms ease;
@@ -394,7 +404,7 @@ html[data-embedded="true"] .site-header {
   padding: 0.48rem 0.62rem;
   color: rgba(18, 18, 15, 0.68);
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 300;
   letter-spacing: -0.03em;
   cursor: pointer;
   transition: color 150ms ease;
@@ -452,7 +462,11 @@ html[data-embedded="true"] .site-header {
   border: 1px solid rgba(82, 104, 134, 0.16);
   border-radius: var(--page-radius);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 249, 255, 0.96)),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.96),
+      rgba(244, 249, 255, 0.96)
+    ),
     var(--page-panel);
   box-shadow: var(--shadow-soft);
   backdrop-filter: blur(18px);
@@ -464,7 +478,7 @@ html[data-embedded="true"] .site-header {
   border-radius: calc(var(--page-radius) - 0.15rem);
   color: var(--page-foreground);
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: 300;
   letter-spacing: -0.02em;
   white-space: nowrap;
   transition: background-color 150ms ease;
@@ -486,7 +500,7 @@ html[data-embedded="true"] .site-header {
   padding: 0.3rem 0.85rem 0.15rem;
   color: var(--page-muted);
   font-size: 0.68rem;
-  font-weight: 700;
+  font-weight: 300;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -532,7 +546,7 @@ html[data-embedded="true"] .site-header {
   gap: 0.55rem;
   border-radius: 0.45rem;
   border: 1px solid transparent;
-  font-weight: 700;
+  font-weight: 300;
   letter-spacing: -0.03em;
   transition:
     background-color 150ms ease,
@@ -592,7 +606,7 @@ html[data-embedded="true"] .site-header {
   gap: 0.55rem;
   font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
   font-style: italic;
-  font-weight: 600;
+  font-weight: 300;
   font-size: 1.5rem;
   letter-spacing: -0.005em;
   padding: 0.7rem 1.85rem;
@@ -601,7 +615,11 @@ html[data-embedded="true"] .site-header {
     radial-gradient(circle at top left, var(--page-glow-cyan), transparent 28%),
     radial-gradient(circle at 82% 10%, var(--page-glow-blue), transparent 26%),
     radial-gradient(circle at 50% 100%, var(--page-glow-mint), transparent 30%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.18)),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.7),
+      rgba(255, 255, 255, 0.18)
+    ),
     var(--page-background);
   border-color: var(--page-border);
   box-shadow: none;
@@ -612,7 +630,11 @@ html[data-embedded="true"] .site-header {
     radial-gradient(circle at top left, var(--page-glow-cyan), transparent 26%),
     radial-gradient(circle at 82% 10%, var(--page-glow-blue), transparent 24%),
     radial-gradient(circle at 50% 100%, var(--page-glow-mint), transparent 28%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.22)),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.78),
+      rgba(255, 255, 255, 0.22)
+    ),
     var(--page-background);
   border-color: var(--page-border-strong);
   box-shadow: none;
@@ -720,7 +742,7 @@ html[data-embedded="true"] .site-header {
   margin: 0;
   font-family: var(--font-display), serif;
   font-size: clamp(2.4rem, 5vw, 4.2rem);
-  font-weight: 400;
+  font-weight: 300;
   line-height: 1.08;
   letter-spacing: -0.05em;
 }
@@ -750,7 +772,7 @@ html[data-embedded="true"] .site-header {
   font-family: var(--font-display), serif;
   /* Small display heading scale. */
   font-size: clamp(1.15rem, 2vw, 1.35rem);
-  font-weight: 400;
+  font-weight: 300;
   letter-spacing: -0.04em;
   line-height: 1.2;
   color: rgba(15, 23, 40, 0.92);
@@ -779,7 +801,7 @@ html[data-embedded="true"] .site-header {
   margin: 0;
   color: var(--page-muted);
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 300;
   letter-spacing: -0.02em;
 }
 
@@ -795,7 +817,7 @@ html[data-embedded="true"] .site-header {
   padding: 0.45rem 0.72rem;
   background: rgba(255, 255, 255, 0.62);
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 300;
   letter-spacing: -0.03em;
 }
 
@@ -825,6 +847,205 @@ html[data-embedded="true"] .site-header {
 .section-deferred-render {
   content-visibility: auto;
   contain-intrinsic-size: 960px;
+}
+
+/* Homepage post-hero story sections, modeled on the Atlas-style rhythm:
+   oversized headline above, side-anchored media with a soft fade, and one
+   compact explanatory copy block beside the mock. */
+.grid-shell.home-atlas-section {
+  --atlas-ink: #0c111d;
+  --atlas-muted: #283344;
+  --atlas-blue: #2563eb;
+  --atlas-bg: var(--page-background);
+  padding-block: clamp(5.5rem, 11vw, 12rem);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.04),
+      rgba(255, 255, 255, 0.22) 44%,
+      rgba(255, 255, 255, 0.04)
+    ),
+    var(--atlas-bg);
+}
+
+.grid-shell.home-atlas-section > * {
+  grid-column: 1 / -1;
+}
+
+.home-atlas-heading {
+  width: min(100%, 78rem);
+  margin: 0 auto clamp(2.4rem, 5.5vw, 5.8rem);
+  text-align: center;
+}
+
+.home-atlas-heading h2 {
+  max-width: 13ch;
+  margin: 0 auto;
+  color: var(--atlas-ink);
+  font-size: clamp(2.9rem, 7.4vw, 7.35rem);
+  font-weight: 360;
+  line-height: 0.94;
+  letter-spacing: 0px;
+  text-wrap: balance;
+  word-spacing: 0;
+}
+
+.home-atlas-scene {
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(18rem, 0.82fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 5.5rem);
+  width: min(100%, 86rem);
+  margin: 0 auto;
+}
+
+.home-atlas-scene--reverse {
+  grid-template-columns: minmax(18rem, 0.82fr) minmax(0, 1.18fr);
+}
+
+.home-atlas-media {
+  position: relative;
+  min-width: 0;
+  isolation: isolate;
+}
+
+.home-atlas-media--left {
+  margin-left: calc(-1 * min(var(--page-margin), 5.25rem));
+}
+
+.home-atlas-media--right {
+  margin-right: calc(-1 * min(var(--page-margin), 5.25rem));
+}
+
+.home-atlas-media::before,
+.home-atlas-media::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  z-index: 5;
+  width: clamp(3.5rem, 12vw, 10rem);
+  pointer-events: none;
+  display: none;
+}
+
+.home-atlas-media--left::before {
+  display: block;
+  left: -1px;
+  background: linear-gradient(
+    90deg,
+    var(--atlas-bg) 0%,
+    rgba(237, 243, 251, 0.98) 8%,
+    rgba(237, 243, 251, 0.92) 18%,
+    rgba(237, 243, 251, 0.78) 32%,
+    rgba(237, 243, 251, 0.56) 50%,
+    rgba(237, 243, 251, 0.3) 72%,
+    rgba(237, 243, 251, 0.1) 90%,
+    rgba(237, 243, 251, 0) 100%
+  );
+}
+
+.home-atlas-media--right::after {
+  display: block;
+  right: -1px;
+  background: linear-gradient(
+    270deg,
+    var(--atlas-bg) 0%,
+    rgba(237, 243, 251, 0.98) 8%,
+    rgba(237, 243, 251, 0.92) 18%,
+    rgba(237, 243, 251, 0.78) 32%,
+    rgba(237, 243, 251, 0.56) 50%,
+    rgba(237, 243, 251, 0.3) 72%,
+    rgba(237, 243, 251, 0.1) 90%,
+    rgba(237, 243, 251, 0) 100%
+  );
+}
+
+.home-atlas-copy {
+  display: flex;
+  max-width: 32rem;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-self: start;
+}
+
+.home-atlas-copy--right {
+  justify-self: end;
+}
+
+.home-atlas-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 1.15rem;
+  color: var(--atlas-blue);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.82rem;
+  font-weight: 300;
+  letter-spacing: 0;
+}
+
+.home-atlas-copy p {
+  margin: 0;
+  color: var(--atlas-ink);
+  font-size: clamp(1.25rem, 2vw, 1.7rem);
+  font-weight: 360;
+  line-height: 1.36;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+@media (max-width: 900px) {
+  .home-atlas-section {
+    padding-block: clamp(4.5rem, 12vw, 7.5rem);
+  }
+
+  .home-atlas-heading {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .home-atlas-heading h2 {
+    max-width: 15ch;
+    margin: 0 auto;
+    font-size: clamp(2.15rem, 7.5vw, 3.25rem);
+    line-height: 1;
+  }
+
+  .home-atlas-scene,
+  .home-atlas-scene--reverse {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+
+  .home-atlas-scene--reverse .home-atlas-media {
+    order: 1;
+  }
+
+  .home-atlas-scene--reverse .home-atlas-copy {
+    order: 2;
+  }
+
+  .home-atlas-media--left,
+  .home-atlas-media--right {
+    margin-inline: 0;
+  }
+
+  .home-atlas-media::before,
+  .home-atlas-media::after {
+    width: clamp(2.2rem, 13vw, 5rem);
+  }
+
+  .home-atlas-copy,
+  .home-atlas-copy--right {
+    justify-self: stretch;
+    max-width: 100%;
+  }
+
+  .home-atlas-copy p {
+    max-width: 32rem;
+    font-size: clamp(1.08rem, 4.6vw, 1.45rem);
+  }
 }
 
 .site-footer {
@@ -877,7 +1098,7 @@ html[data-embedded="true"] .site-header {
 .footer-column h3 {
   margin: 0 0 0.9rem;
   font-size: 0.82rem;
-  font-weight: 800;
+  font-weight: 300;
   letter-spacing: -0.03em;
 }
 
@@ -889,7 +1110,7 @@ html[data-embedded="true"] .site-header {
 .footer-column a {
   color: rgba(18, 18, 15, 0.62);
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 300;
   letter-spacing: -0.03em;
 }
 
@@ -909,8 +1130,13 @@ html[data-embedded="true"] .site-header {
    real layout exactly, with a single calm opacity pulse instead of a
    gradient shimmer (reads as template UI). Reduced-motion safe. */
 @keyframes loading-pulse {
-  0%, 100% { opacity: 0.55; }
-  50%      { opacity: 0.95; }
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.95;
+  }
 }
 
 .loading-block {
@@ -1043,8 +1269,11 @@ html[data-embedded="true"] .site-header {
   width: min(380px, calc(100% - 2rem));
   border: 1px solid rgba(82, 104, 134, 0.16);
   border-radius: 1.1rem;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(246, 250, 255, 0.96));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.97),
+    rgba(246, 250, 255, 0.96)
+  );
   box-shadow:
     0 24px 60px rgba(15, 23, 40, 0.18),
     0 0 0 1px rgba(255, 255, 255, 0.5) inset;
@@ -1090,7 +1319,7 @@ html[data-embedded="true"] .site-header {
   margin: 0 0 0.35rem;
   font-family: var(--font-display), serif;
   font-size: 1.3rem;
-  font-weight: 400;
+  font-weight: 300;
   letter-spacing: -0.04em;
   line-height: 1.2;
 }
@@ -1117,7 +1346,9 @@ html[data-embedded="true"] .site-header {
   font-size: 0.9rem;
   letter-spacing: -0.02em;
   outline: none;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .dl-modal__input:focus {
@@ -1133,7 +1364,7 @@ html[data-embedded="true"] .site-header {
 .dl-modal__error {
   color: #dc2626;
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 300;
   letter-spacing: -0.02em;
   text-align: left;
 }
