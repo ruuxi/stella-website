@@ -282,8 +282,8 @@ html[data-embedded="true"] .site-header {
 .site-nav button.site-nav__signin {
   padding: 0.48rem 0.62rem;
   color: rgba(18, 18, 15, 0.68);
-  font-size: 0.78rem;
-  font-weight: 300;
+  font-size: 0.86rem;
+  font-weight: 400;
   letter-spacing: -0.03em;
   transition:
     color 150ms ease,
@@ -403,8 +403,8 @@ html[data-embedded="true"] .site-header {
   font-family: inherit;
   padding: 0.48rem 0.62rem;
   color: rgba(18, 18, 15, 0.68);
-  font-size: 0.78rem;
-  font-weight: 300;
+  font-size: 0.86rem;
+  font-weight: 400;
   letter-spacing: -0.03em;
   cursor: pointer;
   transition: color 150ms ease;

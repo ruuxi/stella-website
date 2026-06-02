@@ -441,6 +441,7 @@
 }
 
 .noteChecklist li {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.55rem;
@@ -615,9 +616,11 @@
   padding-left: 0.3rem;
 }
 
+/* Anchored to its checklist item so the pointer tip always lands on the
+   checkbox regardless of layout, instead of a brittle %-of-desktop position. */
 .cursorYou {
-  left: 63.2%;
-  top: 43.8%;
+  left: 0.32rem;
+  top: calc(50% - 0.16rem);
   color: #1d2738;
   animation: youDrive 6.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }

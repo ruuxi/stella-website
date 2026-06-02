@@ -16,26 +16,23 @@ import {
   L1_START,
   L1_STEP,
   L2,
-  L2_START,
-  L2_STEP,
+  l2Delay,
 } from "./hero-timing";
 import styles from "./home-hero.module.css";
 
 function RevealWords({
   words,
-  start,
-  step,
+  delayFor,
 }: {
   words: string[];
-  start: number;
-  step: number;
+  delayFor: (i: number) => number;
 }) {
   return words.map((word, i) => (
     <Fragment key={word + i}>
       {i > 0 ? " " : null}
       <span
         className={styles.word}
-        style={{ animationDelay: `${start + i * step}ms` }}
+        style={{ animationDelay: `${delayFor(i)}ms` }}
       >
         {word}
       </span>
@@ -74,11 +71,11 @@ export function HomeHero() {
         aria-label="There are many assistants, but this one is yours."
       >
         <span className={styles.line} aria-hidden="true">
-          <RevealWords words={L1} start={L1_START} step={L1_STEP} />
+          <RevealWords words={L1} delayFor={(i) => L1_START + i * L1_STEP} />
         </span>
         {" "}
         <span className={styles.line} aria-hidden="true">
-          <RevealWords words={L2} start={L2_START} step={L2_STEP} />{" "}
+          <RevealWords words={L2} delayFor={l2Delay} />{" "}
           <span
             className={`${styles.word} ${styles.accent}`}
             style={{ animationDelay: `${ACCENT_DELAY}ms` }}

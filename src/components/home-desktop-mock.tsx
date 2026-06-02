@@ -1310,16 +1310,6 @@ export function HomeMiniChatMock({
   );
 }
 
-// App-section screenshots scattered as faded mini windows behind the mock.
-const BG_WINDOWS = [
-  "/app-mocks/canvas.jpg",
-  "/app-mocks/studio.jpg",
-  "/app-mocks/collage.jpg",
-  "/app-mocks/dashboard.jpg",
-  "/app-mocks/streaming.jpg",
-  "/app-mocks/terminal.jpg",
-];
-
 export function HomeDesktopMock() {
   const [themeId, setThemeId] = useState("pearl");
   const mode: ThemeMode = "light";
@@ -1444,28 +1434,6 @@ export function HomeDesktopMock() {
   return (
     <section className="grid-shell section-border" ref={sectionRef}>
       <div className={styles.shell}>
-        <div className={styles.backdrop} aria-hidden="true">
-          {BG_WINDOWS.map((src, i) => (
-            <figure className={`${styles.bgWin} ${styles[`bg${i}`]}`} key={src}>
-              <span className={styles.bgBar}>
-                <i />
-                <i />
-                <i />
-              </span>
-              <Image
-                src={src}
-                alt=""
-                width={2048}
-                height={1152}
-                loading="lazy"
-                quality={70}
-                sizes="22rem"
-                className={styles.bgShot}
-              />
-            </figure>
-          ))}
-        </div>
-
         <div
           className={styles.showcase}
           style={{ "--mock-emerge-delay": `${CTA_DELAY}ms` } as CSSProperties}

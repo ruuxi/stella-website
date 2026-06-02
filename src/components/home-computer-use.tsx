@@ -209,6 +209,14 @@ export function HomeComputerUse() {
                               <span className={styles.checkLabel}>
                                 {item.label}
                               </span>
+                              {animated ? (
+                                <div
+                                  className={`${styles.cursor} ${styles.cursorYou}`}
+                                >
+                                  <Pointer className={styles.pointer} />
+                                  <span className={styles.cursorLabel}>You</span>
+                                </div>
+                              ) : null}
                             </li>
                           );
                         })}
@@ -254,11 +262,6 @@ export function HomeComputerUse() {
                     </span>
                     Stella
                   </span>
-                </div>
-
-                <div className={`${styles.cursor} ${styles.cursorYou}`}>
-                  <Pointer className={styles.pointer} />
-                  <span className={styles.cursorLabel}>You</span>
                 </div>
               </div>
             </div>
