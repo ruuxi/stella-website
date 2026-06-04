@@ -225,6 +225,29 @@
   line-height: 1.45;
 }
 
+.store-install-dialog-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 12px 26px 0;
+}
+
+.store-install-dialog-tab {
+  border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
+  background: color-mix(in oklch, var(--foreground) 3%, transparent);
+  color: var(--text-weak);
+  border-radius: 999px;
+  padding: 6px 11px;
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.store-install-dialog-tab[data-active="true"] {
+  background: color-mix(in oklch, var(--foreground) 8%, transparent);
+  color: var(--text-strong);
+  border-color: color-mix(in oklch, var(--foreground) 16%, transparent);
+}
+
 .store-install-dialog-viewer {
   flex: 1;
   min-height: 0;
@@ -241,6 +264,18 @@
   color: var(--text-weak);
   padding: 20px 0;
   text-align: center;
+}
+
+.store-install-dialog-diff {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-base);
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    monospace;
 }
 
 .store-install-dialog-actions {

@@ -39,6 +39,13 @@ export type StoreRelease = {
   releaseNumber: number;
   blueprintMarkdown: string;
   commits?: Array<{ hash: string; subject: string; diff: string }>;
+  diff?: string;
+  diffRef?: {
+    kind: "r2";
+    r2Key: string;
+    sha256: string;
+    sizeBytes: number;
+  };
   releaseNotes?: string;
   manifest?: StoreReleaseManifest;
   createdAt: number;

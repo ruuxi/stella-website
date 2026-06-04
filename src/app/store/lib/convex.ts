@@ -24,7 +24,7 @@ export const listPublicPackages = makeFunctionReference<
 
 export const listStoreIntegrations = makeFunctionReference<
   "query",
-  {},
+  Record<string, never>,
   NativeIntegration[]
 >("data/integrations:listStoreIntegrations");
 
@@ -45,6 +45,12 @@ export const listPublicReleases = makeFunctionReference<
   { packageId: string },
   StoreRelease[]
 >("data/store_packages:listPublicReleases");
+
+export const getReleaseDiff = makeFunctionReference<
+  "action",
+  { packageId: string; releaseNumber: number },
+  string | null
+>("data/store_git_artifacts:getReleaseDiff");
 
 export const recordPackageInstall = makeFunctionReference<
   "mutation",
