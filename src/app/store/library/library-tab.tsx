@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "convex/react";
 import { Package, Smile, Sparkles } from "lucide-react";
 import {
+  getPublicPackage,
   listMyEmojiPacks,
   listMyUserPets,
 } from "../lib/convex";
@@ -22,11 +23,44 @@ import { PackageCard } from "../discover/discover-ui";
 
 type LibraryTabProps = {
   installedMods: StoreInstall[];
-  browsePackages: StorePackage[] | undefined;
   installingId: string | null;
   onSelectPackage: (packageId: string) => void;
   onInstallPackage: (pkg: StorePackage) => void;
 };
+
+/**
+ * Renders one installed mod by fetching its package record directly. The
+ * Library used to read these out of the Discover browse list, but that grid
+ * is now paginated, so a mod whose package isn't in the first page would have
+ * silently dropped out. Each card owning its own (cached, deduped) query
+ * keeps the section complete regardless of how far Discover has scrolled.
+ */
+function InstalledModCard({
+  installedMod,
+  installingId,
+  onSelectPackage,
+  onInstallPackage,
+}: {
+  installedMod: StoreInstall;
+  installingId: string | null;
+  onSelectPackage: (packageId: string) => void;
+  onInstallPackage: (pkg: StorePackage) => void;
+}) {
+  const pkg = useQuery(getPublicPackage, {
+    packageId: installedMod.packageId,
+  });
+  if (!pkg) return null;
+  return (
+    <PackageCard
+      pkg={pkg}
+      installed
+      updateAvailable={isStoreUpdateAvailable(pkg, installedMod)}
+      installing={installingId === pkg.packageId}
+      onOpen={() => onSelectPackage(pkg.packageId)}
+      onInstall={() => onInstallPackage(pkg)}
+    />
+  );
+}
 
 /**
  * One-stop "Library" surface: everything the user has on this account
@@ -36,7 +70,6 @@ type LibraryTabProps = {
  */
 export function LibraryTab({
   installedMods,
-  browsePackages,
   installingId,
   onSelectPackage,
   onInstallPackage,
@@ -58,24 +91,6 @@ export function LibraryTab({
     [myUserPets],
   );
 
-  const installedPackageMap = useMemo(() => {
-    const map = new Map<string, StorePackage>();
-    for (const pkg of browsePackages ?? []) map.set(pkg.packageId, pkg);
-    return map;
-  }, [browsePackages]);
-
-  const installedModMap = useMemo(() => {
-    const map = new Map<string, StoreInstall>();
-    for (const mod of installedMods) map.set(mod.packageId, mod);
-    return map;
-  }, [installedMods]);
-
-  const installedPackages = useMemo(() => {
-    return installedMods
-      .map((mod) => installedPackageMap.get(mod.packageId))
-      .filter((pkg): pkg is StorePackage => Boolean(pkg));
-  }, [installedMods, installedPackageMap]);
-
   const [detailsPet, setDetailsPet] = useState<PublicPet | null>(null);
 
   const myEmojiPacks = myPacks ?? [];
@@ -84,7 +99,7 @@ export function LibraryTab({
   const loadingPacks = myPacks === undefined;
 
   const totalCount =
-    installedPackages.length + myPetCards.length + myEmojiPacks.length;
+    installedMods.length + myPetCards.length + myEmojiPacks.length;
 
   if (!loadingPets && !loadingPacks && totalCount === 0) {
     return (
@@ -132,25 +147,20 @@ export function LibraryTab({
       <LibrarySection
         icon={<Package size={16} aria-hidden />}
         title="Mods"
-        count={installedPackages.length}
+        count={installedMods.length}
         empty="No mods installed yet."
       >
-        {installedPackages.length > 0 ? (
+        {installedMods.length > 0 ? (
           <div className="store-grid">
-                        {installedPackages.map((pkg) => (
-                          <PackageCard
-                            key={pkg.packageId}
-                            pkg={pkg}
-                            installed
-                            updateAvailable={isStoreUpdateAvailable(
-                              pkg,
-                              installedModMap.get(pkg.packageId),
-                            )}
-                            installing={installingId === pkg.packageId}
-                            onOpen={() => onSelectPackage(pkg.packageId)}
-                            onInstall={() => onInstallPackage(pkg)}
-                          />
-                        ))}
+            {installedMods.map((mod) => (
+              <InstalledModCard
+                key={mod.packageId}
+                installedMod={mod}
+                installingId={installingId}
+                onSelectPackage={onSelectPackage}
+                onInstallPackage={onInstallPackage}
+              />
+            ))}
           </div>
         ) : null}
       </LibrarySection>

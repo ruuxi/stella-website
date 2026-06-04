@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { Package, Search } from "lucide-react";
 import {
   getPublicPackage,
@@ -11,7 +11,7 @@ import {
   recordPackageInstall,
   searchPublicPackages,
 } from "../lib/convex";
-import { DISCOVER_FILTERS, PAGE_SIZE } from "../lib/constants";
+import { DISCOVER_FILTERS, PACKAGE_PAGE_SIZE, PAGE_SIZE } from "../lib/constants";
 import type { HostedStoreTab } from "../lib/constants";
 import {
   getDesktopStoreBridge,
@@ -73,6 +73,12 @@ export function StoreClientInner() {
   const [localNativeIntegrations, setLocalNativeIntegrations] = useState<
     NativeIntegration[]
   >([]);
+  // Desktop normally serves integrations from the native bridge, so we skip
+  // the (redundant) Convex catalog query while embedded. This flips true if
+  // the bridge ever resolves empty or errors, re-enabling Convex as a safety
+  // net so the section can never silently blank out.
+  const [bridgeIntegrationsUnavailable, setBridgeIntegrationsUnavailable] =
+    useState(false);
   const [activeTab, setActiveTab] = useState<HostedStoreTab>(() =>
     getCurrentStoreTab(),
   );
@@ -106,13 +112,34 @@ export function StoreClientInner() {
   }, []);
 
   const selectedCategory = filter === "all" ? undefined : filter;
-  const browse = useQuery(listPublicPackages, {
-    paginationOpts: { numItems: 80, cursor: null },
-  });
-  const storeIntegrations = useQuery(listStoreIntegrations, {});
+  const isSearching = query.trim().length > 0;
+  // Browse is paginated server-side (recency order, category pushed to the
+  // server) so the discover grid only loads a small first page and grows on
+  // scroll instead of fetching ~80 packages up front.
+  const {
+    results: browseResults,
+    status: browseStatus,
+    loadMore: loadMoreBrowse,
+  } = usePaginatedQuery(
+    listPublicPackages,
+    isSearching ? "skip" : selectedCategory ? { category: selectedCategory } : {},
+    { initialNumItems: PACKAGE_PAGE_SIZE },
+  ) as {
+    results: StorePackage[];
+    status: "LoadingFirstPage" | "CanLoadMore" | "LoadingMore" | "Exhausted";
+    loadMore: (numItems: number) => void;
+  };
+  // On the desktop the integration cards come from the native bridge
+  // (`listNativeIntegrations`, which carries connection state), so the Convex
+  // catalog query is redundant there — only run it on the hosted web store,
+  // where it's the sole source.
+  const storeIntegrations = useQuery(
+    listStoreIntegrations,
+    isEmbedded && !bridgeIntegrationsUnavailable ? "skip" : {},
+  );
   const search = useQuery(
     searchPublicPackages,
-    query.trim() ? { query: query.trim(), category: selectedCategory } : "skip",
+    isSearching ? { query: query.trim(), category: selectedCategory } : "skip",
   );
   const selectedPackage = useQuery(
     getPublicPackage,
@@ -129,24 +156,36 @@ export function StoreClientInner() {
     return map;
   }, [installedMods]);
 
-  const allPackages = query.trim() ? search : browse?.page;
-  const filtered = (allPackages ?? []).filter((pkg) => {
-    if (filter !== "all") {
-      const category = pkg.category ?? "other";
-      if (category !== filter) return false;
-    }
-    return true;
-  });
-  const featured = pickFeaturedPackage(allPackages ?? []);
-  const isForYouSurface = filter === "all" && query.trim() === "";
-  const showFeatured = featured !== null && isForYouSurface;
-  const restRaw = filtered.filter(
-    (pkg) => !showFeatured || pkg.packageId !== featured!.packageId,
+  const isForYouSurface = filter === "all" && !isSearching;
+  // The server already applies the category filter (browse via index, search
+  // via its arg), so the loaded set is the working set. For the unfiltered
+  // "For You" feed we surface promoted/partner/verified ahead of organic —
+  // but only across the FIRST page, so streaming in later pages never
+  // reshuffles the cards already on screen.
+  const rankedPackages = useMemo(() => {
+    if (isSearching) return search ?? [];
+    if (!isForYouSurface) return browseResults;
+    const head = sortPackagesForYou(browseResults.slice(0, PACKAGE_PAGE_SIZE));
+    return [...head, ...browseResults.slice(PACKAGE_PAGE_SIZE)];
+  }, [isSearching, isForYouSurface, search, browseResults]);
+  // Featured is picked from the first page only so it stays put as more
+  // pages stream in.
+  const featured = useMemo(
+    () =>
+      isForYouSurface
+        ? pickFeaturedPackage(browseResults.slice(0, PACKAGE_PAGE_SIZE))
+        : null,
+    [isForYouSurface, browseResults],
   );
-  // On the unfiltered For You feed, surface promoted/partner/verified
-  // ahead of organic; once the user picks a category or searches we
-  // fall back to recency so they get the result they asked for.
-  const rest = isForYouSurface ? sortPackagesForYou(restRaw) : restRaw;
+  const showFeatured = featured !== null;
+  const rest = showFeatured
+    ? rankedPackages.filter((pkg) => pkg.packageId !== featured!.packageId)
+    : rankedPackages;
+  const packagesLoading = isSearching
+    ? search === undefined
+    : browseStatus === "LoadingFirstPage";
+  const canLoadMorePackages = !isSearching && browseStatus === "CanLoadMore";
+  const isLoadingMorePackages = browseStatus === "LoadingMore";
   const nativeIntegrations = useMemo(() => {
     if (localNativeIntegrations.length > 0) return localNativeIntegrations;
     return (storeIntegrations ?? []).map((integration) => ({
@@ -191,6 +230,22 @@ export function StoreClientInner() {
   // pattern and keeps initial layout stable.
   const [integrationsLimit, setIntegrationsLimit] = useState(PAGE_SIZE);
   const integrationsSentinelRef = useRef<HTMLDivElement | null>(null);
+  const packagesSentinelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!canLoadMorePackages) return;
+    const node = packagesSentinelRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          loadMoreBrowse(PACKAGE_PAGE_SIZE);
+        }
+      },
+      { rootMargin: "600px 0px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [canLoadMorePackages, loadMoreBrowse]);
   useEffect(() => {
     setIntegrationsLimit(PAGE_SIZE);
   }, [filter, query]);
@@ -360,9 +415,17 @@ export function StoreClientInner() {
       setInstalledMods(mods);
       setInstalledIds(new Set(mods.map((mod) => mod.packageId)));
     });
-    void window.stellaDesktopStore?.listNativeIntegrations?.().then((items) => {
-      setLocalNativeIntegrations(items);
-    });
+    const bridgeList = window.stellaDesktopStore?.listNativeIntegrations?.();
+    if (bridgeList) {
+      void bridgeList
+        .then((items) => {
+          setLocalNativeIntegrations(items);
+          // Empty result → let the Convex catalog query take over as a
+          // fallback instead of leaving the section blank.
+          setBridgeIntegrationsUnavailable(items.length === 0);
+        })
+        .catch(() => setBridgeIntegrationsUnavailable(true));
+    }
   }, []);
 
   const handleUploadToStore = useCallback(() => {
@@ -426,7 +489,6 @@ export function StoreClientInner() {
         <div hidden={activeTab !== "library"}>
           <LibraryTab
             installedMods={installedMods}
-            browsePackages={browse?.page}
             installingId={installingId}
             onSelectPackage={setSelectedPackageId}
             onInstallPackage={(pkg) => void installPackage(pkg)}
@@ -482,7 +544,7 @@ export function StoreClientInner() {
                 onClick={() => setSelectedPackageId(featured.packageId)}
               />
             ) : null}
-            {!allPackages ? (
+            {packagesLoading ? (
               <StoreLoadingSpinner />
             ) : rest.length === 0 ? (
               <EmptyState
@@ -522,6 +584,14 @@ export function StoreClientInner() {
                     />
                   ))}
                 </div>
+                {canLoadMorePackages || isLoadingMorePackages ? (
+                  <div
+                    ref={packagesSentinelRef}
+                    className="store-grid-sentinel"
+                    data-loading={isLoadingMorePackages ? "true" : "false"}
+                    aria-hidden="true"
+                  />
+                ) : null}
               </div>
             )}
             {totalIntegrations > 0 ? (

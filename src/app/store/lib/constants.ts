@@ -22,6 +22,10 @@ export type PetSort = "downloads" | "name";
 export type EmojiPackSort = "installs" | "name";
 
 export const PAGE_SIZE = 24;
+/** Discover package grid loads a smaller first page than the 24-card
+ *  pets/emojis grids — the mosaic cards are larger, so 12 fills the first
+ *  viewport without rendering a tall offscreen grid on open. */
+export const PACKAGE_PAGE_SIZE = 12;
 export const SEARCH_DEBOUNCE_MS = 200;
 export const ALL_TAG = "all" as const;
 export const PET_SORT_LABELS: Record<PetSort, string> = {
