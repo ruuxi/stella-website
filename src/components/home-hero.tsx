@@ -1,13 +1,11 @@
 "use client";
 
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment } from "react";
+import Image from "next/image";
 import { DownloadButton } from "@/components/download-button";
-import {
-  StellaAnimation,
-  type StellaAnimationHandle,
-} from "@/components/stella-animation/stella-animation";
 /* Apple-style word-by-word blur reveal. Line 1 reads as a calm statement;
- * after a beat, line 2 lands with weight on the accent word "yours."
+ * after a beat, line 2 lands with weight on the accent word "yours." When it
+ * finishes, the headline lifts and the brand lockup drops in above it.
  * Timing lives in hero-timing.ts so the desktop-mock entrance can sync. */
 import {
   ACCENT_DELAY,
@@ -17,6 +15,7 @@ import {
   L1_STEP,
   L2,
   l2Delay,
+  SETTLE_DELAY,
 } from "./hero-timing";
 import styles from "./home-hero.module.css";
 
@@ -41,33 +40,26 @@ function RevealWords({
 }
 
 export function HomeHero() {
-  const orbRef = useRef<StellaAnimationHandle | null>(null);
-
-  useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) {
-      orbRef.current?.reset(1);
-      return;
-    }
-    const id = window.setTimeout(() => orbRef.current?.startBirth(), 2000);
-    return () => window.clearTimeout(id);
-  }, []);
-
   return (
     <section className={styles.hero}>
-      <div className={styles.orb} aria-hidden="true">
-        <StellaAnimation
-          ref={orbRef}
-          width={26}
-          height={17}
-          maxDpr={1.5}
-          frameSkip={1}
-          initialBirthProgress={0.22}
+      <div
+        className={styles.brand}
+        style={{ animationDelay: `${SETTLE_DELAY}ms` }}
+      >
+        <Image
+          className={styles.brandLogo}
+          src="/stella-logo.svg"
+          alt=""
+          width={48}
+          height={48}
+          priority
         />
+        <span className={styles.brandText}>Stella</span>
       </div>
 
       <h1
         className={styles.title}
+        style={{ animationDelay: `${SETTLE_DELAY}ms` }}
         aria-label="There are many assistants, but this one is yours."
       >
         <span className={styles.line} aria-hidden="true">

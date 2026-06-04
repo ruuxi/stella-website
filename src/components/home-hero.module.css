@@ -1,5 +1,6 @@
-/* Hero: centered orb + blur-reveal headline + download CTA. Sized so the
- * desktop-mock section below peeks into the bottom of the first screen. */
+/* Hero: blur-reveal headline that, once it lands on "yours", lifts up while a
+ * brand lockup drops in above and the download CTA slides down below. Sized so
+ * the desktop-mock section peeks into the bottom of the first screen. */
 .hero {
   grid-column: 1 / -1;
   min-height: 58vh;
@@ -12,27 +13,27 @@
   text-align: center;
 }
 
-.orb {
-  width: clamp(8.5rem, 12.5vw, 11rem);
-  height: clamp(5.5rem, 8vw, 7rem);
-  display: flex;
+/* Brand lockup ([logo] Stella) that drops in above the headline on settle. */
+.brand {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  --primary: #0f1626;
-  --accent: #4f76ff;
-  --ring: #7e8fff;
-  --spinner-color-2: #66dcff;
-  --spinner-color-3: #8ff7db;
-  opacity: 0.96;
-  filter: saturate(1.08);
+  gap: 0.7rem;
+  opacity: 0;
+  transform: translateY(-14px);
+  animation: brandIn 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Scale the whole orb up: the glyph cell size (--ascii-font-size) drives the
-   rendered size; the global container hardcodes 7px, so override it here. */
-.orb :global(.stella-animation-container) {
-  --ascii-font-size: 9px;
-  --ascii-line-height: 9px;
+.brandLogo {
+  width: clamp(3.4rem, 6vw, 5.4rem);
+  height: auto;
+}
+
+.brandText {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 5.6vw, 4.6rem);
+  letter-spacing: -0.04em;
+  color: var(--page-foreground, #0c1b33);
 }
 
 .title {
@@ -46,6 +47,10 @@
   letter-spacing: 0;
   text-wrap: balance;
   color: var(--page-foreground, #0c1b33);
+  /* Sits raised during the reveal, then drops into its resting position once
+     "yours" lands (making room for the brand lockup above). `both` holds the
+     raised 0% state until the delay fires. */
+  animation: heroDrop 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .line {
@@ -88,8 +93,8 @@
   width: min(100%, 44rem);
   margin-top: 0.35rem;
   opacity: 0;
-  transform: translateY(10px);
-  animation: heroCta 800ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform: translateY(-12px);
+  animation: heroCta 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes heroReveal {
@@ -171,9 +176,28 @@
   }
 }
 
+@keyframes brandIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Headline sits raised during the reveal, then drops to its resting spot. */
+@keyframes heroDrop {
+  0% {
+    transform: translateY(-3.4rem);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .word,
-  .followUp {
+  .followUp,
+  .brand,
+  .title {
     animation: none;
     opacity: 1;
     filter: none;
@@ -192,11 +216,6 @@
     max-width: min(100%, 22rem);
     font-size: clamp(2rem, 9.8vw, 2.55rem);
     line-height: 1.1;
-  }
-
-  .orb {
-    width: 9.5rem;
-    height: 6.6rem;
   }
 
   .line {

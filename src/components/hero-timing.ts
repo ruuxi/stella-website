@@ -27,6 +27,9 @@ export function l2Delay(i: number): number {
 }
 
 export const ACCENT_DELAY = l2Delay(L2.length);
-/* The lede, download CTA, and desktop mock reveal in lockstep with the
-   accent word "yours" rather than after it settles. */
-export const CTA_DELAY = ACCENT_DELAY;
+
+/* Once "yours" lands, the hero settles: the headline lifts up, the brand
+   lockup drops in above it, and the lede + download CTA slide down below.
+   The desktop mock rises in lockstep with this settle. */
+export const SETTLE_DELAY = ACCENT_DELAY + 620;
+export const CTA_DELAY = SETTLE_DELAY;
