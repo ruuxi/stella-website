@@ -17,21 +17,17 @@
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
+  justify-content: center;
   opacity: 0;
-  transform: translateY(-14px);
-  animation: brandIn 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.brandLogo {
-  width: clamp(3.4rem, 6vw, 5.4rem);
-  height: auto;
+  transform: translateY(-30px);
+  animation: brandIn 1100ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .brandText {
   font-family: var(--font-display), serif;
-  font-weight: 400;
-  font-size: clamp(2.6rem, 5.6vw, 4.6rem);
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(2.9rem, 6.2vw, 5.1rem);
   letter-spacing: -0.04em;
   color: var(--page-foreground, #0c1b33);
 }
@@ -50,7 +46,7 @@
   /* Sits raised during the reveal, then drops into its resting position once
      "yours" lands (making room for the brand lockup above). `both` holds the
      raised 0% state until the delay fires. */
-  animation: heroDrop 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: heroDrop 1150ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .line {
@@ -93,8 +89,10 @@
   width: min(100%, 44rem);
   margin-top: 0.35rem;
   opacity: 0;
-  transform: translateY(-12px);
-  animation: heroCta 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform: translateY(56px);
+  /* Rises up in lockstep with the desktop mock below (same delay, duration,
+     and easing as .showcase's mockRise). */
+  animation: heroCta 1150ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes heroReveal {

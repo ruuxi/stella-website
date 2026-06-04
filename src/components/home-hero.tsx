@@ -1,7 +1,6 @@
 "use client";
 
 import { Fragment } from "react";
-import Image from "next/image";
 import { DownloadButton } from "@/components/download-button";
 /* Apple-style word-by-word blur reveal. Line 1 reads as a calm statement;
  * after a beat, line 2 lands with weight on the accent word "yours." When it
@@ -46,15 +45,15 @@ export function HomeHero() {
         className={styles.brand}
         style={{ animationDelay: `${SETTLE_DELAY}ms` }}
       >
-        <Image
-          className={styles.brandLogo}
-          src="/stella-logo.svg"
-          alt=""
-          width={48}
-          height={48}
-          priority
-        />
         <span className={styles.brandText}>Stella</span>
+      </div>
+
+      <div className={styles.followUp} style={{ animationDelay: `${CTA_DELAY}ms` }}>
+        <p className={styles.lede}>The only app that reshapes itself around you.</p>
+
+        <div className={styles.cta}>
+          <DownloadButton />
+        </div>
       </div>
 
       <h1
@@ -82,14 +81,6 @@ export function HomeHero() {
           </span>
         </span>
       </h1>
-
-      <div className={styles.followUp} style={{ animationDelay: `${CTA_DELAY}ms` }}>
-        <p className={styles.lede}>The only app that reshapes itself around you.</p>
-
-        <div className={styles.cta}>
-          <DownloadButton />
-        </div>
-      </div>
     </section>
   );
 }
