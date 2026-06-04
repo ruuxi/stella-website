@@ -45,11 +45,12 @@ html {
 }
 
 /* The site sits on a flat `--page-background` color; ambient
- * decoration lives in `<PageBackground />` (fixed to the viewport),
+ * decoration lives in `<PageBackground />` at the top of the document,
  * which paints a top blue wash + three blurred elongated triangles.
  * Per-page wrappers (`.stella-page`, `.legal-doc-page`, etc.) stay
  * transparent so the body color + PageBackground show through. */
 body {
+  position: relative;
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
@@ -67,14 +68,17 @@ body {
 }
 
 .page-background {
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70svh;
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
 }
 
-/* Soft blue wash anchored to the top of the viewport. Fades out partway
+/* Soft blue wash anchored to the top of the page. Fades out partway
  * down the first screen, then disappears entirely before the page mock
  * below it. */
 .page-background__wash {
@@ -128,17 +132,35 @@ select {
 
 /* ── Embedded mode ──
  * When the website is loaded inside Stella's desktop `WebContentsView`
- * (Store, Billing, etc.), the body becomes transparent so the desktop's
- * shifting-gradient theme canvas shows through. Theme-aware text/border
- * tokens are pushed in via URL params (initial paint) or the
- * `stellaDesktopStore.onThemeChanged` bridge (live updates) and applied
- * to the `--embedded-*` custom properties on `<html>`. */
+ * (Store, Billing, etc.) the view is kept OPAQUE on the desktop side — a
+ * translucent web layer is a major scroll/interaction lag source on Windows
+ * (Chromium falls off the Direct Composition fast path). So instead of
+ * letting the desktop's gradient canvas show through a transparent body, we
+ * recreate that soft gradient here, painted inside the webview from the
+ * theme tokens the desktop pushes in via URL params (initial paint) or the
+ * `stellaDesktopStore.onThemeChanged` bridge (live updates). */
 html[data-embedded="true"] {
-  background: transparent !important;
+  background: var(--embedded-bg, #f2f4f8) !important;
 }
 
 html[data-embedded="true"] body {
-  background: transparent !important;
+  background:
+    radial-gradient(
+      circle at 16% 8%,
+      color-mix(in srgb, var(--embedded-primary, #0f62fe) 13%, transparent) 0,
+      transparent 42%
+    ),
+    radial-gradient(
+      circle at 88% 14%,
+      color-mix(in srgb, var(--embedded-primary, #0f62fe) 9%, transparent) 0,
+      transparent 46%
+    ),
+    radial-gradient(
+      circle at 50% 92%,
+      color-mix(in srgb, var(--embedded-fg, #161616) 6%, transparent) 0,
+      transparent 50%
+    ),
+    var(--embedded-bg, #f2f4f8) !important;
   color: var(--embedded-fg, var(--page-foreground));
 }
 

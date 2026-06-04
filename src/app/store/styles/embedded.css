@@ -4,7 +4,8 @@
  * legible on every desktop theme without forking the rest of the layout.
  * The internal surface tokens (`--surface-*`) are intentionally kept the
  * same off-white so cards still read as a "raised" surface against the
- * desktop's transparent backdrop. */
+ * themed gradient the body paints inside the (opaque) webview — see the
+ * embedded-mode block in `globals.css`. */
 html[data-embedded="true"] .store-root {
   background: transparent;
   --foreground: var(--embedded-fg, #161616);
@@ -81,9 +82,14 @@ html[data-embedded="true"] .store-root {
     var(--embedded-surface, rgba(105, 112, 119, 0.16)) 70%,
     transparent
   );
+  /* The default 40px + saturate(180%) glass blur is brutal on weaker
+     Windows GPUs. A small radius with no saturate reads the same at dialog
+     scale; the more opaque glass background keeps dialogs legible without
+     leaning on the heavy blur. */
+  --glass-blur: blur(14px);
   --glass-bg: color-mix(
     in srgb,
-    var(--embedded-bg, var(--background)) 60%,
+    var(--embedded-bg, var(--background)) 88%,
     transparent
   );
 }
