@@ -8,6 +8,73 @@ export type ChangelogEntry = {
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: "June 4, 2026",
+    tags: ["New", "Polish"],
+    features: [
+      "Area annotation composer — select an area on screen and add a note right where the context matters.",
+      "Store release diffs are now handled outside the app bundle, making installs and publishes lighter.",
+    ],
+    fixes: [
+      "Discord DM setup copy is clearer.",
+      "Telegram bot links work again.",
+      "Mini display sidebar controls are back.",
+      "Chat stays mounted behind the Home overlay, so switching in and out feels smoother.",
+      "Chat scrolling recovers after toggling Home, and sending a message nudges the layout more smoothly.",
+    ],
+  },
+  {
+    date: "June 3, 2026",
+    tags: ["New", "Polish"],
+    features: [
+      "Mini window got a dedicated lean entry point for faster, lighter launches.",
+      "On Windows, closing Stella can now minimize it to the system tray instead of fully quitting.",
+      "The active conversation now reloads instantly more often.",
+    ],
+    fixes: [
+      "First chat startup is faster.",
+      "Mini window stays always-on-top more reliably on Windows.",
+      "Toasts can appear over embedded website views.",
+      "Release packages no longer include empty placeholder state folders.",
+      "Unused preference cleanup keeps settings simpler.",
+    ],
+  },
+  {
+    date: "June 2, 2026",
+    tags: ["New", "Polish"],
+    features: [
+      "Custom overlay theme — Stella redesigns can now apply live to a Custom theme.",
+      "Local dictation gained Parakeet C++ support.",
+      "Grok Composer became a supported external model option.",
+    ],
+    fixes: [
+      "Restored conversations are preserved more reliably on boot.",
+      "Stella is better at honoring your exact intent when delegating work.",
+      "Theme self-updates reload correctly.",
+      "Store installs from code artifacts are more robust.",
+      "Image attachments are recognized more reliably.",
+      "Upgrade and provider dialogs no longer feel cramped.",
+      "Secrets are redacted more thoroughly from memory.",
+    ],
+  },
+  {
+    date: "June 1, 2026",
+    tags: ["New", "Polish"],
+    features: [
+      "Managed image generation waits for results and surfaces failures more clearly.",
+      "Stella can use a private search fallback when needed.",
+      "Voice provider settings got a refinement pass.",
+      "Recent apps and window detection are faster.",
+    ],
+    fixes: [
+      "Mobile chat retries are deduped, and mobile developer artifacts stay gated.",
+      "Desktop update state is tracked more clearly.",
+      "Image generation starts without blocking the chat.",
+      "Windows development and app hot paths are lighter.",
+      "App context chips gained better accessibility text.",
+      "Task status updates after sending input are more accurate.",
+    ],
+  },
+  {
     date: "May 31, 2026",
     tags: ["Polish"],
     features: [
@@ -19,6 +86,11 @@ export const changelogEntries: ChangelogEntry[] = [
       "Reporting schedules are more reliable.",
       "Windows keeps Stella's available actions more reliably after startup.",
       "More app startup code was reorganized for long-term stability.",
+      "Mobile bridge readiness checks are more reliable.",
+      "Store publish metadata is more private.",
+      "Self-update restart indicators and timing are cleaner.",
+      "Home display model picker is cleaner without extra selection checkmarks.",
+      "Onboarding project discovery improved.",
     ],
   },
   {
