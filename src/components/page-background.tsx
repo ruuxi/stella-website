@@ -1,12 +1,13 @@
 /* Site-wide ambient background:
- *   - a soft blue linear gradient pinned to the top of the viewport that
+ *   - a soft blue linear gradient pinned to the top of the page that
  *     fades out partway down the first screen, and
  *   - three elongated rounded-triangle blue blurs drifting across the
  *     upper band of the page.
  *
- * Fixed to the viewport, rendered behind everything via `z-index: -1`,
- * and hidden in `html[data-embedded="true"]` so the Stella desktop
- * webview's own theme canvas can show through. */
+ * Anchored to the document top (scrolls away with the page), rendered
+ * behind everything via `z-index: -1`, and hidden in
+ * `html[data-embedded="true"]` so the Stella desktop webview's own theme
+ * canvas can show through. */
 export function PageBackground() {
   return (
     <div className="page-background" aria-hidden="true">
