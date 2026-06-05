@@ -1,105 +1,135 @@
-/* Hero: blur-reveal headline that, once it lands on "yours", lifts up while a
- * brand lockup drops in above and the download CTA slides down below. Sized so
- * the desktop-mock section peeks into the bottom of the first screen. */
+/* Hero — editorial layout ported from the fromyou-ai landing page. A single
+ * left-aligned content block (headline, body, download) is vertically centered
+ * over a vivid aurora that pours in from the right. Sized so the desktop mock
+ * below peeks into the bottom of the first screen. */
 .hero {
   grid-column: 1 / -1;
-  min-height: 58vh;
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.05rem;
-  padding: clamp(2.4rem, 6vh, 4.4rem) 1.5rem clamp(0.5rem, 2vh, 1.5rem);
-  text-align: center;
+  min-height: 82svh;
+  padding: clamp(1.5rem, 4svh, 3rem) clamp(28px, 5vw, 64px) 0;
 }
 
-/* Brand lockup ([logo] Stella) that drops in above the headline on settle. */
-.brand {
-  display: inline-flex;
+.aurora {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  /* Fixed visual height, independent of hero height, so the aurora never
+   * squishes; the band it draws lives in the upper-right and flows behind the
+   * desktop mock below. */
+  height: 100svh;
+  pointer-events: none;
+  /* Dissolve toward the left so the copy reads on clean white. */
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 42%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 42%);
+  /* Fallback gradient — replaced by the shader once WebGL is live. */
+  background:
+    radial-gradient(
+      120% 90% at 100% 30%,
+      rgba(56, 189, 248, 0.32),
+      transparent 60%
+    ),
+    radial-gradient(
+      120% 95% at 90% 70%,
+      rgba(167, 139, 250, 0.24),
+      transparent 62%
+    );
+}
+
+/* Mirrored copy of the aurora reflected across its lower band edge, so a
+ * second, inverted band sits just below the first. Because the element is
+ * flipped, its local top renders at the visual bottom, so the bottom fade is a
+ * `to bottom` gradient that dissolves the lower end of the reflection into the
+ * page (intersected with the same left fade as the base aurora). */
+.auroraReverse {
+  transform: scaleY(-1);
+  transform-origin: center 92%;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 42%),
+    linear-gradient(to bottom, transparent 0%, #000 48%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 42%),
+    linear-gradient(to bottom, transparent 0%, #000 48%);
+  mask-composite: intersect;
+}
+
+.inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1 1 auto;
   align-items: center;
-  justify-content: center;
+  width: min(100%, 1320px);
+  margin-inline: auto;
+}
+
+/* The whole content block reveals as one piece on landing: a soft blur + rise,
+ * synced with the desktop mock below. */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 40rem;
   opacity: 0;
-  transform: translateY(-30px);
-  animation: brandIn 1100ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.brandText {
-  font-family: var(--font-display), serif;
-  font-weight: 300;
-  font-style: italic;
-  font-size: clamp(2.9rem, 6.2vw, 5.1rem);
-  letter-spacing: -0.04em;
-  color: var(--page-foreground, #0c1b33);
+  filter: blur(5px);
+  transform: translateY(1.4rem);
+  animation: heroReveal 1000ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+  will-change: opacity, filter, transform;
 }
 
 .title {
   margin: 0;
-  max-width: min(100%, 64rem);
-  font-family: var(--font-display), serif;
+  font-family: "Cormorant Garamond", var(--font-display), Georgia, serif;
+  font-size: clamp(3.4rem, 8.4vw, 7.6rem);
   font-weight: 400;
-  font-style: italic;
-  font-size: clamp(2.1rem, 5.4vw, 4.2rem);
-  line-height: 1.08;
-  letter-spacing: 0;
+  font-style: normal;
+  letter-spacing: -0.035em;
+  line-height: 0.92;
+  color: var(--page-foreground, #0f1728);
   text-wrap: balance;
-  color: var(--page-foreground, #0c1b33);
-  /* Sits raised during the reveal, then drops into its resting position once
-     "yours" lands (making room for the brand lockup above). `both` holds the
-     raised 0% state until the delay fires. */
-  animation: heroDrop 1150ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.line {
-  display: block;
-}
-
-.word {
-  display: inline-block;
-  opacity: 0;
-  filter: blur(4px);
-  transform: translateY(9px);
-  animation: heroReveal 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  will-change: opacity, filter, transform;
-}
-
-.punct {
-  margin-left: -0.06em;
 }
 
 .accent {
   font-style: italic;
-  color: var(--page-accent, #2563eb);
 }
 
-.lede {
-  max-width: 44rem;
-  margin: 0;
-  color: rgba(15, 27, 51, 0.66);
-  font-size: clamp(1rem, 1.25vw, 1.18rem);
+.intro {
+  max-width: 36rem;
+  margin: clamp(1.6rem, 3.4vh, 2.4rem) 0 0;
+  color: var(--page-muted, #44546c);
+  font-family: var(--font-sans), "Manrope", system-ui, sans-serif;
+  font-size: clamp(1.08rem, 1.4vw, 1.3rem);
   font-weight: 400;
-  line-height: 1.72;
-  text-wrap: balance;
+  line-height: 1.62;
+  text-wrap: pretty;
 }
 
-.followUp {
+.cta {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  width: min(100%, 44rem);
-  margin-top: 0.35rem;
-  opacity: 0;
-  transform: translateY(56px);
-  /* Rises up in lockstep with the desktop mock below (same delay, duration,
-     and easing as .showcase's mockRise). */
-  animation: heroCta 1150ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  width: 36rem;
+  max-width: 100%;
+  margin-top: clamp(1.4rem, 3vh, 2rem);
+}
+
+.cta :global(.button--primary) {
+  width: 100%;
+  padding-block: clamp(0.85rem, 1.4vw, 1.1rem);
+  padding-inline: clamp(2.4rem, 5vw, 3.4rem);
+  font-size: clamp(1.2rem, 1.5vw, 1.45rem);
+  border-radius: var(--page-radius, 0.45rem);
 }
 
 @keyframes heroReveal {
   0% {
     opacity: 0;
-    filter: blur(4px);
-    transform: translateY(9px);
+    filter: blur(5px);
+    transform: translateY(1.4rem);
   }
   60% {
     opacity: 1;
@@ -111,91 +141,8 @@
   }
 }
 
-/* CTA — restores the old hero download button: an opaque chip using the same
- * light page-wash gradient as the body, with blue text and no heavy shadow. */
-.cta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  justify-content: center;
-  width: min(100%, 34rem);
-  margin-top: 0;
-}
-
-.cta :global(.button--primary) {
-  align-self: center;
-  gap: 0.55rem;
-  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
-  font-style: italic;
-  font-weight: 600;
-  font-size: 1.5rem;
-  letter-spacing: -0.005em;
-  padding: 0.7rem 1.9rem;
-  border-radius: var(--page-radius, 0.45rem);
-  color: var(--page-accent);
-  background:
-    radial-gradient(circle at top left, var(--page-glow-cyan), transparent 28%),
-    radial-gradient(circle at 82% 10%, var(--page-glow-blue), transparent 26%),
-    radial-gradient(circle at 50% 100%, var(--page-glow-mint), transparent 30%),
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.7),
-      rgba(255, 255, 255, 0.18)
-    ),
-    var(--page-background);
-  border: 1px solid var(--page-border);
-  box-shadow: none;
-}
-
-.cta :global(.button--primary:hover) {
-  background:
-    radial-gradient(circle at top left, var(--page-glow-cyan), transparent 26%),
-    radial-gradient(circle at 82% 10%, var(--page-glow-blue), transparent 24%),
-    radial-gradient(circle at 50% 100%, var(--page-glow-mint), transparent 28%),
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.78),
-      rgba(255, 255, 255, 0.22)
-    ),
-    var(--page-background);
-  border-color: var(--page-border-strong);
-  box-shadow: none;
-}
-
-.cta :global(.button--primary) svg {
-  opacity: 0.85;
-  margin-inline-start: 0.1rem;
-}
-
-@keyframes heroCta {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes brandIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Headline sits raised during the reveal, then drops to its resting spot. */
-@keyframes heroDrop {
-  0% {
-    transform: translateY(-3.4rem);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .word,
-  .followUp,
-  .brand,
-  .title {
+  .content {
     animation: none;
     opacity: 1;
     filter: none;
@@ -203,40 +150,31 @@
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 720px) {
   .hero {
-    min-height: 68vh;
-    padding-inline: 1rem;
-    overflow: hidden;
+    min-height: 88svh;
+    padding: clamp(1.5rem, 5svh, 2.5rem) 22px 0;
+  }
+
+  .content {
+    max-width: 100%;
   }
 
   .title {
-    max-width: min(100%, 22rem);
-    font-size: clamp(2rem, 9.8vw, 2.55rem);
-    line-height: 1.1;
+    font-size: clamp(3rem, 13.5vw, 4.6rem);
+    line-height: 0.96;
   }
 
-  .line {
-    display: inline;
-  }
-
-  .lede {
-    max-width: 22rem;
-    font-size: 0.98rem;
+  .intro {
+    font-size: 1.05rem;
+    line-height: 1.55;
   }
 
   .cta {
     width: 100%;
-    gap: 0.7rem;
   }
 
   .cta :global(.button--primary) {
-    flex: 1 1 100%;
-    max-width: 16.5rem;
-  }
-
-  .cta :global(.button--primary) {
-    font-size: 1.28rem;
-    padding-inline: 1.25rem;
+    font-size: 1.2rem;
   }
 }
