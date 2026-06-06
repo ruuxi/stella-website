@@ -8,11 +8,45 @@ export type ChangelogEntry = {
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: "June 6, 2026",
+    tags: ["Polish"],
+    features: [
+      "Connect dialog and integrations list are now left-aligned for easier scanning.",
+      "Emoji packs got another asset refresh.",
+    ],
+    fixes: [
+      "Discovery is better at finding the right local context and ignoring stale editor projects.",
+      "Onboarding discovery signals are sharper and read your local data live.",
+    ],
+  },
+  {
+    date: "June 5, 2026",
+    tags: ["New", "Polish"],
+    features: [
+      "Native meeting capture sidecar added for Granola-style meeting recording.",
+      "Finished voice sessions now render as a polished summary pill.",
+      "Personality setup now uses editable `PERSONALITY.md` presets and preserves imported personality choices.",
+      "Stella can seed and reconcile agent prompts locally, similar to skills.",
+    ],
+    fixes: [
+      "Windows startup and window detection are faster and less prone to hangs.",
+      "Settings and onboarding welcome screens start more responsively.",
+      "The working indicator now sits below assistant messages.",
+      "Stella keeps startup memory in context more reliably.",
+      "Voice sessions can use the right runtime abilities.",
+      "The radial menu listens for mouse movement only while it is open.",
+      "Hidden composer context polling was disabled to reduce background work.",
+      "Stella has clearer self-knowledge and service-connection guidance.",
+    ],
+  },
+  {
     date: "June 4, 2026",
     tags: ["New", "Polish"],
     features: [
       "Area annotation composer — select an area on screen and add a note right where the context matters.",
       "Store release diffs are now handled outside the app bundle, making installs and publishes lighter.",
+      "New managed skills landed for X, YouTube content, humanizing text, Apple Reminders/Notes, and model help.",
+      "Stella can set up service access and accounts more autonomously.",
     ],
     fixes: [
       "Discord DM setup copy is clearer.",
@@ -20,6 +54,13 @@ export const changelogEntries: ChangelogEntry[] = [
       "Mini display sidebar controls are back.",
       "Chat stays mounted behind the Home overlay, so switching in and out feels smoother.",
       "Chat scrolling recovers after toggling Home, and sending a message nudges the layout more smoothly.",
+      "Windows startup, taskbar/tray icons, and selected-text capture are more reliable.",
+      "Store and Billing webviews load more lazily so they cause less startup lag.",
+      "Computer-use state refresh is faster.",
+      "Workspace strip auto-collapse is less eager.",
+      "Body text is slightly heavier for readability.",
+      "Display sidebar uses a simpler divider instead of a heavy shadow.",
+      "Stella's personality now stays pinned through long conversations.",
     ],
   },
   {
