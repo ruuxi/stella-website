@@ -70,8 +70,8 @@ export const buildEmojiSheetEditPrompt = (style: string): string => {
     "- Preserve the reference image's positions exactly: top-left stays top-left and bottom-right stays bottom-right.",
     "",
     "Background:",
-    `- Background everywhere outside the icons is a single flat ${EMOJI_CHROMA} chroma key (true RGB, no gradient, no noise, no texture).`,
-    `- The gutters between cells must also be the same flat ${EMOJI_CHROMA}.`,
+    `- Preserve the reference image's existing ${EMOJI_CHROMA} background exactly wherever there is no icon.`,
+    `- The gutters between cells must remain the same flat ${EMOJI_CHROMA} chroma key (true RGB, no gradient, no noise, no texture).`,
     "- Do not use magenta or magenta-adjacent colors inside any icon.",
     "",
     "Forbidden:",
@@ -90,7 +90,8 @@ export const buildEmojiReferenceSheetDataUrl = (sheetIndex: number): string => {
   canvas.height = EMOJI_SHEET_SIZE;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas2D unavailable");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = EMOJI_CHROMA;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.font =
