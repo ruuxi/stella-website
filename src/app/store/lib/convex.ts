@@ -1,6 +1,7 @@
 import { makeFunctionReference } from "convex/server";
 import type {
   EmojiPack,
+  EmojiPackUploadUrl,
   EmojiPackVisibility,
   MediaJobSnapshot,
   NativeIntegration,
@@ -161,6 +162,31 @@ export const listMyEmojiPacks = makeFunctionReference<
   Record<string, never>,
   EmojiPack[]
 >("data/emoji_packs:listMine");
+
+export const createEmojiPack = makeFunctionReference<
+  "mutation",
+  {
+    packId: string;
+    displayName: string;
+    description?: string;
+    prompt?: string;
+    coverEmoji: string;
+    coverUrl?: string;
+    sheetUrls: string[];
+    visibility: EmojiPackVisibility;
+  },
+  EmojiPack
+>("data/emoji_packs:createPack");
+
+export const createEmojiPackUploadUrl = makeFunctionReference<
+  "action",
+  {
+    packId: string;
+    sheetSha256s: string[];
+    contentType?: string;
+  },
+  EmojiPackUploadUrl
+>("data/emoji_pack_uploads:createUploadUrl");
 
 export const generateEmojiPack = makeFunctionReference<
   "action",

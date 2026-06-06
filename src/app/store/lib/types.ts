@@ -132,6 +132,18 @@ export type UserPetUploadUrl = {
   preview?: UserPetUploadTarget;
 };
 
+export type EmojiPackUploadTarget = {
+  key: string;
+  publicUrl: string;
+  putUrl: string;
+  headers: Record<string, string>;
+};
+
+export type EmojiPackUploadUrl = {
+  uploadId: string;
+  sheets: EmojiPackUploadTarget[];
+};
+
 export type MediaJobSnapshot = {
   status?: string;
   output?: unknown;
