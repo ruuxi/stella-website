@@ -474,22 +474,24 @@
 
 .user-pet-create-visibility {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 6px;
 }
 
 .user-pet-create-visibility-pill {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 8px 12px;
   border-radius: 10px;
   border: 1px solid var(--border-base);
   background: var(--surface-raised);
   color: var(--text-base);
   cursor: pointer;
-  text-align: left;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
   transition:
     border-color 120ms ease,
     background-color 120ms ease;
@@ -502,22 +504,16 @@
 .user-pet-create-visibility-pill[data-active] {
   border-color: var(--primary);
   background: color-mix(in srgb, var(--primary) 10%, var(--surface-raised));
-}
-
-.user-pet-create-visibility-title {
-  font-size: 12.5px;
-  font-weight: 600;
   color: var(--text-strong);
 }
 
 .user-pet-create-visibility-sub {
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--text-weak);
+  min-height: 16px;
 }
 
 .user-pet-create-actions {
-  position: sticky;
-  bottom: -24px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -525,7 +521,6 @@
   margin: 8px -28px -24px;
   padding: 14px 28px;
   border-top: 1px solid var(--border-weak);
-  z-index: 2;
 }
 
 .user-pet-create-discard {
@@ -538,4 +533,18 @@
 .user-pet-create-discard:hover:not(:disabled) {
   color: var(--danger, #d04444);
   background: color-mix(in oklch, var(--danger, #d04444) 8%, transparent);
+}
+
+.user-pet-create-result {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.user-pet-create-result-text {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-family-sans, "Manrope", sans-serif);
+  font-size: 12.5px;
+  color: var(--text-weak);
 }

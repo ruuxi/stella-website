@@ -80,6 +80,7 @@ export function CreatePetDialog({
   const [busy, setBusy] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [createdPet, setCreatedPet] = useState<UserPetRecord | null>(null);
   const [previewState, setPreviewState] = useState<PetAnimationState>("idle");
   const objectUrlsRef = useRef<string[]>([]);
   const processedJobsRef = useRef<Set<string>>(new Set());
@@ -193,14 +194,26 @@ export function CreatePetDialog({
         ...(upload.preview ? { previewUrl: upload.preview.publicUrl } : {}),
         visibility,
       });
-      onCreated(created);
-      onClose();
+      setCreatedPet(created);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't save pet.");
     } finally {
       setSaving(false);
     }
-  }, [blob, createPet, createUploadUrl, onClose, onCreated, prompt, saving, visibility]);
+  }, [blob, createPet, createUploadUrl, prompt, saving, visibility]);
+
+  const resetForNewPet = useCallback(() => {
+    revokeObjectUrls();
+    processedJobsRef.current = new Set();
+    setCreatedPet(null);
+    setBlob(null);
+    setJobId(null);
+    setPrompt("");
+    setError(null);
+    setBusy(false);
+    setSaving(false);
+    setPreviewState("idle");
+  }, [revokeObjectUrls]);
 
   return (
     <StoreModal onClose={saving ? () => undefined : onClose}>
@@ -258,6 +271,32 @@ export function CreatePetDialog({
               {blob.warnings.slice(0, 2).join(" ")}
             </p>
           ) : null}
+          {createdPet ? (
+            <div className="user-pet-create-result">
+              <p className="user-pet-create-result-text">
+                Your pet is ready. Use it to perch above your work, or find it
+                later in your Library.
+              </p>
+              <div className="user-pet-create-actions">
+                <button
+                  type="button"
+                  className="store-action-btn user-pet-create-discard"
+                  data-variant="subtle"
+                  onClick={resetForNewPet}
+                >
+                  Create another
+                </button>
+                <button
+                  type="button"
+                  className="store-action-btn store-action-btn--lg"
+                  data-variant="get"
+                  onClick={() => onCreated(createdPet)}
+                >
+                  Use pet
+                </button>
+              </div>
+            </div>
+          ) : (
           <form
             className="user-pet-create-form"
             onSubmit={(event) => {
@@ -279,7 +318,7 @@ export function CreatePetDialog({
             </label>
             <div className="user-pet-create-field">
               <span className="user-pet-create-field-label">Visibility</span>
-              <div className="user-pet-create-visibility">
+              <div className="user-pet-create-visibility" role="radiogroup">
                 {(["public", "unlisted", "private"] as UserPetVisibility[]).map(
                   (option) => (
                     <button
@@ -287,23 +326,23 @@ export function CreatePetDialog({
                       key={option}
                       className="user-pet-create-visibility-pill"
                       data-active={visibility === option || undefined}
+                      role="radio"
+                      aria-checked={visibility === option}
                       onClick={() => setVisibility(option)}
                       disabled={saving}
                     >
-                      <span className="user-pet-create-visibility-title">
-                        {option[0]!.toUpperCase() + option.slice(1)}
-                      </span>
-                      <span className="user-pet-create-visibility-sub">
-                        {option === "public"
-                          ? "Listed on the Store"
-                          : option === "unlisted"
-                            ? "Anyone with the link"
-                            : "Only you"}
-                      </span>
+                      {option[0]!.toUpperCase() + option.slice(1)}
                     </button>
                   ),
                 )}
               </div>
+              <span className="user-pet-create-visibility-sub">
+                {visibility === "public"
+                  ? "Listed on the Store for anyone to find."
+                  : visibility === "unlisted"
+                    ? "Only people with the link can see it."
+                    : "Only you can see it."}
+              </span>
             </div>
             <div className="user-pet-create-actions">
               <button
@@ -324,15 +363,17 @@ export function CreatePetDialog({
                 {busy ? "Generating..." : blob ? "Regenerate" : "Generate"}
               </button>
               <button
-                type="submit"
+                type="button"
                 className="store-action-btn store-action-btn--lg"
                 data-variant={saving ? "working" : "get"}
                 disabled={!blob || saving}
+                onClick={() => void handleSave()}
               >
-                {saving ? "Saving..." : "Save pet"}
+                {saving ? "Creating..." : "Create pet"}
               </button>
             </div>
           </form>
+          )}
         </div>
       </div>
     </StoreModal>
