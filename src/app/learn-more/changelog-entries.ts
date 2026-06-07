@@ -1,33 +1,56 @@
+// Hand-curated normie-friendly changelog. Grouped by release (desktop version
+// range that shipped that batch), not by date. Date is kept as a secondary
+// label. Items default to the Desktop app; cross-product items (Launcher,
+// Mobile, Backend) carry a product chip.
+
+export type Product = "Launcher" | "Mobile" | "Backend";
+
+export type ChangeItem = string | { text: string; product: Product };
+
 export type ChangelogEntry = {
+  /** Desktop version range shipped in this batch, e.g. "v0.0.323 – v0.0.324".
+   *  Omitted for pre-tag entries (use `era` instead). */
+  release?: string;
+  /** Calendar date the work landed (secondary label). */
   date: string;
+  /** Used in place of `release` for pre-release foundational entries. */
+  era?: string;
   tags?: string[];
-  features?: string[];
-  fixes?: string[];
-  items?: string[];
+  /** Tier 1: headline, user-facing wins. Rendered open. */
+  highlights?: ChangeItem[];
+  /** Tier 2: misc, fixes, and other. Rendered behind a disclosure. */
+  more?: ChangeItem[];
 };
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    release: "v0.0.323 – v0.0.324",
     date: "June 6, 2026",
     tags: ["Polish"],
-    features: [
+    highlights: [
       "The Connect screen and app list are now left-aligned and easier to scan.",
-      "Fresh emoji packs.",
+      "Fresh emoji packs, generated from richer reference images.",
     ],
-    fixes: [
+    more: [
       "Stella is better at picking up the right context from your computer and skipping things you're no longer working on.",
       "Onboarding does a better job getting to know you from what's already on your computer.",
+      { text: "X (Twitter) integration: connect your account and let Stella read and post on your behalf.", product: "Backend" },
+      { text: "Telegram and Discord get smoother message delivery, with streaming replies in Telegram.", product: "Backend" },
+      { text: "Linq connector can now fetch attached media from messages.", product: "Backend" },
+      { text: "Direct messages on Discord now route through a dedicated gateway.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.321 – v0.0.322",
     date: "June 5, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Meeting recording — Stella can capture and summarize your meetings.",
       "Finished voice chats now wrap up with a tidy summary.",
       "You can give Stella a personality, with easy presets, and the one you pick sticks.",
+      { text: "Stella for iPhone got a ground-up native Swift rewrite — snappier launch, native scroll and chat, polished composer and indicators.", product: "Mobile" },
     ],
-    fixes: [
+    more: [
       "Stella starts up faster on Windows, with fewer freezes.",
       "Settings and the welcome screen open more quickly.",
       "The 'working…' indicator now sits right below Stella's messages.",
@@ -36,17 +59,22 @@ export const changelogEntries: ChangelogEntry[] = [
       "Smoother performance while the radial menu is open.",
       "Less unnecessary background activity.",
       "Stella has a clearer sense of what she is and how to connect your apps.",
+      { text: "Fixed a blank-window bug on Windows after install.", product: "Launcher" },
+      { text: "Windows shortcuts now carry the right app identity, so notifications and taskbar grouping look right.", product: "Launcher" },
+      { text: "Onboarding welcome page is generated on the backend now, decoupled from desktop builds.", product: "Backend" },
+      { text: "Duplicate connector channel connections are handled cleanly.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.314 – v0.0.320",
     date: "June 4, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Point at part of your screen and leave a note for Stella right where it matters.",
       "New built-in skills for X, YouTube content, rewriting text to sound human, and Apple Reminders & Notes.",
       "Stella can set up app access and accounts more on her own.",
     ],
-    fixes: [
+    more: [
       "Clearer Discord setup instructions, and Telegram links work again.",
       "Brought back the controls in the mini display sidebar.",
       "Switching in and out of Home feels smoother, and chat scrolling behaves better afterward.",
@@ -55,33 +83,41 @@ export const changelogEntries: ChangelogEntry[] = [
       "The workspace strip stays open a little longer before tucking away.",
       "Body text is a touch bolder and easier to read.",
       "Stella's personality stays consistent through long conversations.",
+      { text: "Reinstalls preserve more of your existing setup.", product: "Launcher" },
+      { text: "Connectors keep your message contents private to the conversation that owns them.", product: "Backend" },
+      { text: "Built-in Discord DM gateway, so Stella can hold direct-message conversations there.", product: "Backend" },
+      { text: "Tighter anti-abuse limits for the free anonymous tier.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.313",
     date: "June 3, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Mini window got a dedicated lean entry point for faster, lighter launches.",
       "On Windows, closing Stella can now minimize it to the system tray instead of fully quitting.",
       "The active conversation now reloads instantly more often.",
     ],
-    fixes: [
+    more: [
       "First chat startup is faster.",
       "Mini window stays always-on-top more reliably on Windows.",
       "Toasts can appear over embedded website views.",
       "Release packages no longer include empty placeholder state folders.",
       "Unused preference cleanup keeps settings simpler.",
+      { text: "Old per-install state folders are no longer carried along by the installer.", product: "Launcher" },
+      { text: "Kimi K2 P6 now runs on the priority tier for snappier replies.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.295 – v0.0.312",
     date: "June 2, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Custom overlay theme — Stella redesigns can now apply live to a Custom theme.",
       "Local dictation gained Parakeet C++ support.",
       "Grok Composer became a supported external model option.",
     ],
-    fixes: [
+    more: [
       "Restored conversations are preserved more reliably on boot.",
       "Stella is better at honoring your exact intent when delegating work.",
       "Theme self-updates reload correctly.",
@@ -89,34 +125,46 @@ export const changelogEntries: ChangelogEntry[] = [
       "Image attachments are recognized more reliably.",
       "Upgrade and provider dialogs no longer feel cramped.",
       "Secrets are redacted more thoroughly from memory.",
+      { text: "Resetting Stella now also cleans up the processes the installer owns.", product: "Launcher" },
+      { text: "The Parakeet local dictation model is downloaded during install, so it's ready when you turn it on.", product: "Launcher" },
+      { text: "Long-running cross-device chats are watched more efficiently.", product: "Backend" },
+      { text: "Store artifact publishing is more resilient.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.287 – v0.0.294",
     date: "June 1, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Managed image generation waits for results and surfaces failures more clearly.",
       "Stella can use a private search fallback when needed.",
       "Voice provider settings got a refinement pass.",
       "Recent apps and window detection are faster.",
+      { text: "Computer chat on iPhone now streams replies live, and stays reconnected across socket drops.", product: "Mobile" },
     ],
-    fixes: [
+    more: [
       "Mobile chat retries are deduped, and mobile developer artifacts stay gated.",
       "Desktop update state is tracked more clearly.",
       "Image generation starts without blocking the chat.",
       "Windows development and app hot paths are lighter.",
       "App context chips gained better accessibility text.",
       "Task status updates after sending input are more accurate.",
+      { text: "Computer entry moved from the top bar into the sidebar; short chats top-align cleanly.", product: "Mobile" },
+      { text: "Keyboard avoidance behaves consistently in chat.", product: "Mobile" },
+      { text: "App Store submission id configured; mobile bumped to 1.0.5.", product: "Mobile" },
+      { text: "Launcher now bundles ripgrep, with looser payload validation.", product: "Launcher" },
+      { text: "Image generation tracks job status and handles stale failures.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.282 – v0.0.286",
     date: "May 31, 2026",
     tags: ["Polish"],
-    features: [
+    highlights: [
       "Settings are now translated across all supported languages.",
       'The composer placeholder now simply says "Do anything."',
     ],
-    fixes: [
+    more: [
       "User-message context chips and chat typography were tightened up.",
       "Reporting schedules are more reliable.",
       "Windows keeps Stella's available actions more reliably after startup.",
@@ -126,55 +174,68 @@ export const changelogEntries: ChangelogEntry[] = [
       "Self-update restart indicators and timing are cleaner.",
       "Home display model picker is cleaner without extra selection checkmarks.",
       "Onboarding project discovery improved.",
+      { text: "Mobile dismisses the keyboard on send, hardens cold-start bridge connect, and caps desktop wake at ~15s.", product: "Mobile" },
+      { text: "Forced-theme glass contrast is fixed and settings rows are de-carded; bumped to 1.0.4.", product: "Mobile" },
+      { text: "Managed realtime voice usage is now tracked for billing.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.272 – v0.0.281",
     date: "May 30, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "App creation can now start from the Apps empty state with a prefilled prompt.",
       "Google integrations now use the connected-app catalog.",
       "Cadence reports can be toggled once browser discovery is available.",
       "Store publishing helpers are back.",
     ],
-    fixes: [
+    more: [
       "Desktop updates recover and cancel more cleanly when something goes wrong.",
       "Onboarding welcome screens render from Stella's latest content and behave more reliably.",
       "Display tab add menu and home engine controls were restored and polished.",
       "Theme switching no longer flips unexpectedly when closing the picker.",
       "Source imports use one clearer flow.",
       "The app internals were reorganized to make future UI work cleaner.",
+      { text: "Fixed a Computer-tab crash when unpaired; bumped to 1.0.3.", product: "Mobile" },
+      { text: "Installer fetches the full desktop release history so rollbacks have more options.", product: "Launcher" },
+      { text: "Onboarding welcome HTML is now generated on the backend, grounded in Stella's capabilities.", product: "Backend" },
+      { text: "Composio integration sessions are fixed.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.267 – v0.0.271",
     date: "May 29, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Store releases can now be published from selected source changes.",
       "External agent runs can overlap when needed.",
       "Desktop updates now collect better timeout diagnostics.",
       "Self-mod undo notices are preserved even when hidden.",
     ],
-    fixes: [
+    more: [
       "macOS permission reset flows work more reliably.",
       "Computer permission requests go through the host app cleanly.",
       "Chat follow-up scrolling is steadier.",
       "Windows mini-window lag and Store handoff bugs were fixed.",
       "The self-change transition is calmer, using a blur and band sweep instead of a ripple.",
       "Stella's development server now stays on a fixed port.",
+      { text: "Windows installs retry uninstall removal on transient file locks.", product: "Launcher" },
+      { text: "Public store integration payloads are slimmer, and Store releases require source packs.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.258 – v0.0.266",
     date: "May 28, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Mobile can now sync computer-chat artifacts from the desktop.",
       "The mobile bridge exposes model lists and connected providers.",
       "Codex and Claude Code engines gained a thinking-effort control.",
       "Stella now keeps memory in markdown files and drops the older memory store.",
       "Local crash and process-lifecycle logs make troubleshooting easier.",
+      { text: "iPhone app got a major polish pass: taller branded top bar, native-feel desktop bridge, top-bar Computer toggle with inline pairing and a floating menu, and artifact cards with a top-sheet viewer.", product: "Mobile" },
     ],
-    fixes: [
+    more: [
       "Broken desktop installs can self-heal by repairing the desktop binary.",
       "Media history, audio, deletion, and tab selection were cleaned up.",
       "The mini window now opens at Home consistently.",
@@ -182,18 +243,24 @@ export const changelogEntries: ChangelogEntry[] = [
       "Chat no longer shakes when the display panel opens after reload.",
       "Mobile chat sync filtering and discovery paths were fixed.",
       "Cursor runner cleanup, recovery, and secure key storage were improved.",
+      { text: "Chat list migrated from FlashList to Legend List v3 for steadier long-thread performance.", product: "Mobile" },
+      { text: "Theme colors aligned with desktop and the soft/flat gradient is now visible.", product: "Mobile" },
+      { text: "Top-bar seam fixed by sharing one app backdrop; mobile bumped to 1.0.2.", product: "Mobile" },
+      { text: "Designer now uses Claude Opus 4.8.", product: "Backend" },
+      { text: "Convex-side mobile reply storage was removed (mobile replies are transient now).", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.254 – v0.0.257",
     date: "May 27, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Model controls moved into the display sidebar, with a wider and cleaner engine picker.",
       "Codex engine support reached closer parity with Stella's other engines.",
       "Stella gained a source-pack update flow.",
       "Display surfaces got softer Apple-style depth and lighter shadows.",
     ],
-    fixes: [
+    more: [
       "Chat text rendering is steadier during window resizing.",
       "Queued follow-ups clear correctly after failed runs.",
       "Inline artifact selection works better.",
@@ -201,19 +268,22 @@ export const changelogEntries: ChangelogEntry[] = [
       "Restricted-model toasts and model picks are more reliable.",
       "Native helper refresh and macOS dev permission relaunch flows were fixed.",
       "Crash screens now catch more local app errors.",
+      { text: "Removed the global TypeScript install step, and interrupted launcher downloads can now be resumed.", product: "Launcher" },
+      { text: "Store source-pack releases are now supported end-to-end, with a neutral /api/stella/relay endpoint.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.250 – v0.0.253",
     date: "May 26, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Cadence reports now appear as chat artifacts.",
       "Settings moved into the top-bar navigation, and Stella can ask for your nickname.",
       "Reduce Motion setting added.",
       "Workspace actions and reports were reworked into a cleaner flow.",
       "A settings menu now appears next to Sign in when signed out.",
     ],
-    fixes: [
+    more: [
       "Chat workspace strip spacing and user-message padding were tightened.",
       "Old chat errors no longer replay unexpectedly.",
       "Store web toasts now bridge into the desktop.",
@@ -221,38 +291,45 @@ export const changelogEntries: ChangelogEntry[] = [
       "Display-sidebar right-click toggling and code-block scroll jitter were fixed.",
       "Self-change visuals are skipped when Stella is hidden.",
       "Apps and Social empty states got a polish pass.",
+      { text: "Installer provisions tsgo globally so users don't carry a local copy, with native-helper fallback when needed.", product: "Launcher" },
+      { text: "Auth schema regenerated for Better Auth v0.12, with static JWKS support.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.245 – v0.0.249",
     date: "May 25, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Cursor, Codex, Claude Code, Hermes, and OpenClaw engine/import paths landed.",
       "Claude Code model selection added.",
       "Settings → Models folded into the Engine display tab.",
       "User apps now open under their own `/apps` pages, and the Apps nav dot lights up when Stella scaffolds something new.",
       "Bundled skills reconcile into your local Stella folder on launch.",
     ],
-    fixes: [
+    more: [
       "Windows computer automation and native-helper update paths are more reliable.",
       "Engine selection, model assignment, and engine-specific pickers were cleaned up.",
       "Onboarding import and theme steps were polished.",
       "Third-party session and schedule imports were fixed.",
       "Interrupted Claude Code turns resume better.",
       "Self-mod runs survive continuations more reliably.",
+      { text: "Launcher got a migration importer, polished settings layout, and quieter installer messages; the third-party import was removed.", product: "Launcher" },
+      { text: "“Erase everything” now also wipes ~/.stella so the durable home actually resets.", product: "Launcher" },
+      { text: "Signed-in free users can now use media features.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.237 – v0.0.244",
     date: "May 24, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Low-resource desktop launch mode added.",
       "Mini window attach mode added.",
       "Stella uses custom Windows chrome and shows Windows app icons in context chips.",
       "Clean desktop updates now have a faster path.",
       "The left sidebar can be collapsed by dragging from its right edge.",
     ],
-    fixes: [
+    more: [
       "Windows startup work was reduced, and desktop device-key mismatches can recover.",
       "Duplicate toasts are deduped instead of stacking.",
       "Display panel layout state, sidebar motion, and sidebar spacing were refined.",
@@ -260,17 +337,20 @@ export const changelogEntries: ChangelogEntry[] = [
       "Low-resource preview loading and desktop build output were fixed.",
       "macOS edit shortcuts work again.",
       "Sidebars and workspace cards regained tasteful glass depth without excess blur.",
+      { text: "Launcher gained low-resource mode, cleans up Stella processes before reinstalls, and skips install-time desktop dependency setup.", product: "Launcher" },
+      { text: "Standard model routing refactored across OpenAI and OpenRouter, with simpler model modes.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.232 – v0.0.236",
     date: "May 23, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Locked computer use — Stella can now keep computer-control work more contained when needed.",
       "General settings now includes a macOS font-smoothing toggle.",
       "Stella state moved into your home folder, making local app data more predictable across installs.",
     ],
-    fixes: [
+    more: [
       "Chat now auto-focuses the composer, with softer focus styling.",
       "Sidebar navigation and the account footer were reorganized for a cleaner layout.",
       "The feedback prompt now only appears once.",
@@ -280,18 +360,20 @@ export const changelogEntries: ChangelogEntry[] = [
       "Onboarding no longer overflows the viewport, and global shortcuts pause during onboarding demos.",
       "Settings and app startup are faster.",
       "Native helper release publishing and installer launch paths were fixed.",
+      { text: "Launcher calls the Electron installer directly during setup, with polished install banners.", product: "Launcher" },
     ],
   },
   {
+    release: "v0.0.211 – v0.0.231",
     date: "May 22, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Composer now has a New Chat action.",
       "The display sidebar can open straight into a launcher from Home.",
       "The phone Connect dialog now starts with a clearer two-step download + pair flow.",
       "Discover is simpler: one compact mixed stream instead of a wall of chips.",
     ],
-    fixes: [
+    more: [
       "Chat feels steadier: fewer message flashes, better queued-message cleanup, fewer resize loops, and no double-jump after follow-ups.",
       "Streaming text and emoji rendering are smoother and stay local.",
       "The working indicator no longer gets stuck after resuming.",
@@ -301,18 +383,20 @@ export const changelogEntries: ChangelogEntry[] = [
       "Shell and composer glass surfaces are faster, with lighter tint-only panels.",
       "Composer add menu was reordered and simplified.",
       "Display sidebar delete confirmation is simpler, and fresh Discover reports get a subtle unread dot.",
+      { text: "Launcher pins native helpers to the desktop release manifest and explains incomplete install steps.", product: "Launcher" },
     ],
   },
   {
+    release: "v0.0.192 – v0.0.210",
     date: "May 21, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "New Engine onboarding phase for technical users.",
       "The workspace strip got overflow actions and a clearer Open panel for suggestions and discovery.",
       "Pearl is now the default desktop theme for new users, with Pearl made whiter and Noir made blacker.",
       "The \"Hey Stella\" wake word model was updated.",
     ],
-    fixes: [
+    more: [
       "Onboarding capabilities, theme, engine, and permissions flows got a broad polish pass.",
       "The Engine onboarding phase now shows Stella correctly and advances without lag.",
       "Chat typography is lighter and more consistent, with tighter message sizing and smoother working indicators.",
@@ -321,12 +405,16 @@ export const changelogEntries: ChangelogEntry[] = [
       "Update install prompts and changed-file inspection are clearer.",
       "Top shell/sidebar spacing, update pill typography, and shell breakpoint animations were tightened.",
       "A window-listener leak was fixed.",
+      { text: "Pearl is now the default mobile theme too, matching desktop.", product: "Mobile" },
+      { text: "Quieter update affordance and unblocked in-settings install action.", product: "Launcher" },
+      { text: "Desktop social auth callback added.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.178 – v0.0.191",
     date: "May 20, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Settings → Models and the composer model picker got a cleaner redesign, with the real model name shown on every Stella tier row.",
       "Fashion is back as a first-class Store tab.",
       "Display tabs now remember their history, so reopening the panel feels less like starting over.",
@@ -334,8 +422,10 @@ export const changelogEntries: ChangelogEntry[] = [
       "The chat surface is getting a workspace strip, so conversation-specific work can stay easier to find.",
       "Workspace section toggles now live in the Open card header, closer to the work they control.",
       "Media and Canvas tabs got calmer, more useful empty/loading states and cleaner history controls.",
+      { text: "Streaming word-fade reveal added to mobile assistant messages, with markdown rendered via react-native-nitro-markdown.", product: "Mobile" },
+      { text: "Sign in with Apple lands on iPhone, using the native Apple flow.", product: "Mobile" },
     ],
-    fixes: [
+    more: [
       "Stella shuts down and updates more reliably.",
       "Chat text reveals more smoothly word by word, and extra trailing divider lines no longer appear in assistant messages.",
       "The Chat-tab Activity panel is quieter and holds its layout better in narrow sidebars.",
@@ -353,20 +443,28 @@ export const changelogEntries: ChangelogEntry[] = [
       "The workspace strip stays visible in expanded display-panel chat.",
       "The Store tab inside the display sidebar has a calmer publish flow.",
       "The display sidebar confirmation flow was tidied up.",
+      { text: "Computer-tab composer expansion, scroll readjust, and keyboard flicker fixes on mobile.", product: "Mobile" },
+      { text: "Push notifications unregister cleanly on sign out.", product: "Mobile" },
+      { text: "Meets App Store AI disclosure rules for consent, dictation, and microphone access.", product: "Mobile" },
+      { text: "Hardened launcher install manifest writes.", product: "Launcher" },
+      { text: "Apple sign-in backend support and a public auth URL for Google callbacks and magic links.", product: "Backend" },
+      { text: "Mobile push token unregister endpoint added.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.169 – v0.0.177",
     date: "May 19, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Sign in with Google is now available in the desktop app.",
       "Native integrations are now backed by Stella's server catalog, with restored integration icons.",
       "Mobile can receive push updates for Stella's activity, and remote mobile chats now cancel correctly.",
       "Stella can open browser tabs in your existing Chrome windows instead of always making a new window.",
       "When you're scrolled away, Stella can show a small peek of the latest reply above the composer.",
       "Memory and screen context now load on demand, so Stella only pulls that context when it actually helps.",
+      { text: "Mobile got Google login, a read-aloud playback control, a model picker, an animated working-indicator orb, smoother streaming auto-follow, and a Flat gradient theme mode synced from desktop.", product: "Mobile" },
     ],
-    fixes: [
+    more: [
       "Model controls moved into Settings and the composer menu, and the model picker is faster.",
       "Sidebar footer actions were redesigned with larger, easier-to-hit buttons.",
       "Queued composer messages are smaller and sit more naturally in the composer.",
@@ -374,35 +472,47 @@ export const changelogEntries: ChangelogEntry[] = [
       "Top-bar web controls and the sidebar theme picker were cleaned up.",
       "Desktop chat scrolling is steadier while Stella is replying.",
       "Mobile WebView and bridge behavior is more reliable.",
+      { text: "Mobile QR scanner setup fixed; Expo SDK aligned and Convex URLs normalized.", product: "Mobile" },
+      { text: "Mobile chat queue/stop controls, capped auto-scroll, and bottom-anchoring on keyboard rise.", product: "Mobile" },
+      { text: "Google Workspace OAuth provider, native integration OAuth catalog, and Composio integration support added.", product: "Backend" },
+      { text: "Remote turn cancellation state and mobile agent-activity push relay.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.164 – v0.0.168",
     date: "May 18, 2026",
     tags: ["Polish"],
-    features: [
+    highlights: [
       "Stella's replies now appear more smoothly as she writes, with less jitter.",
       "When Stella makes several images at once, they now appear together in one tidy filmstrip.",
       "Messages that are still being written look cleaner in the chat.",
       "Phone pairing and connected-app setup are smoother.",
+      { text: "iPhone got a dedicated Computer tab (replacing the chat/computer pill), a slide-over drawer, server-side dictation, the desktop Stella creature animation, and a working indicator above the composer.", product: "Mobile" },
     ],
-    fixes: [
+    more: [
       "Replies after Stella takes an action now show up reliably, even after a reload.",
       "Follow-up messages now land in the right place instead of being treated like mid-task instructions.",
       "Chat scrolling is steadier while Stella is working, especially near the bottom of a thread.",
       "The chat is less likely to lose its place when new messages, buttons, or results appear.",
       "Mobile sign-in and chat history work more reliably.",
+      { text: "Settings open to guests, identity surfaces only when signed in, and the in-app theme tracks Liquid Glass via UIKit.", product: "Mobile" },
+      { text: "Composer no longer hides behind the iOS keyboard; recorder waveform actually moves; guest sign-in buttons no longer bounce back.", product: "Mobile" },
+      { text: "Computer chat now flows through the paired desktop via a Convex subscription.", product: "Mobile" },
+      { text: "Old mobile chat endpoint returns 410 so older clients prompt to update; new mobile transcription route added.", product: "Backend" },
+      { text: "Reactive Convex surface for mobile-desktop chat handoff.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.153 – v0.0.163",
     date: "May 17, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "More integrations now connect through Stella Connect, including Store add-ons and Google Workspace.",
       "When you add multiple things from the radial menu, Stella keeps them stacked instead of replacing the previous one.",
       "If Stella gets stuck while opening, the splash screen now shows rescue buttons after a short wait.",
       "Some model responses now start appearing sooner instead of waiting for the whole reply to be ready.",
     ],
-    fixes: [
+    more: [
       "Stella formats replies better when you switch between desktop work and connected apps.",
       "Activity row right-side labels stay visible when the display sidebar is narrow.",
       "Smarter handling for Stella's more advanced thinking models.",
@@ -411,18 +521,20 @@ export const changelogEntries: ChangelogEntry[] = [
       "Fewer duplicate background requests when screens load.",
       "Connectors stay on Stella's built-in connection flow after removing a short-lived experiment.",
       "Connector settings now show a more accurate count of available actions.",
+      { text: "Stella provider adapter stack replaced with a thin per-provider relay that also forwards images end-to-end.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.150 – v0.0.152",
     date: "May 16, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Sidebar chat now loads older messages when you scroll to the top.",
       "Stella's built-in browser controls are more complete.",
       "Connecting apps is smoother.",
       "Animated SVG illustrations for display sidebar empty states.",
     ],
-    fixes: [
+    more: [
       "Removed an older connector list so app connections use one clearer flow.",
       "Shrunk Media tab mode labels and flipped the submit icon upward.",
       "Up next copy is softer, and missing files fail gracefully.",
@@ -432,18 +544,21 @@ export const changelogEntries: ChangelogEntry[] = [
       "Display messages now use their own overlay instead of piggybacking on the chat view.",
       "Interrupting Stella mid-reply is more predictable.",
       "Fixed failing automated tests.",
+      { text: "Linq phone numbers are no longer persisted in plaintext; output tokens are no longer capped on managed completions.", product: "Backend" },
+      { text: "Ultra plan returned alongside other tiers in billing status; follow-up assistant messages forward back to the originating connector.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.141 – v0.0.149",
     date: "May 15, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Chat home overview redesigned around an Activity layout, with a paginated, virtualized \"See all\" history dialog.",
       "Inline artifact cards get an Open-with menu and a category · format subtitle that swaps to an Open-preview affordance on hover.",
       "A \"Reconnecting to Stella\" toast appears when Stella is trying again, so silent stalls are visible.",
       "If the chat window hangs for 10 seconds, Stella now shows a recovery page instead of staying frozen.",
     ],
-    fixes: [
+    more: [
       "Schedule details dialog restyled to match the Connect dialog aesthetic.",
       "Store side panel typography and empty-state copy polished; Canvas and Media empty-state text nudged up; Media tab drops the \"Make something\" hero copy.",
       "Dictation now goes into the Store text box when you're typing there.",
@@ -458,64 +573,79 @@ export const changelogEntries: ChangelogEntry[] = [
       "Reduced chat resize work and reused artifact cards for HTML; paused the social empty-state illustration when offscreen and dropped the cursor shadows.",
       "Chat no longer pins to the absolute bottom during resize bursts.",
       "Follow-up messages are handled more clearly.",
+      { text: "Replaced Open-folder with a dedicated Repair page that exposes undo-last-update.", product: "Launcher" },
+      { text: "Fireworks Kimi K2P6 no longer duplicates assistant text; Go subscribers get a discounted first invoice via Stripe.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.139 – v0.0.140",
     date: "May 14, 2026",
     tags: ["Polish"],
-    features: [
+    highlights: [
       "Model picker opens instantly, and unavailable choices are checked reliably.",
     ],
-    fixes: [
+    more: [
       "Auth-error toast routes to the sign-in dialog instead of dumping you on billing.",
       "Fixed the composer's shape after sending and dictation overlapping with already-typed text.",
       "Fixed missing pieces in fast Stella replies.",
+      { text: "stella/light becomes available on restricted tiers, with per-model audience flags surfaced.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.135 – v0.0.138",
     date: "May 13, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Inline undo for self-mod commits, with thread-aware reminders so you can roll back a change Stella just made.",
       "Developer file previews collapse into a single \"Code changes\" tab instead of stacking up per file.",
       "Update pill swaps its spinner for a traveling-border loader.",
       "Stella now double-checks updates before marking them installed, and fixes stale update info after restart.",
     ],
-    fixes: [
+    more: [
       "Temporary model errors retry automatically.",
       "Home sidebar hint dismisses on the first right-click.",
       "Hard cap on rendered task progress phrases so they stop piling up.",
       "Music prompts and progress summaries respect your own connected keys.",
       "Chronicle (screen memory) summaries inject on file change instead of every turn.",
       "Background work now sees Stella's latest files while the app is updating itself.",
+      { text: "Stella, the Launcher, and Mobile are now all Apache 2.0 licensed.", product: "Launcher" },
+      { text: "Dropped the task_summaries action — the runtime owns progress phrases now.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.132 – v0.0.134",
     date: "May 12, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Read aloud: Stella can speak her replies, with a play button on each message and a menu toggle for auto-play.",
       "Realtime voice can use more voice options.",
       "More models now show up in Stella's picker.",
       "Settings got a global search bar and a layout/typography pass.",
       "Subscription upgrades pop a small celebratory dialog.",
+      { text: "iPhone got Liquid Glass on drawer and account surfaces, SF Symbols icons, long-press action sheets on assistant replies, a Live Activity for linked-mode requests, and a swipe-dismiss pair sheet.", product: "Mobile" },
     ],
-    fixes: [
+    more: [
       "Radial dial dropdown trimmed to the actions that don't interrupt what you're doing.",
       "Pet bubble shrinks to fit short messages.",
       "Dev startup splash polish; Stella is now Apache 2.0 licensed with a public README.",
+      { text: "Settings gained a manual \"Check for updates\" row; the brand header is hidden on the Settings view.", product: "Launcher" },
+      { text: "Managed Inworld voice proxy and a /api/voice/tts route for read-aloud playback.", product: "Backend" },
+      { text: "Stripe checkout collects tax IDs; anonymous device usage retention shortened to 7 days.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.127 – v0.0.131",
     date: "May 11, 2026",
     tags: ["New", "Billing"],
-    features: [
+    highlights: [
       "Buy extra usage credit on the billing page when you run low: no need to wait for the monthly reset.",
       "Connect your own AI keys through a polished setup dialog.",
       "Dictation sound controls in settings.",
       "Launcher shows a recovery view when desktop fails to start, plus an option to revert a bad Stella update.",
+      { text: "Launcher, Backend, and Mobile split into their own repositories — the foundation for shipping each on its own schedule.", product: "Launcher" },
+      { text: "iPhone got an in-app QR scanner for desktop pairing, persistent local computer-chat messages, push token registration, and a polished pair/account screen.", product: "Mobile" },
     ],
-    fixes: [
+    more: [
       "Chronicle (screen memory) is now a paid feature.",
       "Seedance replaces the older video generation models.",
       "Paid media (image, voice, video) is gated to subscribers, with a built-in escape hatch to switch to your own keys from the upsell toast.",
@@ -524,12 +654,15 @@ export const changelogEntries: ChangelogEntry[] = [
       "Windows builds ship with the right native helpers for each platform.",
       "Free and anonymous limits are tighter, and plan limits are easier to adjust.",
       "Dropped Teams and Google Chat connector tiles; fixed the Discord install link.",
+      { text: "Mobile push notifications for linked-mode replies.", product: "Backend" },
     ],
   },
   {
+    release: "v0.0.115 – v0.0.126",
     date: "May 10, 2026",
     tags: ["Polish", "Under the hood"],
-    fixes: [
+    highlights: [],
+    more: [
       "Store side panel and Publish dialog got a UX pass.",
       "Stella applies self-changes with fewer restarts and less visual flashing.",
       "Dev Stella stops prompting for macOS Keychain access on every restart.",
@@ -539,14 +672,15 @@ export const changelogEntries: ChangelogEntry[] = [
     ],
   },
   {
+    release: "v0.0.109 – v0.0.114",
     date: "May 9, 2026",
     tags: ["New", "Billing"],
-    features: [
+    highlights: [
       "Billing moved to a Stripe-hosted Checkout with managed payments, and the screen was redesigned to match the Stella aesthetic.",
       "Local models like Ollama are now first-class options in settings.",
       "Voice and agent model choices are easier to configure separately.",
     ],
-    fixes: [
+    more: [
       "Plan tiers now describe usage in plain language (e.g. \"a few hours a day\") instead of opaque dollar allotments.",
       "Stella now chooses the right thinking level automatically for each request.",
       "Mini window: sidebar hidden, traffic-light placement tuned, and embedded web views fade behind a glass mask.",
@@ -556,14 +690,15 @@ export const changelogEntries: ChangelogEntry[] = [
     ],
   },
   {
+    release: "v0.0.105 – v0.0.108",
     date: "May 8, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Canvas tab: Stella can answer with a richer visual view when a chart, layout, or interactive page fits better than plain text.",
       "Composer can pull in the area you have selected on screen as context for your next message.",
       "Stella can spin up more specialized helper agents when a task calls for it.",
     ],
-    fixes: [
+    more: [
       "Model picker now collapses to a small set of Stella presets and expands on demand.",
       "Image generation defaults to fast/low settings (you can still crank it).",
       "Desktop updates moved from Settings into a small top-bar pill.",
@@ -574,27 +709,29 @@ export const changelogEntries: ChangelogEntry[] = [
     ],
   },
   {
+    release: "v0.0.104",
     date: "May 7, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Connect integrations got a cleaner setup path.",
       "Scheduled tasks are more flexible and can send native OS notifications when they're done.",
       "Stella Computer on Windows is more native and reliable.",
       "Realtime voice moved to the GA model, with a British accent option and a refreshed prompt.",
     ],
-    fixes: [
+    more: [
       "Long-running Stella sessions are more reliable, including personality, reminders, and memory.",
       "Smoother chat scroll and working indicator in the suggestion row.",
       "Local updates are smoother when Stella changes herself.",
     ],
   },
   {
+    release: "v0.0.104",
     date: "May 6, 2026",
     tags: ["Under the hood", "Polish"],
-    features: [
+    highlights: [
       "Hosted Store now runs embedded in the desktop, replacing the legacy native Store UI.",
     ],
-    fixes: [
+    more: [
       "Chat timeline and social chat virtualized with Legend List: long threads stay snappy.",
       "Desktop shell upgraded.",
       "Sign-in storage is more secure and better isolated.",
@@ -603,28 +740,30 @@ export const changelogEntries: ChangelogEntry[] = [
     ],
   },
   {
+    release: "v0.0.94 – v0.0.103",
     date: "May 5, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "\"Hey Stella\" voice activation has fewer false starts.",
       "Image generation now runs in the background and shows up in a unified gallery in the display sidebar.",
       "Generated media (images, music, etc.) live in their own sidebar workspace, and previews open in an in-app dialog.",
       "Messages you send while Stella is working now appear inline in the chat.",
       "Stella handles mid-task course corrections more smoothly.",
     ],
-    fixes: [
+    more: [
       "Behind-the-scenes thinking is hidden by default, with advanced controls still in settings.",
       "Store, Pets, and Emoji dialogs aligned with the Connect dialog aesthetic.",
       "Working indicator fades faster when work is done.",
     ],
   },
   {
+    release: "v0.0.94 – v0.0.103",
     date: "May 4, 2026",
     tags: ["Polish"],
-    features: [
+    highlights: [
       "Music generation added.",
     ],
-    fixes: [
+    more: [
       "Working indicator now sits inline below the latest reply instead of in a separate footer.",
       "Cold mini-window summon and splash readiness fixes.",
       "Launcher reinstall now preserves your existing state, and dictation setup re-runs after a reinstall.",
@@ -632,16 +771,17 @@ export const changelogEntries: ChangelogEntry[] = [
     ],
   },
   {
+    release: "v0.0.91 – v0.0.93",
     date: "May 3, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Wake-word voice activation is back: say \"Hey Stella\" to start a voice session, with a bundled prebuilt listener for macOS and Windows. (Off by default; turn it on in settings.)",
       "AI-generated emoji packs in the Store, alongside user-created pet packs.",
       "Sidebar Models picker: choose Stella's main models without leaving chat.",
       "Stella's voice is dynamic now, seeded from your personality.md.",
       "Display canvas is now inline, with refreshed working-indicator copy.",
     ],
-    fixes: [
+    more: [
       "Replaced the four blue themes with Sage, Crimson, Slate, and Cocoa, and made Pearl and Noir standardized single-mode themes.",
       "Dictation: transcripts always paste straight into the focused app, in-app composer flow polished, OS-wide overlay layout cleaned up, on-device toggle hidden on Intel Macs.",
       "Apple-style elevation polish on dropdowns and popovers; toast and display \"+\" menu match the glass aesthetic.",
@@ -652,9 +792,10 @@ export const changelogEntries: ChangelogEntry[] = [
     ],
   },
   {
+    release: "v0.0.91 – v0.0.93",
     date: "May 2, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Floating pet companion in its own window: hatch one with the new pet skill. The pet drives voice mode (replacing the old voice creature overlay) and surfaces status updates.",
       "Pets are now part of the Store catalog.",
       "Home now has a time-ordered Activity strip with an Up Next peek.",
@@ -662,7 +803,7 @@ export const changelogEntries: ChangelogEntry[] = [
       "Post-onboarding hints for Connect and Store.",
       "New native dictation_bridge helper for macOS and Windows; push-to-talk dictation refresh.",
     ],
-    fixes: [
+    more: [
       "Scheduling now shows a neat inline receipt after it runs.",
       "Utility actions moved into the sidebar.",
       "New requests queue more gracefully while Stella is already working.",
@@ -672,16 +813,17 @@ export const changelogEntries: ChangelogEntry[] = [
     ],
   },
   {
+    release: "v0.0.90",
     date: "May 1, 2026",
     tags: ["New", "Onboarding"],
-    features: [
+    highlights: [
       "Personalized app recommendations during onboarding (with badges prefixed \"Stella may:\").",
       "Stella started laying the groundwork for more languages, with a language picker on the start screen.",
       "Stella can track and apply desktop updates.",
       "Canvas artifacts show up in chat.",
       "Snake game added to the sidebar (and made bigger and easier to play).",
     ],
-    fixes: [
+    more: [
       "Store installs now require explicit confirmation, and uninstalls are more reliable.",
       "Store security review got stricter about network access.",
       "New skills for creating Stella apps, generating media, and extending Stella.",
@@ -696,14 +838,15 @@ export const changelogEntries: ChangelogEntry[] = [
     ],
   },
   {
+    release: "v0.0.80 – v0.0.89",
     date: "April 30, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Click-to-update launcher: Stella can now check for and install updates on demand, with a manual update check, reinstall option, and a native uninstall confirmation.",
       "Chat home overview now shows your task history with progress summaries.",
       "In-app dictation bar gets a send arrow.",
     ],
-    fixes: [
+    more: [
       "Launcher UI polish and download fixes.",
       "Store integrations now render as App Store-style rows.",
       "Sent user messages animate into the full chat surface.",
@@ -717,15 +860,16 @@ export const changelogEntries: ChangelogEntry[] = [
     ],
   },
   {
+    release: "v0.0.70 – v0.0.79",
     date: "April 29, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "Universal macOS desktop builds: one download works on both Apple Silicon and Intel Macs.",
       "Local Parakeet dictation is now on by default.",
       "Social: unread badges on the Social tab and Friends button; rooms are marked read correctly; global chat excluded from unread counts.",
       "Store: reworked around threaded creator pages and a feature roster, with new visibility tiers, share-with-friends, and chat embeds.",
     ],
-    fixes: [
+    more: [
       "Sign-in dialog redesigned as a single grow-in form with quick links to your inbox.",
       "Modernized dialog styling across the app.",
       "Launch splash stays up until startup is fully ready (no more flash of an empty window).",
@@ -740,40 +884,44 @@ export const changelogEntries: ChangelogEntry[] = [
     ],
   },
   {
+    release: "v0.0.66 – v0.0.69",
     date: "April 28, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "New setting to keep Stella awake so background work isn't interrupted.",
       "New sound-notification setting, plus an anonymous feedback prompt that can show up once a day.",
       "Fashion shopping: try-on flow you can trigger by dropping a photo into the composer.",
       "Deleted items now appear in a trash view inside the side panel.",
     ],
-    fixes: [
+    more: [
       "Onboarding got a big polish pass: snappier transitions, friendlier copy, clearer steps.",
       "Store: navigation redesign, tighter Fashion agent, and a confirmation step before adding new connectors.",
       "Onboarding now skips the macOS permissions step on Windows and Linux.",
       "Lots of fixes: radial overlay stays on the active macOS Space, Connect dialog layering, inline questions, and visuals while Stella updates herself.",
+      { text: "Stella for iPhone began its journey with the very first commit on this day.", product: "Mobile" },
     ],
   },
   {
+    release: "v0.0.61 – v0.0.65",
     date: "April 27, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Voice and dictation are now part of the onboarding tour.",
       "Chrome extension install step added to onboarding.",
       "Stella's sidebar got a (briefly) playable 3D Snake game.",
       "Country-code dropdown for the Text Stella phone setup.",
     ],
-    fixes: [
+    more: [
       "Better screen-recording permission detection on macOS, plus a per-permission reset.",
       "Spinner now shows while uninstalling Stella, and the launcher checks for updates without blocking.",
       "Smoother Store publishing review flow.",
     ],
   },
   {
+    release: "v0.0.60",
     date: "April 26, 2026",
     tags: ["New", "Windows"],
-    features: [
+    highlights: [
       "Stella Connect: connect external services to Stella.",
       "Computer-use comes to Windows: Stella can now click and type on your screen on Windows machines.",
       'New "+" menu in the chat composer to attach files, capture your screen, or grab recents.',
@@ -781,43 +929,46 @@ export const changelogEntries: ChangelogEntry[] = [
       "Shortcuts settings tab.",
       "Cloud backups are now part of the paid plan.",
     ],
-    fixes: [
+    more: [
       "Removed the Git Bash dependency on Windows.",
       "Onboarding shows a capabilities walkthrough, and capture chips have a unified look.",
     ],
   },
   {
+    release: "v0.0.58 – v0.0.59",
     date: "April 25, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Local Parakeet dictation: fast, private, runs on your device.",
       "Controls for connecting your own AI accounts.",
       "New Fashion tab redesigned as a full-bleed snap feed.",
       "Top-bar chat sidebar toggle and a unified scroll between sidebar chat and full chat.",
       "Stella notifies you when a long-running agent finishes its work.",
     ],
-    fixes: [
+    more: [
       "Long chats are now much faster (stable rows + virtualization).",
       "Onboarding: faster fog, snappier disclosure cascade, friendlier hit targets.",
     ],
   },
   {
+    release: "v0.0.57",
     date: "April 24, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "File-artifact previews in the display sidebar (Codex-style chrome).",
       "Stella now detects files created by outside apps: they show up automatically.",
     ],
-    fixes: [
+    more: [
       "Transparent topbar in the desktop shell.",
       "Mini window: smoother chrome, wider composer, lazier voice startup.",
       "Chat scroll holds its position when you resize the layout.",
     ],
   },
   {
+    release: "v0.0.57",
     date: "April 23, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       'New "Ask Stella" pill that appears above text you select: works in Stella and across other apps.',
       "Display panel is now resizable and can expand to fill the window, even taking over the mini window.",
       "Radial dial restored, replacing the cmd+right-click native menu.",
@@ -825,22 +976,23 @@ export const changelogEntries: ChangelogEntry[] = [
       "Configurable OS-wide dictation.",
       "New Ideas tab on the display sidebar plus a smoother sidebar slide.",
     ],
-    fixes: [
+    more: [
       "Web search wired to Exa for better results.",
       "Time-of-day greetings on the home screen with the occasional fun variant.",
       "Save and copy actions on the display sidebar.",
     ],
   },
   {
+    release: "v0.0.57",
     date: "April 22, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Agents can now ask you a question inline in chat (askQuestion).",
       "Live Memory dialog and a customizable creature face: toggle eyes and mouth.",
       "Twitch emotes render in chat.",
       "Double-tap Option to summon the mini window.",
     ],
-    fixes: [
+    more: [
       "Big computer-use reliability pass: clicks now actually deliver to backgrounded apps, with overlay continuity fixed.",
       'Show more / show less for long user messages.',
       "Settings and Theme moved to the sidebar title bar.",
@@ -848,159 +1000,175 @@ export const changelogEntries: ChangelogEntry[] = [
     ],
   },
   {
+    release: "v0.0.57",
     date: "April 21, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Auto-display generated images in the display sidebar.",
       "Live Memory phase added to onboarding (with sign-in resume).",
       'New "Cozy" theme.',
     ],
-    fixes: [
+    more: [
       "Sidebar app discovery became more reliable.",
       "Onboarding mocks now mirror the real Stella surface.",
     ],
   },
   {
+    release: "v0.0.53 – v0.0.56",
     date: "April 20, 2026",
     tags: ["Under the hood"],
-    fixes: [
+    highlights: [],
+    more: [
       "Major internal reliability upgrade for how agents run.",
       "Stella's instructions were reorganized for clearer behavior.",
       "Launcher reliability: macOS screen-permission build, Windows registry args, fewer first-run dependencies.",
     ],
   },
   {
+    release: "v0.0.53",
     date: "April 19, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Display sidebar now renders Word, Excel, PowerPoint, PDF, and HTML files.",
     ],
   },
   {
+    release: "v0.0.53",
     date: "April 18, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Suggestion chips above the full chat composer.",
       "Categories overlay back on home.",
       "New macOS native session service powering computer-use, with overlay motion aligned to action timing.",
     ],
   },
   {
+    release: "v0.0.53",
     date: "April 17, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Cmd+right-click context menu replaces the radial gesture overlay.",
       "Action overlay with a breathing lens and software cursor when Stella controls your computer.",
     ],
-    fixes: [
+    more: [
       'Onboarding creation mock rebuilt with section-transformation pills.',
     ],
   },
   {
+    release: "v0.0.53",
     date: "April 16, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "macOS desktop automation engine with auto-attached screenshots.",
       "The active-window screenshot is automatically attached to your message as an image.",
       "Display sidebar can be opened from the right-click menu in chat.",
     ],
-    fixes: [
+    more: [
       "Range-based thread compaction for long chats.",
     ],
   },
   {
+    release: "v0.0.53",
     date: "April 15, 2026",
-    features: [
+    highlights: [
       "Stella can write and edit files more directly.",
     ],
-    fixes: [
+    more: [
       "Onboarding reveals theme options in steps.",
       'Refreshed emote bundle.',
       'Pause self-mod hot reload while shell or code-mode writes are happening (less flicker).',
     ],
   },
   {
+    release: "v0.0.53",
     date: "April 14, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Stella shows short thinking summaries while she works, so you can see what she's doing.",
       "Twitch emotes render in Stella's messages.",
     ],
-    fixes: [
+    more: [
       "Stella's live replies got internal cleanup.",
     ],
   },
   {
+    release: "v0.0.53",
     date: "April 13, 2026",
-    fixes: [
+    more: [
       "Smoother live replies, especially after resuming hidden work.",
       "Exponential backoff retry for OpenAI completions.",
       "Reasoning is preserved across Stella completions.",
     ],
   },
   {
+    release: "v0.0.53",
     date: "April 12, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "New deeper coding mode for technical tasks.",
     ],
-    fixes: [
+    more: [
       "Wake-word pipeline removed (Stella moved away from always-listening).",
       "Bundled Stella browser binary refreshed.",
       "Local chat now pages by visible messages for performance.",
     ],
   },
   {
+    release: "v0.0.43 – v0.0.52",
     date: "April 11, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       'Radial dial redesign: the "Full" wedge becomes "Add", and chat persists across workspaces.',
       "Display overlay replaced with a sidebar on the home page.",
     ],
-    fixes: [
+    more: [
       "Launcher reliability fixes for macOS permission flows (TCC prompts, mic, etc.).",
       "Launcher hides its window when desktop starts and restores it on exit.",
     ],
   },
   {
+    release: "v0.0.34 – v0.0.42",
     date: "April 10, 2026",
     tags: ["New", "Polish"],
-    features: [
+    highlights: [
       "ChatGPT-style turn-anchored scrolling in chat.",
       "macOS screen and microphone permission onboarding screen.",
       "Helper-agent progress now shows up in chat.",
       "In-app permission recovery flows.",
     ],
-    fixes: [
+    more: [
       "Stella branding on launcher icons and release artifacts.",
       "Many launcher and CI improvements (Windows/macOS).",
     ],
   },
   {
+    release: "v0.0.34",
     date: "April 9, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Mini chat split into its own dedicated window.",
       "Vision-based window content capture with column detection.",
     ],
   },
   {
+    release: "v0.0.33",
     date: "April 8, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Cloud backups, with settings integration.",
       "Self-mod history is now auto-tracked.",
     ],
-    fixes: [
+    more: [
       "Faster local data storage.",
       "Refreshed Stella brand assets across desktop, launcher, and mobile.",
       "Mobile privacy paperwork added for iOS.",
     ],
   },
   {
+    release: "v0.0.27 – v0.0.32",
     date: "April 7, 2026",
     tags: ["New", "Mobile"],
-    features: [
+    highlights: [
       "Mobile app: dark mode, 17 themes, haptics, voice input, and push notifications.",
       'Voice "look at screen": Stella can highlight things in real time.',
       "Voice screen viewing and guidance overlays improved.",
@@ -1008,40 +1176,43 @@ export const changelogEntries: ChangelogEntry[] = [
       "Suggestion chips in chat with shared screenshot preview.",
       "New Claude Code option for coding work.",
     ],
-    fixes: [
+    more: [
       "One-time welcome dialog after onboarding.",
     ],
   },
   {
+    release: "v0.0.24 – v0.0.26",
     date: "April 6, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Inline previews for Word, Excel, and PowerPoint files.",
       "Stella Office is now vendored into Stella.",
     ],
-    fixes: [
+    more: [
       "Connect dialog redesigned, and the Text Stella flow reversed for clarity.",
       "Permissions onboarding screen on macOS, plus a fix for relaunching from the DMG.",
       "Magic-link sign-in fix on mobile.",
     ],
   },
   {
+    release: "v0.0.23",
     date: "April 5, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       'Home merged into chat, with a shifting gradient on the mini shell.',
       'Radial dial reworked to four wedges with opt-in window context.',
       'New "View messages" button on home when you have chat history.',
     ],
-    fixes: [
+    more: [
       "File-system-based skill environment replaces LoadTools/ActivateSkill.",
       "Cloud device sync now requires a real (non-anonymous) account.",
     ],
   },
   {
+    release: "v0.0.23",
     date: "April 4, 2026",
     tags: ["Polish"],
-    fixes: [
+    more: [
       "Onboarding UX polish: better button visibility, top-down layout, gradient settings fixes.",
       "Live task status while Stella is thinking.",
       "Faster chat transcript persistence (append-only JSONL).",
@@ -1050,69 +1221,75 @@ export const changelogEntries: ChangelogEntry[] = [
     ],
   },
   {
+    release: "v0.0.18 – v0.0.22",
     date: "April 3, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Right-click chat sidebar replaces the floating orb and context menu.",
       "Programmatic send opens the sidebar chat directly.",
     ],
-    fixes: [
+    more: [
       "Launcher auto-closes once Stella is confirmed running.",
       "Window controls moved into the sidebar header.",
       "Onboarding can complete without the canvas morph handoff.",
     ],
   },
   {
+    release: "v0.0.12 – v0.0.17",
     date: "April 2, 2026",
     tags: ["New", "macOS"],
-    features: [
+    highlights: [
       "Custom DMG installer with a mesh-gradient background and icon layout.",
       "Stella requests all macOS permissions upfront, with start/stop launcher controls.",
       "A simpler main-agent setup that can load extra abilities as needed.",
     ],
-    fixes: [
+    more: [
       "Stella branding for desktop app icons.",
     ],
   },
   {
+    release: "v0.0.12",
     date: "April 1, 2026",
-    fixes: [
+    more: [
       "Smoother floating chat indicator (prewarmed animation).",
       "Frame-rate-independent Stella animation using real delta time.",
       "Overlay origin now syncs from actual window bounds on macOS.",
     ],
   },
   {
+    release: "v0.0.10 – v0.0.11",
     date: "March 30, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Multi-desktop per account: device-scoped registration, bridge, and phone pairing.",
     ],
-    fixes: [
+    more: [
       "Daily cron to purge stale anonymous user data.",
       "Older connection plumbing removed from the desktop app and replaced by Connect integrations.",
     ],
   },
   {
+    release: "v0.0.8 – v0.0.9",
     date: "March 28, 2026",
     tags: ["New", "Mobile"],
-    features: [
+    highlights: [
       "Phone pairing.",
       "Mobile: offline chat persistence, image support, and friendlier errors.",
       "New Home surface, with thread context that persists across runs.",
     ],
-    fixes: [
+    more: [
       "macOS code signing and notarization for the launcher.",
       "Cloud data is purged on account delete.",
     ],
   },
   {
+    release: "v0.0.6 – v0.0.7",
     date: "March 26, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       'Linq remote-turn execution: Stella routes messages to your desktop and falls back to an offline responder.',
     ],
-    fixes: [
+    more: [
       "Polling-based magic-link auth, deep-link protocol fix, and migration to cloud.stella.sh.",
       "Smoother first-message replies.",
       "Region capture fixes.",
@@ -1120,233 +1297,255 @@ export const changelogEntries: ChangelogEntry[] = [
     ],
   },
   {
+    release: "v0.0.3 – v0.0.5",
     date: "March 25, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Music generation upgraded.",
       "Home Canvas: LLM generation pipeline, selectable guide, music bar.",
     ],
-    fixes: [
+    more: [
       "Improved wake-word handoff and voice echo gating.",
       "Auth callbacks now route through stella.sh.",
     ],
   },
   {
+    release: "v0.0.2",
     date: "March 24, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "New voice model.",
       "macOS native build of the Stella browser.",
     ],
-    fixes: [
+    more: [
       "Mobile: refreshed chat, desktop bridge, and account screens.",
       "Simpler MorphTransition shader (less heavy on GPU).",
     ],
   },
   {
+    release: "v0.0.2",
     date: "March 23, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "New Media Studio app.",
       "Personalized Home Canvas replaces the home dashboard.",
       "Notification panel on the floating orb.",
       "New display overlay for showing generated files and results.",
     ],
-    fixes: [
+    more: [
       "Dark-mode gradient banding fixed (oklch interpolation + dithering).",
       "Cormorant Garamond added as a display font.",
     ],
   },
   {
+    release: "v0.0.2",
     date: "March 22, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Drag-and-drop file attachments across all three composers.",
       "New Pearl and Noir themes.",
       "Terms of Service, Privacy Policy, and in-app legal notices.",
     ],
-    fixes: [
+    more: [
       "Lightweight CSS radial gradients replace the heavier blob gradient (faster, cleaner).",
       "Open / close animation for the mini shell.",
     ],
   },
   {
+    release: "v0.0.2",
     date: "March 21, 2026",
     tags: ["Under the hood"],
-    fixes: [
+    more: [
       "Stella's agent work now runs in a separate process for better stability.",
       "Chat UI: thinking row, shimmer, message typography refresh.",
     ],
   },
   {
+    release: "v0.0.2",
     date: "March 20, 2026",
-    features: [
+    highlights: [
       "First version of Stella's developer tools.",
     ],
-    fixes: [
+    more: [
       "Backend migrated off the AI SDK.",
       "Faster boot.",
     ],
   },
   {
+    release: "v0.0.2",
     date: "March 19, 2026",
-    fixes: [
+    more: [
       "Switched to Manrope as the default font.",
       "Mobile bridge wired up.",
     ],
   },
   {
+    release: "v0.0.1",
     date: "March 18, 2026",
     tags: ["New", "Mobile"],
-    features: [
+    highlights: [
       "Mobile app initial commit.",
     ],
-    fixes: [
+    more: [
       "Onboarding: Next/Previous step controls, animation and layout polish.",
       "Cross-platform launcher CI workflow (Windows + macOS).",
     ],
   },
   {
+    era: "Pre-release",
     date: "March 17, 2026",
     tags: ["Under the hood"],
-    features: [
+    highlights: [
       "Desktop, mobile, cloud, and launcher code were brought together into one project.",
       "Ultra tier added to billing.",
     ],
-    fixes: [
+    more: [
       "Discovery page generation fix.",
     ],
   },
   {
+    era: "Pre-release",
     date: "March 16, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Plans now get the right managed models automatically.",
       "Realtime transcription.",
       'Friend v1: first cut of the social layer.',
     ],
-    fixes: [
+    more: [
       "Realtime voice usage now reported for billing.",
     ],
   },
   {
+    era: "Pre-release",
     date: "March 15, 2026",
-    features: [
+    highlights: [
       "Launcher's first commit.",
     ],
-    fixes: [
+    more: [
       "Large internal cleanup for how Stella routes work.",
       "Self-mod morph is now readiness-driven (less flash).",
     ],
   },
   {
+    era: "Pre-release",
     date: "March 14, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Multiplayer skill (game).",
       "Scheduling support.",
     ],
-    fixes: [
+    more: [
       "Bundled Stella defaults moved into resources.",
     ],
   },
   {
+    era: "Pre-release",
     date: "March 13, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Blueprint-based Store self-mod flow (v1).",
       "Stella browser ported to native Rust.",
     ],
-    fixes: [
+    more: [
       "Voice: hard VAD gate, adaptive noise floor, echo handling on speakers.",
       "Stripe billing fixes.",
       'Floating orb, chat panel, and input bar now scale with viewport.',
     ],
   },
   {
+    era: "Pre-release",
     date: "March 12, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Floating orb v1 chat.",
       "Self-mod and General agent split with concurrency support.",
     ],
-    fixes: [
+    more: [
       "Header items moved to the sidebar.",
     ],
   },
   {
+    era: "Pre-release",
     date: "March 11, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "New wake-word model (fp16) and voice handoff.",
       "Stella's own model endpoints became the desktop default.",
     ],
-    fixes: [
+    more: [
       'Clearer "connected account" vs "logged in" semantics.',
     ],
   },
   {
+    era: "Pre-release",
     date: "March 10, 2026",
-    features: [
+    highlights: [
       "You can now keep messaging while a task runs in the background.",
     ],
-    fixes: [
+    more: [
       "Backend route consolidation and SQL improvements.",
     ],
   },
   {
+    era: "Pre-release",
     date: "March 9, 2026",
-    features: [
+    highlights: [
       "Audio ducking: music and other sounds dim while Stella speaks.",
     ],
-    fixes: [
+    more: [
       "Unified renderer mic across wake word and voice.",
       "Many small reliability fixes (chat re-renders, double-cache charges, capture leaks, web search failures).",
     ],
   },
   {
+    era: "Pre-release",
     date: "March 8, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Extension system: Stella can discover new abilities, model options, and prompts.",
       'Native text selection inside Stella.',
       'New "auto" radial dial feature.',
       "Search canvas (and the news side trimmed down).",
     ],
-    fixes: [
+    more: [
       "Faster web search and HTML rendering.",
     ],
   },
   {
+    era: "Pre-release",
     date: "March 7, 2026",
     tags: ["New"],
-    features: [
+    highlights: [
       "Synthesis onboarding flow.",
       "Dashboard display and news rendering.",
       "Web search and news generation support added.",
     ],
-    fixes: [
+    more: [
       "Bootstrap quiet window delayed by 2.5s for smoother launch.",
     ],
   },
   {
+    era: "Pre-release",
     date: "March 6, 2026",
-    fixes: [
+    more: [
       "Editing fixes and local scheduling improvements.",
       "Home view and music adjustments.",
     ],
   },
   {
+    era: "Pre-release",
     date: "March 1–5, 2026",
-    fixes: [
+    more: [
       "Ongoing polish and internal cleanup.",
       "Search canvas iteration, animation polish on live reply pills, dashboard fixes.",
     ],
   },
   {
+    era: "Foundation",
     date: "February 2026",
     tags: ["Foundation"],
-    features: [
+    highlights: [
       'Stella renamed and reorganized around agents, helper agents, actions, and skills.',
       "Discovery rewrite: selectable categories, signal collection, and seeded ephemeral memories.",
       "App Store / blueprints groundwork: first cut of how Stella publishes apps.",
@@ -1355,15 +1554,16 @@ export const changelogEntries: ChangelogEntry[] = [
       "Multi-monitor and Windows native window-title detection.",
       "Scheduled-task support, health checks, and better interrupt / queue controls.",
     ],
-    fixes: [
+    more: [
       "Better Auth integration and hardened secrets handling.",
       "Drag-friendly mini shell, radial dial polish, and many capture/dial flicker fixes.",
     ],
   },
   {
+    era: "Genesis",
     date: "January 2026",
     tags: ["Genesis"],
-    features: [
+    highlights: [
       "First commits: shadcn UI scaffolding and the floating Stella surface.",
       "Initial agent, helper-agent, actions, and skills setup.",
       "Working indicator, live replies, conversation history, and thinking UI.",

@@ -388,8 +388,9 @@ self-change breaks startup, the launcher can show a recovery view and, when the
 latest commit is an agent-authored self-change, offer an undo path.
 
 ## A running changelog
-Stella ships preview updates almost daily. The full log, grouped by date with
-new features and fixes, lives at ${abs("/learn-more/whats-new.md")}.
+Stella ships small, frequent releases. The full log, grouped by release with
+highlights up top and the rest collapsed below, lives at
+${abs("/learn-more/whats-new.md")}.
 `;
 
 /* ------------------------------------------------------------------ */
@@ -401,26 +402,31 @@ function renderWhatsNew(): string {
     header(
       "What's New",
       "/learn-more/whats-new",
-      "A running log of what's shipped in Stella, in plain English. New features and fixes, newest first.",
+      "Every Stella release, in plain English. Each version's highlights up top, the rest tucked just below.",
     ),
   ];
 
-  for (const entry of changelogEntries) {
-    const tags = entry.tags?.length ? ` — ${entry.tags.join(", ")}` : "";
-    lines.push(`## ${entry.date}${tags}`, "");
+  const formatItem = (
+    item: string | { text: string; product: string },
+  ): string => {
+    if (typeof item === "string") return `- ${item}`;
+    return `- [${item.product}] ${item.text}`;
+  };
 
-    if (entry.features?.length) {
-      lines.push("### New");
-      for (const item of entry.features) lines.push(`- ${item}`);
+  for (const entry of changelogEntries) {
+    const headline = entry.release ?? entry.era ?? entry.date;
+    const secondary = entry.release ? ` (${entry.date})` : "";
+    const tags = entry.tags?.length ? ` — ${entry.tags.join(", ")}` : "";
+    lines.push(`## ${headline}${secondary}${tags}`, "");
+
+    if (entry.highlights?.length) {
+      lines.push("### Highlights");
+      for (const item of entry.highlights) lines.push(formatItem(item));
       lines.push("");
     }
-    if (entry.fixes?.length) {
-      lines.push("### Fixes & polish");
-      for (const item of entry.fixes) lines.push(`- ${item}`);
-      lines.push("");
-    }
-    if (entry.items?.length) {
-      for (const item of entry.items) lines.push(`- ${item}`);
+    if (entry.more?.length) {
+      lines.push("### More in this release");
+      for (const item of entry.more) lines.push(formatItem(item));
       lines.push("");
     }
   }
