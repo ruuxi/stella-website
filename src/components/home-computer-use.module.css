@@ -918,3 +918,33 @@
     opacity: 0;
   }
 }
+
+/* Low-power devices: stop the always-running cursor/caret/checklist loops in
+   this mock (it sits right above the phone section and runs forever) and drop
+   the heavy backdrop blur. The mock still reads as a populated desktop, just
+   without the continuous compositor churn that builds scroll lag. */
+:global(html[data-low-power]) .typingCaret,
+:global(html[data-low-power]) .cursorYou,
+:global(html[data-low-power]) .cursorStella,
+:global(html[data-low-power]) .clickRing,
+:global(html[data-low-power]) .automationStep b,
+:global(html[data-low-power]) .noteChecklist li[data-anim],
+:global(html[data-low-power]) .noteChecklist li[data-anim] .checkbox,
+:global(html[data-low-power]) .noteChecklist li[data-anim] .checkbox svg,
+:global(html[data-low-power]) .noteChecklist li[data-anim] .checkLabel::after {
+  animation: none;
+}
+
+:global(html[data-low-power]) .automationStep b:nth-child(2) {
+  opacity: 1;
+  transform: none;
+}
+
+:global(html[data-low-power]) .noteChecklist li[data-anim] .checkbox svg {
+  opacity: 0;
+}
+
+:global(html[data-low-power]) .automation {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}

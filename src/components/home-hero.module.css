@@ -41,6 +41,35 @@
     );
 }
 
+/* When WebGL isn't driving the canvas (no GPU / software renderer / low-power
+ * device), keep the fallback alive with a slow, compositor-friendly drift so
+ * the hero never looks frozen. The shader sets `data-webgl="on"` to opt out. */
+.aurora:not([data-webgl="on"]) {
+  animation: auroraDrift 18s ease-in-out infinite alternate;
+}
+
+@keyframes auroraDrift {
+  0% {
+    background-position:
+      100% 26%,
+      88% 72%;
+    opacity: 0.72;
+  }
+  100% {
+    background-position:
+      76% 42%,
+      100% 56%;
+    opacity: 1;
+  }
+}
+
+/* Don't burn cycles drifting on machines we've already flagged as low-power
+ * (or reduced-motion) — show a calm static gradient instead. */
+:global(html[data-low-power]) .aurora:not([data-webgl="on"]) {
+  animation: none;
+  opacity: 1;
+}
+
 /* Mirrored copy of the aurora reflected across its lower band edge, so a
  * second, inverted band sits just below the first. Because the element is
  * flipped, its local top renders at the visual bottom, so the bottom fade is a
@@ -147,6 +176,11 @@
     opacity: 1;
     filter: none;
     transform: none;
+  }
+
+  .aurora:not([data-webgl="on"]) {
+    animation: none;
+    opacity: 1;
   }
 }
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Renderer, Triangle, Program, Mesh } from "ogl";
+import { shouldRunAuroraShader } from "@/lib/device-perf";
 
 const vertex = /* glsl */ `
   attribute vec2 uv;
@@ -110,6 +111,12 @@ export function AuroraCanvas({ className }: { className?: string }) {
     const canvas = ref.current;
     if (!canvas) return;
 
+    // No real GPU (or a software rasterizer / memory-starved device): skip
+    // WebGL entirely and let the animated CSS gradient fallback carry the hero.
+    // Running the FBM shader through SwiftShader looks broken — a few fps or a
+    // blank canvas — so we never blank the fallback in that case.
+    if (!shouldRunAuroraShader()) return;
+
     let renderer: Renderer;
     try {
       renderer = new Renderer({
@@ -137,7 +144,10 @@ export function AuroraCanvas({ className }: { className?: string }) {
     });
     const mesh = new Mesh(gl, { geometry: new Triangle(gl), program });
 
+    // The shader now owns the pixels: drop the CSS fallback gradient and stop
+    // its drift animation (gated on `[data-webgl="on"]`).
     canvas.style.background = "none";
+    canvas.dataset.webgl = "on";
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -161,13 +171,20 @@ export function AuroraCanvas({ className }: { className?: string }) {
     window.addEventListener("resize", resize);
 
     let raf = 0;
+    // Only render while the hero is actually on screen. Without this both
+    // aurora canvases keep a full-viewport WebGL loop running the entire time
+    // the user scrolls down the page, which is the main source of scroll lag as
+    // you approach the lower sections.
+    let inView = true;
     const frame = (t: number) => {
       program.uniforms.uTime.value = t * 0.001;
       renderer.render({ scene: mesh });
       raf = requestAnimationFrame(frame);
     };
     const play = () => {
-      if (!raf && !reduceMotion.matches) raf = requestAnimationFrame(frame);
+      if (!raf && !reduceMotion.matches && inView && !document.hidden) {
+        raf = requestAnimationFrame(frame);
+      }
     };
     const pause = () => {
       if (raf) {
@@ -182,6 +199,16 @@ export function AuroraCanvas({ className }: { className?: string }) {
 
     if (reduceMotion.matches) renderStill();
     else play();
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        inView = entries[0]?.isIntersecting ?? true;
+        if (inView) play();
+        else pause();
+      },
+      { rootMargin: "120px 0px" },
+    );
+    io.observe(canvas);
 
     const onVisibility = () => {
       if (document.hidden) pause();
@@ -201,6 +228,7 @@ export function AuroraCanvas({ className }: { className?: string }) {
 
     return () => {
       pause();
+      io.disconnect();
       ro.disconnect();
       window.removeEventListener("resize", resize);
       document.removeEventListener("visibilitychange", onVisibility);

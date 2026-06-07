@@ -1240,6 +1240,19 @@ html[data-embedded="true"] .site-header {
   }
 }
 
+/* Low-power devices keep the reveal motion but drop the blur — animating
+   `filter: blur()` from 16px → 0 over a second per section is the single
+   most expensive part of the scroll, and the cause of the lag building up as
+   you scroll toward the lower (phone) sections. Opacity + transform stay on
+   the compositor and remain smooth. */
+html[data-low-power] .has-reveal [data-reveal],
+html[data-low-power] .has-reveal [data-reveal] [data-reveal-child] {
+  filter: none !important;
+  transition:
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 800ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
 @keyframes breathing {
   0% {
     transform: scale(1);
