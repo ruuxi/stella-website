@@ -132,15 +132,14 @@ export function isLowPowerDevice(): boolean {
 }
 
 /**
- * Whether the animated WebGL aurora should run. Requires a real GPU with
- * genuine highp fragment precision (else the noise shader garbles — common on
- * older Intel iGPUs) and a device that isn't memory/CPU starved. Reduced-motion
- * is honored separately by the aurora (it renders a still frame).
+ * Whether the animated WebGL aurora should run. Gated on a real (non-software)
+ * GPU with genuine highp fragment precision — else the noise shader garbles,
+ * common on older Intel iGPUs. Core/RAM count is deliberately NOT a factor:
+ * `deviceMemory`/`hardwareConcurrency` report low values on plenty of capable
+ * machines (Chrome caps `deviceMemory` at 8 and commonly reports 4), and
+ * forcing those onto the CSS fallback looks worse than the real shader.
+ * Reduced-motion is honored separately by the aurora (it renders a still frame).
  */
 export function shouldRunAuroraShader(): boolean {
-  return (
-    getWebGLTier() === "hardware" &&
-    hasReliableHighpFragment() &&
-    !isLowPowerDevice()
-  );
+  return getWebGLTier() === "hardware" && hasReliableHighpFragment();
 }

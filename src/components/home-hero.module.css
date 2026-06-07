@@ -27,47 +27,49 @@
   /* Dissolve toward the left so the copy reads on clean white. */
   -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 42%);
   mask-image: linear-gradient(to right, transparent 0%, #000 42%);
-  /* Fallback gradient — replaced by the shader once WebGL is live. */
+  /* Fallback gradient — replaced by the shader once WebGL is live. Approximates
+   * the shader's resting look: a soft rainbow band hugging the right edge and
+   * pouring left, hue ramping top→bottom (rose → violet → cyan → teal) to match
+   * the shader's vertical palette. Wide, overlapping transparent stops keep it
+   * soft rather than the sharp blobs of the old fallback. */
   background:
     radial-gradient(
-      120% 90% at 100% 30%,
-      rgba(56, 189, 248, 0.32),
-      transparent 60%
+      130% 78% at 118% 12%,
+      rgba(244, 114, 182, 0.30),
+      transparent 64%
     ),
     radial-gradient(
-      120% 95% at 90% 70%,
-      rgba(167, 139, 250, 0.24),
-      transparent 62%
+      135% 84% at 120% 38%,
+      rgba(135, 110, 248, 0.32),
+      transparent 66%
+    ),
+    radial-gradient(
+      135% 88% at 110% 62%,
+      rgba(46, 162, 246, 0.34),
+      transparent 68%
+    ),
+    radial-gradient(
+      130% 84% at 98% 88%,
+      rgba(22, 202, 152, 0.28),
+      transparent 66%
     );
 }
 
-/* When WebGL isn't driving the canvas (no GPU / software renderer / low-power
- * device), keep the fallback alive with a slow, compositor-friendly drift so
- * the hero never looks frozen. The shader sets `data-webgl="on"` to opt out. */
+/* When WebGL isn't driving the canvas (no GPU / software renderer / unreliable
+ * precision), keep the fallback gently alive with a compositor-only opacity
+ * breathe so the hero never looks frozen. The shader sets `data-webgl="on"` to
+ * opt out. Opacity is cheap enough to run even on low-power devices. */
 .aurora:not([data-webgl="on"]) {
-  animation: auroraDrift 18s ease-in-out infinite alternate;
+  animation: auroraDrift 14s ease-in-out infinite alternate;
 }
 
 @keyframes auroraDrift {
-  0% {
-    background-position:
-      100% 26%,
-      88% 72%;
-    opacity: 0.72;
+  from {
+    opacity: 0.74;
   }
-  100% {
-    background-position:
-      76% 42%,
-      100% 56%;
+  to {
     opacity: 1;
   }
-}
-
-/* Don't burn cycles drifting on machines we've already flagged as low-power
- * (or reduced-motion) — show a calm static gradient instead. */
-:global(html[data-low-power]) .aurora:not([data-webgl="on"]) {
-  animation: none;
-  opacity: 1;
 }
 
 /* Mirrored copy of the aurora reflected across its lower band edge, so a
