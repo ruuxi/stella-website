@@ -128,6 +128,12 @@ export const createUserPetUploadUrl = makeFunctionReference<
   UserPetUploadUrl
 >("data/user_pet_uploads:createUploadUrl");
 
+export const generateUserPet = makeFunctionReference<
+  "action",
+  { prompt: string; visibility: UserPetVisibility },
+  UserPetRecord
+>("data/user_pet_generation:generatePet");
+
 export const getMediaJobByJobId = makeFunctionReference<
   "query",
   { jobId: string },

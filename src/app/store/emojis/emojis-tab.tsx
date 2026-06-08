@@ -10,9 +10,7 @@ import {
   Search,
 } from "lucide-react";
 import {
-  createEmojiPack,
-  createEmojiPackUploadUrl,
-  getMediaJobByJobId,
+  generateEmojiPack,
   listEmojiPackTagFacets,
   listMyEmojiPacks,
   listPublicEmojiPacks,
@@ -31,14 +29,6 @@ import {
   isEmojiBridgeState,
   redirectToStoreSignIn,
 } from "../lib/bridge";
-import {
-  EMOJI_SHEETS,
-  buildEmojiPackId,
-  extractEmojiSheetUrl,
-  processEmojiSheetImage,
-  submitEmojiSheetJob,
-  uploadEmojiSheetToR2,
-} from "../lib/emoji-media";
 import { formatEmojiUseCount } from "../lib/pet-sprite";
 import type { EmojiBridgeState, EmojiPack, EmojiPackVisibility } from "../lib/types";
 import {
@@ -52,163 +42,31 @@ import {
 
 export function CreateEmojiPackDialog({
   onClose,
-  onCreated,
+  onSubmit,
+  submitting,
 }: {
   onClose: () => void;
-  onCreated: (pack: EmojiPack) => void;
+  onSubmit: (args: { prompt: string; visibility: EmojiPackVisibility }) => Promise<void>;
+  submitting: boolean;
 }) {
-  const createUploadUrl = useAction(createEmojiPackUploadUrl);
-  const createPack = useMutation(createEmojiPack);
   const [prompt, setPrompt] = useState("");
-  const [submittedPrompt, setSubmittedPrompt] = useState("");
   const [visibility, setVisibility] = useState<EmojiPackVisibility>("private");
-  const [submitting, setSubmitting] = useState(false);
-  const [stage, setStage] = useState<"idle" | "generating" | "processing" | "saving">("idle");
-  const [jobIds, setJobIds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [createdPack, setCreatedPack] = useState<EmojiPack | null>(null);
-  const [resultSheet, setResultSheet] = useState(0);
-  const processedJobsRef = useRef<string | null>(null);
-  const sheetJob0 = useQuery(
-    getMediaJobByJobId,
-    jobIds[0] ? { jobId: jobIds[0] } : "skip",
-  );
-  const sheetJob1 = useQuery(
-    getMediaJobByJobId,
-    jobIds[1] ? { jobId: jobIds[1] } : "skip",
-  );
-  const sheetJob2 = useQuery(
-    getMediaJobByJobId,
-    jobIds[2] ? { jobId: jobIds[2] } : "skip",
-  );
-  const sheetJobs = useMemo(
-    () => [sheetJob0, sheetJob1, sheetJob2],
-    [sheetJob0, sheetJob1, sheetJob2],
-  );
-
-  useEffect(() => {
-    if (stage !== "generating" || jobIds.length !== EMOJI_SHEETS.length) return;
-    if (sheetJobs.some((job) => !job)) return;
-    const failed = sheetJobs.find(
-      (job) => job?.status === "failed" || job?.status === "canceled",
-    );
-    if (failed) {
-      setSubmitting(false);
-      setStage("idle");
-      setError(failed?.error?.message ?? "Generation failed.");
-      return;
-    }
-    if (!sheetJobs.every((job) => job?.status === "succeeded")) return;
-    const jobKey = jobIds.join(":");
-    if (processedJobsRef.current === jobKey) return;
-    processedJobsRef.current = jobKey;
-    void (async () => {
-      const processedObjectUrls: string[] = [];
-      try {
-        const imageUrls = sheetJobs.map((job, index) => {
-          const url = extractEmojiSheetUrl(job?.output);
-          if (!url) {
-            throw new Error(`Sheet ${index + 1} finished without an image.`);
-          }
-          return url;
-        });
-        setStage("processing");
-        const sheets = await Promise.all(
-          imageUrls.map((url) => processEmojiSheetImage(url)),
-        );
-        processedObjectUrls.push(...sheets.map((sheet) => sheet.objectUrl));
-        setStage("saving");
-        const packId = buildEmojiPackId();
-        const upload = await createUploadUrl({
-          packId,
-          sheetSha256s: sheets.map((sheet) => sheet.sha256),
-          contentType: "image/webp",
-        });
-        if (upload.sheets.length !== sheets.length) {
-          throw new Error("Upload response did not include every sheet.");
-        }
-        await Promise.all(
-          sheets.map((sheet, index) =>
-            uploadEmojiSheetToR2(sheet.blob, upload.sheets[index]!),
-          ),
-        );
-        const trimmed = submittedPrompt.trim();
-        const created = await createPack({
-          packId,
-          displayName: "Stella emoji pack",
-          description: trimmed,
-          prompt: trimmed,
-          coverEmoji: EMOJI_SHEETS[0]![0]!,
-          sheetUrls: upload.sheets.map((sheet) => sheet.publicUrl),
-          visibility,
-        });
-        setCreatedPack(created);
-        setResultSheet(0);
-        setSubmitting(false);
-        setStage("idle");
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Couldn't create pack.");
-        setSubmitting(false);
-        setStage("idle");
-      } finally {
-        for (const url of processedObjectUrls) URL.revokeObjectURL(url);
-      }
-    })();
-  }, [
-    createPack,
-    createUploadUrl,
-    jobIds,
-    sheetJobs,
-    stage,
-    submittedPrompt,
-    visibility,
-  ]);
 
   const handleSubmit = useCallback(async () => {
     const trimmed = prompt.trim();
     if (!trimmed || submitting) return;
-    if (!(await ensureStoreAuth())) return;
-    setSubmitting(true);
     setError(null);
-    setStage("generating");
-    setJobIds([]);
-    setSubmittedPrompt(trimmed);
-    processedJobsRef.current = null;
     try {
-      const jobs = await Promise.all(
-        EMOJI_SHEETS.map((_, sheetIndex) =>
-          submitEmojiSheetJob({ sheetIndex, style: trimmed }),
-        ),
-      );
-      setJobIds(jobs.map((job) => job.jobId));
+      await onSubmit({ prompt: trimmed, visibility });
+      onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't create pack.");
-      setStage("idle");
-      setSubmitting(false);
     }
-  }, [prompt, submitting]);
-
-  const resetForNewPack = useCallback(() => {
-    setCreatedPack(null);
-    setResultSheet(0);
-    setPrompt("");
-    setSubmittedPrompt("");
-    setJobIds([]);
-    setStage("idle");
-    setError(null);
-    setSubmitting(false);
-    processedJobsRef.current = null;
-  }, []);
-
-  const busyText =
-    stage === "saving"
-      ? "Creating your pack..."
-      : stage === "processing"
-        ? "Cleaning up sheets..."
-        : "Painting your pack...";
+  }, [onClose, onSubmit, prompt, submitting, visibility]);
 
   return (
-    <StoreModal onClose={submitting ? () => undefined : onClose}>
+    <StoreModal onClose={onClose}>
       <div className="emoji-create-dialog">
         <div className="emoji-create-header">
           <div className="emoji-create-title">Create emoji pack</div>
@@ -218,98 +76,15 @@ export function CreateEmojiPackDialog({
           </p>
         </div>
         <div className="emoji-create-body">
-          {createdPack ? (
-            <>
-              <section
-                className="emoji-create-stage"
-                aria-label="Generated emoji pack"
-              >
-                {createdPack.sheetUrls.length > 1 ? (
-                  <div className="emoji-create-stage-tabs">
-                    <button
-                      type="button"
-                      className="emoji-create-arrow"
-                      disabled={resultSheet === 0}
-                      onClick={() =>
-                        setResultSheet((sheet) => Math.max(0, sheet - 1))
-                      }
-                      aria-label="Previous sheet"
-                    >
-                      <ChevronLeft size={16} />
-                    </button>
-                    <span className="emoji-create-stage-label">
-                      Sheet {resultSheet + 1} of {createdPack.sheetUrls.length}
-                    </span>
-                    <button
-                      type="button"
-                      className="emoji-create-arrow"
-                      disabled={resultSheet >= createdPack.sheetUrls.length - 1}
-                      onClick={() =>
-                        setResultSheet((sheet) =>
-                          Math.min(createdPack.sheetUrls.length - 1, sheet + 1),
-                        )
-                      }
-                      aria-label="Next sheet"
-                    >
-                      <ChevronRight size={16} />
-                    </button>
-                  </div>
-                ) : null}
-                <div className="emoji-create-grid" data-state="ready">
-                  {Array.from({ length: 64 }).map((_, index) => (
-                    <div key={index} className="emoji-create-cell">
-                      <EmojiCellPreview
-                        sheetUrl={
-                          createdPack.sheetUrls[resultSheet] ??
-                          createdPack.sheetUrls[0] ??
-                          ""
-                        }
-                        cell={index}
-                        gridSize={8}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </section>
-              <div className="emoji-create-result">
-                <p className="emoji-create-result-text">
-                  Your pack is ready. Use it to swap the emojis in chat, or find
-                  it later in your Library.
-                </p>
-                <div className="emoji-create-actions">
-                  <button
-                    type="button"
-                    className="store-action-btn emoji-create-discard"
-                    data-variant="subtle"
-                    onClick={resetForNewPack}
-                  >
-                    Create another
-                  </button>
-                  <button
-                    type="button"
-                    className="store-action-btn store-action-btn--lg"
-                    data-variant="get"
-                    onClick={() => onCreated(createdPack)}
-                  >
-                    Use pack
-                  </button>
-                </div>
-              </div>
-            </>
-          ) : (
           <>
           <section className="emoji-create-stage" aria-label="Generated emoji preview">
             <div
               className="emoji-create-empty"
-              data-state={submitting ? "busy" : error ? "error" : "empty"}
+              data-state={error ? "error" : "empty"}
             >
               <Package size={22} aria-hidden />
               <span className="emoji-create-empty-text">
-                {submitting
-                  ? busyText
-                  : error
-                    ? error
-                    : "Stella's emojis appear here when they're ready"}
+                {error ?? "Stella will keep working after this dialog closes"}
               </span>
             </div>
           </section>
@@ -331,7 +106,6 @@ export function CreateEmojiPackDialog({
                 placeholder="Neon synthwave, soft pastel, claymation..."
                 rows={3}
                 maxLength={2000}
-                disabled={submitting}
                 autoFocus
               />
             </label>
@@ -348,7 +122,6 @@ export function CreateEmojiPackDialog({
                       role="radio"
                       aria-checked={visibility === option}
                       onClick={() => setVisibility(option)}
-                      disabled={submitting}
                     >
                       {option[0]!.toUpperCase() + option.slice(1)}
                     </button>
@@ -369,7 +142,6 @@ export function CreateEmojiPackDialog({
                 className="store-action-btn emoji-create-discard"
                 data-variant="subtle"
                 onClick={onClose}
-                disabled={submitting}
               >
                 Discard
               </button>
@@ -379,12 +151,11 @@ export function CreateEmojiPackDialog({
                 data-variant={submitting ? "working" : "get"}
                 disabled={submitting || prompt.trim().length === 0}
               >
-                {submitting ? "Creating..." : "Create pack"}
+                {submitting ? "Starting..." : "Create pack"}
               </button>
             </div>
           </form>
           </>
-          )}
         </div>
       </div>
     </StoreModal>
@@ -470,6 +241,7 @@ export function EmojisTab() {
     activePack: null,
   });
   const [workingPackId, setWorkingPackId] = useState<string | null>(null);
+  const [creatingPack, setCreatingPack] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const trimmedSearch = debouncedQuery.trim();
@@ -493,6 +265,7 @@ export function EmojisTab() {
   const tagFacets = useQuery(listEmojiPackTagFacets, {});
   const myPacks = useQuery(listMyEmojiPacks, {});
   const recordInstall = useMutation(recordEmojiInstall);
+  const generatePack = useAction(generateEmojiPack);
   const activePackId = emojiState.activePack?.packId ?? null;
   const canLoadMore = status === "CanLoadMore";
   const isLoadingMore = status === "LoadingMore";
@@ -581,6 +354,44 @@ export function EmojisTab() {
     }
   };
 
+  const startEmojiPackGeneration = async (args: {
+    prompt: string;
+    visibility: EmojiPackVisibility;
+  }) => {
+    if (creatingPack) return;
+    if (!(await ensureStoreAuth())) return;
+    const bridge = getDesktopStoreBridge();
+    setActionError(null);
+    setCreatingPack(true);
+    void bridge?.showToast?.({
+      title: "Creating emoji pack",
+      description: "Stella will keep working in the background.",
+      variant: "loading",
+    });
+    void (async () => {
+      try {
+        const created = await generatePack(args);
+        void bridge?.showToast?.({
+          title: "Emoji pack ready",
+          description: "Stella created the pack and is switching chat to use it.",
+          variant: "success",
+        });
+        await installEmojiPack(created);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Couldn't create pack.";
+        setActionError(message);
+        void bridge?.showToast?.({
+          title: "Emoji pack failed",
+          description: message,
+          variant: "error",
+        });
+      } finally {
+        setCreatingPack(false);
+      }
+    })();
+  };
+
   const clearEmojiPack = async (packId: string) => {
     const bridge = getDesktopStoreBridge();
     if (!bridge?.clearEmojiPack) return;
@@ -597,11 +408,6 @@ export function EmojisTab() {
     } finally {
       setWorkingPackId(null);
     }
-  };
-
-  const handleCreatedPack = (pack: EmojiPack) => {
-    setCreateOpen(false);
-    void installEmojiPack(pack);
   };
 
   return (
@@ -658,11 +464,12 @@ export function EmojisTab() {
           <button
             type="button"
             className="store-action-btn store-action-btn--lg"
-            data-variant="get"
+            data-variant={creatingPack ? "working" : "get"}
+            disabled={creatingPack}
             onClick={() => setCreateOpen(true)}
           >
             <Plus size={14} aria-hidden />
-            Create pack
+            {creatingPack ? "Creating..." : "Create pack"}
           </button>
         </div>
       </div>
@@ -859,7 +666,8 @@ export function EmojisTab() {
       {createOpen ? (
         <CreateEmojiPackDialog
           onClose={() => setCreateOpen(false)}
-          onCreated={handleCreatedPack}
+          onSubmit={startEmojiPackGeneration}
+          submitting={creatingPack}
         />
       ) : null}
     </main>

@@ -6,14 +6,11 @@ import {
   useMemo,
   useRef,
   useState,
-  type DragEvent as ReactDragEvent,
 } from "react";
 import { useAction, useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { Download, Package, Plus, Search } from "lucide-react";
 import {
-  createUserPet,
-  createUserPetUploadUrl,
-  getMediaJobByJobId,
+  generateUserPet,
   incrementPetDownloads,
   listMyUserPets,
   listPetTagFacets,
@@ -41,14 +38,7 @@ import {
 } from "../lib/pet-sprite";
 import {
   PetSprite,
-  buildUserPetAtlasPrompt,
-  buildUserPetId,
-  extractFirstImageUrl,
-  processUserPetAtlasImage,
-  submitUserPetAtlasJob,
-  uploadUserPetSpritesheetToR2,
   userPetToPublicPet,
-  type UserPetSpritesheetBlob,
 } from "../lib/pet-media";
 import type {
   PetBridgeState,
@@ -66,157 +56,31 @@ import {
 
 export function CreatePetDialog({
   onClose,
-  onCreated,
+  onSubmit,
+  submitting,
 }: {
   onClose: () => void;
-  onCreated: (pet: UserPetRecord) => void;
+  onSubmit: (args: { prompt: string; visibility: UserPetVisibility }) => Promise<void>;
+  submitting: boolean;
 }) {
-  const createUploadUrl = useAction(createUserPetUploadUrl);
-  const createPet = useMutation(createUserPet);
   const [prompt, setPrompt] = useState("");
   const [visibility, setVisibility] = useState<UserPetVisibility>("private");
-  const [jobId, setJobId] = useState<string | null>(null);
-  const [blob, setBlob] = useState<UserPetSpritesheetBlob | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [createdPet, setCreatedPet] = useState<UserPetRecord | null>(null);
-  const [previewState, setPreviewState] = useState<PetAnimationState>("idle");
-  const objectUrlsRef = useRef<string[]>([]);
-  const processedJobsRef = useRef<Set<string>>(new Set());
-  const job = useQuery(getMediaJobByJobId, jobId ? { jobId } : "skip");
-
-  const revokeObjectUrls = useCallback(() => {
-    for (const url of objectUrlsRef.current) URL.revokeObjectURL(url);
-    objectUrlsRef.current = [];
-  }, []);
-
-  useEffect(() => revokeObjectUrls, [revokeObjectUrls]);
-
-  useEffect(() => {
-    if (!blob) return;
-    const id = window.setInterval(() => {
-      setPreviewState((current) => {
-        const states: PetAnimationState[] = [
-          "idle",
-          "running-right",
-          "waving",
-          "jumping",
-        ];
-        const index = states.indexOf(current);
-        return states[(index + 1) % states.length] ?? "idle";
-      });
-    }, 3500);
-    return () => window.clearInterval(id);
-  }, [blob]);
-
-  useEffect(() => {
-    if (!jobId || !job) return;
-    if (job.status === "succeeded") {
-      if (processedJobsRef.current.has(jobId)) return;
-      processedJobsRef.current.add(jobId);
-      const url = extractFirstImageUrl(job.output);
-      if (!url) {
-        Promise.resolve().then(() => {
-          setBusy(false);
-          setError("Generation finished without an image.");
-        });
-        return;
-      }
-      void (async () => {
-        try {
-          const processed = await processUserPetAtlasImage(url);
-          revokeObjectUrls();
-          objectUrlsRef.current = [processed.objectUrl];
-          if (processed.preview) objectUrlsRef.current.push(processed.preview.objectUrl);
-          setBlob(processed);
-          setBusy(false);
-          setError(null);
-        } catch (err) {
-          setBusy(false);
-          setError(
-            err instanceof Error ? err.message : "Couldn't process pet atlas.",
-          );
-        }
-      })();
-    } else if (job.status === "failed" || job.status === "canceled") {
-      Promise.resolve().then(() => {
-        setBusy(false);
-        setError(job.error?.message ?? "Generation failed.");
-      });
-    }
-  }, [job, jobId, revokeObjectUrls]);
 
   const handleGenerate = useCallback(async () => {
     const trimmed = prompt.trim();
-    if (!trimmed || busy) return;
-    if (!(await ensureStoreAuth())) return;
-    revokeObjectUrls();
-    processedJobsRef.current = new Set();
-    setBlob(null);
+    if (!trimmed || submitting) return;
     setError(null);
-    setBusy(true);
     try {
-      const result = await submitUserPetAtlasJob(trimmed);
-      setJobId(result.jobId);
+      await onSubmit({ prompt: trimmed, visibility });
+      onClose();
     } catch (err) {
-      setBusy(false);
       setError(err instanceof Error ? err.message : "Couldn't start generation.");
     }
-  }, [busy, prompt, revokeObjectUrls]);
-
-  const handleSave = useCallback(async () => {
-    if (!blob || saving) return;
-    if (!(await ensureStoreAuth())) return;
-    const trimmed = prompt.trim() || "A custom Stella pet.";
-    setSaving(true);
-    try {
-      const petId = buildUserPetId();
-      const upload = await createUploadUrl({
-        petId,
-        spritesheetSha256: blob.sha256,
-        ...(blob.preview ? { previewSha256: blob.preview.sha256 } : {}),
-        contentType: "image/webp",
-      });
-      const uploads = [
-        uploadUserPetSpritesheetToR2(blob.blob, upload.spritesheet),
-      ];
-      if (blob.preview && upload.preview) {
-        uploads.push(uploadUserPetSpritesheetToR2(blob.preview.blob, upload.preview));
-      }
-      await Promise.all(uploads);
-      const created = await createPet({
-        petId,
-        displayName: "Stella pet",
-        description: trimmed,
-        prompt: trimmed,
-        spritesheetUrl: upload.spritesheet.publicUrl,
-        ...(upload.preview ? { previewUrl: upload.preview.publicUrl } : {}),
-        visibility,
-      });
-      setCreatedPet(created);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't save pet.");
-    } finally {
-      setSaving(false);
-    }
-  }, [blob, createPet, createUploadUrl, prompt, saving, visibility]);
-
-  const resetForNewPet = useCallback(() => {
-    revokeObjectUrls();
-    processedJobsRef.current = new Set();
-    setCreatedPet(null);
-    setBlob(null);
-    setJobId(null);
-    setPrompt("");
-    setError(null);
-    setBusy(false);
-    setSaving(false);
-    setPreviewState("idle");
-  }, [revokeObjectUrls]);
+  }, [onClose, onSubmit, prompt, submitting, visibility]);
 
   return (
-    <StoreModal onClose={saving ? () => undefined : onClose}>
+    <StoreModal onClose={onClose}>
       <div className="user-pet-create-dialog">
         <div className="user-pet-create-header">
           <div className="user-pet-create-title">Create a pet</div>
@@ -228,75 +92,15 @@ export function CreatePetDialog({
         <div className="user-pet-create-body">
           <section
             className="user-pet-create-stage"
-            data-state={blob ? "ready" : busy ? "busy" : error ? "error" : "empty"}
+            data-state={error ? "error" : "empty"}
           >
-            {blob ? (
-              <PetSprite
-                spritesheetUrl={blob.objectUrl}
-                state={previewState}
-                size={180}
-              />
-            ) : (
-              <div className="user-pet-create-empty">
-                <Package size={22} aria-hidden />
-                <span className="user-pet-create-empty-text">
-                  {busy
-                    ? "Drawing your pet..."
-                    : error
-                      ? error
-                      : "Your animated pet appears here"}
-                </span>
-              </div>
-            )}
+            <div className="user-pet-create-empty">
+              <Package size={22} aria-hidden />
+              <span className="user-pet-create-empty-text">
+                {error ?? "Stella will keep working after this dialog closes"}
+              </span>
+            </div>
           </section>
-          {blob ? (
-            <div className="user-pet-create-state-row" aria-label="Preview state">
-              {(["idle", "running-right", "waving", "jumping"] as PetAnimationState[]).map(
-                (state) => (
-                  <button
-                    key={state}
-                    type="button"
-                    className="user-pet-create-state-pill"
-                    data-active={previewState === state || undefined}
-                    onClick={() => setPreviewState(state)}
-                  >
-                    {state.replace("-", " ")}
-                  </button>
-                ),
-              )}
-            </div>
-          ) : null}
-          {blob?.warnings.length ? (
-            <p className="user-pet-create-warning">
-              {blob.warnings.slice(0, 2).join(" ")}
-            </p>
-          ) : null}
-          {createdPet ? (
-            <div className="user-pet-create-result">
-              <p className="user-pet-create-result-text">
-                Your pet is ready. Use it to perch above your work, or find it
-                later in your Library.
-              </p>
-              <div className="user-pet-create-actions">
-                <button
-                  type="button"
-                  className="store-action-btn user-pet-create-discard"
-                  data-variant="subtle"
-                  onClick={resetForNewPet}
-                >
-                  Create another
-                </button>
-                <button
-                  type="button"
-                  className="store-action-btn store-action-btn--lg"
-                  data-variant="get"
-                  onClick={() => onCreated(createdPet)}
-                >
-                  Use pet
-                </button>
-              </div>
-            </div>
-          ) : (
           <form
             className="user-pet-create-form"
             onSubmit={(event) => {
@@ -329,7 +133,6 @@ export function CreatePetDialog({
                       role="radio"
                       aria-checked={visibility === option}
                       onClick={() => setVisibility(option)}
-                      disabled={saving}
                     >
                       {option[0]!.toUpperCase() + option.slice(1)}
                     </button>
@@ -350,30 +153,19 @@ export function CreatePetDialog({
                 className="store-action-btn user-pet-create-discard"
                 data-variant="subtle"
                 onClick={onClose}
-                disabled={saving}
               >
                 Discard
               </button>
               <button
                 type="submit"
                 className="store-action-btn store-action-btn--lg"
-                data-variant={busy ? "working" : "get"}
-                disabled={busy || prompt.trim().length === 0}
+                data-variant={submitting ? "working" : "get"}
+                disabled={submitting || prompt.trim().length === 0}
               >
-                {busy ? "Generating..." : blob ? "Regenerate" : "Generate"}
-              </button>
-              <button
-                type="button"
-                className="store-action-btn store-action-btn--lg"
-                data-variant={saving ? "working" : "get"}
-                disabled={!blob || saving}
-                onClick={() => void handleSave()}
-              >
-                {saving ? "Creating..." : "Create pet"}
+                {submitting ? "Starting..." : "Create pet"}
               </button>
             </div>
           </form>
-          )}
         </div>
       </div>
     </StoreModal>
@@ -611,6 +403,7 @@ export function PetsTab() {
     petOpen: false,
   });
   const [workingPetId, setWorkingPetId] = useState<string | null>(null);
+  const [creatingPet, setCreatingPet] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const trimmedSearch = debouncedQuery.trim();
@@ -648,6 +441,7 @@ export function PetsTab() {
   const tagFacets = useQuery(listPetTagFacets, {});
   const incrementDownloads = useMutation(incrementPetDownloads);
   const recordUserInstall = useMutation(recordUserPetInstall);
+  const generatePet = useAction(generateUserPet);
   const installedPetIds = useMemo(
     () => new Set(petState.installedPetIds),
     [petState.installedPetIds],
@@ -841,10 +635,42 @@ export function PetsTab() {
     }
   };
 
-  const handleCreatedPet = (pet: UserPetRecord) => {
-    setCreateOpen(false);
-    const publicPet = userPetToPublicPet(pet);
-    void installPet(publicPet);
+  const startPetGeneration = async (args: {
+    prompt: string;
+    visibility: UserPetVisibility;
+  }) => {
+    if (creatingPet) return;
+    if (!(await ensureStoreAuth())) return;
+    const bridge = getDesktopStoreBridge();
+    setActionError(null);
+    setCreatingPet(true);
+    void bridge?.showToast?.({
+      title: "Creating pet",
+      description: "Stella will keep working in the background.",
+      variant: "loading",
+    });
+    void (async () => {
+      try {
+        const created = await generatePet(args);
+        void bridge?.showToast?.({
+          title: "Pet ready",
+          description: "Stella created the pet and is switching to it.",
+          variant: "success",
+        });
+        await installPet(userPetToPublicPet(created));
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Couldn't create pet.";
+        setActionError(message);
+        void bridge?.showToast?.({
+          title: "Pet failed",
+          description: message,
+          variant: "error",
+        });
+      } finally {
+        setCreatingPet(false);
+      }
+    })();
   };
 
   return (
@@ -892,11 +718,12 @@ export function PetsTab() {
           <button
             type="button"
             className="store-action-btn store-action-btn--lg"
-            data-variant="get"
+            data-variant={creatingPet ? "working" : "get"}
+            disabled={creatingPet}
             onClick={() => setCreateOpen(true)}
           >
             <Plus size={14} aria-hidden />
-            Create pet
+            {creatingPet ? "Creating..." : "Create pet"}
           </button>
           <button
             type="button"
@@ -998,7 +825,8 @@ export function PetsTab() {
       {createOpen ? (
         <CreatePetDialog
           onClose={() => setCreateOpen(false)}
-          onCreated={handleCreatedPet}
+          onSubmit={startPetGeneration}
+          submitting={creatingPet}
         />
       ) : null}
     </main>
