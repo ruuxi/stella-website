@@ -18,7 +18,6 @@
   margin-inline: auto;
   padding: clamp(0.55rem, 1.2vw, 0.85rem);
   border: 1px solid rgba(82, 104, 134, 0.16);
-  border-radius: 0;
   background:
     radial-gradient(
       circle at 20% 16%,
@@ -59,6 +58,7 @@
 
 .window {
   position: relative;
+  z-index: 1;
   aspect-ratio: 1.58;
   min-height: 0;
   overflow: hidden;
@@ -72,6 +72,15 @@
   isolation: isolate;
 }
 
+/* Host for the stacked skin surfaces inside the main window. */
+.surfaceHost {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .miniStage {
   display: flex;
   flex-direction: column;
@@ -81,6 +90,7 @@
   justify-content: center;
   padding-top: 0.25rem;
 }
+
 
 .miniWindow {
   position: relative;
@@ -422,11 +432,13 @@
   padding-left: 84px;
 }
 
-.topbarLeft::before {
-  content: "";
+/* Window-level traffic lights: the one piece of chrome every skin keeps,
+   floating above whatever chrome the active skin draws. */
+.trafficLights {
   position: absolute;
   top: 14px;
   left: 14px;
+  z-index: 4;
   width: 10px;
   height: 10px;
   border-radius: 999px;
@@ -437,6 +449,7 @@
     inset 0 0 0 0.5px rgba(0, 0, 0, 0.18),
     18px 0 0 0 rgba(0, 0, 0, 0.12),
     36px 0 0 0 rgba(0, 0, 0, 0.12);
+  pointer-events: none;
 }
 
 .topbarRight {
@@ -454,9 +467,7 @@
 .iconButton,
 .accountButton,
 .composerButton,
-.submitButton,
-.modeButton,
-.themeButton {
+.submitButton {
   appearance: none;
   border: none;
   font-family: inherit;
@@ -548,16 +559,6 @@
   letter-spacing: 0.04em;
 }
 
-.homeSurface {
-  display: flex;
-  min-height: 100%;
-  padding-top: 38px;
-}
-
-.miniHomeSurface {
-  padding-top: 32px;
-}
-
 .chatSurface {
   display: flex;
   min-height: 100%;
@@ -589,29 +590,6 @@
   text-align: center;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-}
-
-.miniHomeContent {
-  max-width: 100%;
-  padding: 40px 22px 34px;
-}
-
-.miniHomeContent h3 {
-  margin-bottom: 26px;
-  font-size: 32px;
-}
-
-.miniHomeContent .composerWrap {
-  padding-inline: 8px;
-}
-
-.miniHomeContent .contextStrip,
-.miniHomeContent .composer {
-  max-width: min(22rem, calc(100% - 24px));
-}
-
-.miniHomeContent .contextStrip {
-  padding-left: 18px;
 }
 
 .chatContent {
@@ -705,9 +683,10 @@
   min-height: 0;
   overflow: clip;
   border: 1px solid var(--mock-panel-border);
-  border-radius: 999px;
+  border-radius: var(--mock-composer-radius, 999px);
   background: var(--mock-panel-bg-gradient);
   box-shadow: var(--mock-shadow), var(--mock-panel-highlight);
+  transition: border-radius 620ms ease;
 }
 
 .contextStrip {
@@ -791,6 +770,39 @@
   opacity: 0.45;
 }
 
+.submitButton[data-armed="true"] {
+  opacity: 1;
+  transition: opacity 200ms ease;
+}
+
+/* Live request being typed into the mock composer. */
+.typedText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding: 2px 4px;
+  color: var(--mock-text-strong);
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.typedCaret {
+  display: inline-block;
+  width: 1.5px;
+  height: 0.95em;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  background: currentColor;
+  animation: mockCaretBlink 1.06s step-end infinite;
+}
+
+@keyframes mockCaretBlink {
+  50% {
+    opacity: 0;
+  }
+}
+
 .placeholder {
   flex: 1;
   min-width: 0;
@@ -816,130 +828,6 @@
   font-weight: 300;
   line-height: 1.3;
   letter-spacing: -0.01em;
-}
-
-.themePanel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.65rem;
-  width: 3.2rem;
-  min-width: 0;
-  overflow: visible;
-  padding: 0.35rem 0;
-  scrollbar-width: none;
-}
-
-.themePanel::-webkit-scrollbar {
-  display: none;
-}
-
-.modeToggle {
-  display: inline-flex;
-  flex-direction: column;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 0.38rem;
-  padding-top: 0.45rem;
-  border-top: 1px solid var(--page-border);
-}
-
-.modeButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.65rem;
-  height: 1.65rem;
-  padding: 0;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--page-muted);
-}
-
-.modeButton[data-active="true"] {
-  border-color: var(--page-border-strong);
-  background: var(--page-panel-strong);
-  color: var(--page-foreground);
-}
-
-.themeGrid {
-  display: flex;
-  flex-direction: column;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 0.26rem;
-  padding-block: 0.2rem;
-  overflow: visible;
-}
-
-.themeButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.8rem;
-  height: 1.8rem;
-  padding: 0;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  background: transparent;
-  transform-origin: center;
-  transition:
-    border-color 150ms ease,
-    transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.themeButton:hover,
-.themeButton[data-active="true"] {
-  border-color: transparent;
-}
-
-.themeButton:hover {
-  transform: scale(1.65);
-  z-index: 2;
-}
-
-.themeButton:has(+ .themeButton:hover),
-.themeButton:hover + .themeButton {
-  transform: scale(1.28);
-  z-index: 1;
-}
-
-.themeButton:has(+ .themeButton + .themeButton:hover),
-.themeButton:hover + .themeButton + .themeButton {
-  transform: scale(1.1);
-}
-
-.themeSwatch {
-  display: inline-flex;
-  flex-shrink: 0;
-  width: 1.1rem;
-  height: 1.1rem;
-  border-radius: 50%;
-  overflow: hidden;
-  background:
-    radial-gradient(
-      circle at 34% 30%,
-      color-mix(in oklch, var(--theme-bg) 86%, white) 0 30%,
-      transparent 58%
-    ),
-    radial-gradient(
-      circle at 70% 28%,
-      color-mix(in oklch, var(--theme-accent) 88%, var(--theme-bg)) 0 24%,
-      transparent 56%
-    ),
-    radial-gradient(
-      circle at 62% 74%,
-      color-mix(in oklch, var(--theme-fg) 72%, var(--theme-bg)) 0 28%,
-      transparent 62%
-    ),
-    linear-gradient(
-      145deg,
-      var(--theme-bg),
-      color-mix(in oklch, var(--theme-accent) 38%, var(--theme-bg))
-    );
-  box-shadow: 0 0 0 1px color-mix(in oklch, var(--theme-fg) 12%, transparent);
 }
 
 @media (min-width: 1024px) {
@@ -1010,20 +898,11 @@
     width: min(100%, 21.5rem);
   }
 
-  .miniHomeContent {
-    padding: 34px 12px 32px;
-  }
-
-  .miniHomeContent h3 {
-    margin-bottom: 18px;
-    font-size: 28px;
-  }
-
   .topbarLeft {
     padding-left: 12px;
   }
 
-  .topbarLeft::before,
+  .trafficLights,
   .profileCluster,
   .topbarRight,
   .iconButton {
@@ -1086,43 +965,4 @@
     height: 22px;
   }
 
-  .themePanel {
-    flex-direction: row;
-    width: min(100%, 21.5rem);
-    max-width: 100%;
-    justify-content: flex-start;
-    overflow-x: auto;
-    padding: 0.1rem 0 0.2rem;
-  }
-
-  .modeToggle,
-  .themeGrid {
-    flex-direction: row;
-  }
-
-  .themeGrid {
-    flex: 1 1 auto;
-    min-width: 0;
-    max-width: 100%;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .themeGrid::-webkit-scrollbar {
-    display: none;
-  }
-
-  .modeToggle {
-    padding: 0 0 0 0.5rem;
-    border-top: none;
-    border-left: 1px solid var(--page-border);
-  }
-
-  .themeButton:hover,
-  .themeButton:has(+ .themeButton:hover),
-  .themeButton:hover + .themeButton,
-  .themeButton:has(+ .themeButton + .themeButton:hover),
-  .themeButton:hover + .themeButton + .themeButton {
-    transform: none;
-  }
 }

@@ -1,0 +1,79 @@
+.mosaic {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: clamp(15rem, 30vw, 23rem);
+  gap: clamp(1rem, 1.8vw, 1.5rem);
+  width: min(100%, 86rem);
+  margin-inline: auto;
+}
+
+/* Each tile is the app in another guise, holding its own spot in the
+   mosaic — narrow and wide tiles alternate so the grid reads composed,
+   not uniform. Pending tiles keep their space (no layout shift) but
+   stay invisible until their turn. */
+.tile {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, var(--page-foreground) 14%, transparent);
+  background: var(--mock-background);
+  color: var(--mock-text-base);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.08),
+    0 20px 50px -18px rgba(12, 22, 38, 0.22);
+  isolation: isolate;
+  opacity: 0;
+  transform: translateY(16px) scale(0.97);
+  transition:
+    opacity 480ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 560ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 760ms ease;
+}
+
+.tile[data-span="2"] {
+  grid-column: span 2;
+}
+
+.tile[data-state="typing"],
+.tile[data-state="revealed"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* The camera: a typing tile opens zoomed onto its input (transform is
+   measured per tile at runtime); the moment the next tile takes over,
+   this one pulls back to reveal the full design. */
+.camera {
+  position: absolute;
+  inset: 0;
+  transform: scale(1);
+  transition: transform 820ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+@media (max-width: 760px) {
+  .mosaic {
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: auto;
+    width: min(100%, 26rem);
+  }
+
+  /* Taller than desktop so every skin's input row stays inside the
+     tile — the cozy page is the tallest layout. */
+  .tile,
+  .tile[data-span="2"] {
+    grid-column: auto;
+    aspect-ratio: 1.26;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile,
+  .camera {
+    transition: none;
+  }
+
+  .tile {
+    opacity: 1;
+    transform: none;
+  }
+}

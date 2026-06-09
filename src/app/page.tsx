@@ -2,8 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { FooterLegalLinks } from "@/components/footer-legal-links";
 import { homeFooterGroups } from "@/components/site-footer-groups";
-import { HomeCanvasDemos } from "@/components/home-canvas-demos";
 import { HomeComputerUse } from "@/components/home-computer-use";
+import { HomeMakeYours } from "@/components/home-make-yours";
 import { HomeDesktopMock } from "@/components/home-desktop-mock";
 import { HomeDocuments } from "@/components/home-documents";
 import { HomeHero } from "@/components/home-hero";
@@ -20,7 +20,7 @@ export default function Home() {
       <main>
         <HomeHero />
         <HomeDesktopMock />
-        <HomeCanvasDemos />
+        <HomeMakeYours />
         <HomeSingleChat />
         <HomeComputerUse />
         <HomePhoneConnectors />

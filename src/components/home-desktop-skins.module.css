@@ -1,0 +1,951 @@
+/* ------------------------------------------------------------------ */
+/* Wallpapers — one full-bleed layer per skin, crossfaded above the    */
+/* themed gradient canvas but below the skin's own chrome.             */
+/* ------------------------------------------------------------------ */
+
+.wall {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 760ms ease;
+  pointer-events: none;
+}
+
+.wall[data-active] {
+  opacity: 1;
+}
+
+.wall[data-skin="cozy"] {
+  background:
+    radial-gradient(
+      110% 80% at 86% 6%,
+      rgba(236, 200, 173, 0.5),
+      transparent 58%
+    ),
+    radial-gradient(
+      100% 80% at 10% 96%,
+      rgba(214, 178, 148, 0.35),
+      transparent 56%
+    ),
+    linear-gradient(180deg, #f9f1e6 0%, #f2e5d4 100%);
+}
+
+.wall[data-skin="terminal"] {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(70, 216, 131, 0.025) 0 1px,
+      transparent 1px 3px
+    ),
+    radial-gradient(
+      120% 90% at 50% 0%,
+      rgba(34, 197, 94, 0.07),
+      transparent 60%
+    ),
+    linear-gradient(180deg, #07140c 0%, #050f09 100%);
+}
+
+.wall[data-skin="sunset"] {
+  background:
+    radial-gradient(
+      140% 60% at 50% 102%,
+      rgba(255, 178, 110, 0.75),
+      rgba(238, 130, 124, 0.45) 38%,
+      transparent 72%
+    ),
+    linear-gradient(180deg, #322152 0%, #5d3a68 52%, #93537a 78%, #c96f78 100%);
+}
+
+.wall[data-skin="sports"] {
+  background:
+    radial-gradient(
+      60% 46% at 8% -6%,
+      rgba(214, 228, 255, 0.16),
+      transparent 64%
+    ),
+    radial-gradient(
+      60% 46% at 92% -6%,
+      rgba(214, 228, 255, 0.16),
+      transparent 64%
+    ),
+    radial-gradient(
+      130% 64% at 50% 108%,
+      rgba(249, 115, 22, 0.38),
+      rgba(154, 52, 18, 0.16) 48%,
+      transparent 74%
+    ),
+    linear-gradient(180deg, #0c0f17 0%, #11141d 100%);
+}
+
+/* ------------------------------------------------------------------ */
+/* Surface host — one full app per skin, stacked and crossfaded.       */
+/* ------------------------------------------------------------------ */
+
+.surface {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 760ms ease,
+    visibility 0s 760ms;
+}
+
+.surface[data-active] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 760ms ease,
+    visibility 0s;
+}
+
+/* Shared ink caret for the cozy / sunset / sports inputs. */
+.inkCaret {
+  display: inline-block;
+  width: 1.5px;
+  height: 0.95em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: currentColor;
+  animation: skinCaretBlink 1.06s step-end infinite;
+}
+
+/* ------------------------------------------------------------------ */
+/* Minimal — the original app. Chrome comes from the mock module; the  */
+/* body just centers the greeting + composer below the topbar.         */
+/* ------------------------------------------------------------------ */
+
+.minimalBody {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  padding-top: 38px;
+}
+
+.minimalGreeting {
+  transition: color 620ms ease;
+}
+
+/* ------------------------------------------------------------------ */
+/* Cozy — paper journal. Ribbon masthead, bookmark tabs, lined page.   */
+/* ------------------------------------------------------------------ */
+
+.cozyRoot {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  min-height: 0;
+  padding: 18px 24px 26px;
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+}
+
+.cozyMasthead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: min(30rem, 76%);
+  margin-top: 6px;
+}
+
+.cozyRule {
+  flex: 1;
+  height: 1px;
+  background: color-mix(in srgb, var(--mock-foreground) 26%, transparent);
+}
+
+.cozyDate {
+  color: var(--mock-text-weak);
+  font-size: 13px;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+/* Bookmark tabs pinned to the left edge, like ribbons in a diary. */
+.cozyTabs {
+  position: absolute;
+  top: 72px;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cozyTab {
+  padding: 5px 14px 5px 16px;
+  border-radius: 0 999px 999px 0;
+  background: color-mix(in srgb, var(--mock-foreground) 9%, transparent);
+  color: var(--mock-text-weak);
+  font-size: 12.5px;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.cozyTab[data-active] {
+  background: color-mix(in srgb, white 64%, transparent);
+  color: var(--mock-text-strong);
+  box-shadow: var(--mock-panel-highlight);
+}
+
+/* The diary page: a soft paper card with ruled lines. */
+.cozyPage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: min(30rem, 82%);
+  min-height: 0;
+  margin-top: 20px;
+  padding: 26px 30px 22px;
+  border: 1px solid color-mix(in srgb, var(--mock-foreground) 14%, transparent);
+  border-radius: 4px;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 27px,
+      color-mix(in srgb, var(--mock-foreground) 9%, transparent) 27px 28px
+    )
+    0 88px / 100% 100% no-repeat,
+    color-mix(in srgb, white 58%, transparent);
+  box-shadow:
+    var(--mock-panel-highlight),
+    0 18px 38px -26px rgba(74, 50, 32, 0.45);
+}
+
+.cozyGreeting {
+  margin: 0 0 14px;
+  color: var(--mock-text-strong);
+  font-size: clamp(1.5rem, 2.8vw, 30px);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.cozyEntry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cozyEntry p {
+  margin: 0;
+  color: var(--mock-text-base);
+  font-size: 14.5px;
+  font-style: italic;
+  line-height: 1.93;
+}
+
+/* Handwriting input: a ruled line with a quill, not a pill. */
+.cozyInputRow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: auto;
+  padding: 8px 2px 4px;
+  border-bottom: 1.5px solid
+    color-mix(in srgb, var(--mock-foreground) 38%, transparent);
+  color: var(--mock-text-weak);
+}
+
+.cozyTyped,
+.cozyPlaceholder {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.cozyTyped {
+  color: var(--mock-text-strong);
+}
+
+.cozyPlaceholder {
+  color: var(--mock-text-weaker);
+}
+
+/* ------------------------------------------------------------------ */
+/* Terminal — tmux. Window tabs, box-drawing panes, prompt, statusline. */
+/* ------------------------------------------------------------------ */
+
+.termRoot {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  font-family: var(--font-mono), "SF Mono", Menlo, monospace;
+}
+
+.termTmux {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 4px;
+  padding: 7px 14px 7px 84px;
+  background: color-mix(in srgb, var(--mock-foreground) 8%, transparent);
+  color: var(--mock-text-weak);
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.termSession {
+  margin-right: 8px;
+  color: var(--mock-text-strong);
+}
+
+.termWindow {
+  padding: 2px 8px;
+  border-radius: 2px;
+}
+
+.termWindow[data-active] {
+  background: var(--mock-primary);
+  color: var(--mock-primary-foreground);
+}
+
+.termRight {
+  margin-left: auto;
+}
+
+.termDim {
+  opacity: 0.45;
+}
+
+.termPanes {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.termSide {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 5px;
+  padding: 14px 10px 14px 16px;
+  color: var(--mock-text-base);
+  font-size: 11.5px;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+.termSideTitle {
+  color: var(--mock-text-weak);
+}
+
+.termLine {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.termMain {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  min-width: 0;
+  padding: 20px;
+}
+
+.termBanner {
+  margin: 0;
+  color: var(--mock-text-strong);
+  font-size: clamp(7px, 1.05vw, 11px);
+  line-height: 1.25;
+  text-shadow: 0 0 18px color-mix(in srgb, var(--mock-primary) 55%, transparent);
+}
+
+.termHistory {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: min(24rem, 100%);
+  color: var(--mock-text-base);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Full-width prompt row above the status line — input lives at the
+   bottom of a terminal, not floating in the middle. */
+.termPromptRow {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 9px;
+  padding: 10px 16px;
+  border-top: 1px solid
+    color-mix(in srgb, var(--mock-foreground) 16%, transparent);
+  font-size: 12.5px;
+}
+
+.termTyped {
+  color: var(--mock-text-strong);
+  white-space: pre;
+}
+
+.termPlaceholder {
+  color: var(--mock-text-weaker);
+}
+
+.termBlock {
+  width: 7px;
+  height: 14px;
+  background: var(--mock-foreground);
+  animation: skinCaretBlink 1.06s step-end infinite;
+}
+
+.termStatus {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 10px;
+  padding: 6px 16px;
+  background: color-mix(in srgb, var(--mock-foreground) 8%, transparent);
+  color: var(--mock-text-weak);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+/* ------------------------------------------------------------------ */
+/* Sunset — ambient lock-screen OS: clock, scene, dock, whisper bar.   */
+/* ------------------------------------------------------------------ */
+
+.sunsetRoot {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sunDisc,
+.cloud,
+.mountain {
+  position: absolute;
+  pointer-events: none;
+}
+
+.sunDisc {
+  bottom: 16%;
+  left: 50%;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 223, 171, 0.9),
+    rgba(255, 173, 122, 0.32) 64%,
+    transparent 72%
+  );
+  transform: translateX(-50%);
+  filter: blur(2px);
+}
+
+.cloud {
+  height: 7px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 224, 189, 0.45),
+    transparent
+  );
+}
+
+.cloud[data-variant="a"] {
+  top: 26%;
+  left: 16%;
+  width: 34%;
+}
+
+.cloud[data-variant="b"] {
+  top: 34%;
+  right: 10%;
+  width: 26%;
+  opacity: 0.7;
+}
+
+.mountain {
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.mountain[data-layer="back"] {
+  height: 30%;
+  background: linear-gradient(180deg, #3a2853, #2c1d42);
+  clip-path: polygon(
+    0 66%,
+    11% 44%,
+    24% 60%,
+    37% 34%,
+    51% 56%,
+    65% 28%,
+    79% 52%,
+    91% 40%,
+    100% 50%,
+    100% 100%,
+    0 100%
+  );
+  opacity: 0.85;
+}
+
+.mountain[data-layer="front"] {
+  height: 18%;
+  background: linear-gradient(180deg, #271a3d, #1e1430);
+  clip-path: polygon(
+    0 78%,
+    14% 52%,
+    30% 72%,
+    47% 44%,
+    62% 68%,
+    78% 50%,
+    100% 70%,
+    100% 100%,
+    0 100%
+  );
+}
+
+.sunsetClock {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 44px 0 0 30px;
+}
+
+.sunsetTime {
+  color: var(--mock-text-strong);
+  font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(3rem, 6.5vw, 68px);
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 26px rgba(40, 22, 64, 0.5);
+}
+
+.sunsetDate {
+  color: var(--mock-text-weak);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui,
+    sans-serif;
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+}
+
+/* Vertical glass dock hugging the right edge. */
+.sunsetDock {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  transform: translateY(-50%);
+}
+
+.sunsetDockItem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--mock-text-base);
+}
+
+.sunsetDockItem[data-active] {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--mock-text-strong);
+}
+
+/* One floating whisper bar near the horizon. */
+.sunsetBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: min(24rem, 72%);
+  margin: auto auto 13% auto;
+  padding: 11px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 18px 44px -24px rgba(30, 16, 50, 0.7);
+}
+
+.sunsetTyped,
+.sunsetPlaceholder {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui,
+    sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.sunsetTyped {
+  color: var(--mock-text-strong);
+}
+
+.sunsetPlaceholder {
+  color: var(--mock-text-weak);
+}
+
+/* ------------------------------------------------------------------ */
+/* Sports — broadcast dashboard: scoreboard rail, standings, tiles.    */
+/* ------------------------------------------------------------------ */
+
+.sportsRoot {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui,
+    sans-serif;
+}
+
+.scoreRail {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  gap: 8px;
+  padding: 9px 14px 9px 84px;
+  overflow: hidden;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--mock-foreground) 14%, transparent);
+  background: color-mix(in srgb, black 26%, transparent);
+}
+
+.scoreBrand {
+  align-self: center;
+  margin-right: 6px;
+  color: var(--mock-primary);
+  font-size: 11px;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.scoreCard {
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 10px;
+  align-items: center;
+  padding: 4px 10px;
+  border: 1px solid color-mix(in srgb, var(--mock-foreground) 14%, transparent);
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+.scoreTeams {
+  color: var(--mock-text-base);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.scoreValue {
+  grid-row: span 2;
+  color: var(--mock-text-strong);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.scoreState {
+  color: var(--mock-primary);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.sportsBody {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.standings {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 2px;
+  width: 12rem;
+  margin: 16px 0 16px 16px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--mock-foreground) 14%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, black 22%, transparent);
+}
+
+.standingsTitle {
+  margin-bottom: 8px;
+  color: var(--mock-text-weak);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.standingsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--mock-foreground) 8%, transparent);
+  font-size: 12px;
+}
+
+.standingsRow:last-child {
+  border-bottom: none;
+}
+
+.standingsPos {
+  width: 12px;
+  color: var(--mock-primary);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.standingsTeam {
+  flex: 1;
+  color: var(--mock-text-base);
+}
+
+.standingsPts {
+  color: var(--mock-text-strong);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.sportsMain {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  min-width: 0;
+  padding: 20px;
+}
+
+.sportsGreeting {
+  margin: 0;
+  color: var(--mock-text-strong);
+  font-family: var(--font-sans), "Manrope", system-ui, sans-serif;
+  font-size: clamp(1.7rem, 3.4vw, 38px);
+  font-style: italic;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tileRow {
+  display: flex;
+  gap: 10px;
+}
+
+.statTile {
+  display: grid;
+  justify-items: center;
+  row-gap: 2px;
+  min-width: 7.5rem;
+  padding: 12px 16px;
+  border: 1px solid color-mix(in srgb, var(--mock-foreground) 14%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, black 22%, transparent);
+}
+
+.statTile svg {
+  margin-bottom: 4px;
+  color: var(--mock-primary);
+}
+
+.tileValue {
+  color: var(--mock-text-strong);
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.tileLabel {
+  color: var(--mock-text-weak);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Bottom command bar — squared, branded, nothing like the pill. */
+.sportsBar {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 12px;
+  margin: 0 16px 16px;
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--mock-foreground) 16%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, black 30%, transparent);
+}
+
+.sportsBarTag {
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--mock-primary);
+  color: var(--mock-primary-foreground);
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.sportsTyped,
+.sportsPlaceholder {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.sportsTyped {
+  color: var(--mock-text-strong);
+}
+
+.sportsPlaceholder {
+  color: var(--mock-text-weaker);
+}
+
+/* ------------------------------------------------------------------ */
+/* Compact mode — tiles around half hero width (the mosaic). Tighter   */
+/* type, trimmed chrome, nothing clipped.                              */
+/* ------------------------------------------------------------------ */
+
+.surface[data-compact] .termBanner {
+  font-size: 7px;
+}
+
+.surface[data-compact] .termTmux {
+  font-size: 10.5px;
+}
+
+.surface[data-compact] .termTmux .termRight {
+  display: none;
+}
+
+.surface[data-compact] .termSide {
+  width: 11.5rem;
+  font-size: 10.5px;
+}
+
+.surface[data-compact] .termHistory {
+  width: min(19rem, 100%);
+  font-size: 11px;
+}
+
+.surface[data-compact] .scoreRail .scoreCard:nth-child(n + 4) {
+  display: none;
+}
+
+.surface[data-compact] .standings {
+  width: 10rem;
+  font-size: 11px;
+}
+
+
+.surface[data-compact] .sportsGreeting {
+  font-size: clamp(1.3rem, 1.9vw, 26px);
+}
+
+.surface[data-compact] .statTile {
+  min-width: 6.5rem;
+  padding: 9px 12px;
+}
+
+.surface[data-compact] .sunsetTime {
+  font-size: clamp(2.2rem, 3.4vw, 44px);
+}
+
+.surface[data-compact] .cozyGreeting {
+  font-size: clamp(1.2rem, 1.9vw, 22px);
+}
+
+.surface[data-compact] .cozyEntry p {
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.surface[data-compact] .cozyPage {
+  width: min(30rem, 88%);
+  padding: 18px 22px 16px;
+}
+
+@keyframes skinCaretBlink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .cozyTabs,
+  .termSide,
+  .standings,
+  .cloud,
+  .sunsetDock {
+    display: none;
+  }
+
+  .cozyPage {
+    width: min(26.5rem, 94%);
+  }
+
+  .scoreCard:nth-child(n + 4) {
+    display: none;
+  }
+
+  .sunsetClock {
+    margin: 40px 0 0 22px;
+  }
+}
+
+/* Traffic lights are hidden below 760px (see the mock module), so the
+   top rails can reclaim their left inset. */
+@media (max-width: 760px) {
+  .termTmux,
+  .scoreRail {
+    padding-left: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wall,
+  .surface {
+    transition: none;
+  }
+
+  .inkCaret,
+  .termBlock {
+    animation: none;
+  }
+}

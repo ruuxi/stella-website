@@ -1,24 +1,16 @@
 "use client";
 
 import {
-  ArrowUp,
   CheckCircle2,
-  ChevronDown,
-  ChevronRight,
   Circle,
   FileArchive,
   FileImage,
   FileText,
   LoaderCircle,
   MessageSquarePlus,
-  Mic,
-  PanelRight,
-  Plus,
   Scan,
-  Settings,
   VolumeX,
 } from "lucide-react";
-import Image from "next/image";
 import {
   useCallback,
   useEffect,
@@ -29,7 +21,9 @@ import {
   type RefObject,
 } from "react";
 import { CTA_DELAY } from "./hero-timing";
+import { MinimalApp } from "./home-desktop-skins";
 import styles from "./home-desktop-mock.module.css";
+import { Composer } from "./home-mock-composer";
 
 type Rgb = { r: number; g: number; b: number };
 type OklchColor = { l: number; c: number; h: number };
@@ -537,7 +531,6 @@ const BASE_POSITIONS = [
   { x: 0.52, y: 0.54 },
 ];
 
-const NAV_ITEMS = ["Home", "Store", "Social", "Apps"];
 // Curated palette journey used for the scroll-driven theme crossfade.
 const SCROLL_THEMES = [
   "pearl",
@@ -549,11 +542,6 @@ const SCROLL_THEMES = [
   "nightowl",
 ];
 const RENDER_SCALE = 0.6;
-const CONTEXT_CHIPS = [
-  { label: "Mail", iconSrc: "/mock-app-icons/mail.png" },
-  { label: "Maps", iconSrc: "/mock-app-icons/maps.png" },
-  { label: "Notes", iconSrc: "/mock-app-icons/notes.png" },
-];
 const WORKSPACE_ACTIONS = [
   { label: "Read replies aloud", icon: VolumeX },
   { label: "New chat", icon: MessageSquarePlus },
@@ -988,91 +976,6 @@ function cssVars(
   } as CSSProperties;
 }
 
-function Composer({
-  showContext = true,
-  className,
-}: {
-  showContext?: boolean;
-  className?: string;
-}) {
-  return (
-    <div
-      className={
-        className ? `${styles.composerWrap} ${className}` : styles.composerWrap
-      }
-    >
-      {showContext ? (
-        <div className={styles.contextStrip}>
-          {CONTEXT_CHIPS.map(({ label, iconSrc }) => (
-            <button
-              key={label}
-              type="button"
-              className={styles.contextChip}
-              title={`Add ${label} as context`}
-            >
-              <span className={styles.contextPlus} aria-hidden="true">
-                +
-              </span>
-              <Image
-                className={styles.contextIcon}
-                src={iconSrc}
-                alt=""
-                width={16}
-                height={16}
-                aria-hidden="true"
-                draggable={false}
-              />
-            </button>
-          ))}
-        </div>
-      ) : null}
-      <div className={styles.composer}>
-        <div className={styles.composerForm}>
-          <button
-            type="button"
-            className={styles.composerButton}
-            aria-label="Add context"
-          >
-            <Plus size={16} strokeWidth={2.25} />
-          </button>
-          <span className={styles.placeholder}>Ask me anything...</span>
-          <button
-            type="button"
-            className={styles.micButton}
-            aria-label="Start dictation"
-          >
-            <Mic size={15} strokeWidth={1.9} />
-          </button>
-          <button
-            type="button"
-            className={styles.submitButton}
-            aria-label="Send"
-          >
-            <ArrowUp size={14} strokeWidth={2.5} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function HomeCenter({ className }: { className?: string }) {
-  return (
-    <div
-      className={
-        className ? `${styles.homeContent} ${className}` : styles.homeContent
-      }
-    >
-      <h3>Good afternoon</h3>
-      <Composer />
-      <button type="button" className={styles.backToChat}>
-        <span>Back to chat</span>
-        <ChevronRight size={13} strokeWidth={2} aria-hidden="true" />
-      </button>
-    </div>
-  );
-}
-
 function ChatCenter() {
   return (
     <div className={styles.chatContent}>
@@ -1454,47 +1357,9 @@ export function HomeDesktopMock() {
               className={`${styles.gradient} ${styles.gradientFade}`}
               aria-hidden="true"
             />
-            <header className={styles.topbar}>
-              <div className={styles.topbarLeft}>
-                <nav className={styles.nav} aria-label="Stella mock apps">
-                  {NAV_ITEMS.map((item) => (
-                    <span
-                      key={item}
-                      className={styles.navItem}
-                      data-active={item === "Home" ? "true" : undefined}
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </nav>
-              </div>
-              <div className={styles.profileCluster}>
-                <button type="button" className={styles.accountButton}>
-                  <span className={styles.avatar}>A</span>
-                  <span>Alex</span>
-                  <ChevronDown size={13} strokeWidth={1.8} />
-                </button>
-                <button
-                  type="button"
-                  className={styles.iconButton}
-                  aria-label="Settings"
-                >
-                  <Settings size={14} strokeWidth={1.75} />
-                </button>
-              </div>
-              <div className={styles.topbarRight}>
-                <button
-                  type="button"
-                  className={styles.iconButton}
-                  aria-label="Open workspace panel"
-                >
-                  <PanelRight size={15} strokeWidth={1.75} />
-                </button>
-              </div>
-            </header>
-
-            <main className={styles.homeSurface}>
-              <HomeCenter />
+            <span className={styles.trafficLights} aria-hidden="true" />
+            <main className={styles.surfaceHost}>
+              <MinimalApp typed="" />
             </main>
           </div>
 
