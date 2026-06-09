@@ -57,7 +57,7 @@ body {
   background: var(--page-background);
   color: var(--page-foreground);
   font-family: var(--font-sans), "Manrope", system-ui, sans-serif;
-  font-weight: 300;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -1187,13 +1187,13 @@ html[data-embedded="true"] .site-header {
 
 .has-reveal [data-reveal] {
   opacity: 0;
-  transform: translate3d(0, 32px, 0) scale(0.985);
-  filter: blur(16px) saturate(0.9);
+  transform: translate3d(0, 18px, 0) scale(0.992);
+  filter: blur(6px);
   will-change: opacity, transform, filter;
   transition:
-    opacity 1200ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1300ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 560ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .has-reveal [data-reveal][data-revealed] {
@@ -1207,14 +1207,14 @@ html[data-embedded="true"] .site-header {
    `--reveal-index` so the order is intentional, not source-order. */
 .has-reveal [data-reveal] [data-reveal-child] {
   opacity: 0;
-  transform: translate3d(0, 22px, 0);
-  filter: blur(10px);
+  transform: translate3d(0, 14px, 0);
+  filter: blur(4px);
   will-change: opacity, transform, filter;
   transition:
-    opacity 950ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1050ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 900ms cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: calc(160ms + var(--reveal-index, 0) * 80ms);
+    opacity 540ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 480ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(110ms + var(--reveal-index, 0) * 60ms);
 }
 
 .has-reveal [data-reveal][data-revealed] [data-reveal-child] {
@@ -1241,16 +1241,14 @@ html[data-embedded="true"] .site-header {
 }
 
 /* Low-power devices keep the reveal motion but drop the blur — animating
-   `filter: blur()` from 16px → 0 over a second per section is the single
-   most expensive part of the scroll, and the cause of the lag building up as
-   you scroll toward the lower (phone) sections. Opacity + transform stay on
-   the compositor and remain smooth. */
+   `filter: blur()` is the single most expensive part of the scroll.
+   Opacity + transform stay on the compositor and remain smooth. */
 html[data-low-power] .has-reveal [data-reveal],
 html[data-low-power] .has-reveal [data-reveal] [data-reveal-child] {
   filter: none !important;
   transition:
-    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 800ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+    opacity 560ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 640ms cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 
 @keyframes breathing {

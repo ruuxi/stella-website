@@ -143,16 +143,13 @@
 
 .cta {
   display: flex;
-  width: 36rem;
-  max-width: 100%;
-  margin-top: clamp(1.4rem, 3vh, 2rem);
+  margin-top: clamp(1.6rem, 3.2vh, 2.3rem);
 }
 
 .cta :global(.button--primary) {
-  width: 100%;
-  padding-block: clamp(0.85rem, 1.4vw, 1.1rem);
-  padding-inline: clamp(2.4rem, 5vw, 3.4rem);
-  font-size: clamp(1.2rem, 1.5vw, 1.45rem);
+  padding-block: clamp(0.7rem, 1.1vw, 0.85rem);
+  padding-inline: clamp(1.7rem, 2.6vw, 2.3rem);
+  font-size: clamp(1.2rem, 1.4vw, 1.35rem);
   border-radius: var(--page-radius, 0.45rem);
 }
 
