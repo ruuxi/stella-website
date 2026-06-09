@@ -2,13 +2,12 @@
 
 import { Monitor } from "lucide-react";
 import Image from "next/image";
+import { useCallback, useRef, useState } from "react";
+import { useSceneLoop } from "@/lib/use-scene-loop";
 import styles from "./home-computer-use.module.css";
 
-const mailBody = [
-  "Hi Maya,",
-  "Saturday's all set — I booked the 7:30 table at Luna Cucina and added it to the calendar. I'll bring the tickets.",
-  "See you then!",
-];
+const MAIL_LINE =
+  "Saturday's all set — I booked the 7:30 table at Luna Cucina and added it to the calendar. I'll bring the tickets.";
 
 const notes = [
   {
@@ -36,6 +35,16 @@ const checklist = [
   { label: "Print the school form", done: false },
 ];
 
+/* The story, step by step:
+   0 — idle desktop
+   1 — Stella types the reply into Mail
+   2 — Stella's cursor glides to Send
+   3 — click
+   4 — sent: title flips, sign-off lands
+   5 — your cursor glides up and checks off "Text Mom the plan"
+   6 — your cursor returns; scene holds */
+type Step = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
 function Pointer({ className }: { className: string }) {
   return (
     <svg
@@ -58,10 +67,50 @@ function Pointer({ className }: { className: string }) {
 }
 
 export function HomeComputerUse() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [step, setStep] = useState<Step>(0);
+  const [mailTyped, setMailTyped] = useState("");
+  const [momChecked, setMomChecked] = useState(false);
+
+  const reset = useCallback(() => {
+    setStep(0);
+    setMailTyped("");
+    setMomChecked(false);
+  }, []);
+
+  const { reduced } = useSceneLoop(
+    sectionRef,
+    async ({ sleep, type }) => {
+      setStep(1);
+      await sleep(350);
+      await type(MAIL_LINE, setMailTyped, 13);
+      await sleep(300);
+      setStep(2);
+      await sleep(850);
+      setStep(3);
+      await sleep(620);
+      setStep(4);
+      await sleep(1100);
+      setStep(5);
+      await sleep(820);
+      setMomChecked(true);
+      await sleep(750);
+      setStep(6);
+      await sleep(2600);
+    },
+    reset,
+  );
+
+  const shownStep: Step = reduced ? 6 : step;
+  const shownTyped = reduced ? MAIL_LINE : mailTyped;
+  const shownChecked = reduced ? true : momChecked;
+  const sent = shownStep >= 4;
+
   return (
     <section
       className={`grid-shell section-border home-atlas-section ${styles.section}`}
       data-reveal
+      ref={sectionRef}
     >
       <div
         className="home-atlas-heading"
@@ -82,7 +131,7 @@ export function HomeComputerUse() {
             <div className={styles.screen}>
               <div className={styles.wallpaper} />
 
-              <div className={styles.desktop}>
+              <div className={styles.desktop} data-step={shownStep}>
                 {/* Calendar peeking behind for depth */}
                 <div className={`${styles.window} ${styles.calendarWindow}`}>
                   <div className={styles.titlebar}>
@@ -116,10 +165,16 @@ export function HomeComputerUse() {
                       <i />
                       <i />
                     </span>
-                    <span className={styles.title}>New Message</span>
+                    <span className={styles.title} data-sent={sent || undefined}>
+                      {sent ? "Message sent" : "New Message"}
+                    </span>
                   </div>
                   <div className={styles.mailToolbar}>
-                    <button type="button" className={styles.sendButton}>
+                    <button
+                      type="button"
+                      className={styles.sendButton}
+                      data-pressed={shownStep === 3 || undefined}
+                    >
                       <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path
                           d="M3 11.5 21 3l-8.5 18-2.4-7.1Z"
@@ -143,10 +198,16 @@ export function HomeComputerUse() {
                     </div>
                   </div>
                   <div className={styles.mailComposeBody}>
-                    {mailBody.map((line) => (
-                      <p key={line}>{line}</p>
-                    ))}
-                    <span className={styles.typingCaret} />
+                    <p>Hi Maya,</p>
+                    <p>
+                      {shownTyped}
+                      {shownStep === 1 ? (
+                        <span className={styles.typingCaret} />
+                      ) : null}
+                    </p>
+                    <p className={styles.signoff} data-shown={sent || undefined}>
+                      See you then!
+                    </p>
                   </div>
                 </div>
 
@@ -186,25 +247,25 @@ export function HomeComputerUse() {
                       <ul className={styles.noteChecklist}>
                         {checklist.map((item) => {
                           const animated = item.label === "Text Mom the plan";
+                          const done =
+                            item.done || (animated && shownChecked);
                           return (
                             <li
                               key={item.label}
-                              data-done={item.done || undefined}
+                              data-done={done || undefined}
                               data-anim={animated || undefined}
                             >
                               <span className={styles.checkbox}>
-                                {item.done || animated ? (
-                                  <svg viewBox="0 0 12 12" aria-hidden="true">
-                                    <path
-                                      d="M2.5 6.2 5 8.6 9.5 3.6"
-                                      fill="none"
-                                      stroke="#fff"
-                                      strokeWidth="1.6"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                  </svg>
-                                ) : null}
+                                <svg viewBox="0 0 12 12" aria-hidden="true">
+                                  <path
+                                    d="M2.5 6.2 5 8.6 9.5 3.6"
+                                    fill="none"
+                                    stroke="#fff"
+                                    strokeWidth="1.6"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
                               </span>
                               <span className={styles.checkLabel}>
                                 {item.label}
@@ -212,6 +273,7 @@ export function HomeComputerUse() {
                               {animated ? (
                                 <div
                                   className={`${styles.cursor} ${styles.cursorYou}`}
+                                  data-step={shownStep}
                                 >
                                   <Pointer className={styles.pointer} />
                                   <span className={styles.cursorLabel}>You</span>
@@ -241,16 +303,23 @@ export function HomeComputerUse() {
                   </span>
                   <strong>stella-computer</strong>
                   <span className={styles.automationStep}>
-                    <b style={{ ["--step" as string]: 0 }}>Filling the reply</b>
-                    <b style={{ ["--step" as string]: 1 }}>Moving to Send</b>
-                    <b style={{ ["--step" as string]: 2 }}>Message sent</b>
+                    <b data-on={shownStep === 1 || undefined}>
+                      Filling the reply
+                    </b>
+                    <b data-on={shownStep === 2 || shownStep === 3 || undefined}>
+                      Moving to Send
+                    </b>
+                    <b data-on={shownStep >= 4 || undefined}>Message sent</b>
                   </span>
                 </div>
 
-                {/* Cursors */}
+                {/* Stella's cursor */}
                 <div className={`${styles.cursor} ${styles.cursorStella}`}>
                   <Pointer className={styles.pointer} />
-                  <span className={styles.clickRing} />
+                  <span
+                    className={styles.clickRing}
+                    data-click={shownStep === 3 || undefined}
+                  />
                   <span className={styles.cursorLabel}>
                     <span className={styles.cursorLabelMark}>
                       <Image

@@ -9,59 +9,6 @@
   grid-column: 1 / -1;
 }
 
-.row {
-  display: grid;
-  grid-template-columns: minmax(17rem, 0.82fr) minmax(0, 1.18fr);
-  align-items: center;
-  gap: clamp(2rem, 6vw, 6rem);
-  width: min(100%, 74rem);
-  margin: 0 auto;
-}
-
-.copy {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-}
-
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  color: var(--blue);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.8rem;
-  font-weight: 300;
-  letter-spacing: 0;
-}
-
-.eyebrow::after {
-  content: "";
-  width: clamp(2.5rem, 7vw, 6rem);
-  height: 1px;
-  background: rgba(82, 104, 134, 0.24);
-}
-
-.copy h2 {
-  max-width: 14ch;
-  margin: 1rem 0 0;
-  color: var(--ink);
-  font-size: clamp(2.35rem, 5vw, 5.6rem);
-  font-weight: 300;
-  line-height: 0.98;
-  letter-spacing: 0;
-  text-wrap: balance;
-}
-
-.copy p {
-  max-width: 34rem;
-  margin: clamp(1rem, 2vw, 1.35rem) 0 0;
-  color: var(--muted);
-  font-size: clamp(1rem, 1.2vw, 1.18rem);
-  line-height: 1.72;
-}
-
 .stage {
   min-width: 0;
 }
@@ -88,6 +35,68 @@
     0 36px 90px -58px rgba(12, 22, 38, 0.48);
 }
 
+/* The request Stella was asked — files deal out from underneath it. */
+.request {
+  position: absolute;
+  top: 1.1rem;
+  left: 50%;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: calc(100% - 2rem);
+  padding: 0.4rem 0.85rem 0.4rem 0.42rem;
+  border: 1px solid rgba(82, 104, 134, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85) inset,
+    0 16px 36px -22px rgba(12, 22, 38, 0.5);
+  transform: translateX(-50%);
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 300;
+  white-space: nowrap;
+}
+
+.requestMark {
+  display: inline-flex;
+  width: 1.35rem;
+  height: 1.35rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.1);
+}
+
+.requestText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.requestText:empty::before {
+  content: "";
+}
+
+.requestCaret {
+  display: inline-block;
+  width: 1.5px;
+  height: 0.85rem;
+  margin-left: 2px;
+  background: var(--blue);
+  vertical-align: text-bottom;
+  animation: requestCaretBlink 1.1s steps(2, start) infinite;
+}
+
+@keyframes requestCaretBlink {
+  to {
+    opacity: 0;
+  }
+}
+
 .docPreview {
   position: absolute;
   top: 50%;
@@ -100,7 +109,34 @@
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.82) inset,
     0 28px 70px -42px rgba(12, 22, 38, 0.58);
+  /* Undealt: tucked behind the request pill, waiting. */
+  opacity: 0;
+  transform: translate(-50%, -46%) scale(0.84);
+  transition:
+    opacity 460ms ease,
+    transform 720ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 460ms ease;
+  transition-delay: calc(var(--i) * 110ms);
+}
+
+/* Dealt out into the fan. */
+.docPreview[data-dealt] {
+  opacity: 1;
   transform: translate(-50%, -50%) translateX(var(--x));
+}
+
+/* Focus pass: each file takes the front in turn. */
+.docPreview[data-focused] {
+  z-index: 8;
+  transform: translate(-50%, -50%) translateX(var(--x)) translateY(-0.55rem)
+    scale(1.045);
+  transition-delay: 0ms;
+}
+
+.docPreview[data-receded] {
+  filter: saturate(0.92) brightness(0.985);
+  opacity: 0.86;
+  transition-delay: 0ms;
 }
 
 .docPreview_word {
@@ -164,11 +200,6 @@
 }
 
 @media (max-width: 900px) {
-  .row {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-
   .documentShell {
     min-height: clamp(18rem, 56vw, 25rem);
   }
@@ -181,6 +212,28 @@
 
   .docPreview {
     width: min(78vw, 23rem);
+  }
+
+  .docPreview[data-dealt] {
     transform: translate(-50%, -50%) translateX(var(--mobile-x));
+  }
+
+  .docPreview[data-focused] {
+    transform: translate(-50%, -50%) translateX(var(--mobile-x))
+      translateY(-0.45rem) scale(1.04);
+  }
+
+  .request {
+    font-size: 0.72rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docPreview {
+    transition: none;
+  }
+
+  .requestCaret {
+    animation: none;
   }
 }

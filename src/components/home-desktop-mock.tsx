@@ -18,6 +18,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type ReactNode,
   type RefObject,
 } from "react";
 import { CTA_DELAY } from "./hero-timing";
@@ -1131,6 +1132,7 @@ function MiniChatWindow({
   canvasRef,
   fadeRef,
   className,
+  children,
 }: {
   vars: CSSProperties;
   mode: ThemeMode;
@@ -1138,6 +1140,7 @@ function MiniChatWindow({
   canvasRef: RefObject<HTMLCanvasElement | null>;
   fadeRef: RefObject<HTMLCanvasElement | null>;
   className?: string;
+  children?: ReactNode;
 }) {
   return (
     <div
@@ -1158,9 +1161,7 @@ function MiniChatWindow({
         className={styles.miniTopbar}
         aria-label="Stella mini chat window"
       />
-      <main className={styles.chatSurface}>
-        <ChatCenter />
-      </main>
+      <main className={styles.chatSurface}>{children ?? <ChatCenter />}</main>
     </div>
   );
 }
@@ -1168,9 +1169,11 @@ function MiniChatWindow({
 export function HomeMiniChatMock({
   className,
   themeId = "pearl",
+  children,
 }: {
   className?: string;
   themeId?: string;
+  children?: ReactNode;
 }) {
   const selectedTheme =
     THEMES.find((candidate) => candidate.id === themeId) ?? THEMES[0];
@@ -1209,7 +1212,9 @@ export function HomeMiniChatMock({
       themeId={selectedTheme.id}
       canvasRef={canvasRef}
       fadeRef={fadeRef}
-    />
+    >
+      {children}
+    </MiniChatWindow>
   );
 }
 

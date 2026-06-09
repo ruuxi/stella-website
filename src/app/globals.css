@@ -1217,6 +1217,17 @@ html[data-embedded="true"] .site-header {
   transition-delay: calc(110ms + var(--reveal-index, 0) * 60ms);
 }
 
+/* Product sections hold their position — the section and its mock fade
+   in place rather than sliding up, so a window never reads as drifting
+   around the page (the section slide + child slide used to compound). */
+.has-reveal .home-atlas-section[data-reveal] {
+  transform: none;
+}
+
+.has-reveal [data-reveal] .home-atlas-media[data-reveal-child] {
+  transform: none;
+}
+
 .has-reveal [data-reveal][data-revealed] [data-reveal-child] {
   opacity: 1;
   transform: none;

@@ -2,6 +2,8 @@
 
 import { FileText } from "lucide-react";
 import Image from "next/image";
+import { useCallback, useRef, useState } from "react";
+import { useSceneLoop } from "@/lib/use-scene-loop";
 import styles from "./home-documents.module.css";
 
 type Doc = {
@@ -17,11 +19,47 @@ const DOCS: Doc[] = [
   { kind: "pdf", label: "PDF", src: "/doc-mocks/pdf.jpg" },
 ];
 
+const REQUEST = "Turn the quarter's notes into a report, deck, and budget.";
+
 export function HomeDocuments() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [typed, setTyped] = useState("");
+  const [dealt, setDealt] = useState(false);
+  const [focus, setFocus] = useState(-1);
+
+  const reset = useCallback(() => {
+    setTyped("");
+    setDealt(false);
+    setFocus(-1);
+  }, []);
+
+  const { reduced } = useSceneLoop(
+    sectionRef,
+    async ({ sleep, type }) => {
+      await sleep(250);
+      await type(REQUEST, setTyped, 20);
+      await sleep(380);
+      setDealt(true);
+      await sleep(1250);
+      for (let k = 0; k < DOCS.length; k += 1) {
+        setFocus(k);
+        await sleep(1250);
+      }
+      setFocus(-1);
+      await sleep(2400);
+    },
+    reset,
+  );
+
+  const shownTyped = reduced ? REQUEST : typed;
+  const shownDealt = reduced ? true : dealt;
+  const shownFocus = reduced ? -1 : focus;
+
   return (
     <section
       className={`grid-shell section-border home-atlas-section ${styles.section}`}
       data-reveal
+      ref={sectionRef}
     >
       <div
         className="home-atlas-heading"
@@ -41,10 +79,27 @@ export function HomeDocuments() {
             className={styles.documentShell}
             aria-label="Document examples created by Stella"
           >
+            <div className={styles.request} aria-hidden="true">
+              <span className={styles.requestMark}>
+                <Image src="/stella-logo.svg" alt="" width={13} height={13} />
+              </span>
+              <span className={styles.requestText}>
+                {shownTyped || "Ask for the files you need…"}
+                {!reduced && shownTyped && !shownDealt ? (
+                  <i className={styles.requestCaret} />
+                ) : null}
+              </span>
+            </div>
+
             {DOCS.map((doc, index) => (
               <figure
                 className={`${styles.docPreview} ${styles[`docPreview_${doc.kind}`]}`}
                 key={doc.kind}
+                data-dealt={shownDealt || undefined}
+                data-focused={shownFocus === index || undefined}
+                data-receded={
+                  (shownFocus !== -1 && shownFocus !== index) || undefined
+                }
                 style={{ ["--i" as string]: index }}
               >
                 <span className={styles.chip} data-kind={doc.kind}>
