@@ -41,7 +41,6 @@
   gap: 0.48rem;
   width: max-content;
   max-width: 100%;
-  margin-top: 1.5rem;
   padding: 0.62rem 0.86rem;
   border: 1px solid rgba(82, 104, 134, 0.2);
   background: rgba(255, 255, 255, 0.56);
@@ -73,7 +72,6 @@
   gap: clamp(1.1rem, 2.4vw, 2rem);
   text-align: left;
   padding: clamp(1.5rem, 2.8vw, 2.4rem);
-  border-radius: 0.6rem;
   color: #eaf2ff;
   background:
     radial-gradient(
@@ -124,115 +122,6 @@
   line-height: 1.5;
 }
 
-/* ---- Compatibility wall ------------------------------------------------ */
-.wall {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  padding: clamp(1.1rem, 2.2vw, 1.5rem);
-  border: 1px solid rgba(82, 104, 134, 0.16);
-  background: rgba(255, 255, 255, 0.48);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.72) inset,
-    0 28px 62px -46px rgba(12, 22, 38, 0.4);
-}
-
-.group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.2rem;
-}
-
-.groupLabel {
-  font-size: 0.72rem;
-  font-weight: 300;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.logos {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1.1rem 1.8rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.logo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
-  width: 5.6rem;
-}
-
-.logoMark {
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #38475d;
-  transition:
-    color 0.25s ease,
-    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.glyph {
-  height: 100%;
-  width: auto;
-  max-width: 2.4rem;
-  display: block;
-}
-
-.logoName {
-  font-size: 0.78rem;
-  font-weight: 300;
-  color: var(--muted);
-  transition: color 0.25s ease;
-}
-
-.logo:hover .logoMark {
-  transform: translateY(-3px);
-}
-
-.logo:hover .logoName {
-  color: var(--ink);
-}
-
-/* per-brand color on hover — resting state stays a cohesive ink */
-.logo[data-brand="claudeCode"]:hover .logoMark,
-.logo[data-brand="anthropic"]:hover .logoMark {
-  color: #d97757;
-}
-.logo[data-brand="openai"]:hover .logoMark {
-  color: #10a37f;
-}
-.logo[data-brand="google"]:hover .logoMark {
-  color: #1a73e8;
-}
-.logo[data-brand="deepseek"]:hover .logoMark {
-  color: #4d6bfe;
-}
-.logo[data-brand="moonshot"]:hover .logoMark {
-  color: #2b2a6b;
-}
-.logo[data-brand="openclaw"]:hover .logoMark {
-  color: #e8492f;
-}
-.logo[data-brand="hermes"]:hover .logoMark {
-  color: #c0991f;
-}
-.logo[data-brand="cursor"]:hover .logoMark,
-.logo[data-brand="codex"]:hover .logoMark,
-.logo[data-brand="xai"]:hover .logoMark {
-  color: #11151c;
-}
-
 /* ---- Responsive -------------------------------------------------------- */
 @media (max-width: 760px) {
   .panel {
@@ -249,8 +138,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .logoMark,
-  .logoName {
+  .githubLink {
     transition: none;
   }
 }
