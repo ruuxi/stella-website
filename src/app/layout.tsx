@@ -145,7 +145,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // The embedded/perf init scripts tag <html> with data attributes before
+    // hydration (by design, to avoid a flash); suppress the expected mismatch.
+    <html lang="en" suppressHydrationWarning>
       <head>
         <EmbeddedInitScript />
         <PerfInitScript />
