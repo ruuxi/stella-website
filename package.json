@@ -12,7 +12,7 @@
   "dependencies": {
     "@convex-dev/better-auth": "^0.12.2",
     "better-auth": "1.6.9",
-    "convex": "^1.37.0",
+    "convex": "^1.41.0",
     "lightningcss": "1.32.0",
     "lucide-react": "^0.577.0",
     "next": "16.1.6",
