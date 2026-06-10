@@ -24,6 +24,20 @@ export type ChangelogEntry = {
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    release: "v0.0.343 – v0.0.344",
+    date: "June 10, 2026",
+    tags: ["New", "Polish"],
+    highlights: [
+      "Onboarding is now a guided, interactive five-act walkthrough that shows Stella in action.",
+      "A refreshed look — elegant Cormorant headings, a custom Stella icon set, and simpler text-only chips in the top bar.",
+    ],
+    more: [
+      "The 'working…' indicator now stays visible while Stella's answer streams in, with thinking labels that change each turn.",
+      "The pasted-text chip stays open while you hover so you can scroll through it.",
+      "Stella's memory keeps everything tidier behind the scenes for more reliable recall.",
+    ],
+  },
+  {
     release: "v0.0.341 – v0.0.342",
     date: "June 9, 2026",
     tags: ["Polish"],
