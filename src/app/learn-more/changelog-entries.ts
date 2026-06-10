@@ -24,6 +24,62 @@ export type ChangelogEntry = {
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    release: "v0.0.341 – v0.0.342",
+    date: "June 9, 2026",
+    tags: ["Polish"],
+    highlights: [
+      "Stella's replies now sweep in with a smooth left-to-right reveal as she writes.",
+      "The radial dial now shows the icon of the app you're hovering over.",
+    ],
+    more: [
+      "Stella starts up and runs noticeably lighter on Windows.",
+      "Long conversations stay fast — older history quietly slims down in the background.",
+      "Picking a window to capture feels snappier.",
+      "Smoother chat scrolling, including middle-click panning.",
+      "Settings buttons got a styling pass.",
+      "Updating Stella while she's changing herself is more dependable.",
+    ],
+  },
+  {
+    release: "v0.0.334 – v0.0.340",
+    date: "June 8, 2026",
+    tags: ["New", "Polish"],
+    highlights: [
+      "A fresh coat of paint — Stella's desktop moved to a flat, Mac-native look, with new Light and Dark themes joining the gradient and colorful ones.",
+      "Copy and read-aloud buttons now sit right below each of Stella's messages.",
+      "Set up phone connections by scanning a QR code.",
+      "Click your pet to open and close the mini window.",
+      "Long pastes collapse into a neat chip instead of flooding the message box, and a selected area of your screen attaches as a chip too.",
+    ],
+    more: [
+      "App updates are much more dependable — they can pick up where they left off and retry flaky downloads.",
+      "Back-to-back replies from Stella are grouped together in the chat.",
+      "Chat holds its place when you scroll up to load older messages.",
+      "The connection between Stella and your phone is now encrypted.",
+      "Voice connection problems now show up as a clear notification.",
+      "The model picker is a simpler list, grouped by who makes each model.",
+      "Light mode got a cleaner white-and-gray treatment.",
+    ],
+  },
+  {
+    release: "v0.0.325 – v0.0.333",
+    date: "June 7, 2026",
+    tags: ["New", "Polish"],
+    highlights: [
+      "Updating Stella is friendlier — changes show up as a pending card you can apply when you're ready.",
+      "The Activity list now separates what's still running from what's done, and running tasks show as a small chip near the message box.",
+      "Stella can now work with iMessage.",
+      "A big speed push: Stella opens faster, uses less memory, and goes easier on lower-end computers.",
+    ],
+    more: [
+      "Lots of Windows fixes: window capture, voice, dictation, and faster screenshots.",
+      "Activity items show little context chips so you can tell what each task touched.",
+      "Stella prefers polished, shareable results and rambles less when wrapping up.",
+      "Chats resume properly after a restart.",
+      { text: "Telegram messages flow through more reliably.", product: "Backend" },
+    ],
+  },
+  {
     release: "v0.0.323 – v0.0.324",
     date: "June 6, 2026",
     tags: ["Polish"],
