@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude → Simple</title>
+<link rel="stylesheet" href="../shared/claude-base.css">
+<link rel="stylesheet" href="../shared/morph.css">
+<style>
+  /* ===== AFTER: Simple — accessibility-first, no sidebar, huge targets, very high contrast =====
+     Design language: ONE clay accent reserved for the primary "talk" action.
+     Tiles stay calm warm-neutral so the eye lands on the button first.
+     Tokenized roles, color-mix tinted neutrals, one elevation + radius family. */
+  .smp{position:absolute;inset:0;display:grid;grid-template-rows:auto 1fr auto;
+    background:radial-gradient(120% 90% at 50% -10%,#fdfbf6 0%,#f6f1e7 62%,#f1ebdd 100%);
+    color:var(--ink);font-family:var(--font-ui);font-weight:440;
+    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+    /* roles */
+    --ink:#1c1813;--ink-soft:#544c41;--ink-faint:#7a7164;
+    --accent:#b4502f;--accent-deep:#8f3a1e;--accent-ink:#fff;
+    --tile:#fffdf9;--tile-2:#fbf7ef;
+    --line:color-mix(in srgb,var(--accent) 14%,#cfc4ae);
+    --focus:#1c5fd4;
+    /* one elevation family */
+    --el-rest:0 1px 0 color-mix(in srgb,#fff 70%,transparent) inset,
+              0 1px 2px color-mix(in srgb,var(--accent-deep) 10%,transparent),
+              0 6px 16px -8px color-mix(in srgb,var(--accent-deep) 22%,transparent);
+    --el-hover:0 1px 0 color-mix(in srgb,#fff 80%,transparent) inset,
+               0 2px 4px color-mix(in srgb,var(--accent-deep) 12%,transparent),
+               0 14px 28px -10px color-mix(in srgb,var(--accent-deep) 30%,transparent);
+    /* radius family — outer cards 28, nested chips 18 */
+    --r-lg:28px;--r-md:18px}
+
+  /* greeting header */
+  .smp-head{display:flex;align-items:baseline;gap:16px;padding:32px 48px 4px}
+  .smp-head .badge{width:48px;height:48px;border-radius:var(--r-md);flex:none;align-self:center;
+    background:linear-gradient(160deg,var(--accent) 0%,var(--accent-deep) 100%);
+    display:grid;place-items:center;
+    box-shadow:0 1px 0 color-mix(in srgb,#fff 35%,transparent) inset,
+               0 4px 12px -2px color-mix(in srgb,var(--accent-deep) 45%,transparent)}
+  .smp-head .badge .ast{width:24px;height:24px;display:block;color:var(--accent-ink)}
+  .smp-head .who{font-size:26px;font-weight:560;letter-spacing:-.01em;color:var(--ink)}
+  .smp-head .who b{font-weight:680}
+  .smp-head .sp{flex:1}
+  .smp-head .time{text-align:right;line-height:1;align-self:center}
+  .smp-head .time .t{font-family:var(--font-mono);font-size:30px;font-weight:600;
+    letter-spacing:-.02em;color:var(--ink);font-feature-settings:"tnum" 1}
+  .smp-head .time .d{font-size:16px;color:var(--ink-soft);font-weight:520;margin-top:4px}
+
+  /* hero */
+  .smp-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:0 48px;min-height:0;gap:24px;overflow:hidden}
+  .smp-lead{font-family:var(--font-serif);font-size:34px;font-weight:500;line-height:1.2;
+    text-align:center;max-width:680px;color:var(--ink);letter-spacing:-.015em}
+  .smp-talk{display:flex;flex-direction:column;align-items:center;gap:16px;
+    width:560px;padding:32px 40px 30px;border-radius:var(--r-lg);
+    background:linear-gradient(165deg,
+      color-mix(in srgb,var(--accent) 92%,#fff) 0%,var(--accent) 46%,var(--accent-deep) 100%);
+    color:var(--accent-ink);
+    box-shadow:0 1px 0 color-mix(in srgb,#fff 28%,transparent) inset,
+               0 2px 6px color-mix(in srgb,var(--accent-deep) 30%,transparent),
+               0 22px 46px -12px color-mix(in srgb,var(--accent-deep) 55%,transparent);
+    outline:4px solid transparent;outline-offset:6px;cursor:pointer;position:relative;
+    transition:transform .22s var(--ease),box-shadow .22s var(--ease)}
+  .smp-talk:hover{transform:translateY(-3px);
+    box-shadow:0 1px 0 color-mix(in srgb,#fff 32%,transparent) inset,
+               0 3px 8px color-mix(in srgb,var(--accent-deep) 32%,transparent),
+               0 30px 56px -12px color-mix(in srgb,var(--accent-deep) 60%,transparent)}
+  .smp-talk:active{transform:translateY(-1px)}
+  .smp-talk:focus-visible,.smp-talk.show-focus{outline-color:var(--focus)}
+  .smp-talk .ring{width:104px;height:104px;border-radius:50%;flex:none;position:relative;
+    background:color-mix(in srgb,#fff 16%,transparent);display:grid;place-items:center;
+    box-shadow:inset 0 0 0 2px color-mix(in srgb,#fff 32%,transparent)}
+  .smp-talk .ring::before{content:"";position:absolute;inset:-9px;border-radius:50%;
+    border:3px solid color-mix(in srgb,#fff 34%,transparent)}
+  .smp-talk .ring svg{width:46px;height:46px;color:var(--accent-ink);stroke-width:2}
+  .smp-talk .big{font-size:31px;font-weight:680;letter-spacing:-.01em;line-height:1.1;text-align:center}
+  .smp-talk .small{font-size:18px;font-weight:500;color:color-mix(in srgb,#fff 86%,transparent)}
+
+  /* three big shortcut tiles — calm, equal, neutral */
+  .smp-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:28px 48px 32px}
+  .smp-tile{background:linear-gradient(180deg,var(--tile) 0%,var(--tile-2) 100%);
+    border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--el-rest);
+    padding:24px;display:flex;flex-direction:column;gap:16px;cursor:pointer;
+    outline:4px solid transparent;outline-offset:4px;
+    transition:transform .2s var(--ease),box-shadow .2s var(--ease),border-color .2s var(--ease)}
+  .smp-tile:hover{transform:translateY(-3px);box-shadow:var(--el-hover);
+    border-color:color-mix(in srgb,var(--accent) 24%,#cfc4ae)}
+  .smp-tile:focus-visible,.smp-tile.show-focus{outline-color:var(--focus)}
+  .smp-tile .ic{width:60px;height:60px;border-radius:var(--r-md);display:grid;place-items:center;flex:none;
+    color:var(--accent-deep);background:color-mix(in srgb,var(--accent) 11%,#fff);
+    box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 16%,transparent)}
+  .smp-tile .ic svg{width:32px;height:32px;stroke-width:2}
+  .smp-tile .body{display:flex;flex-direction:column;gap:4px}
+  .smp-tile .tt{font-size:23px;font-weight:660;letter-spacing:-.01em;line-height:1.1;color:var(--ink)}
+  .smp-tile .ss{font-size:16px;color:var(--ink-soft);font-weight:480;line-height:1.3}
+  .smp-tile .meta{margin-top:auto;display:flex;align-items:center;gap:9px;font-size:16px;font-weight:580;
+    color:var(--ink-soft)}
+  .smp-tile .meta .pip{width:10px;height:10px;border-radius:50%;flex:none;
+    background:color-mix(in srgb,var(--ink-faint) 70%,transparent)}
+  .smp-tile .meta .num{font-family:var(--font-mono);font-weight:600;font-feature-settings:"tnum" 1}
+  .smp-tile .meta.q{color:var(--accent-deep)}
+  .smp-tile .meta.q .pip{background:var(--accent);
+    box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 18%,transparent)}
+
+  @media (prefers-reduced-motion:no-preference){
+    #stage.show-after .smp-head{animation:smp-fade .55s var(--ease) both}
+    #stage.show-after .smp-lead{animation:smp-rise .6s var(--ease) .04s both}
+    #stage.show-after .smp-talk{animation:smp-rise .7s var(--ease) .12s both}
+    #stage.show-after .smp-tile{animation:smp-rise .6s var(--ease) both}
+    #stage.show-after .smp-tile:nth-child(1){animation-delay:.22s}
+    #stage.show-after .smp-tile:nth-child(2){animation-delay:.30s}
+    #stage.show-after .smp-tile:nth-child(3){animation-delay:.38s}
+    .smp-talk .ring::before{animation:smp-pulse 2.8s ease-in-out infinite}
+  }
+  @keyframes smp-rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  @keyframes smp-fade{from{opacity:0}to{opacity:1}}
+  @keyframes smp-pulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.07);opacity:.85}}
+</style>
+</head>
+<body>
+<div id="stage" data-prompt="make this easier for me to see" data-persona="Simple">
+
+  <!-- ============ BEFORE: faithful Claude desktop (reuse across demos) ============ -->
+  <section class="screen" id="before">
+    <div class="cd-app">
+      <aside class="cd-sidebar">
+        <div class="cd-brand">
+          <span class="mark"><span class="ast" style="width:20px;height:20px;display:block"></span></span>
+          <span class="name">Claude</span><span class="sp"></span>
+        </div>
+        <div class="cd-newchat"><span class="plus ast" style="width:14px;height:14px"></span> New chat</div>
+        <div class="cd-seclabel">Recents</div>
+        <div class="cd-row sel"><span class="dot clay"></span><span>The text is too small</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Call Margaret on Sunday</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Read my new messages</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Pharmacy refill reminder</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Photos from the grandkids</span></div>
+        <div class="cd-spacer"></div>
+        <div class="cd-account"><span class="av">EW</span><span class="who">Eleanor</span><span class="plan">· Free</span></div>
+      </aside>
+      <div class="cd-main">
+        <div class="cd-topbar"><span class="crumb"><b>Personal</b></span><span class="sp"></span></div>
+        <div class="cd-convo"><div class="cd-col">
+          <div class="cd-user">Everything is so small on here. Can you make this easier for me to see?</div>
+          <div class="cd-assistant">
+            <p>Of course. I can make the writing much <b>larger and bolder</b>, raise the contrast so it&rsquo;s easier on your eyes, and clear away anything you don&rsquo;t need.</p>
+            <p>Let&rsquo;s keep the few things you reach for most&mdash;<b>calling family, reading your messages, and your reminders</b>&mdash;and make talking to me as simple as holding one big button.</p>
+          </div>
+        </div></div>
+        <div class="cd-composerwrap">
+          <div class="cd-composer">
+            <div class="cd-prompt" id="cdPrompt" data-ph="Reply to Claude&hellip;"></div>
+            <div class="cd-comprow">
+              <span class="cd-iconbtn">+</span>
+              <span class="sp"></span>
+              <span class="cd-work"><span class="cd-spark working"><i></i></span> Working&hellip;</span>
+              <span class="cd-model">Opus 4.8 (1M context) &middot; Fast</span>
+              <span class="cd-send"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M12 5l-6 6M12 5l6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </div>
+          <div class="cd-foot">Claude is AI and can make mistakes. Please double-check responses.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AFTER: Simple ============ -->
+  <section class="screen" id="after">
+    <div class="smp">
+      <div class="smp-head">
+        <span class="badge"><span class="ast"></span></span>
+        <div class="who">Good afternoon, <b>Eleanor</b></div>
+        <span class="sp"></span>
+        <div class="time">
+          <div class="t">2:14</div>
+          <div class="d">Saturday, June 13</div>
+        </div>
+      </div>
+
+      <div class="smp-hero">
+        <div class="smp-lead">What can I help you with today?</div>
+        <div class="smp-talk show-focus" role="button" tabindex="0" aria-label="Hold to talk to Claude">
+          <div class="ring">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 15.5a3.5 3.5 0 0 0 3.5-3.5V6.5a3.5 3.5 0 0 0-7 0V12a3.5 3.5 0 0 0 3.5 3.5Z" stroke="currentColor" stroke-width="2"/>
+              <path d="M19 11.5a7 7 0 0 1-14 0M12 18.5V22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="big">Hold to talk to Claude</div>
+          <div class="small">Ask anything. I&rsquo;m listening.</div>
+        </div>
+      </div>
+
+      <div class="smp-tiles">
+        <div class="smp-tile" role="button" tabindex="0">
+          <div class="ic">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5.5 4.5h3l1.5 4-2 1.4a12 12 0 0 0 5.6 5.6l1.4-2 4 1.5v3a2 2 0 0 1-2.2 2A16 16 0 0 1 3.5 6.7 2 2 0 0 1 5.5 4.5Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="body">
+            <div class="tt">Call family</div>
+            <div class="ss">Margaret, David &amp; 2 more</div>
+          </div>
+          <div class="meta"><span class="pip"></span>Margaret called Tuesday</div>
+        </div>
+
+        <div class="smp-tile" role="button" tabindex="0">
+          <div class="ic">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5h16a1 1 0 0 1 1 1V16a1 1 0 0 1-1 1H9l-4 3.5V17H4a1 1 0 0 1-1-1V6.5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="body">
+            <div class="tt">Read my messages</div>
+            <div class="ss">I&rsquo;ll read them out loud</div>
+          </div>
+          <div class="meta q"><span class="pip"></span><span class="num">3</span>&nbsp;new today</div>
+        </div>
+
+        <div class="smp-tile" role="button" tabindex="0">
+          <div class="ic">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="8" stroke="currentColor"/><path d="M12 9v4l2.5 2M9 3.5 6 6M15 3.5 18 6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="body">
+            <div class="tt">Today&rsquo;s reminders</div>
+            <div class="ss">Pills &amp; one appointment</div>
+          </div>
+          <div class="meta q"><span class="pip"></span>Next&nbsp;<span class="num">6:00&nbsp;PM</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="morph-fx"><div class="morph-band"></div></div>
+  <div class="caption"><span class="cap-prompt"></span><span class="cap-arrow">&rarr;</span><span class="cap-name"></span></div>
+  <button class="replay" id="replay" aria-label="Replay">&#8634;</button>
+</div>
+<script src="../shared/morph.js"></script>
+</body>
+</html>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { CommandBox } from "./command-box";
+import { MorphEmbed } from "./morph-embed";
 import "./claude-build.css";
 
 export const metadata: Metadata = {
@@ -29,6 +30,17 @@ export default function ClaudeBuildPage() {
           Stella is a personal desktop app whose interface rewrites itself. Open
           the Store, install a new look or tool, and watch the whole app morph in
           place. One command sets up a local copy so you can try it end to end.
+        </p>
+
+        <p className="cb-section-label">See it redesign itself</p>
+        <MorphEmbed src="/morph/montage.html" />
+        <p className="cb-hint">
+          Each clip is the real Claude desktop app rebuilding itself from a
+          single request &mdash; new look, new layout, new features.{" "}
+          <a href="/morph/index.html" target="_blank" rel="noreferrer">
+            Open the full gallery
+          </a>
+          .
         </p>
 
         <p className="cb-section-label">Run this</p>

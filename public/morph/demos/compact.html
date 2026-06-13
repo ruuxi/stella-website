@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude → Compact</title>
+<link rel="stylesheet" href="../shared/claude-base.css">
+<link rel="stylesheet" href="../shared/morph.css">
+<style>
+  /* ===== AFTER: Compact — same Claude, denser power-user layout =====
+     One targeted change: DENSITY. Narrower sidebar, tighter rows, smaller
+     base type, slimmer topbar, tighter message spacing, compact composer.
+     Everything else stays the canonical Claude conversation + look. ===== */
+
+  /* narrower sidebar (~220px) */
+  .cmp-app{grid-template-columns:220px 1fr}
+
+  /* slightly tighter sidebar chrome so more recents fit */
+  .cmp-app .cd-sidebar{padding:10px 8px;gap:1px}
+  .cmp-app .cd-brand{padding:5px 6px 9px}
+  .cmp-app .cd-brand .name{font-size:18px}
+  .cmp-app .cd-newchat{padding:6px 10px;margin-bottom:6px;font-size:12.5px}
+  .cmp-app .cd-seclabel{padding:8px 8px 4px;font-size:10.5px;
+    display:flex;align-items:center}
+  .cmp-app .cd-seclabel .ct{margin-left:auto;font-family:var(--font-mono);
+    font-size:10px;color:var(--text-400);opacity:.7;font-feature-settings:"tnum" 1}
+
+  /* tighter row height — the heart of the density change */
+  .cmp-app .cd-row{height:22px;padding:0 8px;font-size:12px;gap:7px}
+  .cmp-app .cd-row .dot{width:5px;height:5px}
+  .cmp-app .cd-account{padding:6px 7px;margin-top:4px;gap:7px}
+  .cmp-app .cd-account .av{width:21px;height:21px}
+  .cmp-app .cd-account .who,.cmp-app .cd-account .plan{font-size:12px}
+
+  /* slimmer 40px topbar */
+  .cmp-app .cd-main{grid-template-rows:40px 1fr auto}
+  .cmp-app .cd-topbar{padding:0 14px;font-size:12.5px}
+  .cmp-app .cd-topbar .crumb{font-size:12.5px}
+  .cmp-app .cd-density{margin-left:auto;display:flex;align-items:center;gap:6px;
+    font-size:11px;color:var(--text-400);font-weight:500;
+    padding:3px 8px;border-radius:var(--r-pill);background:var(--bg-200);
+    box-shadow:inset 0 0 0 1px var(--hairline)}
+  .cmp-app .cd-density .ic{width:13px;height:13px;color:var(--clay)}
+
+  /* smaller base type + tighter message spacing, wider column to use the room */
+  .cmp-app .cd-convo{padding:14px 22px 6px;overflow-y:auto}
+  .cmp-app .cd-col{max-width:760px;gap:15px}
+  .cmp-app .cd-user{font-size:14px;line-height:1.45;padding:7px 11px;max-width:78%}
+  .cmp-app .cd-assistant{font-size:14.5px;line-height:1.48}
+  .cmp-app .cd-assistant p{margin-bottom:9px}
+  .cmp-app .cd-assistant p:last-child{margin-bottom:0}
+
+  /* a compact bulleted list inside the assistant reply, serif to match */
+  .cmp-app .cd-list{list-style:none;margin:2px 0 9px;padding:0;
+    display:flex;flex-direction:column;gap:4px}
+  .cmp-app .cd-list li{position:relative;padding-left:16px}
+  .cmp-app .cd-list li::before{content:"";position:absolute;left:3px;top:.62em;
+    width:4px;height:4px;border-radius:50%;background:var(--clay);opacity:.85}
+
+  /* turn divider — subtle hairline so multiple exchanges read cleanly when dense */
+  .cmp-app .cd-turn{padding-top:15px;margin-top:1px;
+    border-top:1px solid color-mix(in srgb,var(--text-400) 14%,transparent)}
+  .cmp-app .cd-turn:first-child{padding-top:0;margin-top:0;border-top:0}
+
+  /* slightly more compact composer */
+  .cmp-app .cd-composerwrap{padding:6px 22px 11px}
+  .cmp-app .cd-composer{max-width:760px;padding:11px 12px 8px}
+  .cmp-app .cd-prompt{font-size:14.5px;min-height:20px}
+  .cmp-app .cd-comprow{margin-top:9px;gap:9px}
+  .cmp-app .cd-iconbtn{width:24px;height:24px;font-size:14px}
+  .cmp-app .cd-send{width:26px;height:26px}
+  .cmp-app .cd-send svg{width:15px}
+  .cmp-app .cd-model{font-size:11.5px}
+  .cmp-app .cd-foot{margin-top:6px;font-size:11px;max-width:760px}
+
+  /* ---- motion: gentle, reduced-motion-guarded entrance ---- */
+  @media (prefers-reduced-motion:no-preference){
+    #stage.show-after .cmp-app .cd-row{animation:cmp-rowin .42s var(--ease) both}
+    #stage.show-after .cmp-app .cd-row:nth-child(4){animation-delay:.02s}
+    #stage.show-after .cmp-app .cd-row:nth-child(5){animation-delay:.05s}
+    #stage.show-after .cmp-app .cd-row:nth-child(6){animation-delay:.08s}
+    #stage.show-after .cmp-app .cd-row:nth-child(7){animation-delay:.11s}
+    #stage.show-after .cmp-app .cd-row:nth-child(8){animation-delay:.14s}
+    #stage.show-after .cmp-app .cd-row:nth-child(9){animation-delay:.17s}
+    #stage.show-after .cmp-app .cd-row:nth-child(10){animation-delay:.20s}
+    #stage.show-after .cmp-app .cd-row:nth-child(11){animation-delay:.23s}
+    #stage.show-after .cmp-app .cd-row:nth-child(12){animation-delay:.26s}
+    #stage.show-after .cmp-app .cd-density{animation:cmp-fade .5s var(--ease) both;animation-delay:.18s}
+    #stage.show-after .cmp-app .cd-turn{animation:cmp-fade .5s var(--ease) both;animation-delay:.22s}
+    .cmp-app .cd-row{transition:background .18s var(--ease),color .18s var(--ease)}
+    .cmp-app .cd-row:not(.sel):hover{background:var(--bg-300)}
+  }
+  @keyframes cmp-rowin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+  @keyframes cmp-fade{from{opacity:0}to{opacity:1}}
+</style>
+</head>
+<body>
+<div id="stage" data-prompt="make it more compact, fit more on screen" data-persona="Compact">
+
+  <!-- ============ BEFORE: faithful Claude desktop (reuse across demos) ============ -->
+  <section class="screen" id="before">
+    <div class="cd-app">
+      <aside class="cd-sidebar">
+        <div class="cd-brand">
+          <span class="mark"><span class="ast" style="width:20px;height:20px;display:block"></span></span>
+          <span class="name">Claude</span><span class="sp"></span>
+        </div>
+        <div class="cd-newchat"><span class="plus ast" style="width:14px;height:14px"></span> New chat</div>
+        <div class="cd-seclabel">Recents</div>
+        <div class="cd-row sel"><span class="dot clay"></span><span>Refactor the billing module</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Weeknight dinner ideas</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Trip to Kyoto in spring</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Resume feedback</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Budget for Q3</span></div>
+        <div class="cd-spacer"></div>
+        <div class="cd-account"><span class="av">RN</span><span class="who">Rahul</span><span class="plan">· Max</span></div>
+      </aside>
+      <div class="cd-main">
+        <div class="cd-topbar"><span class="crumb"><b>Personal</b></span><span class="sp"></span></div>
+        <div class="cd-convo"><div class="cd-col">
+          <div class="cd-user">What's a clean way to structure error handling in this service?</div>
+          <div class="cd-assistant">
+            <p>The cleanest approach is to <b>centralize your errors into typed classes</b> and let a single boundary translate them into responses. That keeps your route handlers readable and your logging consistent.</p>
+            <p>From there you can attach a stable error code to each class, so the client always gets a predictable shape it can branch on.</p>
+          </div>
+        </div></div>
+        <div class="cd-composerwrap">
+          <div class="cd-composer">
+            <div class="cd-prompt" id="cdPrompt" data-ph="Reply to Claude&hellip;"></div>
+            <div class="cd-comprow">
+              <span class="cd-iconbtn">+</span>
+              <span class="sp"></span>
+              <span class="cd-work"><span class="cd-spark working"><i></i></span> Working&hellip;</span>
+              <span class="cd-model">Opus 4.8 (1M context) &middot; Fast</span>
+              <span class="cd-send"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M12 5l-6 6M12 5l6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </div>
+          <div class="cd-foot">Claude is AI and can make mistakes. Please double-check responses.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AFTER: Compact — same Claude, denser ============ -->
+  <section class="screen" id="after">
+    <div class="cd-app cmp-app">
+      <aside class="cd-sidebar">
+        <div class="cd-brand">
+          <span class="mark"><span class="ast" style="width:20px;height:20px;display:block"></span></span>
+          <span class="name">Claude</span><span class="sp"></span>
+        </div>
+        <div class="cd-newchat"><span class="plus ast" style="width:14px;height:14px"></span> New chat</div>
+        <div class="cd-seclabel">Recents<span class="ct">14</span></div>
+        <div class="cd-row sel"><span class="dot clay"></span><span>Refactor the billing module</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Weeknight dinner ideas</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Trip to Kyoto in spring</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Resume feedback</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Budget for Q3</span></div>
+        <div class="cd-row"><span class="dot"></span><span>API rate-limit design</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Onboarding email copy</span></div>
+        <div class="cd-row"><span class="dot"></span><span>SQL window functions</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Garden planting schedule</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Reading list for fall</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Postmortem draft</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Standup notes</span></div>
+        <div class="cd-spacer"></div>
+        <div class="cd-account"><span class="av">RN</span><span class="who">Rahul</span><span class="plan">· Max</span></div>
+      </aside>
+      <div class="cd-main">
+        <div class="cd-topbar">
+          <span class="crumb"><b>Personal</b></span>
+          <span class="cd-density">
+            <svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 10h16M4 14h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Compact
+          </span>
+        </div>
+        <div class="cd-convo"><div class="cd-col">
+          <div class="cd-turn">
+            <div class="cd-user">What's a clean way to structure error handling in this service?</div>
+          </div>
+          <div class="cd-turn">
+            <div class="cd-assistant">
+              <p>The cleanest approach is to <b>centralize your errors into typed classes</b> and let a single boundary translate them into responses. That keeps route handlers readable and logging consistent.</p>
+              <ul class="cd-list">
+                <li>One base <b>AppError</b> with a stable <b>code</b> and HTTP status.</li>
+                <li>Subclasses for the cases you actually branch on.</li>
+                <li>A single middleware that maps any thrown error to a response.</li>
+              </ul>
+              <p>From there the client always gets a predictable shape it can branch on.</p>
+            </div>
+          </div>
+          <div class="cd-turn">
+            <div class="cd-user">Should validation errors go through the same boundary?</div>
+          </div>
+          <div class="cd-turn">
+            <div class="cd-assistant">
+              <p>Yes &mdash; wrap them as a <b>ValidationError</b> so they share the same envelope. Carry the field-level details in a <b>details</b> array, and your boundary returns <b>422</b> automatically. One code path, one response shape, no special-casing in handlers.</p>
+            </div>
+          </div>
+        </div></div>
+        <div class="cd-composerwrap">
+          <div class="cd-composer">
+            <div class="cd-prompt" data-ph="Reply to Claude&hellip;"></div>
+            <div class="cd-comprow">
+              <span class="cd-iconbtn">+</span>
+              <span class="sp"></span>
+              <span class="cd-model">Opus 4.8 (1M context) &middot; Fast</span>
+              <span class="cd-send"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M12 5l-6 6M12 5l6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </div>
+          <div class="cd-foot">Claude is AI and can make mistakes. Please double-check responses.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="morph-fx"><div class="morph-band"></div></div>
+  <div class="caption"><span class="cap-prompt"></span><span class="cap-arrow">&rarr;</span><span class="cap-name"></span></div>
+  <button class="replay" id="replay" aria-label="Replay">&#8634;</button>
+</div>
+<script src="../shared/morph.js"></script>
+</body>
+</html>

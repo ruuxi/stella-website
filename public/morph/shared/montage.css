@@ -1,0 +1,16 @@
+/* ============================================================
+   Montage — every demo as-is, back to back, at 1.4x speed.
+   Each demo plays its OWN Claude->variant morph (the band sweep).
+   Between demos: NO transition — a hard cut (the next demo simply
+   begins on its Claude baseline).
+   ============================================================ */
+html,body{height:100%;margin:0;background:#0e0e0d;overflow:hidden;font-family:var(--font-ui)}
+#mstage{position:absolute;inset:0;overflow:hidden;background:var(--bg-100)}
+
+/* stacked frames; instant show/hide — no fade, no transition */
+.mframe{position:absolute;inset:0;width:100%;height:100%;border:0;opacity:0}
+.mframe.show{opacity:1}
+
+/* thin progress line along the top */
+.m-prog{position:absolute;left:0;top:0;height:3px;width:0;z-index:60;
+  background:var(--clay);opacity:.9;transition:width .5s linear;border-radius:0 2px 2px 0}

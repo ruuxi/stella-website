@@ -218,3 +218,24 @@
   color: var(--page-accent);
   font-weight: 500;
 }
+
+/* Embedded "redesigns itself" showcase (scaled 1200x760 iframe) */
+.cb-morph {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--page-radius);
+  border: 1px solid var(--page-border);
+  background: #faf9f5;
+  box-shadow:
+    0 1px 3px rgba(20, 20, 19, 0.08),
+    0 18px 44px rgba(20, 20, 19, 0.1);
+}
+
+.cb-morph iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 0;
+  display: block;
+}

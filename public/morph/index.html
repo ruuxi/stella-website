@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What if Claude could redesign itself?</title>
+<link rel="icon" href="assets/asterisk.svg">
+<link rel="stylesheet" href="shared/claude-base.css">
+<style>
+  :root{--gap:30px;--cardw:384px}
+  html,body{height:auto;margin:0;background:var(--bg-100);overflow:auto}
+  body{font-family:var(--font-ui);color:var(--text-100);font-weight:400;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1300px;margin:0 auto;padding:56px 32px 80px}
+
+  header{text-align:center;max-width:760px;margin:0 auto 14px}
+  .mark{width:46px;height:46px;color:var(--clay);margin:0 auto 22px}
+  .mark .ast{width:100%;height:100%;display:block}
+  h1{font-family:var(--font-serif);font-weight:500;font-size:44px;line-height:1.08;letter-spacing:-.02em;margin:0 0 16px}
+  .sub{font-size:17px;line-height:1.55;color:var(--text-200);max-width:600px;margin:0 auto}
+  .sub b{color:var(--text-100);font-weight:560}
+
+  .bar{display:flex;align-items:center;justify-content:center;gap:12px;margin:30px 0 8px}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--text-100);
+    background:var(--bg-000);border:1px solid var(--hairline);border-radius:9999px;padding:9px 18px;cursor:pointer;
+    transition:background .15s,box-shadow .15s}
+  .btn:hover{background:var(--bg-300)}
+  .btn.primary{background:var(--clay);color:#fff;border-color:transparent}
+  .btn.primary:hover{background:var(--clay-press)}
+  .btn .ic{width:15px;height:15px}
+
+  .section{margin-top:62px}
+  .sec-head{text-align:center;max-width:640px;margin:0 auto 30px}
+  .sec-head .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--clay);font-weight:600}
+  .sec-head h2{font-family:var(--font-serif);font-weight:500;font-size:29px;letter-spacing:-.02em;margin:8px 0 8px}
+  .sec-head p{font-size:15.5px;line-height:1.5;color:var(--text-200);margin:0}
+
+  .grid{display:grid;grid-template-columns:repeat(3,var(--cardw));gap:var(--gap);justify-content:center}
+  .demo{width:var(--cardw)}
+  .frame{position:relative;width:var(--cardw);height:243px;overflow:hidden;border-radius:14px;
+    background:var(--bg-100);box-shadow:0 1px 3px rgba(20,20,19,.08),0 12px 28px rgba(20,20,19,.06);
+    border:1px solid var(--hairline)}
+  .frame iframe{width:1200px;height:760px;border:0;transform:scale(.32);transform-origin:top left;display:block}
+  .frame::after{content:"";position:absolute;inset:0;border-radius:14px;box-shadow:inset 0 0 0 1px rgba(20,20,19,.04);pointer-events:none}
+  .label{margin:14px 2px 0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .label .q{font-size:13.5px;color:var(--text-400)}
+  .label .q::before{content:"\201C"} .label .q::after{content:"\201D"}
+  .label .arrow{color:var(--text-400);opacity:.6}
+  .label .name{font-size:14px;font-weight:600;color:var(--clay)}
+
+  /* montage */
+  .mont-wrap{display:flex;justify-content:center;margin-top:6px}
+  .mont{position:relative;width:1080px;height:684px;overflow:hidden;border-radius:20px;
+    background:var(--bg-100);border:1px solid var(--hairline);
+    box-shadow:0 2px 6px rgba(20,20,19,.08),0 26px 60px rgba(20,20,19,.10)}
+  .mont iframe{width:1200px;height:760px;border:0;transform:scale(.9);transform-origin:top left;display:block}
+
+  footer{text-align:center;margin-top:64px;font-size:13px;color:var(--text-400)}
+  @media (max-width:1240px){.grid{grid-template-columns:repeat(2,var(--cardw))}.mont{width:760px;height:481px}.mont iframe{transform:scale(.6333)}}
+  @media (max-width:840px){.grid{grid-template-columns:var(--cardw)} h1{font-size:34px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="mark"><span class="ast"></span></div>
+    <h1>What if Claude could redesign itself?</h1>
+    <p class="sub">One sentence, and the app rebuilds around you. Some asks just <b>rearrange</b> it; others let it <b>become something else entirely</b>. Every tile below is live HTML, transforming itself on a loop.</p>
+  </header>
+
+  <div class="bar">
+    <button class="btn primary" id="replayAll">
+      <svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1 1 2.3 5.6M4 12V7m0 5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Replay all
+    </button>
+  </div>
+
+  <section class="section">
+    <div class="sec-head">
+      <div class="k">Targeted</div>
+      <h2>Tune itself to you</h2>
+      <p>Same Claude, one thing moved &mdash; a tab strip, an icon rail, a files pane, a focus view. Small asks, instant fit.</p>
+    </div>
+    <div class="grid" id="gridSmall"></div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head">
+      <div class="k">Transformative</div>
+      <h2>Or become something else entirely</h2>
+      <p>When the task is bigger, the whole app can change &mdash; new look, new layout, new structure.</p>
+    </div>
+    <div class="grid" id="gridBig"></div>
+  </section>
+
+  <section class="section">
+    <div class="sec-head">
+      <div class="k">The whole thing</div>
+      <h2>All of it, end to end</h2>
+      <p>One continuous take: Claude reshaping itself, one ask after another &mdash; no resets in between.</p>
+    </div>
+    <div class="mont-wrap">
+      <div class="mont"><iframe loading="lazy" title="Continuous montage" src="montage.html"></iframe></div>
+    </div>
+  </section>
+
+  <footer>Built with Claude Opus 4.8 &middot; faithful Claude desktop baseline, real Anthropic faces, the clay asterisk</footer>
+</div>
+
+<script>
+  var SMALL = [
+    { slug:'tabs',    q:'let me keep a few chats open at once',        name:'Tabbed' },
+    { slug:'rail',    q:'shrink the sidebar to just icons',           name:'Icon Rail' },
+    { slug:'slim',    q:'make the input smaller, give me room to read', name:'Slim Composer' },
+    { slug:'files',   q:'keep my files open beside the chat',          name:'Files Pane' },
+    { slug:'topnav',  q:'move navigation up to the top',               name:'Top Nav' },
+    { slug:'focus',   q:'hide everything, just let me write',          name:'Focus' },
+    { slug:'split',   q:'show two chats side by side',                 name:'Split View' },
+    { slug:'compact', q:'make it more compact, fit more on screen',    name:'Compact' },
+    { slug:'quick',   q:'give me quick actions under the box',         name:'Quick Actions' }
+  ];
+  var BIG = [
+    { slug:'fitness',   q:'make this my running coach',     name:'Runner’s Coach' },
+    { slug:'cook',      q:'turn this into my recipe kitchen', name:'Kitchen' },
+    { slug:'household', q:'help me run the household',        name:'Home Base' },
+    { slug:'study',     q:'be my study buddy',               name:'Study' },
+    { slug:'travel',    q:'plan my Japan trip',              name:'Trip' },
+    { slug:'studio',    q:'make this my music studio',        name:'Studio' },
+    { slug:'trader',    q:'turn this into my trading desk',   name:'Markets' },
+    { slug:'calm',      q:'help me wind down',               name:'Calm' },
+    { slug:'access',    q:'make this easier for me to see',   name:'Simple' }
+  ];
+  function fill(id, list){
+    var grid = document.getElementById(id);
+    list.forEach(function(d){
+      var cell = document.createElement('div'); cell.className = 'demo';
+      cell.innerHTML =
+        '<div class="frame"><iframe loading="lazy" title="'+d.name+'" src="demos/'+d.slug+'.html"></iframe></div>' +
+        '<div class="label"><span class="q">'+d.q+'</span><span class="arrow">→</span><span class="name">'+d.name+'</span></div>';
+      grid.appendChild(cell);
+    });
+  }
+  fill('gridSmall', SMALL);
+  fill('gridBig', BIG);
+  document.getElementById('replayAll').addEventListener('click', function(){
+    document.querySelectorAll('.grid .frame iframe').forEach(function(f){
+      try { f.contentWindow.postMessage('replay-demo','*'); } catch(e){}
+    });
+  });
+</script>
+</body>
+</html>

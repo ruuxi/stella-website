@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude → Quick Actions</title>
+<link rel="stylesheet" href="../shared/claude-base.css">
+<link rel="stylesheet" href="../shared/morph.css">
+<style>
+  /* ===== AFTER: Quick Actions — chips above the composer + tools row inside it.
+     Everything stays canonical Claude: same tokens, same cd-* classes, clay used sparingly. ===== */
+
+  /* row of dashed suggestion chips sitting just above the composer */
+  .qa-chips{max-width:720px;margin:0 auto 10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .qa-chip{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 13px;
+    border-radius:var(--r-pill);font-size:13px;color:var(--text-200);background:var(--bg-000);
+    border:1px dashed var(--hairline);white-space:nowrap;cursor:default;
+    transition:border-color .2s var(--ease),color .2s var(--ease),background .2s var(--ease),transform .2s var(--ease)}
+  .qa-chip svg{width:14px;height:14px;color:var(--clay);flex:none;opacity:.85}
+  .qa-chip .lbl{font-weight:400}
+  .qa-more{color:var(--text-400);font-size:13px;padding:0 6px;cursor:default;flex:none}
+
+  /* a quiet model pill + tool glyphs living inside the composer's control row */
+  .qa-pill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px 0 9px;
+    border-radius:var(--r-pill);font-size:12px;color:var(--text-200);background:var(--bg-200);
+    box-shadow:inset 0 0 0 1px var(--hairline);white-space:nowrap;
+    transition:box-shadow .2s var(--ease)}
+  .qa-pill .spark{width:13px;height:13px;color:var(--clay);flex:none}
+  .qa-pill .chev{width:11px;height:11px;color:var(--text-400);flex:none}
+  .qa-tools{display:inline-flex;align-items:center;gap:2px}
+  .qa-tool{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:var(--text-400);
+    transition:color .2s var(--ease),background .2s var(--ease)}
+  .qa-tool svg{width:16px;height:16px}
+  .qa-div{width:1px;height:18px;background:var(--hairline);margin:0 4px;flex:none}
+
+  @media (prefers-reduced-motion:no-preference){
+    /* chips fan in from the composer, one after another */
+    #stage.show-after .qa-chip{animation:qa-rise .42s var(--ease) both}
+    #stage.show-after .qa-chip:nth-child(1){animation-delay:.16s}
+    #stage.show-after .qa-chip:nth-child(2){animation-delay:.22s}
+    #stage.show-after .qa-chip:nth-child(3){animation-delay:.28s}
+    #stage.show-after .qa-chip:nth-child(4){animation-delay:.34s}
+    #stage.show-after .qa-more{animation:qa-rise .42s var(--ease) both;animation-delay:.40s}
+    #stage.show-after .qa-pill,#stage.show-after .qa-tools{animation:qa-fade .5s var(--ease) both;animation-delay:.30s}
+    .qa-chip:hover{border-color:color-mix(in srgb,var(--clay) 45%,var(--hairline));
+      color:var(--text-100);background:var(--bg-100);transform:translateY(-1px)}
+    .qa-tool:hover{color:var(--text-200);background:var(--bg-200)}
+    .qa-pill:hover{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--clay) 35%,var(--hairline))}
+  }
+  @keyframes qa-rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes qa-fade{from{opacity:0}to{opacity:1}}
+</style>
+</head>
+<body>
+<div id="stage" data-prompt="give me quick actions under the box" data-persona="Quick Actions">
+
+  <!-- ============ BEFORE: faithful Claude desktop (reuse across demos) ============ -->
+  <section class="screen" id="before">
+    <div class="cd-app">
+      <aside class="cd-sidebar">
+        <div class="cd-brand">
+          <span class="mark"><span class="ast" style="width:20px;height:20px;display:block"></span></span>
+          <span class="name">Claude</span><span class="sp"></span>
+        </div>
+        <div class="cd-newchat"><span class="plus ast" style="width:14px;height:14px"></span> New chat</div>
+        <div class="cd-seclabel">Recents</div>
+        <div class="cd-row sel"><span class="dot clay"></span><span>Quarterly update email</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Weeknight dinner ideas</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Trip to Kyoto in spring</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Resume feedback</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Budget for Q3</span></div>
+        <div class="cd-spacer"></div>
+        <div class="cd-account"><span class="av">RN</span><span class="who">Rahul</span><span class="plan">· Max</span></div>
+      </aside>
+      <div class="cd-main">
+        <div class="cd-topbar"><span class="crumb"><b>Personal</b></span><span class="sp"></span></div>
+        <div class="cd-convo"><div class="cd-col">
+          <div class="cd-user">Here's a long thread from the team about the launch — can you help me figure out the next step?</div>
+          <div class="cd-assistant">
+            <p>I read through it. The thread mostly settles two things: the <b>launch date holds at the 24th</b>, and marketing wants final copy a week ahead. The one open question is who owns the rollout checklist.</p>
+            <p>The fastest move is a short reply naming an owner and confirming the copy deadline. Want me to draft that, or pull the whole thread into a tidy summary first?</p>
+          </div>
+        </div></div>
+        <div class="cd-composerwrap">
+          <div class="cd-composer">
+            <div class="cd-prompt" id="cdPrompt" data-ph="Reply to Claude&hellip;"></div>
+            <div class="cd-comprow">
+              <span class="cd-iconbtn">+</span>
+              <span class="sp"></span>
+              <span class="cd-work"><span class="cd-spark working"><i></i></span> Working&hellip;</span>
+              <span class="cd-model">Opus 4.8 (1M context) &middot; Fast</span>
+              <span class="cd-send"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M12 5l-6 6M12 5l6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </div>
+          <div class="cd-foot">Claude is AI and can make mistakes. Please double-check responses.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AFTER: Quick Actions — same Claude app, chips above box + tools row inside ============ -->
+  <section class="screen" id="after">
+    <div class="cd-app">
+      <aside class="cd-sidebar">
+        <div class="cd-brand">
+          <span class="mark"><span class="ast" style="width:20px;height:20px;display:block"></span></span>
+          <span class="name">Claude</span><span class="sp"></span>
+        </div>
+        <div class="cd-newchat"><span class="plus ast" style="width:14px;height:14px"></span> New chat</div>
+        <div class="cd-seclabel">Recents</div>
+        <div class="cd-row sel"><span class="dot clay"></span><span>Quarterly update email</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Weeknight dinner ideas</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Trip to Kyoto in spring</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Resume feedback</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Budget for Q3</span></div>
+        <div class="cd-spacer"></div>
+        <div class="cd-account"><span class="av">RN</span><span class="who">Rahul</span><span class="plan">· Max</span></div>
+      </aside>
+      <div class="cd-main">
+        <div class="cd-topbar"><span class="crumb"><b>Personal</b></span><span class="sp"></span></div>
+        <div class="cd-convo"><div class="cd-col">
+          <div class="cd-user">Here's a long thread from the team about the launch — can you help me figure out the next step?</div>
+          <div class="cd-assistant">
+            <p>I read through it. The thread mostly settles two things: the <b>launch date holds at the 24th</b>, and marketing wants final copy a week ahead. The one open question is who owns the rollout checklist.</p>
+            <p>The fastest move is a short reply naming an owner and confirming the copy deadline. Want me to draft that, or pull the whole thread into a tidy summary first?</p>
+          </div>
+        </div></div>
+        <div class="cd-composerwrap">
+          <!-- THE ONE CHANGE — quick-action chips just above the composer -->
+          <div class="qa-chips">
+            <span class="qa-chip">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M5 6h14M5 10h14M5 14h9M5 18h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <span class="lbl">Summarize thread</span>
+            </span>
+            <span class="qa-chip">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M9 17l-4-1 1-4 9-9 3 3-9 9-1 2Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 5l3 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              <span class="lbl">Draft a reply</span>
+            </span>
+            <span class="qa-chip">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7"/><path d="M9.6 9.4a2.4 2.4 0 1 1 3.3 2.4c-.7.3-.9.7-.9 1.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="16.4" r=".9" fill="currentColor"/></svg>
+              <span class="lbl">Explain this</span>
+            </span>
+            <span class="qa-chip">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.1 1 1.9v.7h5v-.7c0-.8.4-1.4 1-1.9A6 6 0 0 0 12 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 20h4M10.5 22h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <span class="lbl">Brainstorm</span>
+            </span>
+            <span class="qa-more">More&hellip;</span>
+          </div>
+
+          <div class="cd-composer">
+            <div class="cd-prompt" data-ph="Reply to Claude&hellip;"></div>
+            <div class="cd-comprow">
+              <span class="cd-iconbtn">+</span>
+              <!-- subtle tools row inside the composer: model pill + a couple of tool glyphs -->
+              <span class="qa-pill">
+                <span class="ast spark"></span>
+                <span>Opus 4.8</span>
+                <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="qa-tools">
+                <span class="qa-tool" title="Search the web"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.3 3.6 8.5S14.4 18.2 12 20.5C9.6 18.2 8.4 15.2 8.4 12S9.6 5.8 12 3.5Z" stroke="currentColor" stroke-width="1.7"/></svg></span>
+                <span class="qa-tool" title="Attach file"><svg viewBox="0 0 24 24" fill="none"><path d="M18 8.5l-7.6 7.6a3 3 0 0 1-4.3-4.3l7.8-7.8a2 2 0 0 1 2.9 2.9l-7.8 7.8a1 1 0 0 1-1.4-1.4l7.2-7.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="qa-tool" title="Dictate"><svg viewBox="0 0 24 24" fill="none"><path d="M12 14.5a2.8 2.8 0 0 0 2.8-2.8V6.8a2.8 2.8 0 0 0-5.6 0v4.9A2.8 2.8 0 0 0 12 14.5Z" stroke="currentColor" stroke-width="1.7"/><path d="M17.5 11a5.5 5.5 0 0 1-11 0M12 17.5V20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+              </span>
+              <span class="sp"></span>
+              <span class="qa-div"></span>
+              <span class="cd-send"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M12 5l-6 6M12 5l6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </div>
+          <div class="cd-foot">Claude is AI and can make mistakes. Please double-check responses.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="morph-fx"><div class="morph-band"></div></div>
+  <div class="caption"><span class="cap-prompt"></span><span class="cap-arrow">&rarr;</span><span class="cap-name"></span></div>
+  <button class="replay" id="replay" aria-label="Replay">&#8634;</button>
+</div>
+<script src="../shared/morph.js"></script>
+</body>
+</html>

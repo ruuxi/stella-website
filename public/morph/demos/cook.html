@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude → Kitchen</title>
+<link rel="stylesheet" href="../shared/claude-base.css">
+<link rel="stylesheet" href="../shared/morph.css">
+<style>
+  /* ===== AFTER: Kitchen — cozy, no sidebar, search + rail + grid + cooking panel ===== */
+  .cook{position:absolute;inset:0;font-family:var(--font-ui);font-weight:400;
+    background:radial-gradient(125% 95% at 14% -12%,#fdf8ef 0%,#f6efe2 54%,#efe6d6 100%);
+    color:var(--ink);display:grid;grid-template-rows:auto 1fr;
+    /* ----- scoped token system ----- */
+    --clayc:#c4663f;--clay-deep:#a8522f;            /* the single hero accent */
+    --olive:#6f7a4a;--olive-deep:#566040;           /* secondary / "veg" semantic */
+    --amber:#9a6620;                                /* tertiary "cozy" semantic */
+    --card:#fffdf8;
+    --ink:#2e271f;                                  /* primary text */
+    --ink-2:#5c5142;                                /* secondary text (AA on card) */
+    --mut:#83755f;                                  /* tertiary text (AA on card/cream) */
+    /* tinted neutrals via color-mix, never raw alpha-hex */
+    --line:color-mix(in srgb,var(--ink) 11%,transparent);
+    --line-soft:color-mix(in srgb,var(--ink) 7%,transparent);
+    --fill-2:color-mix(in srgb,var(--ink) 6%,transparent);
+    --clay-wash:color-mix(in srgb,var(--clayc) 9%,var(--card));
+    --olive-wash:color-mix(in srgb,var(--olive) 13%,transparent);
+    /* one coherent elevation system: tight contact + soft ambient */
+    --el-1:0 1px 1px color-mix(in srgb,var(--ink) 5%,transparent),0 2px 6px color-mix(in srgb,var(--ink) 5%,transparent);
+    --el-2:0 1px 2px color-mix(in srgb,var(--ink) 6%,transparent),0 8px 22px -8px color-mix(in srgb,var(--ink) 16%,transparent);
+    --el-clay:0 4px 14px -4px color-mix(in srgb,var(--clayc) 52%,transparent);
+    /* rational radius family */
+    --rad-xl:18px;--rad-lg:14px;--rad-md:12px;--rad-sm:10px;--rad-pill:9999px}
+
+  /* top search bar */
+  .cook-top{display:flex;align-items:center;gap:16px;padding:18px 24px 12px}
+  .cook-logo{display:flex;align-items:center;gap:10px;flex:none}
+  .cook-logo .knob{width:32px;height:32px;border-radius:var(--rad-sm);flex:none;
+    background:linear-gradient(150deg,var(--clayc),var(--clay-deep));display:grid;place-items:center;color:#fff;
+    box-shadow:var(--el-clay)}
+  .cook-logo .knob svg{width:18px;height:18px}
+  .cook-logo .nm{font-family:var(--font-serif);font-size:20px;font-weight:500;letter-spacing:-.02em;color:var(--ink)}
+  .cook-search{flex:1;display:flex;align-items:center;gap:12px;background:var(--card);
+    border:1px solid var(--line);border-radius:var(--rad-pill);padding:11px 16px;box-shadow:var(--el-1);
+    transition:box-shadow .25s var(--ease),border-color .25s var(--ease)}
+  .cook-search:hover{border-color:color-mix(in srgb,var(--clayc) 30%,var(--line));box-shadow:var(--el-2)}
+  .cook-search svg{width:18px;height:18px;color:var(--clayc);flex:none}
+  .cook-search .ph{color:var(--ink);font-size:15px;letter-spacing:-.005em}
+  .cook-search .ph b{color:var(--mut);font-weight:400;font-style:italic}
+  .cook-search .sp{flex:1}
+  .cook-search .chip{font-size:12px;color:var(--olive-deep);background:var(--olive-wash);
+    border-radius:var(--rad-pill);padding:5px 11px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.005em}
+  .cook-av{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;
+    color:#fff;font-size:13px;font-weight:600;letter-spacing:.01em;
+    background:linear-gradient(150deg,var(--olive),var(--olive-deep));
+    box-shadow:0 2px 8px -3px color-mix(in srgb,var(--olive-deep) 60%,transparent)}
+
+  /* 3-column body */
+  .cook-body{display:grid;grid-template-columns:132px 1fr 288px;gap:20px;padding:8px 24px 20px;min-height:0}
+
+  /* LEFT rail */
+  .cook-rail{display:flex;flex-direction:column;gap:4px;min-width:0}
+  .cook-cat{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:var(--rad-md);
+    color:var(--ink-2);font-size:14px;font-weight:500;letter-spacing:-.005em;cursor:default;
+    transition:background .2s var(--ease),color .2s var(--ease)}
+  .cook-cat svg{width:18px;height:18px;color:var(--mut);flex:none;transition:color .2s var(--ease)}
+  .cook-cat:not(.on):hover{background:var(--fill-2);color:var(--ink)}
+  .cook-cat:not(.on):hover svg{color:var(--ink-2)}
+  .cook-cat.on{background:linear-gradient(150deg,var(--clayc),var(--clay-deep));color:#fff;font-weight:600;
+    box-shadow:var(--el-clay)}
+  .cook-cat.on svg{color:#fff}
+  .cook-rail .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);
+    padding:4px 12px 8px;font-weight:600}
+  .cook-rail .div{height:1px;background:var(--line-soft);margin:8px 4px}
+  .cook-tip{margin-top:auto;background:var(--olive-wash);border:1px solid color-mix(in srgb,var(--olive) 16%,transparent);
+    border-radius:var(--rad-md);padding:12px;font-size:12px;color:var(--olive-deep);line-height:1.45}
+  .cook-tip b{font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:5px;color:var(--ink)}
+  .cook-tip b svg{width:14px;height:14px;color:var(--olive-deep)}
+
+  /* CENTER grid */
+  .cook-center{display:flex;flex-direction:column;min-width:0}
+  .cook-chead{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+  .cook-chead h2{font-family:var(--font-serif);font-size:24px;font-weight:500;letter-spacing:-.02em;color:var(--ink)}
+  .cook-chead .ct{font-size:13px;color:var(--mut);margin-left:auto;letter-spacing:-.005em}
+  .cook-chead .ct b{color:var(--ink-2);font-weight:600;font-variant-numeric:tabular-nums}
+  .cook-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;overflow:hidden;align-content:start}
+  .cook-card{background:var(--card);border:1px solid var(--line);border-radius:var(--rad-lg);overflow:hidden;
+    box-shadow:var(--el-1);display:flex;flex-direction:column;
+    transition:transform .28s var(--ease),box-shadow .28s var(--ease),border-color .28s var(--ease)}
+  .cook-card:hover{transform:translateY(-3px);box-shadow:var(--el-2);
+    border-color:color-mix(in srgb,var(--clayc) 22%,var(--line))}
+  .cook-photo{height:94px;position:relative;display:flex;align-items:flex-start;justify-content:flex-end;padding:8px}
+  .cook-photo::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,transparent 55%,color-mix(in srgb,var(--ink) 12%,transparent))}
+  .cook-photo .fav{width:26px;height:26px;border-radius:50%;position:relative;z-index:1;
+    background:color-mix(in srgb,var(--card) 86%,transparent);display:grid;place-items:center;color:var(--clayc);
+    box-shadow:0 1px 3px color-mix(in srgb,var(--ink) 18%,transparent);
+    -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+    transition:transform .2s var(--ease),color .2s var(--ease)}
+  .cook-card:hover .fav{transform:scale(1.08)}
+  .cook-photo .fav svg{width:14px;height:14px}
+  .ph-a{background:linear-gradient(150deg,#e8a06a,#c4663f 90%)}
+  .ph-b{background:linear-gradient(150deg,#cdd49a,#6f7a4a 92%)}
+  .ph-c{background:linear-gradient(150deg,#f0c98a,#d99a4e 90%)}
+  .ph-d{background:linear-gradient(150deg,#e6b89a,#a8522f 95%)}
+  .ph-e{background:linear-gradient(150deg,#dcd2a8,#9aa05e 92%)}
+  .ph-f{background:linear-gradient(150deg,#f2cf9c,#cf8a52 90%)}
+  .cook-cbody{padding:12px;display:flex;flex-direction:column;gap:8px}
+  .cook-card h3{font-family:var(--font-serif);font-size:16px;font-weight:500;letter-spacing:-.01em;line-height:1.18;color:var(--ink)}
+  .cook-meta{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mut)}
+  .cook-meta .mi{display:flex;align-items:center;gap:5px}
+  .cook-meta .mi b{font-weight:600;color:var(--ink-2);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .cook-meta svg{width:13px;height:13px;flex:none}
+  .cook-meta .dotsep{width:3px;height:3px;border-radius:50%;background:currentColor;opacity:.45}
+  .cook-tag{align-self:flex-start;font-size:11px;font-weight:600;padding:3px 9px;border-radius:var(--rad-pill);letter-spacing:.005em}
+  .tag-veg{background:var(--olive-wash);color:var(--olive-deep)}
+  .tag-quick{background:color-mix(in srgb,var(--clayc) 12%,transparent);color:var(--clay-deep)}
+  .tag-cozy{background:color-mix(in srgb,var(--amber) 15%,transparent);color:var(--amber)}
+
+  /* RIGHT cooking-now panel — the live focal task */
+  .cook-now{background:var(--card);
+    border:1px solid color-mix(in srgb,var(--clayc) 20%,var(--line));border-radius:var(--rad-xl);
+    padding:16px;display:flex;flex-direction:column;min-height:0;box-shadow:var(--el-2)}
+  .cook-now .nlabel{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--clay-deep);font-weight:700;display:flex;align-items:center;gap:7px}
+  .cook-now .nlabel .pulse{width:7px;height:7px;border-radius:50%;background:var(--clayc);
+    box-shadow:0 0 0 0 color-mix(in srgb,var(--clayc) 50%,transparent)}
+  .cook-now h3{font-family:var(--font-serif);font-size:19px;font-weight:500;margin:8px 0 3px;letter-spacing:-.015em;line-height:1.18;color:var(--ink)}
+  .cook-now .nsub{font-size:12px;color:var(--mut);margin-bottom:14px}
+  .cook-now .nsub b{color:var(--ink-2);font-weight:600;font-variant-numeric:tabular-nums}
+  .cook-timer{display:flex;align-items:center;gap:14px;
+    background:linear-gradient(150deg,color-mix(in srgb,var(--clayc) 7%,var(--card)),color-mix(in srgb,var(--clayc) 14%,var(--card)));
+    border:1px solid color-mix(in srgb,var(--clayc) 22%,transparent);border-radius:var(--rad-lg);padding:12px 14px;margin-bottom:14px}
+  .cook-tring{width:50px;height:50px;flex:none}
+  .cook-timer .tt{font-family:var(--font-mono);font-size:23px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1;color:var(--clay-deep)}
+  .cook-timer .tl{font-size:11.5px;color:var(--ink-2);margin-top:4px;font-weight:500}
+  .cook-steps{display:flex;flex-direction:column;gap:13px;overflow:hidden;min-height:0;padding-top:1px}
+  .cook-step{display:flex;gap:11px;align-items:flex-start}
+  .cook-step .num{width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;
+    font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums;background:var(--fill-2);color:var(--mut)}
+  .cook-step .tx{font-size:13px;line-height:1.42;color:var(--ink-2);padding-top:1px}
+  .cook-step.done .num{background:var(--olive);color:#fff}
+  .cook-step.done .tx{color:var(--mut);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--mut) 50%,transparent)}
+  .cook-step.active .num{background:linear-gradient(150deg,var(--clayc),var(--clay-deep));color:#fff;
+    box-shadow:0 0 0 4px color-mix(in srgb,var(--clayc) 16%,transparent)}
+  .cook-step.active .tx{font-weight:600;color:var(--ink)}
+  .cook-step .num svg{width:12px;height:12px}
+  .cook-nbtn{margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;
+    background:linear-gradient(150deg,var(--clayc),var(--clay-deep));color:#fff;border-radius:var(--rad-md);
+    padding:12px;font-size:13.5px;font-weight:600;letter-spacing:-.005em;cursor:default;box-shadow:var(--el-clay);
+    transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+  .cook-nbtn:hover{transform:translateY(-1px);box-shadow:0 7px 18px -5px color-mix(in srgb,var(--clayc) 60%,transparent)}
+  .cook-nbtn:active{transform:translateY(0)}
+  .cook-nbtn svg{width:15px;height:15px}
+
+  @media (prefers-reduced-motion:no-preference){
+    .cook-card{animation:cook-rise .55s var(--ease) both}
+    #stage.show-after .cook-card:nth-child(2){animation-delay:.05s}
+    #stage.show-after .cook-card:nth-child(3){animation-delay:.1s}
+    #stage.show-after .cook-card:nth-child(4){animation-delay:.15s}
+    #stage.show-after .cook-card:nth-child(5){animation-delay:.2s}
+    #stage.show-after .cook-card:nth-child(6){animation-delay:.25s}
+    .cook-top{animation:cook-drop .5s var(--ease) both}
+    .cook-now{animation:cook-slide .6s var(--ease) .08s both}
+    .cook-tip{animation:cook-fade .5s var(--ease) .22s both}
+    .cook-rail .cook-cat{animation:cook-fade .5s var(--ease) both}
+    #stage.show-after .cook-cat:nth-child(3){animation-delay:.04s}
+    #stage.show-after .cook-cat:nth-child(4){animation-delay:.08s}
+    #stage.show-after .cook-cat:nth-child(5){animation-delay:.12s}
+    #stage.show-after .cook-cat:nth-child(6){animation-delay:.16s}
+    .cook-now .pulse{animation:cook-pulse 1.8s ease-in-out infinite}
+    .cook-tdash{animation:cook-dash 1.1s var(--ease) .15s both}
+  }
+  @keyframes cook-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  @keyframes cook-slide{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+  @keyframes cook-fade{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+  @keyframes cook-drop{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+  @keyframes cook-pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--clayc) 45%,transparent)}
+    70%{box-shadow:0 0 0 6px color-mix(in srgb,var(--clayc) 0%,transparent)}
+    100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--clayc) 0%,transparent)}}
+  @keyframes cook-dash{from{stroke-dashoffset:126}to{stroke-dashoffset:34}}
+</style>
+</head>
+<body>
+<div id="stage" data-prompt="turn this into my recipe kitchen" data-persona="Kitchen">
+
+  <!-- ============ BEFORE: faithful Claude desktop (reuse across demos) ============ -->
+  <section class="screen" id="before">
+    <div class="cd-app">
+      <aside class="cd-sidebar">
+        <div class="cd-brand">
+          <span class="mark"><span class="ast" style="width:20px;height:20px;display:block"></span></span>
+          <span class="name">Claude</span><span class="sp"></span>
+        </div>
+        <div class="cd-newchat"><span class="plus ast" style="width:14px;height:14px"></span> New chat</div>
+        <div class="cd-seclabel">Recents</div>
+        <div class="cd-row sel"><span class="dot clay"></span><span>What can I make with chickpeas?</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Weeknight dinner ideas</span></div>
+        <div class="cd-row"><span class="dot"></span><span>How to fix a salty soup</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Sourdough starter schedule</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Meal prep for the week</span></div>
+        <div class="cd-spacer"></div>
+        <div class="cd-account"><span class="av">RN</span><span class="who">Rahul</span><span class="plan">· Max</span></div>
+      </aside>
+      <div class="cd-main">
+        <div class="cd-topbar"><span class="crumb"><b>Personal</b></span><span class="sp"></span></div>
+        <div class="cd-convo"><div class="cd-col">
+          <div class="cd-user">I have chickpeas, spinach, and half a can of tomatoes. What can I make for dinner?</div>
+          <div class="cd-assistant">
+            <p>That is the start of a lovely <b>chickpea and spinach stew</b>. Soften an onion and some garlic in olive oil, stir in the tomatoes with a pinch of cumin and smoked paprika, then add the drained chickpeas and let it simmer for ten minutes.</p>
+            <p>Fold the spinach through at the end until it just wilts, finish with lemon and salt, and serve over rice or with warm bread. It comes together in about twenty-five minutes.</p>
+          </div>
+        </div></div>
+        <div class="cd-composerwrap">
+          <div class="cd-composer">
+            <div class="cd-prompt" id="cdPrompt" data-ph="Reply to Claude&hellip;"></div>
+            <div class="cd-comprow">
+              <span class="cd-iconbtn">+</span>
+              <span class="sp"></span>
+              <span class="cd-work"><span class="cd-spark working"><i></i></span> Working&hellip;</span>
+              <span class="cd-model">Opus 4.8 (1M context) &middot; Fast</span>
+              <span class="cd-send"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M12 5l-6 6M12 5l6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </div>
+          <div class="cd-foot">Claude is AI and can make mistakes. Please double-check responses.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AFTER: Kitchen ============ -->
+  <section class="screen" id="after">
+    <div class="cook">
+      <div class="cook-top">
+        <div class="cook-logo">
+          <span class="knob"><svg viewBox="0 0 24 24" fill="none"><path d="M7 2v6M11 2v6M9 8v3a2 2 0 0 1-4 0V8M9 11v11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 2c-1.5 0-2.5 2-2.5 5.5S15.5 13 17 13v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="nm">Kitchen</span>
+        </div>
+        <div class="cook-search">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.9"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+          <span class="ph">What&rsquo;s in your fridge? <b>chickpeas, spinach, tomatoes&hellip;</b></span>
+          <span class="sp"></span>
+          <span class="chip">3 ingredients</span>
+        </div>
+        <span class="cook-av">RN</span>
+      </div>
+
+      <div class="cook-body">
+        <!-- LEFT category rail -->
+        <nav class="cook-rail">
+          <div class="lbl">Browse</div>
+          <div class="cook-cat"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19h16M6 19v-4a6 6 0 0 1 12 0v4M9 6V4M12 6V3M15 6V4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg> Breakfast</div>
+          <div class="cook-cat"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12V3M9 3v5a3 3 0 0 0 6 0V3M5 21h14a2 2 0 0 0 0-4H5a2 2 0 0 0 0 4Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Lunch</div>
+          <div class="cook-cat on"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4v16M5 4c2 0 3 2 3 4s-1 4-3 4M19 4v16M16 4v8h6M19 4h3v8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Dinner</div>
+          <div class="cook-cat"><svg viewBox="0 0 24 24" fill="none"><path d="M4 18h16l-2 3H6l-2-3ZM6 18a6 6 0 0 1 12 0M12 8V5M10 5h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Desserts</div>
+          <div class="cook-cat"><svg viewBox="0 0 24 24" fill="none"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Quick</div>
+          <div class="div"></div>
+          <div class="cook-tip"><b><svg viewBox="0 0 24 24" fill="none"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Tonight&rsquo;s pantry</b>You&rsquo;re one ingredient from 8 new dinners. Add garlic to unlock them.</div>
+        </nav>
+
+        <!-- CENTER recipe grid -->
+        <main class="cook-center">
+          <div class="cook-chead">
+            <h2>Dinner tonight</h2>
+            <span class="ct">From your 3 ingredients &middot; <b>24</b> matches</span>
+          </div>
+          <div class="cook-grid">
+            <article class="cook-card">
+              <div class="cook-photo ph-a"><span class="fav"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z"/></svg></span></div>
+              <div class="cook-cbody">
+                <h3>Smoky Chickpea &amp; Spinach Stew</h3>
+                <div class="cook-meta"><span class="mi"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><b>25</b>&nbsp;min</span><span class="dotsep"></span><span>Easy</span></div>
+                <span class="cook-tag tag-veg">Vegetarian</span>
+              </div>
+            </article>
+            <article class="cook-card">
+              <div class="cook-photo ph-c"><span class="fav"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z" stroke="currentColor" stroke-width="1.8"/></svg></span></div>
+              <div class="cook-cbody">
+                <h3>Lemon Garlic Butter Salmon</h3>
+                <div class="cook-meta"><span class="mi"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><b>20</b>&nbsp;min</span><span class="dotsep"></span><span>Easy</span></div>
+                <span class="cook-tag tag-quick">Weeknight</span>
+              </div>
+            </article>
+            <article class="cook-card">
+              <div class="cook-photo ph-b"><span class="fav"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z" stroke="currentColor" stroke-width="1.8"/></svg></span></div>
+              <div class="cook-cbody">
+                <h3>Charred Broccoli Orzo</h3>
+                <div class="cook-meta"><span class="mi"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><b>30</b>&nbsp;min</span><span class="dotsep"></span><span>Medium</span></div>
+                <span class="cook-tag tag-veg">Vegetarian</span>
+              </div>
+            </article>
+            <article class="cook-card">
+              <div class="cook-photo ph-d"><span class="fav"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z" stroke="currentColor" stroke-width="1.8"/></svg></span></div>
+              <div class="cook-cbody">
+                <h3>Braised Harissa Short Ribs</h3>
+                <div class="cook-meta"><span class="mi"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><b>2</b>&nbsp;hr&nbsp;<b>10</b></span><span class="dotsep"></span><span>Project</span></div>
+                <span class="cook-tag tag-cozy">Cozy</span>
+              </div>
+            </article>
+            <article class="cook-card">
+              <div class="cook-photo ph-e"><span class="fav"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z" stroke="currentColor" stroke-width="1.8"/></svg></span></div>
+              <div class="cook-cbody">
+                <h3>Herby Green Shakshuka</h3>
+                <div class="cook-meta"><span class="mi"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><b>22</b>&nbsp;min</span><span class="dotsep"></span><span>Easy</span></div>
+                <span class="cook-tag tag-veg">Vegetarian</span>
+              </div>
+            </article>
+            <article class="cook-card">
+              <div class="cook-photo ph-f"><span class="fav"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9Z" stroke="currentColor" stroke-width="1.8"/></svg></span></div>
+              <div class="cook-cbody">
+                <h3>Brown Butter Gnocchi</h3>
+                <div class="cook-meta"><span class="mi"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><b>18</b>&nbsp;min</span><span class="dotsep"></span><span>Easy</span></div>
+                <span class="cook-tag tag-cozy">Cozy</span>
+              </div>
+            </article>
+          </div>
+        </main>
+
+        <!-- RIGHT cooking-now panel -->
+        <aside class="cook-now">
+          <div class="nlabel"><span class="pulse"></span> Cooking now</div>
+          <h3>Smoky Chickpea &amp; Spinach Stew</h3>
+          <div class="nsub">Serves <b>4</b> &middot; Step <b>3</b> of <b>5</b></div>
+
+          <div class="cook-timer">
+            <svg class="cook-tring" viewBox="0 0 44 44">
+              <circle cx="22" cy="22" r="20" fill="none" stroke="#c4663f22" stroke-width="4"/>
+              <circle class="cook-tdash" cx="22" cy="22" r="20" fill="none" stroke="#c4663f" stroke-width="4"
+                stroke-linecap="round" stroke-dasharray="126" stroke-dashoffset="34" transform="rotate(-90 22 22)"/>
+            </svg>
+            <div>
+              <div class="tt">7:24</div>
+              <div class="tl">Simmer remaining</div>
+            </div>
+          </div>
+
+          <div class="cook-steps">
+            <div class="cook-step done">
+              <span class="num"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="tx">Soften onion &amp; garlic in olive oil until golden.</span>
+            </div>
+            <div class="cook-step done">
+              <span class="num"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="tx">Stir in tomatoes, cumin &amp; smoked paprika.</span>
+            </div>
+            <div class="cook-step active">
+              <span class="num">3</span>
+              <span class="tx">Add chickpeas and simmer for 10 minutes until thickened.</span>
+            </div>
+            <div class="cook-step">
+              <span class="num">4</span>
+              <span class="tx">Fold spinach through until it just wilts.</span>
+            </div>
+            <div class="cook-step">
+              <span class="num">5</span>
+              <span class="tx">Finish with lemon, salt &amp; a drizzle of oil.</span>
+            </div>
+          </div>
+
+          <div class="cook-nbtn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg> Next step</div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <div class="morph-fx"><div class="morph-band"></div></div>
+  <div class="caption"><span class="cap-prompt"></span><span class="cap-arrow">&rarr;</span><span class="cap-name"></span></div>
+  <button class="replay" id="replay" aria-label="Replay">&#8634;</button>
+</div>
+<script src="../shared/morph.js"></script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude → Top Nav</title>
+<link rel="stylesheet" href="../shared/claude-base.css">
+<link rel="stylesheet" href="../shared/morph.css">
+<style>
+  /* ===== AFTER: Top Nav — sidebar removed, navigation lifted into the top bar ===== */
+  .tn{position:absolute;inset:0;background:var(--bg-100);color:var(--text-100);
+    font-family:var(--font-ui);font-weight:360;
+    display:grid;grid-template-rows:56px 1fr auto;min-width:0;overflow:hidden;
+    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+  /* ---- top navigation bar ---- */
+  .tn-nav{display:flex;align-items:center;gap:8px;height:56px;padding:0 22px;
+    background:var(--bg-000);border-bottom:1px solid var(--hairline)}
+  .tn-brand{display:flex;align-items:center;gap:9px;flex:none;padding-right:6px}
+  .tn-brand .mark{width:21px;height:21px;color:var(--clay);flex:none}
+  .tn-brand .mark .ast{width:21px;height:21px;display:block}
+  .tn-brand .name{font-family:var(--font-serif);font-size:20px;font-weight:500;letter-spacing:-.01em}
+
+  .tn-divide{width:1px;height:22px;background:var(--hairline);margin:0 6px;flex:none}
+
+  /* chats dropdown affordance */
+  .tn-chats{display:flex;align-items:center;gap:7px;height:34px;padding:0 11px;border-radius:var(--r-pill);
+    background:var(--bg-200);box-shadow:inset 0 0 0 1px var(--hairline);
+    font-size:13.5px;color:var(--text-100);font-weight:420;flex:none}
+  .tn-chats .lbl{color:var(--text-200)}
+  .tn-chats .cur{color:var(--text-100);font-weight:480}
+  .tn-chats .chev{width:13px;height:13px;color:var(--text-400);margin-left:1px}
+
+  /* secondary nav items */
+  .tn-links{display:flex;align-items:center;gap:2px;margin-left:4px}
+  .tn-link{display:flex;align-items:center;gap:7px;height:34px;padding:0 12px;border-radius:var(--r-pill);
+    font-size:13.5px;color:var(--text-400);font-weight:420}
+  .tn-link svg{width:15px;height:15px;flex:none;opacity:.85}
+  .tn-link.on{color:var(--text-100);background:var(--bg-200)}
+
+  .tn-sp{flex:1}
+
+  /* new chat pill + avatar */
+  .tn-new{display:flex;align-items:center;gap:7px;height:34px;padding:0 14px 0 12px;border-radius:var(--r-pill);
+    background:var(--bg-000);box-shadow:0 0 0 1px var(--hairline);
+    font-size:13px;color:var(--text-100);font-weight:440;flex:none}
+  .tn-new .plus{width:14px;height:14px;color:var(--clay);flex:none}
+  .tn-av{width:30px;height:30px;border-radius:8px;background:var(--clay);color:#fff;
+    display:grid;place-items:center;font-size:12px;font-weight:600;flex:none;
+    box-shadow:0 1px 2px rgba(20,20,19,.10)}
+
+  /* ---- conversation: full-width centered column ---- */
+  .tn-convo{overflow:hidden;padding:38px 24px 8px}
+  .tn-col{max-width:68ch;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+  .tn-crumb{font-size:13px;color:var(--text-400);text-align:center;margin-bottom:6px}
+  .tn-crumb b{color:var(--text-200);font-weight:500}
+
+  /* composer reuses cd-* but widened to match the 68ch column */
+  .tn .cd-composer,.tn .cd-foot{max-width:68ch}
+
+  /* ---- motion: nav settles in from the top, content rises ---- */
+  @media (prefers-reduced-motion:no-preference){
+    #stage.show-after .tn-nav{animation:tn-drop .5s var(--ease) both}
+    #stage.show-after .tn-brand{animation:tn-fade .5s var(--ease) both;animation-delay:.10s}
+    #stage.show-after .tn-chats{animation:tn-fade .5s var(--ease) both;animation-delay:.16s}
+    #stage.show-after .tn-link{animation:tn-fade .5s var(--ease) both}
+    #stage.show-after .tn-link:nth-of-type(1){animation-delay:.20s}
+    #stage.show-after .tn-link:nth-of-type(2){animation-delay:.24s}
+    #stage.show-after .tn-new{animation:tn-fade .5s var(--ease) both;animation-delay:.28s}
+    #stage.show-after .tn-av{animation:tn-fade .5s var(--ease) both;animation-delay:.32s}
+    #stage.show-after .tn-col{animation:tn-rise .55s var(--ease) both;animation-delay:.22s}
+    .tn-chats,.tn-link,.tn-new{transition:background .2s var(--ease),color .2s var(--ease),box-shadow .2s var(--ease)}
+    .tn-chats:hover{background:var(--bg-300)}
+    .tn-link:not(.on):hover{color:var(--text-200);background:var(--bg-200)}
+    .tn-new:hover{box-shadow:0 0 0 1px var(--clay)}
+  }
+  @keyframes tn-drop{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+  @keyframes tn-fade{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+  @keyframes tn-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div id="stage" data-prompt="move navigation up to the top" data-persona="Top Nav">
+
+  <!-- ============ BEFORE: faithful Claude desktop (reuse across demos) ============ -->
+  <section class="screen" id="before">
+    <div class="cd-app">
+      <aside class="cd-sidebar">
+        <div class="cd-brand">
+          <span class="mark"><span class="ast" style="width:20px;height:20px;display:block"></span></span>
+          <span class="name">Claude</span><span class="sp"></span>
+        </div>
+        <div class="cd-newchat"><span class="plus ast" style="width:14px;height:14px"></span> New chat</div>
+        <div class="cd-seclabel">Recents</div>
+        <div class="cd-row sel"><span class="dot clay"></span><span>Tide pools at Point Reyes</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Weeknight dinner ideas</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Trip to Kyoto in spring</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Resume feedback</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Budget for Q3</span></div>
+        <div class="cd-spacer"></div>
+        <div class="cd-account"><span class="av">RN</span><span class="who">Rahul</span><span class="plan">· Max</span></div>
+      </aside>
+      <div class="cd-main">
+        <div class="cd-topbar"><span class="crumb"><b>Personal</b></span><span class="sp"></span></div>
+        <div class="cd-convo"><div class="cd-col">
+          <div class="cd-user">What's the best time to see tide pools at Point Reyes?</div>
+          <div class="cd-assistant">
+            <p>Aim for a <b>negative low tide</b>, which uncovers the most life and the deepest pools. These tend to cluster around new and full moons, and the lowest daytime lows in spring usually fall in the early morning.</p>
+            <p>Check a local tide table for the day you're planning, look for readings below <b>&minus;0.5 ft</b>, and arrive about an hour before the low so you can work your way out as the water keeps dropping.</p>
+          </div>
+        </div></div>
+        <div class="cd-composerwrap">
+          <div class="cd-composer">
+            <div class="cd-prompt" id="cdPrompt" data-ph="Reply to Claude&hellip;"></div>
+            <div class="cd-comprow">
+              <span class="cd-iconbtn">+</span>
+              <span class="sp"></span>
+              <span class="cd-work"><span class="cd-spark working"><i></i></span> Working&hellip;</span>
+              <span class="cd-model">Opus 4.8 (1M context) &middot; Fast</span>
+              <span class="cd-send"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M12 5l-6 6M12 5l6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </div>
+          <div class="cd-foot">Claude is AI and can make mistakes. Please double-check responses.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AFTER: Top Nav — sidebar gone, nav lifted into the top bar ============ -->
+  <section class="screen" id="after">
+    <div class="tn">
+      <nav class="tn-nav">
+        <div class="tn-brand">
+          <span class="mark"><span class="ast"></span></span>
+          <span class="name">Claude</span>
+        </div>
+        <span class="tn-divide"></span>
+        <div class="tn-chats">
+          <span class="lbl">Chats</span>
+          <span class="cur">/ Tide pools at Point Reyes</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="tn-links">
+          <span class="tn-link"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>Projects</span>
+          <span class="tn-link"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M9 9h6M9 13h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Artifacts</span>
+        </div>
+        <span class="tn-sp"></span>
+        <div class="tn-new"><span class="plus ast"></span> New chat</div>
+        <div class="tn-av">RN</div>
+      </nav>
+
+      <div class="tn-convo">
+        <div class="tn-col">
+          <div class="tn-crumb"><b>Personal</b></div>
+          <div class="cd-user">What's the best time to see tide pools at Point Reyes?</div>
+          <div class="cd-assistant">
+            <p>Aim for a <b>negative low tide</b>, which uncovers the most life and the deepest pools. These tend to cluster around new and full moons, and the lowest daytime lows in spring usually fall in the early morning.</p>
+            <p>Check a local tide table for the day you're planning, look for readings below <b>&minus;0.5 ft</b>, and arrive about an hour before the low so you can work your way out as the water keeps dropping.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cd-composerwrap">
+        <div class="cd-composer">
+          <div class="cd-prompt" data-ph="Reply to Claude&hellip;"></div>
+          <div class="cd-comprow">
+            <span class="cd-iconbtn">+</span>
+            <span class="sp"></span>
+            <span class="cd-model">Opus 4.8 (1M context) &middot; Fast</span>
+            <span class="cd-send"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M12 5l-6 6M12 5l6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+        <div class="cd-foot">Claude is AI and can make mistakes. Please double-check responses.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="morph-fx"><div class="morph-band"></div></div>
+  <div class="caption"><span class="cap-prompt"></span><span class="cap-arrow">&rarr;</span><span class="cap-name"></span></div>
+  <button class="replay" id="replay" aria-label="Replay">&#8634;</button>
+</div>
+<script src="../shared/morph.js"></script>
+</body>
+</html>

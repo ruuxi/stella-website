@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude → Runner's Coach</title>
+<link rel="stylesheet" href="../shared/claude-base.css">
+<link rel="stylesheet" href="../shared/morph.css">
+<style>
+  /* ===== AFTER: Runner's Coach — dark, no sidebar, bottom tab bar ===== */
+  .fit{position:absolute;inset:0;
+    background:radial-gradient(135% 95% at 50% -18%,#1f2229 0%,#15171c 56%,#0f1013 100%);
+    color:var(--ink);font-family:var(--font-ui);font-weight:400;
+    display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;
+    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+    /* ---- scoped tokens ---- */
+    --lime:#c8f24a;
+    --ink:#eef0f4;          /* primary text */
+    --ink-2:#b6bac4;        /* secondary text (AA on card) */
+    --mut:#9da2ad;          /* tertiary / labels (AA-large on card) */
+    --card:#1a1c22;         /* surface 1 */
+    --inset:#212530;        /* surface 2 (nested panels) */
+    --inset-2:#2b2f3a;      /* track / empty bar */
+    --line:color-mix(in srgb,#ffffff 9%,transparent);
+    --line-2:color-mix(in srgb,#ffffff 5%,transparent);
+    /* elevation: tight contact + soft ambient */
+    --el-card:0 1px 0 color-mix(in srgb,#ffffff 5%,transparent) inset,
+              0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+    /* radius family */
+    --r-lg:18px;--r-md:13px;--r-sm:9px;--r-pill:999px}
+
+  /* ---- header ---- */
+  .fit-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:24px 32px 4px}
+  .fit-over{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--lime);
+    font-weight:600;font-feature-settings:"tnum" 1}
+  .fit-h1{font-family:var(--font-serif);font-size:32px;font-weight:500;letter-spacing:-.02em;
+    margin-top:5px;line-height:1.02;color:#fff}
+  .fit-sub{color:var(--ink-2);font-size:13.5px;margin-top:7px;display:flex;align-items:center;gap:8px}
+  .fit-sub b{color:var(--ink);font-weight:600;font-family:var(--font-mono);font-feature-settings:"tnum" 1;letter-spacing:-.01em}
+  .fit-sub .dot{width:3px;height:3px;border-radius:50%;background:color-mix(in srgb,var(--ink-2) 60%,transparent)}
+  .fit-ringwrap{display:flex;align-items:center;gap:12px;flex:none}
+  .fit-ringmeta{text-align:right}
+  .fit-ringmeta .rv{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+  .fit-ringmeta .rl{font-size:10.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;margin-top:1px}
+  .fit-ring{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;flex:none;
+    background:conic-gradient(var(--lime) 0 78%,var(--inset-2) 78% 100%);
+    box-shadow:0 0 0 1px var(--line) inset,0 6px 16px -8px color-mix(in srgb,var(--lime) 50%,transparent)}
+  .fit-ring i{width:46px;height:46px;border-radius:50%;background:#15171b;display:grid;place-items:center;
+    font-family:var(--font-mono);font-size:13px;font-weight:600;font-style:normal;color:#fff;
+    box-shadow:0 0 0 1px var(--line-2) inset}
+
+  /* ---- stat row ---- */
+  .fit-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:18px 32px 6px}
+  .fit-stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
+    padding:12px 14px 13px;box-shadow:var(--el-card)}
+  .fit-stat .n{font-family:var(--font-mono);font-size:22px;font-weight:600;letter-spacing:-.02em;
+    color:var(--ink);font-feature-settings:"tnum" 1;line-height:1}
+  .fit-stat .n small{font-family:var(--font-ui);font-size:12px;font-weight:500;color:var(--mut);margin-left:3px}
+  .fit-stat .l{font-size:11px;color:var(--mut);margin-top:6px;text-transform:uppercase;letter-spacing:.07em;font-weight:500}
+
+  /* ---- main grid ---- */
+  .fit-main{display:grid;grid-template-columns:1.55fr 1fr;gap:12px;padding:14px 32px 10px;min-height:0}
+  .fit-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+    padding:16px;display:flex;flex-direction:column;box-shadow:var(--el-card)}
+  .fit-card h3{font-size:11px;font-weight:600;color:var(--mut);text-transform:uppercase;
+    letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:baseline;gap:8px}
+  .fit-card h3 .trend{margin-left:auto;color:var(--lime);font-family:var(--font-mono);
+    font-size:11px;letter-spacing:0;text-transform:none;font-weight:600}
+  .fit-chart{flex:1;min-height:108px}
+  .fit-splits{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:12px}
+  .fit-split{text-align:center;background:var(--inset);border:1px solid var(--line-2);
+    border-radius:var(--r-sm);padding:9px 2px}
+  .fit-split.best{border-color:color-mix(in srgb,var(--lime) 40%,transparent);
+    background:color-mix(in srgb,var(--lime) 9%,var(--inset))}
+  .fit-split .p{font-family:var(--font-mono);font-weight:600;font-size:13px;color:var(--ink);
+    font-feature-settings:"tnum" 1;letter-spacing:-.01em}
+  .fit-split.best .p{color:var(--lime)}
+  .fit-split .m{font-size:10px;color:var(--mut);margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+
+  /* ---- upcoming ---- */
+  .fit-up{display:flex;flex-direction:column;gap:8px}
+  .fit-upi{display:flex;align-items:center;gap:11px;padding:7px 9px;border-radius:var(--r-sm);
+    background:var(--inset);border:1px solid var(--line-2)}
+  .fit-upi .d{width:32px;height:32px;border-radius:var(--r-sm);background:#15171b;display:grid;
+    place-items:center;flex:none;color:var(--lime)}
+  .fit-upi .d svg{width:16px;height:16px}
+  .fit-upi .meta{min-width:0;line-height:1.25}
+  .fit-upi .t{font-size:13px;font-weight:600;color:var(--ink)}
+  .fit-upi .t b{font-weight:600;color:var(--lime)}
+  .fit-upi .s{font-size:11.5px;color:var(--mut);margin-top:1px}
+  .fit-upi .v{margin-left:auto;font-family:var(--font-mono);font-size:12px;font-weight:600;
+    color:var(--ink-2);flex:none;font-feature-settings:"tnum" 1}
+
+  /* ---- week bars ---- */
+  .fit-week{display:flex;align-items:flex-end;gap:6px;height:84px;margin-top:auto;padding-top:12px}
+  .fit-weekcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+  .fit-weekcol .bar{width:100%;border-radius:4px 4px 2px 2px;background:var(--inset-2);min-height:4px}
+  .fit-weekcol.on .bar{background:var(--lime)}
+  .fit-weekcol .dl{font-size:9.5px;color:var(--mut);letter-spacing:.04em;text-transform:uppercase}
+  .fit-weekcol.on .dl{color:var(--lime);font-weight:600}
+
+  /* ---- bottom: ask + tabs ---- */
+  .fit-bottom{padding:8px 32px 18px}
+  .fit-ask{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);
+    border-radius:var(--r-pill);padding:11px 16px;color:var(--mut);font-size:13.5px;margin-bottom:14px;
+    box-shadow:var(--el-card)}
+  .fit-ask .pl{width:7px;height:7px;border-radius:50%;background:var(--lime);flex:none;
+    box-shadow:0 0 0 3px color-mix(in srgb,var(--lime) 18%,transparent)}
+  .fit-ask .sp{flex:1}
+  .fit-ask .mic{width:18px;height:18px;color:var(--ink-2)}
+  .fit-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .fit-tab{display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--mut);
+    font-size:11px;font-weight:500;letter-spacing:.01em;padding:4px 0}
+  .fit-tab svg{width:21px;height:21px}
+  .fit-tab.on{color:var(--lime)}
+
+  /* ---- motion: choreographed entrance + hover affordances ---- */
+  @media (prefers-reduced-motion:no-preference){
+    .fit-top,.fit-stat,.fit-card,.fit-ask,.fit-tabs{opacity:0}
+    #stage.show-after .fit-top{animation:fit-rise .5s var(--ease) both}
+    #stage.show-after .fit-stat{animation:fit-rise .5s var(--ease) both}
+    #stage.show-after .fit-stat:nth-child(1){animation-delay:.06s}
+    #stage.show-after .fit-stat:nth-child(2){animation-delay:.10s}
+    #stage.show-after .fit-stat:nth-child(3){animation-delay:.14s}
+    #stage.show-after .fit-stat:nth-child(4){animation-delay:.18s}
+    #stage.show-after .fit-main .fit-card:nth-child(1){animation:fit-rise .55s var(--ease) both;animation-delay:.22s}
+    #stage.show-after .fit-main .fit-card:nth-child(2){animation:fit-rise .55s var(--ease) both;animation-delay:.28s}
+    #stage.show-after .fit-ask{animation:fit-rise .5s var(--ease) both;animation-delay:.34s}
+    #stage.show-after .fit-tabs{animation:fit-rise .5s var(--ease) both;animation-delay:.38s}
+    .fit-stat,.fit-tab,.fit-ask,.fit-upi{transition:transform .25s var(--ease),border-color .25s var(--ease),color .25s var(--ease)}
+    .fit-stat:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--lime) 28%,var(--line))}
+    .fit-upi:hover{border-color:color-mix(in srgb,var(--lime) 24%,var(--line-2))}
+    .fit-tab:not(.on):hover{color:var(--ink-2)}
+    .fit-ask:hover{border-color:color-mix(in srgb,var(--lime) 22%,var(--line))}
+  }
+  @keyframes fit-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div id="stage" data-prompt="make this my running coach" data-persona="Runner&rsquo;s Coach">
+
+  <!-- ============ BEFORE: faithful Claude desktop (reuse across demos) ============ -->
+  <section class="screen" id="before">
+    <div class="cd-app">
+      <aside class="cd-sidebar">
+        <div class="cd-brand">
+          <span class="mark"><span class="ast" style="width:20px;height:20px;display:block"></span></span>
+          <span class="name">Claude</span><span class="sp"></span>
+        </div>
+        <div class="cd-newchat"><span class="plus ast" style="width:14px;height:14px"></span> New chat</div>
+        <div class="cd-seclabel">Recents</div>
+        <div class="cd-row sel"><span class="dot clay"></span><span>Marathon training plan</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Weeknight dinner ideas</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Trip to Kyoto in spring</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Resume feedback</span></div>
+        <div class="cd-row"><span class="dot"></span><span>Budget for Q3</span></div>
+        <div class="cd-spacer"></div>
+        <div class="cd-account"><span class="av">RN</span><span class="who">Rahul</span><span class="plan">· Max</span></div>
+      </aside>
+      <div class="cd-main">
+        <div class="cd-topbar"><span class="crumb"><b>Personal</b></span><span class="sp"></span></div>
+        <div class="cd-convo"><div class="cd-col">
+          <div class="cd-user">What weekly mileage should I start with for a spring marathon?</div>
+          <div class="cd-assistant">
+            <p>For a spring race, a gentle on-ramp is around <b>15&ndash;20 miles a week</b>, spread over three or four runs. Keep most of them easy and conversational, add one slightly longer weekend run, and only grow your weekly total by about ten percent at a time.</p>
+            <p>Once that feels comfortable, we can layer in a weekly tempo session and start building toward your long run.</p>
+          </div>
+        </div></div>
+        <div class="cd-composerwrap">
+          <div class="cd-composer">
+            <div class="cd-prompt" id="cdPrompt" data-ph="Reply to Claude&hellip;"></div>
+            <div class="cd-comprow">
+              <span class="cd-iconbtn">+</span>
+              <span class="sp"></span>
+              <span class="cd-work"><span class="cd-spark working"><i></i></span> Working&hellip;</span>
+              <span class="cd-model">Opus 4.8 (1M context) &middot; Fast</span>
+              <span class="cd-send"><svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M12 5l-6 6M12 5l6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </div>
+          <div class="cd-foot">Claude is AI and can make mistakes. Please double-check responses.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AFTER: Runner's Coach ============ -->
+  <section class="screen" id="after">
+    <div class="fit">
+      <div class="fit-top">
+        <div>
+          <div class="fit-over">Today &middot; Tuesday, Jun 16</div>
+          <div class="fit-h1">Tempo Run</div>
+          <div class="fit-sub">6 miles<span class="dot"></span>target <b>8:20</b>/mi<span class="dot"></span><b>18</b> days to race</div>
+        </div>
+        <div class="fit-ringwrap">
+          <div class="fit-ringmeta"><div class="rv">Week 11 / 16</div><div class="rl">Plan progress</div></div>
+          <div class="fit-ring"><i>78%</i></div>
+        </div>
+      </div>
+      <div class="fit-stats">
+        <div class="fit-stat"><div class="n">32.4<small>mi</small></div><div class="l">This week</div></div>
+        <div class="fit-stat"><div class="n">14<small>days</small></div><div class="l">Streak</div></div>
+        <div class="fit-stat"><div class="n">52<small>bpm</small></div><div class="l">Resting HR</div></div>
+        <div class="fit-stat"><div class="n">48<small>VO&#8322;</small></div><div class="l">Fitness</div></div>
+      </div>
+      <div class="fit-main">
+        <div class="fit-card">
+          <h3>Pace &middot; last 6 runs<span class="trend">&minus;0:44 avg</span></h3>
+          <svg class="fit-chart" viewBox="0 0 360 130" preserveAspectRatio="none">
+            <defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#c8f24a" stop-opacity=".30"/><stop offset="1" stop-color="#c8f24a" stop-opacity="0"/>
+            </linearGradient></defs>
+            <line x1="0" y1="32" x2="360" y2="32" stroke="#ffffff0d"/>
+            <line x1="0" y1="74" x2="360" y2="74" stroke="#ffffff0d"/>
+            <line x1="0" y1="116" x2="360" y2="116" stroke="#ffffff0d"/>
+            <path d="M0,96 L72,82 L144,90 L216,58 L288,64 L360,38 L360,130 L0,130 Z" fill="url(#lg)"/>
+            <path d="M0,96 L72,82 L144,90 L216,58 L288,64 L360,38" fill="none" stroke="#c8f24a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="360" cy="38" r="4.5" fill="#c8f24a"/>
+            <circle cx="360" cy="38" r="8" fill="none" stroke="#c8f24a" stroke-opacity=".35" stroke-width="1.5"/>
+          </svg>
+          <div class="fit-splits">
+            <div class="fit-split"><div class="p">8:42</div><div class="m">Mi 1</div></div>
+            <div class="fit-split"><div class="p">8:21</div><div class="m">Mi 2</div></div>
+            <div class="fit-split"><div class="p">8:18</div><div class="m">Mi 3</div></div>
+            <div class="fit-split"><div class="p">8:15</div><div class="m">Mi 4</div></div>
+            <div class="fit-split"><div class="p">8:09</div><div class="m">Mi 5</div></div>
+            <div class="fit-split best"><div class="p">7:58</div><div class="m">Mi 6</div></div>
+          </div>
+        </div>
+        <div class="fit-card">
+          <h3>Up next<span class="trend">3 runs</span></h3>
+          <div class="fit-up">
+            <div class="fit-upi"><span class="d"><svg viewBox="0 0 24 24" fill="none"><path d="M6 19l3-7 4 2 2-5 3 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="meta"><div class="t"><b>Wed</b> Easy run</div><div class="s">Recovery pace</div></span><span class="v">4 mi</span></div>
+            <div class="fit-upi"><span class="d"><svg viewBox="0 0 24 24" fill="none"><path d="M13 3L5 13h6l-1 8 8-10h-6l1-8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span><span class="meta"><div class="t"><b>Fri</b> Intervals</div><div class="s">6 &times; 800m</div></span><span class="v">5 mi</span></div>
+            <div class="fit-upi"><span class="d"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l2.5 5.3L20 9l-4 4 1 6-5-2.8L7 19l1-6-4-4 5.5-.7L12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span><span class="meta"><div class="t"><b>Sun</b> Long run</div><div class="s">Peak week</div></span><span class="v">14 mi</span></div>
+          </div>
+          <div class="fit-week">
+            <div class="fit-weekcol on"><div class="bar" style="height:48%"></div><div class="dl">M</div></div>
+            <div class="fit-weekcol on"><div class="bar" style="height:30%"></div><div class="dl">T</div></div>
+            <div class="fit-weekcol"><div class="bar" style="height:55%"></div><div class="dl">W</div></div>
+            <div class="fit-weekcol"><div class="bar" style="height:24%"></div><div class="dl">T</div></div>
+            <div class="fit-weekcol"><div class="bar" style="height:62%"></div><div class="dl">F</div></div>
+            <div class="fit-weekcol"><div class="bar" style="height:14%"></div><div class="dl">S</div></div>
+            <div class="fit-weekcol"><div class="bar" style="height:100%"></div><div class="dl">S</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="fit-bottom">
+        <div class="fit-ask"><span class="pl"></span><span>Ask your coach &mdash; &ldquo;how should I pace Sunday&rsquo;s long run?&rdquo;</span><span class="sp"></span><svg class="mic" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z" stroke="currentColor" stroke-width="1.8"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <div class="fit-tabs">
+          <div class="fit-tab on"><svg viewBox="0 0 24 24" fill="none"><path d="M4 13l8-8 8 8M6 11v8h12v-8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Today</div>
+          <div class="fit-tab"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M4 9h16M9 3v4M15 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Plan</div>
+          <div class="fit-tab"><svg viewBox="0 0 24 24" fill="none"><path d="M5 19V5a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v14M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Log</div>
+          <div class="fit-tab"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M5 20a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Coach</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="morph-fx"><div class="morph-band"></div></div>
+  <div class="caption"><span class="cap-prompt"></span><span class="cap-arrow">&rarr;</span><span class="cap-name"></span></div>
+  <button class="replay" id="replay" aria-label="Replay">&#8634;</button>
+</div>
+<script src="../shared/morph.js"></script>
+</body>
+</html>
