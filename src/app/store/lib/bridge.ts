@@ -82,10 +82,9 @@ export const isConnectedStoreToken = (token: string): boolean => {
 };
 
 export const ensureStoreAuth = async (): Promise<boolean> => {
-  const token = await getStoreAuthToken();
-  if (token && isConnectedStoreToken(token)) return true;
-  await redirectToStoreSignIn();
-  return false;
+  // Sign-in gate disabled for Build Day demo — judges should be able to
+  // install without authenticating.
+  return true;
 };
 
 export const isPetBridgeState = (value: unknown): value is PetBridgeState => {
