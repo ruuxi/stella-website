@@ -239,3 +239,46 @@
   border: 0;
   display: block;
 }
+
+/* Instructions-for-Claude paste block */
+.cb-copybox {
+  position: relative;
+  border: 1px solid var(--page-border-strong);
+  border-radius: var(--page-radius);
+  background: var(--page-quote);
+}
+
+.cb-copybox__text {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  padding-right: 5rem;
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(0.72rem, 1.2vw, 0.82rem);
+  line-height: 1.65;
+  color: var(--page-foreground);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.cb-copybox__copy {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--page-background);
+  color: var(--page-foreground);
+  border: 1px solid var(--page-border-strong);
+  border-radius: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  font-family: var(--font-sans), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.cb-copybox__copy:hover {
+  background: var(--page-quote);
+}

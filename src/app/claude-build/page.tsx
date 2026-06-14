@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { CommandBox } from "./command-box";
+import { CommandBox, CopyBox } from "./command-box";
 import { MorphEmbed } from "./morph-embed";
 import "./claude-build.css";
 
@@ -14,6 +14,37 @@ export const metadata: Metadata = {
 
 const SETUP_COMMAND =
   "curl -fsSL https://raw.githubusercontent.com/ruuxi/stella/claude-redesign/setup.sh | bash";
+
+const CLAUDE_INSTRUCTIONS = `Set up and run Stella for me, a self-modifying desktop app.
+
+1. Clone into my home folder:
+   git clone -b claude-redesign https://github.com/ruuxi/stella ~/stella
+   git clone -b master https://github.com/ruuxi/stella-website ~/stella-website
+
+2. Write ~/stella/.env.local:
+   CONVEX_DEPLOYMENT=dev:impartial-crab-34
+   VITE_CONVEX_URL=https://impartial-crab-34.convex.cloud
+   VITE_CONVEX_SITE_URL=https://impartial-crab-34.convex.site
+   STELLA_SELF_MOD_HMR_MODE=deferred
+
+3. Write ~/stella/desktop/.env.local:
+   VITE_CONVEX_URL=https://impartial-crab-34.convex.cloud
+   VITE_CONVEX_SITE_URL=https://impartial-crab-34.convex.site
+   VITE_SITE_URL=http://localhost:57314/
+   VITE_TWITCH_EMOTE_TWITCH_ID=40934651
+   STELLA_STORE_WEB_URL=http://localhost:3000/store
+
+4. Write ~/stella-website/.env.local:
+   NEXT_PUBLIC_CONVEX_URL=https://impartial-crab-34.convex.cloud
+   NEXT_PUBLIC_CONVEX_SITE_URL=https://impartial-crab-34.convex.site
+
+5. Run \`bun install\` in both ~/stella and ~/stella-website.
+
+6. Start the website in the background: from ~/stella-website run \`bun run dev\` (it serves http://localhost:3000).
+
+7. Launch the desktop app: from ~/stella run \`bun run electron:dev\`, then tell me when the window opens.
+
+Requires macOS, git, and bun (https://bun.sh).`;
 
 export default function ClaudeBuildPage() {
   return (
@@ -43,7 +74,14 @@ export default function ClaudeBuildPage() {
           .
         </p>
 
-        <p className="cb-section-label">Run this</p>
+        <p className="cb-section-label">Have Claude set it up</p>
+        <CopyBox text={CLAUDE_INSTRUCTIONS} />
+        <p className="cb-hint">
+          Paste this into Claude (Claude Code, or any coding agent) and it will
+          clone, configure, and launch everything for you.
+        </p>
+
+        <p className="cb-section-label">Or run it yourself</p>
         <CommandBox command={SETUP_COMMAND} />
         <p className="cb-hint">
           Paste it into a terminal. First launch takes a few minutes while it
