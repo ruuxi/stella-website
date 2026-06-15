@@ -177,7 +177,19 @@
   opacity: 0.65;
 }
 
-.googleIcon {
+.appleButton {
+  background: #000;
+  border-color: #000;
+  color: #fff;
+}
+
+.appleButton:hover {
+  background: #1a1a1a;
+  border-color: #1a1a1a;
+}
+
+.googleIcon,
+.appleIcon {
   width: 1.125rem;
   height: 1.125rem;
   flex: 0 0 auto;

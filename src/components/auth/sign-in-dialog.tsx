@@ -18,7 +18,7 @@ import { clearCachedToken } from "@/lib/auth-token";
 import { useMagicLinkAuth } from "@/lib/use-magic-link-auth";
 import { isConvexConfigured } from "@/lib/convex-urls";
 import formStyles from "@/app/sign-in/sign-in.module.css";
-import { GoogleSignInButton } from "./google-sign-in-button";
+import { SocialSignInButtons } from "./social-sign-in-buttons";
 import styles from "./sign-in-dialog.module.css";
 
 const AUTH_TOKEN_PATTERN = /^[A-Za-z0-9._~-]{8,2048}$/;
@@ -216,11 +216,11 @@ function DialogBody({ onClose }: { onClose: () => void }) {
         <>
           <h2 className={formStyles.title}>Sign in to Stella</h2>
           <p className={formStyles.subtitle}>
-            Use Google or enter your email and we&apos;ll send you a one-time
-            sign-in link. No password needed.
+            Use Apple, Google, or enter your email and we&apos;ll send you a
+            one-time sign-in link. No password needed.
           </p>
 
-          <GoogleSignInButton />
+          <SocialSignInButtons />
 
           <div className={formStyles.methodDivider}>
             <span>or use email</span>
