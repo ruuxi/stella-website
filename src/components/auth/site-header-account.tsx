@@ -2,7 +2,10 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useCallback, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { clearCachedToken } from "@/lib/auth-token";
 import { useDesktopBridgeAuthUser } from "@/lib/desktop-bridge-auth";
 import { isConvexConfigured } from "@/lib/convex-urls";
 import { useSignInDialog } from "./sign-in-dialog";
@@ -46,19 +49,62 @@ function InnerImpl() {
   const isSignedIn = Boolean(user) && user?.isAnonymous !== true;
 
   if (isSignedIn && user) {
-    const label = user.name?.trim() || user.email?.trim() || "Account";
-    return (
-      <Link
-        className="site-nav__signin"
-        href="/billing"
-        aria-label="Manage your Stella account"
-      >
-        {label}
-      </Link>
-    );
+    return <AccountMenu user={user} />;
   }
 
   return <SignInButton />;
+}
+
+/**
+ * Signed-in account control: a hover/focus popover (reusing the primary nav's
+ * `site-nav__group` styling) that links to billing and offers a sign-out
+ * action. The popover is right-aligned so it stays inside the viewport at the
+ * far-right edge of the header.
+ */
+function AccountMenu({ user }: { user: SessionUser }) {
+  const label = user.name?.trim() || user.email?.trim() || "Account";
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleSignOut = useCallback(async () => {
+    setSigningOut(true);
+    try {
+      await authClient.signOut();
+      clearCachedToken();
+    } catch {
+      // Drop the cached token regardless so the client stops presenting a
+      // stale session; the session hook re-renders to the signed-out state.
+      clearCachedToken();
+    } finally {
+      setSigningOut(false);
+    }
+  }, []);
+
+  return (
+    <div className="site-nav__group">
+      <button
+        type="button"
+        className="site-nav__trigger"
+        aria-haspopup="true"
+        aria-label="Account menu"
+      >
+        {label}
+        <ChevronDown size={13} aria-hidden="true" />
+      </button>
+      <div className="site-nav__menu site-nav__menu--end">
+        <div className="site-nav__panel">
+          <Link href="/billing">Manage account</Link>
+          <button
+            type="button"
+            className="site-nav__panel-action"
+            onClick={() => void handleSignOut()}
+            disabled={signingOut}
+          >
+            {signingOut ? "Signing out…" : "Sign out"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function SignInButton({

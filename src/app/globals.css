@@ -511,6 +511,41 @@ html[data-embedded="true"] .site-header {
   color: var(--page-foreground);
 }
 
+/* Right-anchored popover variant for the account menu at the header's edge. */
+.site-nav__menu--end {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+.site-nav__panel-action {
+  display: block;
+  width: 100%;
+  text-align: left;
+  appearance: none;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  padding: 0.5rem 0.7rem;
+  border-radius: calc(var(--page-radius) - 0.15rem);
+  color: var(--page-foreground);
+  font-size: 0.82rem;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.site-nav__panel-action:hover {
+  background: rgba(18, 18, 15, 0.05);
+}
+
+.site-nav__panel-action:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .site-nav__sheet-group + .site-nav__sheet-group {
   margin-top: 0.35rem;
   padding-top: 0.35rem;
