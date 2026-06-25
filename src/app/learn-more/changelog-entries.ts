@@ -24,6 +24,56 @@ export type ChangelogEntry = {
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    release: "v0.0.351 – v0.0.354",
+    date: "June 25, 2026",
+    tags: ["New", "Polish"],
+    highlights: [
+      "A redesigned workspace — the full window is now a cleaner main-and-side layout, with a collapsible left sidebar and a single floating display panel.",
+      "The left sidebar got a tidy-up: your plan shows next to your name, sections stay short with 'View all' on hover, and the account row was reworked.",
+      "Web search results now show images right in the chat.",
+    ],
+    more: [
+      "Smoother chat: streaming replies glide in, auto-scroll follows along naturally, and the view no longer jumps when you send while scrolled up.",
+      "Chat headings are clearly larger than body text, with cleaner list spacing.",
+      "The model picker is simpler — a default plus real-model overrides.",
+      "Models open in a quick popover that warms up as you reach for it.",
+      "Stella has better memory recall while you work.",
+      "Composer gained a New Chat action, and the running-tasks chip and cadence reports were removed for a calmer interface.",
+      "The pasted-text chip now shows its content on hover in sent messages too.",
+    ],
+  },
+  {
+    release: "v0.0.348 – v0.0.350",
+    date: "June 13, 2026",
+    tags: ["New", "Polish"],
+    highlights: [
+      "Canvas library — a home for all the pages Stella builds for you.",
+      "Stella can group related work, search past conversations, and run multi-step workflows.",
+    ],
+    more: [
+      "Stella no longer leaves background processes running after you close it.",
+      "Store installs are safer, skipping protected files, and uninstalls are more reliable.",
+      "Better conversation search that ranks by how well things match.",
+      "Screen-capture failures now show a clear message, with a fallback.",
+      "The launch screen colors match the Pearl and Noir themes.",
+      "Retired the old apps gallery in favor of the simpler Apps page.",
+    ],
+  },
+  {
+    release: "v0.0.345 – v0.0.347",
+    date: "June 10, 2026",
+    tags: ["New", "Polish"],
+    highlights: [
+      "Paste images straight into the composer, or attach them by path.",
+    ],
+    more: [
+      "Attaching and sending lots of images is much faster, with smarter resizing for big pictures.",
+      "Oversized images are handled gracefully so Stella can still view them.",
+      "Streaming text wraps up cleanly even when Stella pauses to use a tool.",
+      "Tasks no longer flash 'Done' in the middle of a longer job.",
+    ],
+  },
+  {
     release: "v0.0.343 – v0.0.344",
     date: "June 10, 2026",
     tags: ["New", "Polish"],
