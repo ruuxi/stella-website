@@ -5,7 +5,7 @@
  *   - https://stella.sh/docs/media          (overview)
  *   - https://stella.sh/docs/media/images   (image generation + edit)
  *   - https://stella.sh/docs/media/video    (image-to-video, video-to-video, extend)
- *   - https://stella.sh/docs/media/audio    (TTS, sound effects, transcription, separation)
+ *   - https://stella.sh/docs/media/audio    (audio generation, transcription, separation)
  *   - https://stella.sh/docs/media/music    (text-to-music)
  *   - https://stella.sh/docs/media/3d       (text-to-3d)
  *
@@ -146,7 +146,7 @@ const KIND_DESCRIPTIONS: Record<MediaDocsKind, string> = {
   images: "image generation and editing",
   video: "image-to-video, video extension, and video-to-video",
   audio:
-    "speech-to-text, text-to-dialogue, sound effects, and audio separation",
+    "audio generation (speech, dialogue, sound effects, ambient), speech-to-text, and audio separation",
   music: "text-to-music generation",
   "3d": "text-to-3d asset generation",
 };
@@ -276,27 +276,34 @@ curl -X POST "$STELLA_API/api/media/v1/generate" \\
 const SECTION_AUDIO = `
 ## Capabilities
 
-### \`text_to_dialogue\` — speak a script
+### \`audio_generation\` — speech, dialogue, sound effects, ambient
 
-- Single profile (\`default\`).
-- Convenience field: \`prompt\` is mapped to the provider's \`text\` field.
-- Useful \`input\` hints: voice settings, speaker mapping for multi-voice scripts.
+- Single profile (\`default\`); ByteDance Seed Audio 1.0. One model for any non-music audio — spoken lines, multi-speaker dialogue, Foley/sound effects, and background ambience. For music, use \`text_to_music\`.
+- Convenience field: \`prompt\` describes what to generate.
+- Useful \`input\` overrides: \`voice\` (preset voice id), \`audio_urls\` (up to 3 reference clips for voice cloning — reference them inline in the prompt as \`@Audio1\`/\`@Audio2\`/\`@Audio3\`), \`image_url\` (single reference image; can't be combined with audio refs), \`output_format\` (\`wav\` | \`mp3\` | \`pcm\` | \`ogg_opus\`), \`sample_rate\`, \`speed\`, \`volume\`, \`pitch\`.
 
 \`\`\`bash
 curl -X POST "$STELLA_API/api/media/v1/generate" \\
   -H "Authorization: Bearer $STELLA_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "capability": "text_to_dialogue",
+    "capability": "audio_generation",
     "prompt": "Welcome to Stella. How can I help today?"
   }'
 \`\`\`
 
-### \`sound_effects\` — Foley / sfx from text
+For a sound effect or ambience, just describe it:
 
-- Single profile (\`default\`).
-- Convenience field: \`prompt\` → provider \`text\`.
-- Required \`input\` hint: \`duration_seconds\` (gateway requires it for billing).
+\`\`\`bash
+curl -X POST "$STELLA_API/api/media/v1/generate" \\
+  -H "Authorization: Bearer $STELLA_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "capability": "audio_generation",
+    "prompt": "heavy rain on a tin roof with distant thunder",
+    "input": { "output_format": "wav" }
+  }'
+\`\`\`
 
 ### \`speech_to_text\` — transcribe audio
 
