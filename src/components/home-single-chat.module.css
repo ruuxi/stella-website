@@ -167,6 +167,10 @@
   display: grid;
   flex: 1;
   grid-template-rows: minmax(0, 1fr) auto;
+  /* Pin the single column to the window width. Without an explicit column the
+     implicit track is content-sized, so the nowrap typed request in the
+     composer would stretch it — and the composer pill — as it grows. */
+  grid-template-columns: minmax(0, 1fr);
   width: 100%;
   min-width: 0;
   padding: 10px 18px 16px;
@@ -179,7 +183,7 @@
   width: 100%;
   max-width: min(23.5rem, 100%);
   margin: 0 auto;
-  padding-bottom: 14px;
+  padding-bottom: 28px;
   overflow: hidden;
   mask-image: linear-gradient(180deg, transparent 0, #000 14%);
   -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%);
@@ -198,6 +202,10 @@
 .entry {
   display: grid;
   grid-template-rows: 0fr;
+  /* Isolate each row's height animation so reflow/repaint doesn't cascade to
+     the rest of the transcript and window, which is what made it feel laggy. */
+  contain: layout paint;
+  will-change: grid-template-rows;
   animation: entryGrow 440ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -207,6 +215,8 @@
   min-height: 0;
   overflow: hidden;
   padding-top: 10px;
+  transform: translateZ(0);
+  will-change: transform, opacity;
   animation: entryFade 360ms cubic-bezier(0.22, 1, 0.36, 1) 90ms both;
 }
 
