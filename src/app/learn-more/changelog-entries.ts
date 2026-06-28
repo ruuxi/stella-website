@@ -24,6 +24,26 @@ export type ChangelogEntry = {
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    release: "v0.0.355 – v0.0.361",
+    date: "June 28, 2026",
+    tags: ["New", "Polish"],
+    highlights: [
+      "When Stella keeps working in the background, you now see a live card in the chat (and a small activity pill in the composer) so you always know what's running.",
+      "The activity list shows rolling progress summaries for each task as it goes.",
+      "Finished reports from Stella now render as a polished page right in the chat.",
+      "The branded Stella mode picker is back, including Vision for image-aware chats.",
+    ],
+    more: [
+      "Chat no longer shakes or bounces when the side panel slides open.",
+      "On Windows, the window controls moved up to the top-right next to the panel toggles.",
+      "Chat cards blend more cleanly into the surface around them.",
+      "Updated audio generation for Stella's media.",
+      "Light and Dark themes no longer show stray gradient blobs.",
+      "Fixed a clipped bottom edge on icon-only message rows.",
+      { text: "Stella for iPhone stays in sync with background work on your desktop, with more reliable sign-in.", product: "Mobile" },
+    ],
+  },
+  {
     release: "v0.0.351 – v0.0.354",
     date: "June 25, 2026",
     tags: ["New", "Polish"],
