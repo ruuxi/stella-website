@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import { openSignInDialog } from "@/components/auth/sign-in-dialog";
 import { isConvexConfigured } from "@/lib/convex-urls";
 
-type BillingPlan = "free" | "go" | "pro" | "plus" | "ultra";
+type BillingPlan = "free" | "go" | "pro" | "plus" | "ultra" | "max";
 type PaidBillingPlan = Exclude<BillingPlan, "free">;
 
 type BillingPlanConfig = {
@@ -100,7 +100,14 @@ const createUsageCreditCheckoutSession = makeFunctionReference<
   CheckoutSessionPayload
 >("billing:createUsageCreditCheckoutSession");
 
-const PLAN_ORDER: BillingPlan[] = ["free", "go", "pro", "plus", "ultra"];
+const PLAN_ORDER: BillingPlan[] = [
+  "free",
+  "go",
+  "pro",
+  "plus",
+  "ultra",
+  "max",
+];
 const RECOMMENDED_PLAN: BillingPlan = "pro";
 
 const STATIC_PLAN_DISPLAY: Record<
@@ -112,6 +119,7 @@ const STATIC_PLAN_DISPLAY: Record<
   pro: { label: "Pro", monthlyPriceCents: 6_000 },
   plus: { label: "Plus", monthlyPriceCents: 10_000 },
   ultra: { label: "Ultra", monthlyPriceCents: 20_000 },
+  max: { label: "Stella Max", monthlyPriceCents: 100_000 },
 };
 
 const PLAN_USAGE_TAGLINE: Record<BillingPlan, string> = {
@@ -120,6 +128,7 @@ const PLAN_USAGE_TAGLINE: Record<BillingPlan, string> = {
   pro: "3x the usage of Go",
   plus: "5x the usage of Go",
   ultra: "10x the usage of Go",
+  max: "50x the usage of Go",
 };
 
 const BASE_PLAN_FEATURES: readonly string[] = [
@@ -136,11 +145,16 @@ const PRIORITY_PLAN_FEATURE = "Higher priority, increased speeds";
 // to your username on Store posts. Free doesn't get it.
 const VERIFIED_BADGE_FEATURE = "Verified creator badge on the Store";
 
-const PRIORITY_PLANS = new Set<BillingPlan>(["pro", "plus", "ultra"]);
-const PAID_PLANS = new Set<BillingPlan>(["go", "pro", "plus", "ultra"]);
+// The Stella Max plan makes the flagship Stella Max model mode (Claude
+// Fable 5) its default. Called out at the top of the Max card.
+const MAX_MODEL_FEATURE = "Stella Max model (Claude Fable 5) by default";
+
+const PRIORITY_PLANS = new Set<BillingPlan>(["pro", "plus", "ultra", "max"]);
+const PAID_PLANS = new Set<BillingPlan>(["go", "pro", "plus", "ultra", "max"]);
 
 const getPlanFeatures = (plan: BillingPlan): readonly string[] => {
   const features: string[] = [];
+  if (plan === "max") features.push(MAX_MODEL_FEATURE);
   if (PRIORITY_PLANS.has(plan)) features.push(PRIORITY_PLAN_FEATURE);
   features.push(...BASE_PLAN_FEATURES);
   if (PAID_PLANS.has(plan)) features.push(VERIFIED_BADGE_FEATURE);
