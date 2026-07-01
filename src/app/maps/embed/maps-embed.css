@@ -1,0 +1,68 @@
+/* /maps/embed — fills whatever frame hosts it (desktop iframe card, mobile
+   WebView). No site chrome; the map is the whole page. */
+
+.maps-embed-root,
+.maps-embed-fallback {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #e8eaed;
+}
+
+.maps-embed-root[data-mode="dark"],
+[data-embedded="true"] .maps-embed-fallback {
+  background: #1a2230;
+}
+
+.maps-embed-map {
+  position: absolute;
+  inset: 0;
+}
+
+.maps-embed-error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 13px;
+  color: #5f6368;
+  background: inherit;
+}
+
+.maps-embed-root[data-mode="dark"] .maps-embed-error {
+  color: #9aa4b2;
+}
+
+/* Marker info window content (injected as HTML by the client). */
+.maps-embed-info {
+  max-width: 220px;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  display: grid;
+  gap: 2px;
+  padding: 2px 2px 4px;
+}
+
+.maps-embed-info-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #202124;
+}
+
+.maps-embed-info-rating {
+  font-size: 12px;
+  color: #b06000;
+}
+
+.maps-embed-info-rating span {
+  color: #5f6368;
+}
+
+.maps-embed-info-address {
+  font-size: 12px;
+  line-height: 1.35;
+  color: #5f6368;
+}
